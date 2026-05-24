@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+    <main>
+        <h1>Intelligence Artificielle</h1>
+        <p>Du machine learning classique aux LLMs et à l'AI Security.</p>
+
+        <details>
+            <summary>Fondamentaux du machine learning</summary>
+            <ul class="article-list">
+                <li><em>Aucun article publié pour l'instant.</em></li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>LLMs & NLP</summary>
+            <ul class="article-list">
+                <li><em>Aucun article publié pour l'instant.</em></li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>AI Security</summary>
+            <ul class="article-list">
+                <li><em>Aucun article publié pour l'instant.</em></li>
+            </ul>
+        </details>
+    </main>
+</Layout>
+
+<style>
+    main { margin: auto; padding: 1rem; width: 1200px; max-width: calc(100% - 2rem); }
+
+    details {
+        background: #f4f4f4;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        overflow: hidden;
+    }
+
+    summary {
+        padding: 1rem;
+        cursor: pointer;
+        font-weight: bold;
+        background-color: #eee;
+        position: relative;
+        list-style: none;
+    }
+
+    summary:hover { background-color: #e2e2e2; }
+    summary::after { content: '+'; position: absolute; right: 20px; font-weight: bold; }
+    details[open] summary::after { content: '-'; }
+
+    .article-list { padding: 1rem 2rem; margin: 0; }
+    .article-list li { margin-bottom: 0.5rem; }
+    .article-list a { text-decoration: none; color: #333; }
+    .article-list a:hover { color: #5a41dc; text-decoration: underline; }
+</style>

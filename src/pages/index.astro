@@ -1,11 +1,95 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+    <main>
+        <h1>Vizion Blog</h1>
+        <p class="intro">
+            Journal de progression vers l'<strong>AI Security Engineering</strong>.
+            Je documente ici mon apprentissage, de Python aux LLMs en passant par la cybersécurité classique.
+        </p>
+
+        <hr />
+
+        <h2>Les sections</h2>
+
+        <ul class="sections">
+            <li>
+                <a href="/informatique">
+                    <strong>Informatique</strong>
+                    <span>Python, Linux, Git — les fondations.</span>
+                </a>
+            </li>
+            <li>
+                <a href="/cybersecurite">
+                    <strong>Cybersécurité</strong>
+                    <span>Réseaux, attaque/défense, TryHackMe, OverTheWire.</span>
+                </a>
+            </li>
+            <li>
+                <a href="/mathematiques">
+                    <strong>Mathématiques</strong>
+                    <span>Algèbre linéaire, probas, analyse — pour comprendre l'IA.</span>
+                </a>
+            </li>
+            <li>
+                <a href="/ia">
+                    <strong>Intelligence Artificielle</strong>
+                    <span>Machine learning, LLMs, AI Security.</span>
+                </a>
+            </li>
+        </ul>
+    </main>
 </Layout>
+
+<style>
+    main {
+        margin: auto;
+        padding: 1rem;
+        width: 800px;
+        max-width: calc(100% - 2rem);
+        color: #333;
+        font-family: sans-serif;
+    }
+    h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5em;
+    }
+    .intro {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+    .sections {
+        list-style-type: none;
+        padding: 0;
+    }
+    .sections li {
+        margin-bottom: 1rem;
+        background: #f4f4f4;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .sections a {
+        display: block;
+        padding: 1rem;
+        text-decoration: none;
+        color: #2b2b2b;
+    }
+    .sections a strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+    }
+    .sections a span {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    .sections a:hover {
+        background: #ecebff;
+    }
+    .sections a:hover strong {
+        color: #5a41dc;
+    }
+</style>
