@@ -1,9 +1,8 @@
 ---
-// Pas de logique pour l'instant
 ---
 <nav class="navbar">
     <div class="nav-content">
-        <a href="/" class="site-title">Vizion Blog</a>
+        <a href="/" class="site-title">Vizion<span class="dot">.</span>Blog</a>
 
         <div class="menu-links">
             <a href="/informatique">Informatique</a>
@@ -16,36 +15,55 @@
 
 <style>
     .navbar {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #e0e0e0;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
         padding: 1rem 0;
         margin-bottom: 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(8px);
     }
 
     .nav-content {
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
-        padding: 0 1rem;
+        padding: 0 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .site-title {
-        font-weight: 800;
-        font-size: 1.2rem;
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--text-primary);
         text-decoration: none;
-        color: #000;
+        letter-spacing: -0.02em;
+    }
+    .site-title .dot {
+        color: var(--accent);
+    }
+
+    .menu-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .menu-links a {
-        margin-left: 20px;
         text-decoration: none;
-        color: #555;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
         font-weight: 500;
+        transition: color 0.2s ease;
+        border-bottom: 1px solid transparent;
     }
 
     .menu-links a:hover {
-        color: #5a41dc;
+        color: var(--accent);
     }
 </style>

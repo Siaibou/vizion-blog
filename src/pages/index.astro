@@ -3,93 +3,124 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-    <main>
-        <h1>Vizion Blog</h1>
-        <p class="intro">
-            Journal de progression vers l'<strong>AI Security Engineering</strong>.
+    <div class="hero">
+        <p class="kicker">Journal de progression</p>
+        <h1 class="hero-title">Vers l'<span>AI Security Engineering</span>.</h1>
+        <p class="hero-sub">
             Je documente ici mon apprentissage, de Python aux LLMs en passant par la cybersécurité classique.
+            Les articles sont des notes que je publie pour mieux les structurer — et pour qu'on me corrige si je me trompe.
         </p>
+    </div>
 
-        <hr />
+    <hr />
 
-        <h2>Les sections</h2>
+    <h2 class="sections-title">Les sections</h2>
 
-        <ul class="sections">
-            <li>
-                <a href="/informatique">
-                    <strong>Informatique</strong>
-                    <span>Python, Linux, Git — les fondations.</span>
-                </a>
-            </li>
-            <li>
-                <a href="/cybersecurite">
-                    <strong>Cybersécurité</strong>
-                    <span>Réseaux, attaque/défense, TryHackMe, OverTheWire.</span>
-                </a>
-            </li>
-            <li>
-                <a href="/mathematiques">
-                    <strong>Mathématiques</strong>
-                    <span>Algèbre linéaire, probas, analyse — pour comprendre l'IA.</span>
-                </a>
-            </li>
-            <li>
-                <a href="/ia">
-                    <strong>Intelligence Artificielle</strong>
-                    <span>Machine learning, LLMs, AI Security.</span>
-                </a>
-            </li>
-        </ul>
-    </main>
+    <div class="sections-grid">
+        <a class="section-card" href="/informatique">
+            <span class="section-tag">01</span>
+            <strong>Informatique</strong>
+            <span class="section-desc">Python, Linux, Git, systèmes — les fondations techniques.</span>
+        </a>
+        <a class="section-card" href="/cybersecurite">
+            <span class="section-tag">02</span>
+            <strong>Cybersécurité</strong>
+            <span class="section-desc">Réseaux, attaque/défense, TryHackMe, OverTheWire.</span>
+        </a>
+        <a class="section-card" href="/mathematiques">
+            <span class="section-tag">03</span>
+            <strong>Mathématiques</strong>
+            <span class="section-desc">Algèbre linéaire, probas, analyse — pour comprendre l'IA.</span>
+        </a>
+        <a class="section-card" href="/ia">
+            <span class="section-tag">04</span>
+            <strong>Intelligence Artificielle</strong>
+            <span class="section-desc">Machine learning, LLMs, AI Security.</span>
+        </a>
+    </div>
 </Layout>
 
 <style>
-    main {
-        margin: auto;
-        padding: 1rem;
-        width: 800px;
-        max-width: calc(100% - 2rem);
-        color: #333;
-        font-family: sans-serif;
+    .hero { margin-top: 2rem; margin-bottom: 2.5rem; }
+
+    .kicker {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 0 0 0.5rem 0;
     }
-    h1 {
-        font-size: 3rem;
+
+    .hero-title {
+        font-size: 2.8rem;
         font-weight: 700;
-        margin-bottom: 0.5em;
-    }
-    .intro {
-        font-size: 1.2rem;
-        line-height: 1.6;
-    }
-    .sections {
-        list-style-type: none;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin: 0 0 1rem 0;
         padding: 0;
+        border: none;
     }
-    .sections li {
-        margin-bottom: 1rem;
-        background: #f4f4f4;
-        border-radius: 8px;
-        border: 1px solid #ddd;
+    .hero-title span {
+        color: var(--accent);
     }
-    .sections a {
-        display: block;
-        padding: 1rem;
+
+    .hero-sub {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        max-width: 620px;
+    }
+
+    .sections-title {
+        font-size: 1.1rem;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        font-weight: 500;
+        border: none;
+        margin-top: 2.5rem;
+    }
+
+    .sections-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .section-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 1.3rem 1.4rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
         text-decoration: none;
-        color: #2b2b2b;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+        position: relative;
     }
-    .sections a strong {
-        display: block;
+    .section-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+    }
+    .section-card .section-tag {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+    }
+    .section-card strong {
         font-size: 1.2rem;
-        margin-bottom: 0.25rem;
+        color: var(--text-primary);
+        font-weight: 600;
     }
-    .sections a span {
-        color: #666;
+    .section-card .section-desc {
         font-size: 0.95rem;
-    }
-    .sections a:hover {
-        background: #ecebff;
-    }
-    .sections a:hover strong {
-        color: #5a41dc;
+        color: var(--text-secondary);
+        line-height: 1.5;
     }
 </style>

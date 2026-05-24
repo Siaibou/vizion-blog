@@ -1,0 +1,75 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 0 → 1"
+date: 2026-05-24
+description: "Premier niveau de Bandit : ma première connexion SSH depuis un terminal, et les pièges de la syntaxe."
+---
+
+# Bandit — Niveau 0 → 1
+
+*Premier niveau de Bandit, le wargame d'OverTheWire. L'objectif est simple sur le papier : se connecter en SSH au serveur de jeu. Mais quand on n'a jamais utilisé SSH en ligne de commande, la syntaxe peut piéger.*
+
+## 🎯 Objectif
+
+Se connecter en SSH au serveur `bandit.labs.overthewire.org` (port `2220`), en utilisant le compte `bandit0` et le mot de passe fourni publiquement sur le site d'OverTheWire.
+
+## 🧠 Concepts à connaître
+
+**SSH (Secure Shell)** est le protocole standard pour ouvrir un terminal sur une machine distante. C'est l'outil universel quand on veut se connecter à un serveur Linux à distance pour y exécuter des commandes. Tout le trafic est chiffré.
+
+Une connexion SSH a besoin de trois informations :
+
+- **Le nom d'utilisateur** sur la machine distante (ici `bandit0`).
+- **L'adresse du serveur** (ici `bandit.labs.overthewire.org`).
+- **Le port** sur lequel le serveur SSH écoute. Par défaut c'est `22`, mais sur Bandit c'est un port non-standard : `2220` (probablement pour éviter le bruit des bots qui scannent le port 22 par défaut).
+
+La **syntaxe correcte** dans un terminal :
+
+```bash
+ssh user@host -p PORT
+```
+
+- `user@host` (avec le `@`) précise l'utilisateur sur le serveur. Sans le `@`, SSH suppose que tu veux te connecter avec le **même nom d'utilisateur** que celui de ta session locale — ce qui ne marchera pas ici.
+- `-p` (minuscule) précise le port. Attention, c'est `-p` pour `ssh` mais `-P` (majuscule) pour `scp`. Source de bug classique.
+
+## 🔍 Ma démarche
+
+J'avais déjà utilisé SSH au lycée pendant mon **BTS SIO SLAM**, mais toujours via une interface graphique qui mâche le travail : tu remplis des cases "host", "user", "port", et l'outil construit la commande à ta place. Là, je me retrouvais devant un terminal nu, à devoir taper la commande complète à la main.
+
+Premier essai, naïvement :
+
+```bash
+ssh bandit.labs.overthewire.org 2220
+```
+
+Échec. Deux problèmes invisibles pour un débutant :
+
+1. **Aucun nom d'utilisateur précisé.** SSH a tenté de se connecter avec mon nom d'utilisateur Linux local — qui n'existe évidemment pas sur le serveur Bandit.
+2. **Le `2220` à la fin n'a pas été interprété comme un port.** En SSH, un argument qui traîne après le nom de l'hôte est considéré comme une commande à exécuter sur la machine distante, pas comme un numéro de port. Pour préciser un port, il faut explicitement le flag `-p`.
+
+Après lecture du `man ssh`, j'ai corrigé :
+
+```bash
+ssh bandit0@bandit.labs.overthewire.org -p 2220
+```
+
+Cette fois, SSH demande le mot de passe. Détail à noter : **rien ne s'affiche quand on tape le mot de passe**, pas même des `*`. C'est volontaire — c'est une mesure de sécurité pour qu'un voisin qui regarde l'écran ne puisse même pas compter les caractères. Beaucoup de débutants croient à un clavier cassé la première fois.
+
+Je colle le mot de passe, j'appuie sur Entrée, et me voilà connecté en tant que `bandit0`.
+
+Premier réflexe une fois dans le shell distant : `ls`, pour voir ce qu'il y a dans le répertoire courant. Un fichier `readme` apparaît. `cat readme` affiche le mot de passe du niveau 1, que je peux utiliser pour me reconnecter en `bandit1`.
+
+## 🛠️ Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `ssh user@host -p PORT` | Ouvrir un terminal sur une machine distante via SSH |
+| `ls` | Lister les fichiers du répertoire courant |
+| `cat fichier` | Afficher le contenu d'un fichier texte dans le terminal |
+| `man ssh` | Afficher le manuel d'une commande (réflexe à acquérir) |
+
+## 💡 Ce que je retiens
+
+La syntaxe d'une connexion SSH en ligne de commande : `ssh user@host -p PORT`. Le `@` est obligatoire pour préciser l'utilisateur, le `-p` (minuscule) pour le port. Cette commande, je vais la retaper des centaines de fois dans ma carrière — autant l'avoir intégrée dès le premier niveau.
+
+Petit bonus mental : sur tous les services SSH "sérieux" exposés sur internet, le port n'est presque jamais le `22` par défaut. C'est de la sécurité par l'obscurité (mineure mais utile) — quand un service expose le port 22 sur internet, il prend des dizaines de tentatives de connexion par seconde de la part de bots qui essaient `root` / `admin` / `123456`. Changer le port ne sécurise pas grand-chose, mais ça nettoie les logs.
