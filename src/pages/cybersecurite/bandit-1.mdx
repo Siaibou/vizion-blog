@@ -1,0 +1,64 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 1 → 2"
+date: 2026-05-25
+description: "Comment lire un fichier dont le nom est un caractère spécial : la convention '-' pour stdin, la redirection d'entrée, et le chemin relatif explicite."
+---
+
+# Bandit — Niveau 1 → 2
+
+*Le niveau 1 paraît trivial sur le papier : lire un fichier. Sauf que ce fichier s'appelle `-`, et ce simple caractère révèle une convention Unix fondamentale qui va se retrouver partout dans ta vie en ligne de commande.*
+
+## 🎯 Objectif
+
+Lire le contenu d'un fichier nommé `-` situé dans le répertoire personnel de `bandit1`.
+
+## 🧠 Concepts à connaître
+
+**La convention `-` comme stdin/stdout.** En Unix, énormément de commandes (`cat`, `tar`, `grep`, etc.) interprètent le caractère `-` passé en argument comme *"l'entrée standard"* (stdin) ou *"la sortie standard"* (stdout), pas comme un nom de fichier. C'est une convention adoptée par la quasi-totalité des outils Unix.
+
+Conséquence directe : `cat -` ne lit **pas** un fichier nommé `-`, il lit ce que tu tapes au clavier (et attend, donc rien ne se passe à l'écran). C'est exactement le piège du niveau.
+
+**Deux façons de contourner la convention :**
+
+- **Le chemin relatif explicite `./`** — préfixer le nom avec `./` transforme `-` en chemin de fichier sans ambiguïté. `cat ./-` dit clairement : *"lis le fichier nommé `-` dans le répertoire courant."*
+- **La redirection d'entrée `<`** — le caractère `<` est un opérateur du shell qui dit *"prends ce qui suit comme entrée standard pour la commande."* `cat < -` revient à dire : *"cat, ton stdin est maintenant le contenu du fichier `-`."* Ici le shell s'occupe d'ouvrir le fichier, pas `cat`, donc aucune ambiguïté.
+
+## 🔍 Ma démarche
+
+Première tentative naïve, par réflexe :
+
+```bash
+cat -
+```
+
+Aucun résultat affiché. Le terminal reste figé en attente. C'est le piège exact : `cat` attend que je tape quelque chose au clavier parce que `-` est interprété comme stdin.
+
+J'annule avec **`Ctrl + C`** et je cherche. Le site d'OverTheWire propose une liste de commandes utiles, dont `cat`, `file`, `find`. Le truc, c'est que ce n'est pas une question de commande, c'est une question de syntaxe.
+
+J'essaie alors les deux variantes :
+
+```bash
+cat ./-
+cat < -
+```
+
+Les deux fonctionnent et affichent le password du niveau 2.
+
+Petit défi bonus pour moi : comment se déconnecter proprement de SSH ? Une recherche Google m'a appris deux commandes : `exit` et `logout`. Les deux fonctionnent ici, mais `exit` est plus universel — `logout` ne marche que dans un *login shell* (le shell principal d'une session). À retenir : **`exit` comme réflexe par défaut**, et `Ctrl + D` comme raccourci clavier équivalent.
+
+## 🛠️ Commandes & outils découverts
+
+| Commande / opérateur | Ce qu'elle fait |
+|---|---|
+| `cat ./fichier` | Préfixer avec `./` pour lire un fichier dont le nom commence par un caractère spécial |
+| `cat < fichier` | Rediriger le contenu d'un fichier vers stdin de la commande |
+| `Ctrl + C` | Interrompre une commande en cours (envoie SIGINT) |
+| `exit` | Quitter le shell courant (préféré à `logout`) |
+| `Ctrl + D` | Envoie l'EOF, équivaut souvent à `exit` |
+
+## 💡 Ce que je retiens
+
+En Unix, **`-` en argument signifie souvent "stdin/stdout" par convention**, pas un nom de fichier. Pour manipuler un vrai fichier dont le nom commence par `-`, il faut explicitement le préfixer avec `./` ou contourner via une redirection `<`. C'est la première de plusieurs leçons sur les noms de fichiers "piégés" que Bandit va m'apprendre.
+
+Et accessoirement, j'ai pris le réflexe `exit` pour quitter SSH proprement.

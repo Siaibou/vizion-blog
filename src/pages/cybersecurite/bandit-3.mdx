@@ -1,0 +1,54 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 3 → 4"
+date: 2026-05-25
+description: "Comment afficher les fichiers cachés sous Linux : la convention du point en début de nom et l'option ls -a."
+---
+
+# Bandit — Niveau 3 → 4
+
+*Niveau rapide qui apprend la convention Linux des fichiers cachés : le point en début de nom et l'option `-a` de `ls`.*
+
+## 🎯 Objectif
+
+Trouver et lire un fichier caché dans le sous-dossier `inhere` du répertoire personnel.
+
+## 🧠 Concepts à connaître
+
+**Les fichiers cachés en Linux.** Sous Unix/Linux, **un fichier ou dossier dont le nom commence par un point (`.`) est considéré comme "caché"** par convention. Ils n'apparaissent pas dans la sortie de `ls` par défaut. Ce n'est pas un attribut système (comme sous Windows), c'est juste une convention de nommage que tous les outils respectent.
+
+**Exemples courants** : `.bashrc`, `.ssh/`, `.git/` — tous ces fichiers/dossiers sont "cachés" simplement parce qu'ils commencent par un point.
+
+**L'option `-a` de `ls`.** Pour voir aussi les fichiers cachés, on passe l'option `-a` (pour *"all"*) :
+
+```bash
+ls -a
+```
+
+À noter : `ls -a` affiche aussi deux entrées spéciales, `.` (le dossier courant) et `..` (le dossier parent). Si tu veux tout voir sauf ces deux-là, utilise `ls -A` (majuscule).
+
+## 🔍 Ma démarche
+
+Je connaissais déjà l'option `-a` avant ce niveau, donc pas de surprise. La démarche s'enchaîne en trois étapes :
+
+```bash
+cd inhere
+ls -a
+cat .hidden-file
+```
+
+(le nom exact du fichier varie, c'est juste un exemple.)
+
+Le password apparaît, je peux me connecter en `bandit4`.
+
+## 🛠️ Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `ls -a` | Lister **tous** les fichiers, y compris ceux commençant par `.` |
+| `ls -A` | Idem mais sans afficher `.` et `..` |
+| `ls -la` | Combine `-l` (format détaillé) et `-a` — combo très utilisé |
+
+## 💡 Ce que je retiens
+
+Sous Linux, **les fichiers cachés sont une simple convention de nommage** : ils commencent par un point. Pas de magie, pas d'attribut système. Pour les voir, `ls -a`. Tous les fichiers de configuration utilisateur dans `~/` (le home) sont cachés par cette convention — c'est pour ça que ton home a l'air vide alors qu'il contient des dizaines de fichiers de config.

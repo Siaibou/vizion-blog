@@ -1,0 +1,109 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 4 → 5"
+date: 2026-05-25
+description: "Identifier le type d'un fichier avec la commande file, et découvrir la convention Linux du séparateur -- pour échapper aux pièges des noms commençant par tiret."
+---
+
+# Bandit — Niveau 4 → 5
+
+*Ce niveau apprend deux choses : la commande `file` pour déterminer le type d'un fichier, et surtout une convention Unix fondamentale — le séparateur `--` qui marque la fin des options.*
+
+## 🎯 Objectif
+
+Dans le dossier `inhere`, qui contient une dizaine de fichiers nommés `-file00`, `-file01`, etc., trouver le **seul fichier "human-readable"** (lisible par un humain, par opposition à un fichier binaire).
+
+## 🧠 Concepts à connaître
+
+**La commande `file`** détermine le type d'un fichier en analysant son contenu (pas son extension). Elle utilise une base de signatures connues — pour reconnaître par exemple qu'un fichier est un PDF, une image PNG, un script bash, un exécutable ELF, ou du texte ASCII.
+
+```bash
+file mon_fichier
+# mon_fichier: ASCII text
+file mon_image.png
+# mon_image.png: PNG image data, 800 x 600, 8-bit/color RGB
+```
+
+Pour analyser plusieurs fichiers d'un coup, on combine avec le **wildcard `*`** (qui veut dire "tout") :
+
+```bash
+file *
+```
+
+**Le piège du niveau** : dans `inhere`, tous les fichiers s'appellent `-file00`, `-file01`, etc. Quand le shell expanse `*` en `-file00 -file01 -file02 ...`, la commande `file` reçoit chaque argument et... **les interprète comme des options**. Parce que par convention, dans toutes les commandes Unix, un argument qui commence par `-` est une option, pas un nom de fichier. Résultat : `file` plante avec une erreur du genre `invalid option`.
+
+**Deux façons de contourner ça** — et la deuxième est une des conventions Unix les plus utiles à connaître :
+
+**Solution 1 — Préfixer chaque fichier avec `./`** :
+```bash
+file ./*
+```
+Le shell expanse en `./-file00 ./-file01 ...`. Chaque argument commence maintenant par `./`, donc aucun ne ressemble à une option.
+
+**Solution 2 — Le séparateur `--`** :
+```bash
+file -- *
+```
+
+> 🧠 **Convention Unix à graver dans la tête** : **`--` (deux tirets seuls) signifie "fin des options, ce qui suit est des arguments positionnels"**. Tout ce qui vient après `--` est interprété comme nom de fichier ou argument, jamais comme option, même si ça commence par `-`. Cette convention est respectée par la quasi-totalité des outils GNU.
+
+Quelques exemples où `--` te sauve :
+```bash
+rm -- -fichier-dangereux    # supprime un fichier nommé "-fichier-dangereux"
+grep -- -v fichier.txt       # cherche la chaîne "-v" dans fichier.txt
+```
+
+## 🔍 Ma démarche
+
+J'arrive dans le dossier, je tape :
+
+```bash
+ls
+```
+
+Une dizaine de fichiers tous nommés `-fileXX`. J'enchaîne naturellement :
+
+```bash
+file *
+```
+
+Plante. Erreur. Tous les fichiers sont vus comme des options.
+
+C'est là que ma question se pose : *"OK, je sais préfixer un fichier avec `./` pour qu'il ne soit pas confondu avec une option. Mais ici j'ai un wildcard `*`, pas un nom précis. Comment faire ?"*
+
+La réponse vient en regardant ce que le shell fait avec `./*` : il expanse en `./-file00 ./-file01 ...`. Le préfixe `./` est appliqué à chaque résultat de l'expansion. Donc :
+
+```bash
+file ./*
+```
+
+Marche. Sortie :
+```
+./-file00: data
+./-file01: data
+./-file02: data
+...
+./-file07: ASCII text
+./-file08: data
+./-file09: data
+```
+
+Un seul fichier est marqué `ASCII text` — c'est le fichier "human-readable" qu'on cherche. `cat ./-file07` (ou autre selon le numéro) donne le password.
+
+J'ai aussi testé la variante `file -- *`, qui marche tout aussi bien. Avantage de cette syntaxe : elle est plus "déclarative" — elle dit explicitement *"les arguments qui suivent ne sont pas des options"*, alors que `./*` masque ça via le préfixe. À utiliser selon les goûts, mais `--` est plus universel pour les scripts.
+
+## 🛠️ Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `file fichier` | Déterminer le type d'un fichier en analysant son contenu |
+| `file ./*` | Analyser tous les fichiers en évitant le piège des noms commençant par `-` |
+| `file -- *` | Idem, en utilisant le séparateur `--` (convention Unix) |
+| `*` | Wildcard du shell, signifie "tout" ce qui matche |
+
+## 💡 Ce que je retiens
+
+Deux leçons :
+
+1. **`file` détermine le type d'un fichier à partir de son contenu**, pas de son extension — donc fiable même pour des fichiers sans extension ou mal renommés. Pratique en cybersécurité (un fichier malveillant `image.png` qui est en fait un exécutable, par exemple).
+2. **La convention Unix `--` marque la fin des options**. À retenir pour toutes les situations où un nom commence par `-` : `rm -- -dangereux`, `grep -- -motif`, etc. C'est une convention universelle, plus propre que de bricoler avec `./`.

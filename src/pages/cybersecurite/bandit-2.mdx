@@ -1,0 +1,60 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 2 → 3"
+date: 2026-05-25
+description: "Comment lire un fichier dont le nom contient des espaces : guillemets ou échappement avec backslash."
+---
+
+# Bandit — Niveau 2 → 3
+
+*Court niveau qui apprend à gérer les noms de fichiers contenant des espaces — un piège classique pour qui débute en ligne de commande.*
+
+## 🎯 Objectif
+
+Lire le contenu d'un fichier nommé `spaces in this filename` (avec les espaces littéralement dans le nom) situé dans le répertoire personnel.
+
+## 🧠 Concepts à connaître
+
+**Pourquoi les espaces posent problème.** Dans un shell, l'**espace** est le séparateur entre les arguments d'une commande. Quand tu tapes `cat spaces in this filename`, le shell comprend : *"lance `cat` avec quatre arguments : `spaces`, `in`, `this`, `filename`"*. `cat` tente alors d'ouvrir quatre fichiers distincts, qui n'existent pas. Erreur.
+
+**Trois solutions équivalentes pour échapper les espaces :**
+
+| Syntaxe | Exemple |
+|---|---|
+| Guillemets doubles | `cat "spaces in this filename"` |
+| Guillemets simples | `cat 'spaces in this filename'` |
+| Backslash devant chaque espace | `cat spaces\ in\ this\ filename` |
+
+Les trois disent au shell : *"considère tout ça comme un seul argument."*
+
+> 💡 **Subtilité utile pour plus tard** : guillemets simples et doubles ne sont pas exactement équivalents. Les **doubles** (`"..."`) permettent l'interprétation des variables (`"$HOME/fichier"` est remplacé par ton dossier home). Les **simples** (`'...'`) ne font aucune interprétation — c'est du texte brut. À ce niveau ça ne change rien, mais c'est bon à savoir.
+
+## 🔍 Ma démarche
+
+Pas de drame ici. Mon intuition de débutant a bien marché : devant un nom de fichier avec des espaces, j'ai mis des guillemets autour, et ça a fonctionné.
+
+```bash
+cat "spaces in this filename"
+```
+
+Le password du niveau 3 apparaît immédiatement.
+
+J'ai aussi testé la version avec `./` du niveau précédent par curiosité, vu que le fichier commence en plus par un caractère spécial dans sa logique :
+
+```bash
+cat ./'spaces in this filename'
+```
+
+Marche aussi. La cohabitation `./` + guillemets fonctionne sans accroc.
+
+## 🛠️ Commandes & outils découverts
+
+| Syntaxe | Ce qu'elle fait |
+|---|---|
+| `cat "fichier avec espaces"` | Encadrer un nom avec espaces de guillemets doubles |
+| `cat 'fichier avec espaces'` | Idem avec guillemets simples (pas d'interprétation de variables) |
+| `cat fichier\ avec\ espaces` | Échapper chaque espace avec `\` |
+
+## 💡 Ce que je retiens
+
+Dans un shell, **l'espace est un séparateur d'arguments**. Pour qu'un nom de fichier contenant des espaces soit traité comme un seul argument, il faut l'encadrer de guillemets ou échapper les espaces avec `\`. Détail anodin une fois qu'on le sait, mais c'est typiquement le genre de truc qui bloque un débutant pendant 10 minutes la première fois.

@@ -1,0 +1,118 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 5 → 6"
+date: 2026-05-25
+description: "Trouver un fichier avec des critères précis dans une arborescence : maîtriser find, ses suffixes de taille piégeux, et l'option -printf pour formater la sortie."
+---
+
+# Bandit — Niveau 5 → 6
+
+*Premier niveau qui m'a vraiment fait galérer. La solution paraît évidente — utiliser `find` avec un filtre de taille. Sauf que `find` cache un piège vicieux dans le suffixe d'unité, et j'ai mis du temps à comprendre pourquoi mes commandes ne renvoyaient rien.*
+
+## 🎯 Objectif
+
+Trouver, quelque part dans l'arborescence du dossier `inhere`, un fichier ayant **toutes** ces propriétés :
+
+- **human-readable** (texte lisible)
+- **1033 bytes** exactement
+- **non exécutable**
+
+## 🧠 Concepts à connaître
+
+**La commande `find`** est l'outil universel pour parcourir une arborescence et filtrer les fichiers selon plein de critères : nom, taille, type, date de modification, permissions, etc. Syntaxe générale :
+
+```bash
+find POINT_DE_DEPART [conditions...] [actions...]
+```
+
+Par exemple :
+```bash
+find . -type f -name "*.txt"
+```
+Cherche, depuis le répertoire courant (`.`), tous les fichiers (`-type f`) dont le nom finit par `.txt`.
+
+**Le piège vicieux : les suffixes de taille de `find`.** Quand tu utilises `-size`, `find` accepte un suffixe pour préciser l'unité — et le défaut n'est pas ce qu'on croit :
+
+| Suffixe | Signification |
+|---|---|
+| `b` ou (rien) | **blocs de 512 octets** — pas des octets ! |
+| `c` | octets (**c**aractères) |
+| `k` | kilo-octets (1024 octets) |
+| `M` | méga-octets |
+| `G` | giga-octets |
+
+Donc `find . -size 1033b` veut dire **"1033 blocs de 512 octets"**, soit ~528 Ko. Aucun fichier ne fait cette taille → aucun résultat. C'est exactement le piège dans lequel je suis tombé.
+
+Pour "1033 octets exactement", il faut écrire `-size 1033c`.
+
+**L'option `-printf` pour formater la sortie.** Par défaut, `find` affiche juste les chemins. Avec `-printf "FORMAT"`, on contrôle ce qui sort. Comme `printf` en C ou Python, le format contient des **symboles** remplacés par les infos du fichier :
+
+| Symbole | Veut dire |
+|---|---|
+| `%s` | la **size** (taille en octets) |
+| `%p` | le **path** (chemin complet) |
+| `\t` | une tabulation |
+| `\n` | un saut de ligne |
+
+Donc `find . -type f -printf "%s\t%p\n"` produit une ligne par fichier au format `taille[TAB]chemin`. Combiné avec `sort -n` derrière (tri **numérique**), on obtient la liste de tous les fichiers triés par taille croissante.
+
+## 🔍 Ma démarche
+
+J'ai d'abord eu la bonne intuition : utiliser `find` avec un filtre de taille.
+
+```bash
+find . -size 1033B
+find . -size 1033b
+```
+
+Rien. Aucun résultat. Je me dis que peut-être il faut un seuil "supérieur à" :
+
+```bash
+find . -type f -size +1032b
+find . -type f -size +1032B
+```
+
+Toujours rien. Je suis bloqué. À ce stade je ne comprends pas pourquoi : le fichier existe forcément, l'énoncé est clair. Le problème vient nécessairement de ma commande.
+
+Plutôt que de continuer à deviner, je décide de **changer de stratégie : afficher TOUS les fichiers avec leurs tailles, et chercher manuellement celui qui fait 1033**. Je cherche sur StackOverflow, et je tombe sur cette commande :
+
+```bash
+find . -type f -printf "%s\t%p\n" | sort -n
+```
+
+Je la lance. Ça fonctionne — j'obtiens la liste de tous les fichiers de l'arborescence avec leur taille, triés. Je scrolle, je trouve la ligne `1033 ./mongoroupe/quelquechose` (chemin maquillé), et `cat` sur ce fichier me donne le password.
+
+**Sauf que je ne comprenais pas ce que je tapais.** J'avais fait du copier-coller. C'est seulement après que j'ai pris le temps de creuser ce que signifient `%s`, `%p`, `\t`, `\n` — ce qui m'a mené à comprendre `-printf` (voir la section Concepts).
+
+**La leçon brutale, c'est aussi pourquoi mon `find -size` ne marchait pas.** En lisant le `man find` plus attentivement, je découvre les suffixes. Mon `1033b` était interprété comme "1033 blocs de 512 octets". La commande élégante que j'aurais pu écrire dès le début, si j'avais lu la doc :
+
+```bash
+find . -type f -size 1033c ! -executable -readable
+```
+
+- `-type f` : seulement les fichiers (pas les dossiers).
+- `-size 1033c` : exactement 1033 octets.
+- `! -executable` : qui n'est **pas** exécutable (le `!` signifie NOT).
+- `-readable` : qui est lisible.
+
+Trois mots qui auraient évité tout ce détour. Mais en même temps, le détour m'a appris `-printf` et `sort -n`, qui sont des outils précieux ailleurs.
+
+## 🛠️ Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `find . -type f` | Lister tous les fichiers (pas les dossiers) à partir d'ici, récursivement |
+| `find . -size 1033c` | Filtrer par taille en octets (`c` = caractères/octets) |
+| `find . -size 1033b` | ⚠️ Filtre par **blocs de 512 octets**, pas par octets |
+| `find ... ! -executable` | Inverser un critère avec `!` (NOT logique) |
+| `find ... -printf "%s\t%p\n"` | Personnaliser la sortie : `%s` = taille, `%p` = chemin |
+| `sort -n` | Trier la sortie **numériquement** (sans `-n`, tri alphabétique : `10` vient avant `2`) |
+| `\|` (pipe) | Brancher la sortie d'une commande sur l'entrée de la suivante |
+
+## 💡 Ce que je retiens
+
+Trois leçons que je ne veux pas oublier :
+
+1. **`find -size` a un suffixe d'unité piégeux : `b` = blocs de 512 octets, `c` = octets.** Si tu cherches par octets, c'est toujours `c`. La prochaine fois je vérifie dans `man find` avant de taper.
+2. **Quand une commande ne renvoie rien et que je suis sûr du résultat attendu, le problème vient quasi toujours d'une option ou d'un argument mal interprété.** Ça arrivera des milliers de fois dans ma carrière. Le réflexe : `man <commande>` et relire la section qui m'intéresse.
+3. **Ne pas copier-coller du code de StackOverflow sans comprendre ce que ça fait.** Ça m'a sauvé ce niveau, mais si je ne prends pas le temps de décortiquer `%s\t%p\n`, je ne progresse pas. La règle simple : tant que tu ne peux pas réécrire la commande de tête, tu ne l'as pas vraiment apprise.
