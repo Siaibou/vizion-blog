@@ -1,0 +1,103 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 8 → 9"
+date: 2026-05-27
+description: "Trouver la ligne unique dans un fichier de doublons : initiation aux pipes Unix avec sort et uniq, et au principe philosophique de la composition de petits outils."
+---
+
+# Bandit — Niveau 8 → 9
+
+*Niveau fondamental : on apprend les **pipes** Unix, à enchaîner plusieurs commandes. C'est l'esprit même d'Unix — des petits outils spécialisés qui se branchent les uns aux autres pour résoudre des problèmes complexes.*
+
+## Objectif
+
+Dans `data.txt`, trouver la **seule ligne** qui apparaît **une fois** (toutes les autres apparaissent en plusieurs exemplaires).
+
+## Concepts à connaître
+
+**Le pipe `|` : la mécanique fondamentale d'Unix.** Le pipe (`|`) prend la **sortie** d'une commande et la branche en **entrée** de la suivante. Au lieu d'écrire des commandes monolithiques, on enchaîne des petits outils spécialisés.
+
+```bash
+commande_A | commande_B | commande_C
+```
+
+C'est lu : *"la sortie de A devient l'entrée de B, dont la sortie devient l'entrée de C."*
+
+> Ce principe a un nom : **la philosophie Unix**. Inventée dans les années 1970 par Ken Thompson et Doug McIlroy, elle se résume en : *"Faites un programme qui fait une chose et la fait bien. Faites des programmes qui collaborent entre eux."* C'est la raison pour laquelle Unix/Linux a survécu 50 ans.
+
+**Pourquoi `grep` ne suffit pas ici.** `grep` cherche un **motif connu**. Or l'énoncé ne donne aucun motif — il dit *"la ligne qui apparaît une fois"*. Tu ne peux pas grep ce que tu ne connais pas. Il faut un autre outil : un outil qui **compte les occurrences**.
+
+**Les deux outils nouveaux : `sort` et `uniq`.**
+
+- **`sort`** : trie les lignes alphabétiquement (ou numériquement avec `-n`).
+- **`uniq`** : supprime les **doublons consécutifs** — c'est crucial : `uniq` ne marche que sur des lignes déjà triées (sinon il ne voit pas les doublons éloignés).
+
+D'où l'idiome universel **`sort | uniq`** : on trie d'abord pour grouper les identiques côte à côte, puis `uniq` fait son travail.
+
+**L'option `-c` de `uniq`.** Au lieu de juste supprimer les doublons, `uniq -c` **compte** combien de fois chaque ligne apparaît, et préfixe le résultat de ce compteur :
+
+```
+     10 ligneA
+      1 ligneB
+     10 ligneC
+```
+
+## Ma démarche
+
+Premier réflexe : tenter avec `grep`. Mais `grep` cherche un motif, et je n'en ai pas. Mauvaise piste.
+
+Je regarde les commandes utiles proposées par OverTheWire : `grep, sort, uniq, strings, base64, tr, tar, gzip, bzip2, xxd`. `sort` et `uniq` retiennent mon attention — un `man uniq` me confirme que c'est exactement ce qu'il faut, avec l'option `-c` pour compter.
+
+```bash
+sort data.txt | uniq -c
+```
+
+La sortie ressemble à ça :
+
+```
+10 2WKcZk64zTg8NT0cZIHTRHwrR5pfCUev
+10 3ku4RwHKoqN3ZVgBL9AKMMSc2L2ankAi
+ 1 4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
+10 4lEvwERBraPNB1G7XdFeRi7GP78babHT
+10 4tsxNEl92WRocQJon0QrBdwdJGrKH6Lv
+```
+
+La ligne avec le compteur `1` est celle qui m'intéresse — c'est le password.
+
+**Question que je me suis posée pendant le niveau** : peut-on **trier le résultat de `uniq -c` par compteur** pour faire remonter la ligne unique en haut sans avoir à scroller ?
+
+Réponse : oui, en rajoutant un `sort -n` à la fin de la chaîne. `-n` veut dire "tri numérique" (sans, on aurait un tri alphabétique où `10` viendrait avant `2`).
+
+```bash
+sort data.txt | uniq -c | sort -n
+```
+
+Sortie :
+```
+ 1 4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
+10 2WKcZk64zTg8NT0cZIHTRHwrR5pfCUev
+10 3ku4RwHKoqN3ZVgBL9AKMMSc2L2ankAi
+...
+```
+
+La ligne unique est maintenant en **première position** — plus besoin de scroller. C'est exactement le genre d'enchaînement (`sort | uniq -c | sort -n`) qu'on retrouve partout dans les scripts shell pros.
+
+## Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `\|` (pipe) | Branche la sortie d'une commande sur l'entrée de la suivante |
+| `sort fichier` | Trie les lignes alphabétiquement |
+| `sort -n fichier` | Trie numériquement (10 après 9, pas avant) |
+| `uniq` | Supprime les doublons **consécutifs** (à utiliser après `sort`) |
+| `uniq -c` | Compte les occurrences de chaque ligne |
+| `sort \| uniq` | Idiome pour dédupliquer un fichier |
+| `sort \| uniq -c \| sort -n` | Idiome pour trier par fréquence croissante |
+
+## Ce que je retiens
+
+Trois leçons :
+
+1. **Le pipe `|` est la mécanique centrale du shell Unix.** Cesser de penser *"quelle commande fait tout ça ?"* et commencer à penser *"quelles commandes je peux enchaîner pour arriver au résultat ?"* — c'est un saut conceptuel qui change tout.
+2. **`sort` puis `uniq` vont ensemble par construction**. `uniq` ne supprime que les doublons **consécutifs**, donc il faut **trier d'abord**. Réflexe à intégrer dès maintenant.
+3. **Quand tu ne connais pas le motif à chercher, ne pense pas à `grep`.** `grep` répond à *"montre-moi les lignes contenant X"*. Pour des questions du type *"trouve-moi la ligne qui apparaît une seule fois"* ou *"compte les occurrences"*, c'est `sort`+`uniq` qui prennent le relais.

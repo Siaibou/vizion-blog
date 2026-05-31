@@ -1,0 +1,73 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 9 → 10"
+date: 2026-05-27
+description: "Découverte de la commande strings pour extraire les chaînes lisibles d'un fichier binaire. Réponse à une confusion classique : l'extension d'un fichier ne dit pas ce qu'il est vraiment."
+---
+
+# Bandit — Niveau 9 → 10
+
+*Niveau qui apprend `strings`, et qui m'a fait réaliser un truc fondamental sous Linux : **l'extension d'un fichier ne veut absolument rien dire**. On peut avoir un fichier `.txt` qui est en réalité du binaire — et c'est exactement ce qui se passe ici.*
+
+## Objectif
+
+Dans `data.txt`, trouver le password parmi les rares chaînes lisibles, **précédé de plusieurs caractères `=`**.
+
+## Concepts à connaître
+
+**Premier choc : un fichier `.txt` qui n'est pas du texte.** Le `data.txt` de ce niveau est un **fichier binaire** — du contenu non lisible directement par un humain. Si tu fais `cat data.txt`, ton terminal va afficher des caractères absurdes, faire des bips, parfois se brouiller au point qu'il faut taper `reset` pour le récupérer.
+
+**Pourquoi un fichier binaire a-t-il une extension `.txt` ?** Excellente question, et la réponse est instructive :
+
+> Sous Unix/Linux, **l'extension d'un fichier ne signifie rien pour le système**. Elle est juste une convention pour les humains et certains programmes (comme les éditeurs ou les navigateurs). Tu peux renommer un PDF en `.txt`, ça reste un PDF — c'est son **contenu** (sa signature en début de fichier) qui détermine son vrai type. C'est exactement ce que fait la commande `file` (voir niveau 4→5) : elle lit les premiers octets pour deviner le type réel.
+
+Cette confusion vient surtout de Windows, où l'OS associe l'extension à un programme d'ouverture. Sous Linux, ce système n'existe pas — chaque programme se débrouille pour reconnaître son format. C'est plus souple, mais ça peut piéger.
+
+**Sur la définition "fichier binaire" :** Wikipédia dit *"un fichier qui n'est pas un fichier texte"*. C'est correct mais frustrant. Une définition plus utile : un fichier binaire contient des **séquences d'octets quelconques** (de 0 à 255), pas seulement des octets qui correspondent à des caractères imprimables ASCII/UTF-8. Un `.exe`, une image PNG, un ZIP, un PDF — tous sont des binaires. Et un `.txt` peut très bien en être un aussi si son créateur l'a fabriqué comme ça (cas de ce niveau).
+
+**`strings` : extraire les fragments lisibles d'un binaire.** La commande `strings` lit un fichier (binaire ou pas) et **extrait toutes les séquences de caractères imprimables** d'au moins 4 caractères consécutifs. Très utile pour :
+
+- Inspecter un fichier inconnu rapidement.
+- En cybersécurité : analyser un binaire suspect (un malware par exemple — on y trouve souvent des URLs, des messages d'erreur, des chemins de fichiers).
+- Dans ce niveau : isoler les chaînes humaines noyées dans du bruit binaire.
+
+## Ma démarche
+
+Naïvement, premier réflexe :
+
+```bash
+cat data.txt
+```
+
+Le terminal part en vrille — caractères bizarres partout. Je sors avec `Ctrl + C` et, si nécessaire, je tape `reset` pour rétablir un terminal propre.
+
+Je me souviens que l'énoncé proposait `strings` dans la liste des commandes utiles. Un `man strings` confirme : *"print the sequences of printable characters in files"*. C'est exactement ce qu'il me faut.
+
+```bash
+strings data.txt
+```
+
+La sortie défile, mais elle est **beaucoup** plus courte qu'un `cat`. Je vois une liste de fragments lisibles. Pour trouver les chaînes précédées de plusieurs `=`, je combine avec `grep` :
+
+```bash
+strings data.txt | grep '==='
+```
+
+Je tombe sur quelques lignes, dont la bonne contient le password.
+
+## Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `strings fichier` | Extrait les séquences imprimables d'au moins 4 caractères |
+| `strings -n N fichier` | Idem mais avec un seuil de N caractères au lieu de 4 |
+| `strings \| grep '...'` | Combo standard pour fouiller un binaire |
+| `reset` | Restaure un terminal cassé par un affichage de binaire |
+
+## Ce que je retiens
+
+Trois leçons :
+
+1. **L'extension d'un fichier sous Linux n'est qu'une convention pour les humains.** Le système se moque qu'un fichier s'appelle `.txt` ou `.exe`. C'est la commande `file` qui détermine son vrai type, en lisant le contenu.
+2. **Un fichier "binaire" contient des octets quelconques**, pas seulement des caractères imprimables. Tout ce qui n'est pas du texte pur est binaire : image, PDF, ZIP, exécutable, etc.
+3. **`strings` est un classique de l'analyse de fichiers inconnus.** En cybersécurité, c'est typiquement la première commande qu'on lance sur un binaire suspect — on y trouve souvent des URLs, des clés API hardcodées, ou des messages d'erreur révélateurs. À se rappeler quand l'analyse de malwares arrivera dans le cursus.

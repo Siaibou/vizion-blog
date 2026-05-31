@@ -1,0 +1,71 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 7 → 8"
+date: 2026-05-27
+description: "Premier contact avec grep, l'outil de recherche dans les fichiers. Filtrer un fichier énorme pour ne garder que les lignes contenant un mot précis."
+---
+
+# Bandit — Niveau 7 → 8
+
+*Premier niveau où on apprend `grep`, l'outil universel de recherche dans les fichiers. C'est probablement la commande Unix la plus utilisée de toutes — autant la rencontrer dans de bonnes conditions.*
+
+## Objectif
+
+Dans le fichier `data.txt`, trouver le password qui se trouve **à côté du mot `millionth`**.
+
+## Concepts à connaître
+
+**`grep` : la recherche de motif dans du texte.** `grep` lit un fichier (ou stdin) ligne par ligne, et **affiche les lignes qui contiennent le motif** demandé. Syntaxe de base :
+
+```bash
+grep "motif" fichier
+```
+
+Le motif peut être un mot simple, mais aussi une **expression régulière** (regex) — sujet vaste qu'on n'a pas besoin d'aborder ici.
+
+**Pourquoi `grep` est si important.** Énormément de fichiers en Unix (logs, configurations, sources de code, dumps de données) sont en texte. `grep` te permet d'**extraire l'info qui t'intéresse** d'un fichier qui peut faire des Mo voire des Go, instantanément. Tu l'utiliseras tous les jours dans une carrière en sécurité ou en dev.
+
+**L'erreur classique du débutant : `cat` sur un fichier énorme.** Quand un fichier fait quelques Mo, `cat` va te déverser tout son contenu dans le terminal — tu vois défiler des milliers de lignes que tu ne peux pas lire. La bonne approche est de **filtrer dès le départ** au lieu de regarder le tout.
+
+## Ma démarche
+
+Premier réflexe naïf :
+
+```bash
+cat data.txt
+```
+
+Catastrophe — le fichier est gigantesque. Des milliers de lignes défilent. Impossible de repérer `millionth` au milieu de tout ça.
+
+Je vais lire le manuel de `grep` (`man grep`) pour comprendre la syntaxe. Une fois que j'ai compris, la commande est simple :
+
+```bash
+grep 'millionth' data.txt
+```
+
+Une seule ligne sort, du genre :
+```
+millionth    <password ici>
+```
+
+`grep` a trouvé l'unique ligne contenant le mot `millionth`, et — heureusement — le fichier était structuré comme un dictionnaire (un mot suivi d'une valeur), donc le password était juste à côté.
+
+**Petite note d'auto-critique** : si le fichier avait été structuré différemment (par exemple le mot `millionth` apparaissant à 50 endroits, ou le password sur une autre ligne), il aurait fallu combiner `grep` avec d'autres outils (`-A` pour afficher les lignes après le match, `head`/`tail` pour limiter, etc.). Pour ce niveau, le dictionnaire était bienveillant.
+
+## Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `grep 'motif' fichier` | Affiche les lignes du fichier contenant le motif |
+| `grep -i 'motif' fichier` | Comme avant, mais insensible à la casse |
+| `grep -n 'motif' fichier` | Affiche aussi le numéro de ligne |
+| `grep -v 'motif' fichier` | Inverse : affiche les lignes qui **ne contiennent pas** le motif |
+| `grep -A N 'motif' fichier` | Affiche aussi les N lignes après chaque match |
+| `grep -B N 'motif' fichier` | Affiche aussi les N lignes avant chaque match |
+
+## Ce que je retiens
+
+Deux leçons :
+
+1. **`grep` filtre dès l'entrée plutôt que de lire tout puis chercher à l'œil.** Devant un fichier de plus de 50 lignes, le réflexe doit être : *"de quoi j'ai besoin précisément ?"* puis grep pour ne récupérer que ça.
+2. **Quand tu ne sais pas quelle commande utiliser, l'énoncé d'OverTheWire donne la liste des commandes utiles.** C'est une invitation à lire leur `man` page. La commande exacte se déduit de leur doc en 2 minutes, plus rapide que de chercher sur Google.

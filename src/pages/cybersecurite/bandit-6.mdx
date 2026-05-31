@@ -1,0 +1,106 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Bandit — Niveau 6 → 7"
+date: 2026-05-27
+description: "Chercher un fichier dans toute l'arborescence du serveur en filtrant par propriétaire, groupe et taille avec find. Découverte des commandes groups et id pour comprendre l'identité Unix."
+---
+
+# Bandit — Niveau 6 → 7
+
+*Premier niveau où il faut chercher sur **tout le serveur**, pas seulement dans un dossier. Et premier contact avec la notion d'identité Unix : utilisateurs, groupes, et fichiers qui leur appartiennent.*
+
+## Objectif
+
+Trouver, quelque part sur le serveur, un fichier ayant les propriétés :
+
+- appartenant à l'utilisateur **bandit7**
+- appartenant au groupe **bandit6**
+- d'une taille de **33 bytes**
+
+## Concepts à connaître
+
+**L'identité Unix : utilisateurs et groupes.** Sous Linux, chaque fichier appartient à **un utilisateur** (le propriétaire) et **un groupe**. Le système vérifie ces identités à chaque accès pour décider qui peut lire/écrire/exécuter quoi.
+
+Deux commandes pour explorer ça :
+
+```bash
+groups              # affiche les groupes auxquels appartient l'utilisateur courant
+groups bandit7      # affiche les groupes d'un utilisateur spécifique
+id                  # informations détaillées sur l'identité (UID, GID, groupes)
+id bandit7          # idem pour un autre utilisateur
+```
+
+**Pourquoi ce niveau a deux identités différentes (user bandit7, group bandit6).** C'est une construction volontaire de Bandit : tu es connecté en `bandit6` (donc tu peux **lire** les fichiers du groupe `bandit6`), mais le fichier **appartient** à l'utilisateur `bandit7`. C'est exactement le mécanisme classique d'élévation de privilèges en Unix : le fichier "passe le relais" du niveau 6 au niveau 7 via le système de groupe.
+
+**Chercher dans toute l'arborescence du système.** Au lieu de chercher depuis le répertoire courant (`.`), on cherche depuis la racine (`/`) :
+
+```bash
+find / -type f -user bandit7 -group bandit6 -size 33c
+```
+
+Mais comme la majorité des dossiers du système sont protégés en lecture pour ton utilisateur, `find` va afficher **des centaines de lignes d'erreur** `Permission denied`. Pour les masquer, on redirige la sortie d'erreur vers le néant :
+
+```bash
+find / -type f -user bandit7 -group bandit6 -size 33c 2>/dev/null
+```
+
+**Décomposition de `2>/dev/null`** — c'est un pattern crucial à comprendre :
+
+| Élément | Signification |
+|---|---|
+| `2` | Le **descripteur de fichier** numéro 2, qui correspond à **stderr** (la sortie d'erreur). Pour rappel : `0` = stdin, `1` = stdout, `2` = stderr. |
+| `>` | Redirection de sortie (équivalent côté écriture du `<` du niveau 1). |
+| `/dev/null` | Un fichier spécial qui agit comme un "trou noir" — tout ce qu'on y écrit est jeté. |
+
+L'ensemble dit : *"envoie les messages d'erreur dans le néant."* Les vrais résultats (sur stdout) continuent de s'afficher normalement.
+
+## Ma démarche
+
+Premier réflexe naïf, sans réfléchir aux propriétés du fichier :
+
+```bash
+find . -size 33c
+```
+
+Cherche depuis le répertoire courant (`.`). Une longue liste s'affiche, et... j'ai eu de la chance : le bon fichier était parmi les premiers, j'ai tapé `cat` dessus et c'était le bon password. Mais cette approche était mauvaise — beaucoup de fausses pistes, beaucoup de fichiers à vérifier un par un, et c'est seulement par chance que ça a marché.
+
+Au passage, j'ai exploré l'arborescence et ça m'a soulevé deux questions intéressantes :
+
+**Question 1 : pourquoi `cat .` ne fait rien mais `cat ..` non plus ?** Réponse : `.` est le **dossier courant**, `..` est le **dossier parent**. Ce ne sont pas des fichiers — `cat` sur un dossier n'affiche rien d'utile (et selon les systèmes, peut afficher une erreur explicite). Tu as raison de penser que `.` signifie le dossier actuel.
+
+**Question 2 : pourquoi `cat .bashrc`, `.profile`, `.bash_logout` ont marché ?** Parce que ce sont des **fichiers**, pas des dossiers. Le point en début de nom indique juste qu'ils sont "cachés" par convention (voir niveau 3→4). Ce sont des scripts de configuration du shell, lus automatiquement à chaque connexion.
+
+Revenons au problème. **La méthode propre** pour ce niveau, c'est d'utiliser **tous** les critères de l'énoncé en une seule commande `find` :
+
+```bash
+find / -type f -user bandit7 -group bandit6 -size 33c 2>/dev/null
+```
+
+Cette commande me retourne **un seul fichier**. `cat` dessus → password.
+
+Encore plus pratique, avec `-ls` à la fin pour voir les détails du fichier trouvé (taille, permissions, propriétaire) :
+
+```bash
+find / -type f -user bandit7 -group bandit6 -size 33c -ls 2>/dev/null
+```
+
+## Commandes & outils découverts
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `groups` | Affiche les groupes de l'utilisateur courant |
+| `groups <user>` | Affiche les groupes d'un utilisateur donné |
+| `id` | Affiche UID, GID et groupes de l'utilisateur courant |
+| `id <user>` | Idem pour un autre utilisateur |
+| `find / -user <u>` | Filtrer par utilisateur propriétaire |
+| `find / -group <g>` | Filtrer par groupe propriétaire |
+| `find ... -ls` | Afficher les résultats au format détaillé (comme `ls -l`) |
+| `2>/dev/null` | Rediriger les messages d'erreur (stderr) dans le néant |
+
+## Ce que je retiens
+
+Trois leçons :
+
+1. **Unix associe à chaque fichier un utilisateur et un groupe propriétaires.** `find` peut filtrer sur ces deux propriétés (`-user`, `-group`) — utile partout, pas seulement dans Bandit.
+2. **`2>/dev/null` masque les erreurs.** Pattern indispensable quand on lance `find` sur tout le système : sans ça, le bruit des `Permission denied` rend la sortie illisible.
+3. **Quand l'énoncé donne plusieurs propriétés, utilise-les toutes en une seule commande.** Filtrer sur 1 critère et trier ensuite à la main est inefficace et fragile. Filtrer sur 3 critères donne souvent un résultat unique du premier coup.
