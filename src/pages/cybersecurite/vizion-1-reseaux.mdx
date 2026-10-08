@@ -5,7 +5,7 @@ date: 2026-05-24
 description: "Premier récap de mes notes de cybersécurité : modèle OSI, three-way handshake TCP, différence TCP/UDP, intermédiaires du trafic, switches/routeurs, threat modeling."
 ---
 
-# 📚 Vizion 1 — Réseaux : OSI, TCP/UDP, intermédiaires
+# Vizion 1 — Réseaux : OSI, TCP/UDP, intermédiaires
 
 *Voici mon premier récap "Vizion" — des notes de cours synthétisées, faites pour être relues à intervalles croissants (J+1, J+3, J+7, J+15, J+30). Je publie ces récaps publiquement parce que les écrire pour quelqu'un d'autre m'oblige à les structurer mieux, et parce que si je me trompe quelque part, j'aimerais qu'on me corrige.*
 
@@ -13,7 +13,7 @@ description: "Premier récap de mes notes de cybersécurité : modèle OSI, thre
 
 ---
 
-## 🎯 Vue d'ensemble : l'objectif
+## Vue d'ensemble : l'objectif
 
 **Devenir AI Security Engineer.** C'est l'intersection de trois socles à construire **dans cet ordre** :
 
@@ -21,13 +21,13 @@ description: "Premier récap de mes notes de cybersécurité : modèle OSI, thre
 2. **Cybersécurité classique** : attaque/défense de sites web, serveurs, applications.
 3. **Machine learning** : comprendre comment un modèle fonctionne, s'entraîne, se déploie.
 
-> 🧠 **À retenir :** sauter des étapes = construire sur du sable.
+> **À retenir :** sauter des étapes = construire sur du sable.
 
 **Principe transversal :** la constance bat l'intensité. 1h/jour pendant 5 ans > 10h/jour pendant 3 mois.
 
 ---
 
-## 🧅 PARTIE 1 — Le modèle OSI et la base du réseau
+## PARTIE 1 — Le modèle OSI et la base du réseau
 
 ### 1.1 Header et Payload : l'enveloppe et la lettre
 
@@ -62,7 +62,7 @@ Sans IP source/destination, les routeurs ne sauraient pas où envoyer le paquet.
 └──────────────────────────────────────────────┘
 ```
 
-> 🧠 **Subtilité clé :** le payload d'une couche **contient le paquet complet (header + payload) de la couche du dessus.**
+> **Subtilité clé :** le payload d'une couche **contient le paquet complet (header + payload) de la couche du dessus.**
 
 ### 1.3 Tableau récapitulatif des couches OSI
 
@@ -73,7 +73,7 @@ Sans IP source/destination, les routeurs ne sauraient pas où envoyer le paquet.
 | Couche 4 (Transport) | **Segment** (TCP) / **Datagram** (UDP) | **Port** |
 | Couche 7 (Application) | **Données** / **Message** | (juste du contenu) |
 
-> 🧠 **Réflexe à acquérir :**
+> **Réflexe à acquérir :**
 > - Quand on dit **« IP »** → pense **packet** (L3).
 > - Quand on dit **« MAC »** ou **« Ethernet »** → pense **frame** (L2).
 
@@ -82,15 +82,15 @@ Sans IP source/destination, les routeurs ne sauraient pas où envoyer le paquet.
 | | Adresse MAC | Adresse IP |
 |---|---|---|
 | **Origine** | Gravée à la fabrication | Attribuée logiquement |
-| **Changement** | Jamais (en théorie) | Change selon le réseau |
+| **Changement** | Fixée à la fabrication, mais modifiable par logiciel | Change selon le réseau |
 | **Format** | `A4:C3:F0:85:AC:2D` | `192.168.1.42` |
 | **Portée** | Locale | Globale |
 
-**Analogie :** MAC = ton ADN (jamais change). IP = ton adresse postale (change si tu déménages).
+**Analogie :** MAC = le numéro de série de ta carte réseau (gravé à l'usine, mais n'importe qui peut en annoncer un faux). IP = ton adresse postale (change si tu déménages). Les téléphones récents annoncent même une MAC aléatoire différente pour chaque réseau wifi : c'est pour ça que filtrer par adresse MAC protège mal.
 
 ---
 
-## 🤝 PARTIE 2 — TCP et le three-way handshake
+## PARTIE 2 — TCP et le three-way handshake
 
 ### 2.1 Pourquoi « three-way » ?
 
@@ -116,7 +116,7 @@ Sans IP source/destination, les routeurs ne sauraient pas où envoyer le paquet.
 - **SYN-ACK** = synchronize + acknowledge. Le serveur confirme ET propose son propre n°.
 - **ACK** = acknowledge. Le client confirme la réception.
 
-> 🧠 **Pourquoi pas deux messages ?** Après 2 messages, le serveur ne sait pas si le client a reçu sa réponse. Le 3ᵉ message est la double confirmation.
+> **Pourquoi pas deux messages ?** Après 2 messages, le serveur ne sait pas si le client a reçu sa réponse. Le 3ᵉ message est la double confirmation.
 
 ### 2.3 Pourquoi TCP fait tout ce cinéma
 
@@ -135,7 +135,7 @@ TCP garantit que les données arrivent **dans le bon ordre, sans corruption, san
 
 ---
 
-## 📨 PARTIE 3 — TCP vs UDP
+## PARTIE 3 — TCP vs UDP
 
 ### 3.1 La règle d'or
 
@@ -156,11 +156,13 @@ Sur du temps réel (visio, jeu en ligne, streaming live) :
 | Cas | Choix | Pourquoi |
 |---|---|---|
 | Téléchargement de fichier | TCP | 1 octet manquant = fichier corrompu |
-| Email, HTTP/HTTPS | TCP | Contenu incomplet = inutilisable |
+| Email, HTTP/HTTPS (HTTP/1.1 et HTTP/2) | TCP | Contenu incomplet = inutilisable |
 | Appel vidéo / Zoom | UDP | Mieux un glitch que tout figer |
 | Jeu en ligne (FPS) | UDP | Position d'il y a 1 sec = inutile |
 | DNS | UDP | Requête minuscule → redemander coûte moins cher que monter une connexion TCP |
-| Netflix / YouTube (vidéo enregistrée) | TCP | Pas du vrai direct → le buffer compense |
+| Netflix (vidéo enregistrée) | TCP | Pas du vrai direct → le buffer compense |
+
+Nuance : HTTP/3, déjà utilisé pour une grande partie du trafic web (YouTube notamment), passe par **QUIC**, qui tourne sur UDP mais refait lui-même les renvois et la remise en ordre. La règle « tout doit arriver » reste vraie : c'est simplement QUIC qui s'en charge, au lieu de TCP.
 
 ### 3.4 Implications sécurité
 
@@ -168,17 +170,17 @@ Sur du temps réel (visio, jeu en ligne, streaming live) :
 - **UDP difficile à filtrer** (pas d'état à suivre) → règles de pare-feu plus grossières.
 - **Scan UDP lent et peu fiable** → cauchemar avec Nmap.
 
-> 🧠 **Image :** TCP = la Poste avec accusé de réception. UDP = lancer une feuille par la fenêtre.
+> **Image :** TCP = la Poste avec accusé de réception. UDP = lancer une feuille par la fenêtre.
 
 ---
 
-## 🌐 PARTIE 4 — Qui voit ton trafic ? Les intermédiaires
+## PARTIE 4 — Qui voit ton trafic ? Les intermédiaires
 
 Entre toi et un site web, ton trafic passe par **9 types d'acteurs** :
 
 1. **Ta box / routeur** (Livebox, Freebox...).
 2. **Le réseau local** (wifi public = risque man-in-the-middle).
-3. **Ton FAI** (Orange, Free, SFR...) — voit tout, conservation 1 an obligatoire en France.
+3. **Ton FAI** (Orange, Free, SFR...) — voit passer tout ton trafic. En France, la loi l'oblige à conserver un an certaines données de connexion (comme l'adresse IP qui t'est attribuée), mais jamais le contenu des échanges ni les pages consultées.
 4. **Les serveurs DNS** — traduisent `google.com` → `142.250.74.110`. Par défaut ceux du FAI.
 5. **Les opérateurs de transit** (Cogent, Level 3, Arelion...) — les « hops ».
 6. **Les IXP** (Internet Exchange Points, ex: France-IX) — bâtiments physiques où s'échange le trafic.
@@ -192,11 +194,11 @@ Le DNS est le « répertoire téléphonique » d'internet. **Avant** d'envoyer q
 
 **Par défaut, c'est le DNS de ton FAI** → ton FAI sait, en temps réel, tous les sites que tu cherches à visiter, **même si tout le reste est chiffré**.
 
-Alternatives : Cloudflare (`1.1.1.1`), Quad9 (`9.9.9.9`). Mais alors c'est eux qui voient.
+Alternatives : Cloudflare (`1.1.1.1`), Quad9 (`9.9.9.9`). Mais en DNS classique, tes requêtes traversent toujours le réseau de ton FAI en clair : il peut encore les lire. Pour les lui cacher, il faut activer le DNS chiffré (DoH, *DNS over HTTPS*, ou DoT, *DNS over TLS*). Et alors, ce sont Cloudflare ou Quad9 qui voient tes requêtes.
 
 ### 4.2 HTTPS : contenu vs contenant
 
-| Avec HTTPS, les intermédiaires voient ✅ | Ils ne voient PAS ❌ |
+| Avec HTTPS, les intermédiaires voient | Ils ne voient PAS |
 |---|---|
 | IP source et destination | Le contenu des pages |
 | Ports utilisés (443) | Les URL précises (juste le domaine) |
@@ -204,7 +206,7 @@ Alternatives : Cloudflare (`1.1.1.1`), Quad9 (`9.9.9.9`). Mais alors c'est eux q
 | Horodatage | Tes messages |
 | Nom de domaine via **SNI** | Les en-têtes HTTP, cookies |
 
-> 🧠 **HTTPS protège la confidentialité du contenu, mais pas les métadonnées.** Et les métadonnées sont souvent **plus révélatrices** que le contenu.
+> **HTTPS protège la confidentialité du contenu, mais pas les métadonnées.** Et les métadonnées sont souvent **plus révélatrices** que le contenu.
 
 ### 4.3 Le SNI (Server Name Indication)
 
@@ -215,17 +217,17 @@ Solution émergente : **ECH** (Encrypted Client Hello) — chiffre aussi le SNI.
 ### 4.4 VPN : pas magique
 
 Un VPN crée un **tunnel chiffré** entre toi et un serveur du fournisseur VPN.
-- ✅ Ton FAI ne voit plus quels sites tu visites.
-- ✅ Les sites voient l'IP du VPN, pas la tienne.
-- ❌ **Le fournisseur VPN voit tout ce que ton FAI voyait avant.** Tu as juste **déplacé la confiance**.
+- Avantage : ton FAI ne voit plus quels sites tu visites.
+- Avantage : les sites voient l'IP du VPN, pas la tienne.
+- Limite : **le fournisseur VPN voit tout ce que ton FAI voyait avant.** Tu as juste **déplacé la confiance**.
 
-> 🧠 Un VPN gratuit douteux est **pire** que pas de VPN du tout.
+> Un VPN gratuit douteux est **pire** que pas de VPN du tout.
 
 **Tor** va plus loin : 3 relais successifs, chacun ne connaît qu'une partie du puzzle. Vraie anonymisation, mais lent.
 
 ---
 
-## 🔀 PARTIE 5 — Switches et routeurs
+## PARTIE 5 — Switches et routeurs
 
 ### 5.1 Switch L2 vs L3
 
@@ -254,7 +256,7 @@ Un VPN crée un **tunnel chiffré** entre toi et un serveur du fournisseur VPN.
 **VLAN** = Virtual LAN = découper un réseau physique en plusieurs réseaux logiques isolés.
 
 **Pourquoi c'est crucial :** sans segmentation, **une seule machine compromise = tout le réseau compromis**.
-> 🔴 **Exemple célèbre :** Target en 2013 — attaquants entrés par le système de climatisation, ont volé 40 millions de cartes bancaires parce que tout était sur le même réseau.
+> **Exemple célèbre :** Target en 2013 — les attaquants sont entrés avec les identifiants volés à un prestataire de climatisation, puis sont arrivés jusqu'aux caisses parce que le réseau des paiements n'était pas isolé du reste. Résultat : 40 millions de cartes bancaires volées.
 
 **Outils pour gérer la segmentation :** VLAN, ACL (Access Control Lists).
 
@@ -271,11 +273,11 @@ Un VPN crée un **tunnel chiffré** entre toi et un serveur du fournisseur VPN.
 - Route hijacking.
 - Attaques BGP.
 
-> 🧠 **Principe défensif :** un IDS qui regarde la L3 ne verra rien d'une attaque L2. Il faut **placer ses protections aux bonnes couches**.
+> **Principe défensif :** un IDS qui regarde la L3 ne verra rien d'une attaque L2. Il faut **placer ses protections aux bonnes couches**.
 
 ---
 
-## 🛡️ PARTIE 6 — Concepts de sécurité transversaux
+## PARTIE 6 — Concepts de sécurité transversaux
 
 ### 6.1 Threat modeling (modélisation des menaces)
 
@@ -306,11 +308,11 @@ Aucun moyen de paiement anonyme ne sert si :
 - Tu portes ton téléphone connecté à ton compte Google.
 - Tu passes devant des caméras à reconnaissance faciale.
 
-> 🧠 **L'anonymat n'est pas un toggle, c'est tout un mode de vie cohérent.**
+> **L'anonymat n'est pas un toggle, c'est tout un mode de vie cohérent.**
 
 ---
 
-## 🛠️ Outils à connaître (pour plus tard)
+## Outils à connaître (pour plus tard)
 
 | Outil | Pour quoi |
 |---|---|
@@ -323,7 +325,7 @@ Aucun moyen de paiement anonyme ne sert si :
 
 ---
 
-## ✅ Auto-test : sais-tu répondre à ça ?
+## Auto-test : sais-tu répondre à ça ?
 
 Réponds dans ta tête, sans regarder. Si tu hésites sur une question, retourne dans la partie correspondante.
 
@@ -340,7 +342,7 @@ Réponds dans ta tête, sans regarder. Si tu hésites sur une question, retourne
 
 ---
 
-> 💡 **Conseil de révision :** ne lis pas ce doc passivement. Pour chaque section, ferme les yeux et essaie de **réexpliquer le concept à voix haute** comme si tu l'enseignais à quelqu'un. Tu sentiras immédiatement où tu as des trous. C'est ça, étudier efficacement.
+> **Conseil de révision :** ne lis pas ce doc passivement. Pour chaque section, ferme les yeux et essaie de **réexpliquer le concept à voix haute** comme si tu l'enseignais à quelqu'un. Tu sentiras immédiatement où tu as des trous. C'est ça, étudier efficacement.
 
 ---
 

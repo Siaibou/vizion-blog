@@ -70,10 +70,17 @@ import Navigation from '../components/Navigation.astro';
     }
 
     .page-main {
+        box-sizing: border-box;
         margin: auto;
         padding: 1rem 1.5rem 4rem;
-        width: 880px;
-        max-width: calc(100% - 2rem);
+        width: 928px;
+        max-width: 100%;
+    }
+
+    /* ---- Téléphone : marges plus fines, tableaux larges défilables ---- */
+    @media (max-width: 700px) {
+        .page-main { padding-left: 1rem; padding-right: 1rem; }
+        table { display: block; overflow-x: auto; }
     }
 
     /* ---- Titres ---- */

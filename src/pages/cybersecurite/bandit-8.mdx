@@ -52,14 +52,14 @@ Je regarde les commandes utiles proposées par OverTheWire : `grep, sort, uniq, 
 sort data.txt | uniq -c
 ```
 
-La sortie ressemble à ça :
+La sortie ressemble à ça (lignes remplacées par des exemples) :
 
 ```
-10 2WKcZk64zTg8NT0cZIHTRHwrR5pfCUev
-10 3ku4RwHKoqN3ZVgBL9AKMMSc2L2ankAi
- 1 4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
-10 4lEvwERBraPNB1G7XdFeRi7GP78babHT
-10 4tsxNEl92WRocQJon0QrBdwdJGrKH6Lv
+10 ligne-repetee-A
+10 ligne-repetee-B
+ 1 <password ici>
+10 ligne-repetee-C
+10 ligne-repetee-D
 ```
 
 La ligne avec le compteur `1` est celle qui m'intéresse — c'est le password.
@@ -74,9 +74,9 @@ sort data.txt | uniq -c | sort -n
 
 Sortie :
 ```
- 1 4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
-10 2WKcZk64zTg8NT0cZIHTRHwrR5pfCUev
-10 3ku4RwHKoqN3ZVgBL9AKMMSc2L2ankAi
+ 1 <password ici>
+10 ligne-repetee-A
+10 ligne-repetee-B
 ...
 ```
 

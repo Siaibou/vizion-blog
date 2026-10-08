@@ -2,59 +2,61 @@
 layout: ../../layouts/Layout.astro
 title: "Bandit — Niveau 2 → 3"
 date: 2026-05-25
-description: "Comment lire un fichier dont le nom contient des espaces : guillemets ou échappement avec backslash."
+description: "Lire un fichier dont le nom contient des espaces et commence par deux tirets : guillemets, chemin ./ et redirection d'entrée."
 ---
 
 # Bandit — Niveau 2 → 3
 
-*Court niveau qui apprend à gérer les noms de fichiers contenant des espaces — un piège classique pour qui débute en ligne de commande.*
+*Court niveau sur les noms de fichiers qui contiennent des espaces, un piège classique quand on débute en ligne de commande. Avec une difficulté en plus : ce nom-là commence aussi par des tirets, comme au niveau précédent.*
 
-## 🎯 Objectif
+## Objectif
 
-Lire le contenu d'un fichier nommé `spaces in this filename` (avec les espaces littéralement dans le nom) situé dans le répertoire personnel.
+Lire le contenu d'un fichier nommé `--spaces in this filename--`, situé dans le répertoire personnel. Le nom cumule deux pièges : il contient des espaces, et il commence par `--`.
 
-## 🧠 Concepts à connaître
+## Concepts à connaître
 
-**Pourquoi les espaces posent problème.** Dans un shell, l'**espace** est le séparateur entre les arguments d'une commande. Quand tu tapes `cat spaces in this filename`, le shell comprend : *"lance `cat` avec quatre arguments : `spaces`, `in`, `this`, `filename`"*. `cat` tente alors d'ouvrir quatre fichiers distincts, qui n'existent pas. Erreur.
+**Pourquoi les espaces posent problème.** Dans un shell, l'**espace** est le séparateur entre les arguments d'une commande. Quand tu tapes `cat --spaces in this filename--`, le shell comprend : *"lance `cat` avec quatre arguments : `--spaces`, `in`, `this`, `filename--`"*. `cat` prend le premier pour une option qu'il ne connaît pas, et s'arrête sur une erreur.
 
-**Trois solutions équivalentes pour échapper les espaces :**
+**Trois façons de regrouper un nom avec espaces en un seul argument :**
 
 | Syntaxe | Exemple |
 |---|---|
-| Guillemets doubles | `cat "spaces in this filename"` |
-| Guillemets simples | `cat 'spaces in this filename'` |
-| Backslash devant chaque espace | `cat spaces\ in\ this\ filename` |
+| Guillemets doubles | `"mon fichier.txt"` |
+| Guillemets simples | `'mon fichier.txt'` |
+| Backslash devant chaque espace | `mon\ fichier.txt` |
 
 Les trois disent au shell : *"considère tout ça comme un seul argument."*
 
-> 💡 **Subtilité utile pour plus tard** : guillemets simples et doubles ne sont pas exactement équivalents. Les **doubles** (`"..."`) permettent l'interprétation des variables (`"$HOME/fichier"` est remplacé par ton dossier home). Les **simples** (`'...'`) ne font aucune interprétation — c'est du texte brut. À ce niveau ça ne change rien, mais c'est bon à savoir.
+**Pourquoi les guillemets seuls ne suffisent pas ici.** Le shell retire les guillemets avant de lancer la commande. Avec `cat "--spaces in this filename--"`, `cat` reçoit donc un seul argument, `--spaces in this filename--`, qui commence toujours par `--` : il le prend encore pour une option, et l'erreur revient (`cat: unrecognized option`). C'est un cousin du piège du niveau 1 → 2 : un nom qui commence par un tiret n'est pas lu comme un nom de fichier. Il faut donc ajouter une des solutions du niveau précédent :
 
-## 🔍 Ma démarche
+- **`./` devant le nom** : dans `./'--spaces in this filename--'`, le shell colle `./` et la partie entre guillemets en un seul argument. Il commence par `.` et non plus par `-`, donc `cat` le traite comme un fichier.
+- **La redirection `<`** : c'est le shell qui ouvre le fichier et le donne à `cat` sur son entrée standard. `cat` ne voit jamais le nom, donc il ne peut pas le confondre avec une option.
 
-Pas de drame ici. Mon intuition de débutant a bien marché : devant un nom de fichier avec des espaces, j'ai mis des guillemets autour, et ça a fonctionné.
+Il existe une troisième solution, que je découvrirai au [niveau 4 → 5](/cybersecurite/bandit-4) : `cat -- "--spaces in this filename--"`, où `--` annonce la fin des options.
+
+> **Subtilité utile pour plus tard** : guillemets simples et doubles ne sont pas exactement équivalents. Les **doubles** (`"..."`) permettent l'interprétation des variables (`"$HOME/fichier"` est remplacé par ton dossier home). Les **simples** (`'...'`) ne font aucune interprétation — c'est du texte brut. À ce niveau ça ne change rien, mais c'est bon à savoir.
+
+## Ma démarche
+
+Aucune difficulté ici : j'ai deviné qu'il fallait mettre des guillemets du début à la fin du nom de fichier. Mes deux solutions reprennent les deux techniques du niveau précédent, la redirection `<` et le chemin `./`, avec les guillemets en plus :
 
 ```bash
-cat "spaces in this filename"
+cat < "--spaces in this filename--"
+cat ./'--spaces in this filename--'
 ```
 
-Le password du niveau 3 apparaît immédiatement.
+Les deux affichent le password du niveau 3.
 
-J'ai aussi testé la version avec `./` du niveau précédent par curiosité, vu que le fichier commence en plus par un caractère spécial dans sa logique :
-
-```bash
-cat ./'spaces in this filename'
-```
-
-Marche aussi. La cohabitation `./` + guillemets fonctionne sans accroc.
-
-## 🛠️ Commandes & outils découverts
+## Commandes & outils découverts
 
 | Syntaxe | Ce qu'elle fait |
 |---|---|
 | `cat "fichier avec espaces"` | Encadrer un nom avec espaces de guillemets doubles |
 | `cat 'fichier avec espaces'` | Idem avec guillemets simples (pas d'interprétation de variables) |
 | `cat fichier\ avec\ espaces` | Échapper chaque espace avec `\` |
+| `cat ./'--nom avec espaces--'` | Guillemets pour les espaces, `./` pour le tiret en tête |
+| `cat < "--nom avec espaces--"` | Le shell ouvre le fichier lui-même : `cat` ne voit pas le nom |
 
-## 💡 Ce que je retiens
+## Ce que je retiens
 
-Dans un shell, **l'espace est un séparateur d'arguments**. Pour qu'un nom de fichier contenant des espaces soit traité comme un seul argument, il faut l'encadrer de guillemets ou échapper les espaces avec `\`. Détail anodin une fois qu'on le sait, mais c'est typiquement le genre de truc qui bloque un débutant pendant 10 minutes la première fois.
+Dans un shell, **l'espace est un séparateur d'arguments**. Pour qu'un nom de fichier contenant des espaces soit traité comme un seul argument, il faut l'encadrer de guillemets ou échapper les espaces avec `\`. Mais les guillemets ne règlent que ce problème-là : un nom qui commence par `-` reste pris pour une option. Ici il fallait combiner deux réflexes, les guillemets pour les espaces, et `./` ou `<` pour le tiret. Détail anodin une fois qu'on le sait, mais c'est typiquement le genre de truc qui bloque un débutant pendant 10 minutes la première fois.

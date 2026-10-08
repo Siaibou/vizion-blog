@@ -21,7 +21,7 @@ Dans `data.txt`, trouver le password parmi les rares chaînes lisibles, **préc�
 
 > Sous Unix/Linux, **l'extension d'un fichier ne signifie rien pour le système**. Elle est juste une convention pour les humains et certains programmes (comme les éditeurs ou les navigateurs). Tu peux renommer un PDF en `.txt`, ça reste un PDF — c'est son **contenu** (sa signature en début de fichier) qui détermine son vrai type. C'est exactement ce que fait la commande `file` (voir niveau 4→5) : elle lit les premiers octets pour deviner le type réel.
 
-Cette confusion vient surtout de Windows, où l'OS associe l'extension à un programme d'ouverture. Sous Linux, ce système n'existe pas — chaque programme se débrouille pour reconnaître son format. C'est plus souple, mais ça peut piéger.
+Cette confusion vient surtout de Windows, où l'OS associe l'extension à un programme d'ouverture. Sous Linux, le noyau et le shell ignorent complètement l'extension. Seuls les environnements de bureau (KDE, GNOME) s'en servent, avec le contenu du fichier, pour choisir l'application qui l'ouvre quand tu double-cliques. C'est plus souple, mais ça peut piéger.
 
 **Sur la définition "fichier binaire" :** Wikipédia dit *"un fichier qui n'est pas un fichier texte"*. C'est correct mais frustrant. Une définition plus utile : un fichier binaire contient des **séquences d'octets quelconques** (de 0 à 255), pas seulement des octets qui correspondent à des caractères imprimables ASCII/UTF-8. Un `.exe`, une image PNG, un ZIP, un PDF — tous sont des binaires. Et un `.txt` peut très bien en être un aussi si son créateur l'a fabriqué comme ça (cas de ce niveau).
 

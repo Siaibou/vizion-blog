@@ -5,7 +5,41 @@ import Layout from '../../layouts/Layout.astro';
 <Layout>
     <p class="section-kicker">Section</p>
     <h1>Mathématiques</h1>
-    <p class="section-intro">Les mathématiques qui sous-tendent l'informatique et le machine learning.</p>
+    <p class="section-intro">Les mathématiques de ma licence, reprises depuis les bases, et celles qui sous-tendent l'informatique et le machine learning.</p>
+
+    <details open>
+        <summary>Les bases</summary>
+        <ul class="article-list">
+            <li>
+                <a href="/cours/le-calcul.html">Le calcul, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+            <li>
+                <a href="/cours/geometrie-et-trigonometrie.html">Géométrie et trigonométrie, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+        </ul>
+    </details>
+
+    <details open>
+        <summary>Logique et démonstrations</summary>
+        <ul class="article-list">
+            <li>
+                <a href="/cours/la-logique.html">La logique, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+        </ul>
+    </details>
+
+    <details open>
+        <summary>Analyse</summary>
+        <ul class="article-list">
+            <li>
+                <a href="/cours/majorants-et-bornes.html">Majorants et bornes, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+        </ul>
+    </details>
 
     <details>
         <summary>Algèbre linéaire</summary>
@@ -16,13 +50,6 @@ import Layout from '../../layouts/Layout.astro';
 
     <details>
         <summary>Probabilités & statistiques</summary>
-        <ul class="article-list">
-            <li><em>Aucun article publié pour l'instant.</em></li>
-        </ul>
-    </details>
-
-    <details>
-        <summary>Analyse</summary>
         <ul class="article-list">
             <li><em>Aucun article publié pour l'instant.</em></li>
         </ul>
@@ -89,4 +116,11 @@ import Layout from '../../layouts/Layout.astro';
     }
     .article-list li:first-child { border-top: none; }
     .article-list em { color: var(--text-muted); }
+    .item-meta {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+    }
 </style>

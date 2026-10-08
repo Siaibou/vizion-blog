@@ -5,12 +5,26 @@ import Layout from '../../layouts/Layout.astro';
 <Layout>
     <p class="section-kicker">Section</p>
     <h1>Informatique</h1>
-    <p class="section-intro">Python, shell Linux, Git, et outils de développement.</p>
+    <p class="section-intro">Architecture des ordinateurs, Python, shell Linux, Git et outils de développement.</p>
 
-    <details>
+    <details open>
+        <summary>Architecture des ordinateurs</summary>
+        <ul class="article-list">
+            <li>
+                <a href="/cours/le-binaire.html">Le binaire, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+            <li>
+                <a href="/cours/les-portes-logiques.html">Les portes logiques, depuis le tout début</a>
+                <span class="item-meta">Cours interactif · rédigé avec Claude</span>
+            </li>
+        </ul>
+    </details>
+
+    <details open>
         <summary>Python — Les bases</summary>
         <ul class="article-list">
-            <li><em>Aucun article publié pour l'instant.</em></li>
+            <li><a href="/informatique/python-erreurs-password-checker">Erreurs faites pendant le projet password-checker</a></li>
         </ul>
     </details>
 
@@ -21,10 +35,10 @@ import Layout from '../../layouts/Layout.astro';
         </ul>
     </details>
 
-    <details>
+    <details open>
         <summary>Git & GitHub</summary>
         <ul class="article-list">
-            <li><em>Aucun article publié pour l'instant.</em></li>
+            <li><a href="/informatique/git-essentiels">Fiche des commandes & concepts essentiels</a></li>
         </ul>
     </details>
 </Layout>
@@ -89,4 +103,11 @@ import Layout from '../../layouts/Layout.astro';
     }
     .article-list li:first-child { border-top: none; }
     .article-list em { color: var(--text-muted); }
+    .item-meta {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+    }
 </style>

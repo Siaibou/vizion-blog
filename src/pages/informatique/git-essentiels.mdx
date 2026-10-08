@@ -1,0 +1,289 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Git — Fiche des commandes & concepts essentiels"
+date: 2026-05-26
+description: "Récap personnel des commandes Git apprises pendant mes premiers projets : modèle mental, cycle add/commit/push, remotes, branches et dépannage."
+---
+
+# Git — Fiche des commandes & concepts essentiels
+
+*Récap de tout ce que j'ai appris sur Git pendant mes premiers projets (notamment **password-checker**). Cette fiche est faite pour être relue régulièrement pendant les premières semaines, le temps que les commandes essentielles s'ancrent par la pratique.*
+
+---
+
+## 1. Le modèle mental de Git en 30 secondes
+
+Git est un **système de versionnage** : il prend des "photos" (**commits**) de ton projet à différents moments. Chaque commit contient :
+
+- Un identifiant unique (un hash, ex. `3c3ba89...`)
+- Un auteur (nom + email — d'où l'importance de la config)
+- Une date
+- Un message qui explique le changement
+- Le contenu du projet à cet instant
+
+Tu peux à tout moment revenir à un commit antérieur, comparer deux commits, créer des branches parallèles.
+
+**Trois zones à connaître :**
+
+```
+[Working dir]  --git add-->  [Staging area]  --git commit-->  [Repository]
+```
+
+1. **Working directory** : ton dossier de travail, où tu modifies les fichiers.
+2. **Staging area** (zone d'index) : le "panier" où tu prépares les fichiers à inclure dans le prochain commit. `git add` y dépose.
+3. **Repository** : l'historique des commits. `git commit` y enregistre depuis le staging.
+
+> **Analogie utile** : pense à Git comme à un **photographe**. Tu choisis ce qui doit apparaître sur la photo (`git add`), puis tu prends la photo (`git commit`). La photo est ensuite rangée dans l'album (le repository). Tu peux à tout moment feuilleter l'album pour revoir un instant passé.
+
+---
+
+## 2. Identité & configuration
+
+### Les trois niveaux de portée
+
+| Portée | Commande | Stocké dans | S'applique à |
+|---|---|---|---|
+| System | `git config --system ...` | `/etc/gitconfig` | Tous les utilisateurs |
+| Global | `git config --global ...` | `~/.gitconfig` | Tous tes repos |
+| Local | `git config ...` (dans un repo) | `.git/config` du repo | Ce repo uniquement |
+
+**Règle** : local écrase global, global écrase system. Le plus spécifique gagne.
+
+### Configurer ton identité (une fois par machine)
+
+```bash
+git config --global user.name "TonPseudo"
+git config --global user.email "id+pseudo@users.noreply.github.com"
+```
+
+**Pourquoi le noreply** : ton email apparaît dans chaque commit public. Le noreply de GitHub te protège sans casser le lien avec ton compte.
+
+### Configurer la branche par défaut
+
+```bash
+git config --global init.defaultBranch main
+```
+
+Sans ça, `git init` crée une branche `master` (alors que GitHub utilise `main` pour les nouveaux dépôts depuis 2020).
+
+### Voir ta config
+
+```bash
+git config --global --list      # tout ce qui est en global
+git config --list               # tout (system + global + local du repo courant)
+git config user.email           # juste cette clé, valeur effective
+```
+
+---
+
+## 3. Démarrer un nouveau projet
+
+```bash
+mkdir mon-projet && cd mon-projet
+git init
+```
+
+Crée un dossier caché `.git/` qui contiendra tout l'historique. **Ne touche jamais à ce dossier manuellement.**
+
+```bash
+ls -a              # affiche aussi les fichiers cachés (commençant par .)
+git status         # état du repo
+```
+
+> **`git status` est ton meilleur ami.** Tape-le 10 fois par session si besoin. C'est gratuit, et ça te dit exactement où tu en es : quels fichiers sont modifiés, lesquels sont dans le staging, lesquels ne sont pas suivis.
+
+---
+
+## 4. Le cycle de base : add → commit
+
+### Ajouter des fichiers au staging
+
+```bash
+git add fichier.py            # un fichier précis
+git add .                     # tout le dossier courant (sauf ce qui est dans .gitignore)
+git add src/                  # un dossier
+```
+
+### Faire le commit
+
+```bash
+git commit -m "Message court qui explique le changement"
+```
+
+**Bonnes pratiques pour les messages :**
+
+- En **anglais** (norme tech).
+- À l'**impératif présent** : *"Add login form"*, pas *"Added login form"*. Mémo : ton message complète la phrase *"If applied, this commit will..."*.
+- **50 caractères max** idéalement pour la première ligne.
+- Pas de point final.
+- Pour un message long : ne mets pas `-m`, Git ouvre un éditeur où tu peux écrire un titre court suivi d'un paragraphe.
+
+### Voir l'historique
+
+```bash
+git log                       # historique complet
+git log --oneline             # une ligne par commit, plus lisible
+git log --oneline --graph     # avec le graphe des branches
+```
+
+Pour quitter le viewer (`less`) : tape `q`.
+
+---
+
+## 5. Ignorer des fichiers : `.gitignore`
+
+Crée un fichier `.gitignore` à la racine du projet. Liste-y ce que Git doit ignorer.
+
+Exemple pour un projet Python :
+
+```gitignore
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Environnements virtuels
+venv/
+.venv/
+
+# Secrets
+.env
+*.key
+
+# Éditeurs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+```
+
+**Règles de syntaxe :**
+
+- `#` = commentaire.
+- `nom/` = un **dossier** (slash final).
+- `nom` = fichier ou dossier portant ce nom.
+- `*.ext` = tous les fichiers avec cette extension.
+- `*.py[cod]` matche `.pyc`, `.pyo`, `.pyd`.
+
+**Important** : `.gitignore` lui-même **doit être commité**. Il fait partie du projet : c'est l'engagement explicite *"voilà ce que je ne veux jamais voir dans l'historique"*.
+
+> **Piège classique** : ajouter au `.gitignore` un fichier **déjà commité** ne le retire pas. Git continue de le suivre, et il reste dans l'historique. Pour arrêter de le suivre tout en gardant le fichier sur ton disque : `git rm --cached fichier`, puis un commit. Et si c'était un secret (mot de passe, clé), considère-le comme compromis : il reste lisible dans les anciens commits.
+
+---
+
+## 6. Travailler avec GitHub (remote)
+
+### Lier un repo local à un repo GitHub
+
+Une fois le repo GitHub créé (**sans** README ni .gitignore : sinon il contient déjà un commit que tu n'as pas, et ton premier push est refusé) :
+
+```bash
+git remote add origin git@github.com:Pseudo/nom-du-repo.git
+git remote -v                 # vérifie : 2 lignes (fetch + push)
+```
+
+- `origin` = alias conventionnel pour le remote principal. Tu **pourrais** l'appeler autrement, mais tous les tutos et outils partent du principe que c'est `origin`.
+- Utilise l'URL **SSH** (`git@github.com:...`) si tu as une clé SSH, pas HTTPS.
+
+### Premier push
+
+```bash
+git push -u origin main
+```
+
+- `-u` = `--set-upstream`. **Uniquement la première fois** pour cette branche : lie ta branche locale `main` à `origin/main`.
+- Ensuite, simplement `git push`.
+
+### Récupérer les changements distants
+
+```bash
+git pull                      # récupère ET fusionne
+git fetch                     # récupère seulement, sans fusionner
+```
+
+---
+
+## 7. Manipuler les branches
+
+### Renommer une branche
+
+```bash
+git branch -m ancien nouveau          # renomme une branche spécifique
+git branch -m nouveau                 # renomme la branche courante
+```
+
+Exemple vu pendant le projet : `git branch -m master main`.
+
+### Voir les branches
+
+```bash
+git branch                    # branches locales
+git branch -a                 # locales + distantes
+```
+
+### Créer / changer de branche (à explorer plus tard)
+
+```bash
+git switch -c nouvelle-branche       # créer ET basculer dessus
+git switch main                      # basculer sur une branche existante
+```
+
+---
+
+## 8. Workflow type quand tu démarres une session de code
+
+```bash
+cd ~/chemin/vers/projet
+git status                    # où en suis-je ?
+git pull                      # si tu travailles sur plusieurs machines
+# ... tu codes ...
+git status                    # qu'est-ce qui a changé ?
+git diff                      # détails des changements ligne par ligne
+git add .
+git status                    # vérifie ce qui va être commité
+git commit -m "Add X feature"
+git push
+```
+
+---
+
+## 9. En cas de pépin
+
+| Problème | Commande qui sauve |
+|---|---|
+| Annuler les changements d'un fichier pas encore ajoutés avec `git add` | `git checkout -- fichier.py` |
+| Désindexer un fichier ajouté par erreur (sans perdre les changements) | `git reset HEAD fichier.py` |
+| Modifier le dernier commit (message ou contenu, **avant push**) | `git commit --amend` |
+| Voir le contenu du dernier commit | `git show` |
+| Voir un commit précis | `git show <hash>` |
+| `Permission denied (publickey)` | Vérifier que ta clé SSH est ajoutée à GitHub |
+| `remote origin already exists` | `git remote remove origin` puis le ré-ajouter |
+| `updates were rejected` au push | Le remote a des commits que tu n'as pas. `git pull` d'abord. |
+
+Pour les deux premières lignes, les versions récentes de Git (depuis 2019) proposent des commandes plus claires, et c'est d'ailleurs celles que suggère `git status` : `git restore fichier.py` pour annuler les changements pas encore ajoutés, et `git restore --staged fichier.py` pour désindexer (si tu avais déjà fait `git add`, désindexe d'abord, puis annule). Les anciennes commandes fonctionnent toujours.
+
+> **Règle d'or** : ne fais **jamais** `git push --force` sur une branche partagée. Tu écrases l'historique des autres. Sur tes projets solo c'est OK techniquement, mais prends l'habitude de le considérer comme dangereux — comme `rm -rf`.
+
+---
+
+## 10. Glossaire
+
+| Terme | Signification |
+|---|---|
+| **Repository / repo** | Un projet versionné par Git |
+| **Commit** | Une "photo" du projet à un instant |
+| **Branch** | Une ligne de développement parallèle |
+| **HEAD** | Le commit où tu te trouves actuellement |
+| **Staging area / Index** | La zone d'attente avant commit |
+| **Remote** | Un repo distant (ex : sur GitHub) |
+| **Origin** | Nom conventionnel pour le remote principal |
+| **Clone** | Copier un repo distant en local |
+| **Pull** | Récupérer les commits distants et fusionner |
+| **Push** | Envoyer tes commits vers le remote |
+| **Merge** | Fusionner deux branches |
+| **Fork** | Copier le repo de quelqu'un d'autre sur ton compte GitHub |
+| **Pull Request (PR)** | Proposer des changements à un repo |
+
+---
+
+> **Comment mémoriser ?** N'apprends pas ces commandes par cœur. Utilise cette fiche 2-3 semaines, le temps que les essentielles (`status`, `add`, `commit`, `push`, `log`) s'ancrent par la pratique. Les autres viendront avec le besoin. Quand tu n'ouvres plus la fiche que pour vérifier un détail, c'est gagné.

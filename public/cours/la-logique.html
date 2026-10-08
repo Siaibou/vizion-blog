@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La logique, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+.hero{position:relative}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.m{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-style:italic;font-size:1.1em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+.vec{position:relative;display:inline-block;padding-top:.45em;line-height:1.1}
+.vec::before{content:"→";position:absolute;top:-.12em;left:0;right:0;text-align:center;font-size:.75em;line-height:1;font-style:normal}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.toc{columns:2 220px;margin:10px 0;padding-left:1.4em}
+.toc li{break-inside:avoid}
+details.check{margin:28px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+details.check[open]>summary{margin-bottom:4px}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:'STIX Two Text','Cambria Math',serif;font-style:italic;font-size:16px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.thick{stroke-width:4}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}
+/* widget */
+.widget .ctrl{max-width:440px;margin:12px auto 0}
+.widget label{font-weight:700;display:block;margin-bottom:4px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.presets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;background:var(--paper);border-radius:8px;padding:10px 14px}
+.readout b{font-weight:600}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+/* ---- ajouts propres au cours de logique ---- */
+td.v,span.v{color:var(--green);font-weight:700}
+td.f,span.f{color:var(--red);font-weight:700}
+table.c tr.hl td{background:var(--soft-r)}
+table.c tr.ok td{background:var(--soft-g)}
+table.c th{white-space:nowrap}
+table.tight{width:auto;margin:0 auto}
+.sym{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.sym b{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.25rem;text-align:center;min-width:1.6em;color:var(--blue)}
+.rule{border-left:5px solid var(--blue);background:var(--card);border-radius:10px;padding:10px 14px;margin:14px 0;border:1px solid var(--line);border-left-width:5px}
+.steps{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.15em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.redac .note{font-size:.9rem;color:var(--muted)}
+/* machine à promesses */
+.toggles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 12px}
+.tog{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:8px 14px;cursor:pointer;min-height:44px;text-align:left}
+.tog b{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
+.tog[aria-pressed="true"]{border-color:var(--green)}
+.tog[aria-pressed="false"]{border-color:var(--red)}
+.tog .val{font-weight:700}
+.tog[aria-pressed="true"] .val{color:var(--green)}
+.tog[aria-pressed="false"] .val{color:var(--red)}
+.verdict{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:1rem}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+/* cartes de Wason */
+.cards{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.card{width:72px;height:100px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-family:'STIX Two Text',serif;font-size:2rem;cursor:pointer;display:grid;place-items:center;position:relative}
+.card[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);box-shadow:0 0 0 3px var(--soft-b)}
+.card[aria-pressed="true"]::after{content:"à retourner";position:absolute;bottom:4px;left:0;right:0;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.62rem;color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.center{text-align:center}
+.fb p{margin:6px 0}
+.fb .good{color:var(--green);font-weight:700}
+.fb .bad{color:var(--red);font-weight:700}
+/* labo */
+.labin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.labin input{flex:1 1 220px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.keys button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;min-width:44px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.keys button:hover{border-color:var(--blue)}
+.keys button.w{font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem}
+.presets2{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.presets2 button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+#lab-out .err{color:var(--red);font-weight:700}
+#lab-out .tm{color:var(--muted)}
+#lab-out .verdict{margin-top:10px}
+.phr{font-style:italic}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body id="haut">
+<div class="vz-bar">
+<a class="vz-back" href="/mathematiques">← Vizion.Blog / Mathématiques</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »). Dans cette version publique, j'ai retiré les remarques sur le polycopié de mon enseignant.</p>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<marker id="ah-i" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fi"/></marker>
+<marker id="ah-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fb"/></marker>
+<marker id="ah-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fr"/></marker>
+<marker id="ah-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fg"/></marker>
+<symbol id="lock" viewBox="0 0 30 36"><path d="M8,16 V10 A7,7 0 0 1 22,10 V16" style="fill:none;stroke:var(--ink);stroke-width:2.5"/><rect x="3" y="15" width="24" height="19" rx="4" style="fill:var(--soft-b);stroke:var(--ink);stroke-width:2"/><circle cx="15" cy="23" r="2.6" style="fill:var(--ink)"/><path d="M15,24 V29" style="stroke:var(--ink);stroke-width:2"/></symbol>
+<symbol id="key" viewBox="0 0 40 20"><circle cx="8" cy="10" r="6" style="fill:none;stroke:var(--green);stroke-width:2.5"/><path d="M14,10 H37 M30,10 V16 M35,10 V15" style="fill:none;stroke:var(--green);stroke-width:2.5"/></symbol>
+</defs></svg>
+
+<header class="hero">
+<p class="kicker">Suites numériques, chapitre 0 — remise à niveau</p>
+<h1>La logique, depuis le tout début<small>Pour comprendre l'implication, et tout ce qui est construit dessus.</small></h1>
+<p class="lede">Tu as décroché au mot « implique ». C'est très courant, et ce n'est pas un problème d'intelligence : l'implication des mathématiciens ne se comporte pas comme le « si… alors » de la vie de tous les jours, et presque personne ne prend le temps de le dire. On reprend donc tout, depuis les ensembles du collège jusqu'aux démonstrations par récurrence.</p>
+</header>
+
+<main>
+
+<!-- ============ PARTIE 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<p>Dans tes notes, tu as écrit : « partiel = 50 % de démonstration ». Garde cette phrase en tête pendant tout ce cours. Une démonstration, c'est une <b>chaîne d'implications</b> : « ceci est vrai, donc cela est vrai, donc cela aussi… ». La logique est la grammaire de cette chaîne. Si le mot « implique » reste flou, toutes les démonstrations du semestre le seront aussi. À l'inverse, une fois l'implication vraiment comprise, une grosse partie du cours de suites devient lisible.</p>
+
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Crayon et feuille obligatoires.</b> Recopie chaque table de vérité à la main, en la remplissant toi-même avant de regarder la mienne.</li>
+<li><b>Les questions « Vérifie-toi » en fin de partie :</b> réponds par écrit <em>avant</em> d'ouvrir la réponse. Te tromper ici ne coûte rien, et c'est ce qui te fait progresser.</li>
+<li><b>Rythme conseillé :</b> jour 1, parties 1 à 3 ; jour 2, la partie 4 seule (c'est le cœur, prends ton temps) ; jour 3, parties 5 à 7, puis refais les exercices 1 à 4 sans tes notes ; jour 4, partie 8 ; jour 5, partie 9, puis relecture de tes notes (partie 10).</li>
+<li><b>Code couleur :</b> <span class="c-g">V (vrai) en vert</span>, <span class="c-r">F (faux) en rouge</span>.</li>
+</ul>
+</div>
+
+<h3>Les symboles, et comment les lire à voix haute</h3>
+<div class="box">
+<div class="sym">
+<b>¬</b><span>« non ». Ton polycopié le dessine ⌉ et tu l'écris « 7 » dans tes notes : c'est le même symbole. Attention seulement à ne pas le confondre avec le chiffre 7 quand il y aura des nombres.</span>
+<b>∧</b><span>« et »</span>
+<b>∨</b><span>« ou »</span>
+<b>⇒</b><span>« implique », ou « si… alors… »</span>
+<b>⇔</b><span>« équivaut à », ou « si et seulement si »</span>
+<b>∀</b><span>« pour tout » (un A à l'envers, comme <i>All</i>)</span>
+<b>∃</b><span>« il existe » (un E à l'envers, comme <i>Exists</i>)</span>
+<b>∈</b><span>« appartient à »</span>
+</div>
+</div>
+
+<h3>Où trouver quoi</h3>
+<ul class="blk">
+<li><a href="#p2"><b>•</b>Qu'est-ce qu'une proposition ?</a></li>
+<li><a href="#p3"><b>•</b>Non, et, ou, tables de vérité</a></li>
+<li><a href="#p4"><b>•</b>L'implication (là où tu as décroché)</a></li>
+<li><a href="#p4-cns"><b>•</b>Condition nécessaire, suffisante</a></li>
+<li><a href="#p4-rec"><b>•</b>Réciproque et contraposée</a></li>
+<li><a href="#p4-neg"><b>•</b>Nier une implication</a></li>
+<li><a href="#p5"><b>•</b>L'équivalence</a></li>
+<li><a href="#p6"><b>•</b>Le labo : vérifie tes tables</a></li>
+<li><a href="#p7"><b>•</b>Règles de calcul, exercices 3 et 4</a></li>
+<li><a href="#p8"><b>•</b>Quantificateurs ∀ et ∃</a></li>
+<li><a href="#p9"><b>•</b>Méthodes de démonstration</a></li>
+<li><a href="#p9-rec"><b>•</b>La récurrence</a></li>
+<li><a href="#p10"><b>•</b>Relecture de tes notes</a></li>
+<li><a href="#p11"><b>•</b>Ta feuille d'exercices</a></li>
+</ul>
+</section>
+
+<!-- ============ PARTIE 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Les rappels indispensables : ensembles et nombres</h2>
+<p>La logique parle sans arrêt d'ensembles et de nombres. Avant de commencer, on remet à plat le vocabulaire du collège et du lycée qu'elle utilise. Si tout ça te paraît connu, lis quand même en diagonale : il y a deux ou trois pièges qu'on retrouvera plus loin.</p>
+
+<h3>1.1 Un ensemble, c'est un sac</h3>
+<p>Un <b>ensemble</b> est une collection d'objets, qu'on appelle ses <b>éléments</b>. Pense à un sac : on regarde seulement ce qu'il y a dedans. On écrit un ensemble entre accolades : <span class="mr">{1, 2, 3}</span>. L'ordre ne compte pas (<span class="mr">{1, 2, 3}</span> et <span class="mr">{3, 1, 2}</span> sont le même sac), et un objet est dedans ou pas dedans, il n'y est pas « deux fois ».</p>
+<ul>
+<li><span class="mr">2 ∈ {1, 2, 3}</span> se lit « 2 <b>appartient</b> à l'ensemble {1, 2, 3} ».</li>
+<li><span class="mr">5 ∉ {1, 2, 3}</span> se lit « 5 n'appartient pas à… ».</li>
+<li><span class="mr">∅</span> est l'<b>ensemble vide</b> : le sac sans rien dedans.</li>
+</ul>
+<div class="box nts">
+<p class="lbl">Dans ton polycopié</p>
+<p>Il définit l'ensemble vide par <span class="mr">∅ = {x ; x ≠ x}</span>, c'est-à-dire « l'ensemble des objets qui sont différents d'eux-mêmes ». Comme aucun objet n'est différent de lui-même, ce sac est forcément vide. C'est une astuce de logicien : décrire le vide par une propriété que personne ne vérifie.</p>
+</div>
+
+<h3>1.2 Les ensembles de nombres</h3>
+<div class="tw"><table>
+<tr><th>Symbole</th><th>Nom</th><th>Ce qu'il contient</th><th>Exemples</th></tr>
+<tr><td class="mr">ℕ</td><td>entiers naturels</td><td>les nombres pour compter, à partir de 0</td><td class="mr">0, 1, 2, 3, 12, 2026</td></tr>
+<tr><td class="mr">ℤ</td><td>entiers relatifs</td><td>ℕ plus les entiers négatifs</td><td class="mr">−7, −2, 0, 5</td></tr>
+<tr><td class="mr">ℚ</td><td>rationnels</td><td>les fractions p/q, avec p et q entiers et q ≠ 0 (le Q de « quotient »)</td><td class="mr">1/3, −5/2, 0,25 = 1/4, 4 = 4/1</td></tr>
+<tr><td class="mr">ℝ</td><td>réels</td><td>tous les points de la droite graduée, y compris ceux qui ne sont pas des fractions</td><td class="mr">√2, π, −1,5, 0</td></tr>
+</table></div>
+
+<figure>
+<svg viewBox="0 0 440 250" role="img" aria-label="Les ensembles de nombres emboîtés : N dans Z dans Q dans R">
+<rect x="10" y="10" width="420" height="230" rx="28" class="sb" style="fill:var(--soft-b)"/>
+<rect x="30" y="42" width="300" height="188" rx="24" class="sg" style="fill:var(--card)"/>
+<rect x="50" y="74" width="190" height="146" rx="20" class="sr" style="fill:var(--soft-r)"/>
+<rect x="68" y="106" width="104" height="104" rx="16" class="st" style="fill:var(--card)"/>
+<text x="24" y="36" class="mt tb" style="font-size:20px">ℝ</text>
+<text x="44" y="68" class="mt tg" style="font-size:20px">ℚ</text>
+<text x="64" y="100" class="mt tr" style="font-size:20px">ℤ</text>
+<text x="80" y="130" class="mt" style="font-size:20px">ℕ</text>
+<text x="96" y="162" class="mt">0</text><text x="136" y="152" class="mt">3</text><text x="112" y="194" class="mt">12</text>
+<text x="190" y="138" class="mt">−2</text><text x="192" y="188" class="mt">−7</text>
+<text x="262" y="120" class="mt">1/3</text><text x="258" y="168" class="mt">−5/2</text><text x="266" y="212" class="mt">0,25</text>
+<text x="366" y="112" class="mt">√2</text><text x="372" y="166" class="mt">π</text>
+</svg>
+<figcaption>Les ensembles sont emboîtés comme des poupées russes : ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ. Un entier naturel est aussi un relatif, un rationnel et un réel.</figcaption>
+</figure>
+
+<p>Trois décorations reviennent souvent : une étoile enlève le zéro (<span class="mr">ℝ* = </span> les réels sauf 0, <span class="mr">ℤ*</span> = les entiers sauf 0), un petit + garde les positifs (<span class="mr">ℝ⁺</span>), un petit − garde les négatifs (<span class="mr">ℝ⁻</span>). Ton polycopié écrit « <span class="mr">q ∈ ℤ*</span> » pour dire « q est un entier non nul », parce qu'on ne divise jamais par 0.</p>
+
+<h3>1.3 Inclusion, intersection, réunion</h3>
+<p>Prenons <span class="mr">A = {1, 2, 3, 4}</span> et <span class="mr">B = {3, 4, 5}</span>.</p>
+<ul>
+<li><b>Intersection</b> <span class="mr">A ∩ B</span> : ce qui est dans A <b>et</b> dans B. Ici <span class="mr">{3, 4}</span>.</li>
+<li><b>Réunion</b> <span class="mr">A ∪ B</span> : ce qui est dans A <b>ou</b> dans B (ou dans les deux). Ici <span class="mr">{1, 2, 3, 4, 5}</span>.</li>
+<li><b>Privé de</b> <span class="mr">A ∖ B</span> : ce qui est dans A mais pas dans B. Ici <span class="mr">{1, 2}</span>. Ton polycopié écrit <span class="mr">ℝ ∖ ℚ</span> pour « les réels qui ne sont pas rationnels », c'est-à-dire les irrationnels.</li>
+<li><b>Inclusion</b> <span class="mr">A ⊂ B</span> : « A est inclus dans B », ce qui veut dire que <b>tout élément de A est aussi un élément de B</b>. Par exemple <span class="mr">{3, 4} ⊂ B</span>, mais A n'est pas inclus dans B, puisque 1 est dans A et pas dans B.</li>
+</ul>
+<div class="box img">
+<p class="lbl">Petit truc visuel</p>
+<p>Le signe ∩ ressemble au signe ∧ (« et »), et ∪ ressemble à ∨ (« ou »). Ce n'est pas un hasard : l'intersection, c'est le « et » des ensembles, et la réunion, c'est leur « ou ». Retiens aussi la phrase de l'inclusion, « <i>tout élément de A est un élément de B</i> » : elle cache une implication, et on la retrouvera en partie 4.</p>
+</div>
+
+<h3>1.4 Un ensemble décrit par une propriété</h3>
+<p>Au lieu de lister les éléments, on peut décrire un ensemble par une règle :</p>
+<p class="eq">{ n ∈ ℕ | n &lt; 4 } = {0, 1, 2, 3}</p>
+<p>Ça se lit : « l'ensemble des n appartenant à ℕ <b>tels que</b> n &lt; 4 ». La barre | (ou le point-virgule ; dans ton polycopié) veut dire « tels que ». Toi qui programmes, c'est exactement une liste en compréhension en Python : <code>[n for n in N if n &lt; 4]</code>. On parcourt l'ensemble de départ, et on garde ceux qui passent le test.</p>
+<p>Les <b>intervalles</b> sont des ensembles de ce type : <span class="mr">[0, 1] = {x ∈ ℝ | 0 ≤ x ≤ 1}</span>. Un crochet tourné vers le nombre l'inclut, un crochet tourné vers l'extérieur l'exclut : <span class="mr">[0, 1[</span> contient 0 mais pas 1.</p>
+
+<h3>1.5 Les inégalités, et un premier piège</h3>
+<p><span class="mr">a &lt; b</span> : « a est strictement inférieur à b ». <span class="mr">a ≤ b</span> : « a est inférieur <b>ou égal</b> à b ».</p>
+<p>Question qui surprend souvent : <span class="mr">3 ≤ 3</span> est-il vrai ? <b>Oui.</b> « Inférieur ou égal » est vrai dès que l'un des deux est vrai, et ici « égal » est vrai. C'est ton premier « ou » mathématique, on y reviendra.</p>
+<div class="box warn">
+<p class="lbl">Le piège de la négation</p>
+<p>Le contraire logique de « <span class="mr">x &lt; 3</span> » n'est pas « <span class="mr">x &gt; 3</span> », mais « <span class="mr">x ≥ 3</span> ». Si x n'est pas strictement plus petit que 3, il peut être plus grand… ou égal à 3. N'oublie jamais le cas d'égalité quand tu nies une inégalité.</p>
+</div>
+<p>Et <span class="mr">a ≤ x ≤ b</span> est un raccourci pour « <span class="mr">a ≤ x</span> <b>et</b> <span class="mr">x ≤ b</span> ».</p>
+
+<h3>1.6 Pair, impair, premier, valeur absolue</h3>
+<ul>
+<li>Un entier n est <b>pair</b> s'il existe un entier k tel que <span class="mr">n = 2k</span> (exemples : 0, 6, −4). Il est <b>impair</b> s'il existe un entier k tel que <span class="mr">n = 2k + 1</span> (exemples : 7 = 2×3 + 1, −1 = 2×(−1) + 1). Ces deux écritures sont les outils de base de beaucoup de démonstrations.</li>
+<li>Un entier <span class="mr">p ≥ 2</span> est <b>premier</b> s'il a exactement deux diviseurs positifs : 1 et lui-même. 2, 3, 5, 7, 11, 13… 1 n'est pas premier (un seul diviseur), et 2 est le seul nombre premier pair.</li>
+<li>La <b>valeur absolue</b> <span class="mr">|x|</span> est la distance entre x et 0 : <span class="mr">|−3| = 3</span>, <span class="mr">|5| = 5</span>. Dire <span class="mr">|x| ≤ M</span>, c'est dire que x est à distance au plus M de zéro, donc que <span class="mr">−M ≤ x ≤ M</span>. Ça servira pour l'exercice 9.</li>
+</ul>
+
+<details class="check"><summary>Vérifie-toi (partie 1)</summary><ol>
+<li>Vrai ou faux : <span class="mr">−3 ∈ ℕ</span> ; <span class="mr">−3 ∈ ℤ</span> ; <span class="mr">1/2 ∈ ℤ</span> ; <span class="mr">5 ∈ ℚ</span>.<details><summary>Réponse</summary><div>Faux, vrai, faux, vrai (5 = 5/1, donc 5 est aussi un rationnel).</div></details></li>
+<li>Écris en extension (en listant) l'ensemble <span class="mr">{n ∈ ℕ | n est pair et n &lt; 9}</span>.<details><summary>Réponse</summary><div><span class="mr">{0, 2, 4, 6, 8}</span>. N'oublie pas 0, qui est pair (0 = 2×0).</div></details></li>
+<li>Quelle est la négation de « <span class="mr">x ≥ 5</span> » ?<details><summary>Réponse</summary><div>« <span class="mr">x &lt; 5</span> » (strict, puisque le cas « égal à 5 » faisait partie de x ≥ 5).</div></details></li>
+<li>Est-ce que <span class="mr">[0, 1]</span> contient 1 ? Et <span class="mr">[0, 1[</span> ?<details><summary>Réponse</summary><div>Oui pour le premier, non pour le second : le crochet tourné vers l'extérieur exclut 1.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>La proposition : la brique de base</h2>
+<p>Une <b>proposition</b> (on dit aussi une <i>assertion</i>) est une phrase qui est <b>soit vraie, soit fausse</b>. Jamais les deux à la fois, jamais « un peu vraie ».</p>
+<div class="tw"><table>
+<tr><th>Phrase</th><th>Proposition ?</th><th>Pourquoi</th></tr>
+<tr><td>« 2 + 2 = 4 »</td><td>oui</td><td>elle est vraie</td></tr>
+<tr><td>« 7 est pair »</td><td>oui</td><td>elle est fausse, mais c'est bien une proposition : une proposition fausse reste une proposition</td></tr>
+<tr><td>« Paris est en France »</td><td>oui</td><td>vraie</td></tr>
+<tr><td>« Ferme la porte ! »</td><td>non</td><td>c'est un ordre : ni vrai ni faux</td></tr>
+<tr><td>« Quelle heure est-il ? »</td><td>non</td><td>c'est une question</td></tr>
+<tr><td>« x &gt; 3 »</td><td>pas encore</td><td>ça dépend de x ! Pour x = 5 c'est vrai, pour x = 1 c'est faux. On appelle ça un <b>prédicat</b> ; on le traite en partie 8</td></tr>
+</table></div>
+
+<p>Une proposition a donc une <b>valeur de vérité</b> : V ou F. Tu connais déjà ça sous un autre nom : c'est un <b>booléen</b>. V correspond à <code>True</code> (ou 1), F à <code>False</code> (ou 0). Toute la logique de ce chapitre, c'est de l'algèbre de booléens, celle que tu manipules dans tes <code>if</code>.</p>
+
+<h3>« Soient P et Q deux propositions »</h3>
+<p>C'est la première ligne de ton polycopié, et elle mérite d'être décortiquée. <b>« Soient »</b> veut dire « prenons ». P et Q sont des <b>lettres qui remplacent des propositions quelconques</b>, exactement comme en algèbre la lettre x remplace un nombre quelconque. Quand on écrit <span class="mr">(a + b)² = a² + 2ab + b²</span>, ça marche pour tous les nombres a et b. De la même façon, quand on écrit une règle de logique avec P et Q, elle marche quelles que soient les propositions qu'on met à leur place.</p>
+<p>En programmation, c'est comme déclarer deux variables de type booléen, <code>P: bool</code> et <code>Q: bool</code>, sans savoir encore ce qu'elles vaudront. Et comme chacune ne peut valoir que V ou F, il n'y a que 4 situations possibles pour le couple (P, Q). C'est pour ça que les tables de vérité existent : on peut <b>tester tous les cas</b>.</p>
+
+<div class="box key">
+<p class="lbl">Les deux règles du jeu</p>
+<p><b>Principe de non-contradiction :</b> une proposition ne peut pas être à la fois vraie et fausse.</p>
+<p><b>Principe du tiers exclu :</b> une proposition est forcément vraie ou fausse, il n'y a pas de troisième possibilité (« tiers » = troisième, « exclu » = interdit).</p>
+<p>Ces deux règles ont l'air évidentes. Elles sont pourtant le moteur de la démonstration par l'absurde (partie 9).</p>
+</div>
+
+<details class="check"><summary>Vérifie-toi (partie 2)</summary><ol>
+<li>« 10 est un nombre premier » est-elle une proposition ?<details><summary>Réponse</summary><div>Oui : c'est une proposition fausse (10 = 2 × 5).</div></details></li>
+<li>« n² est pair » est-elle une proposition ?<details><summary>Réponse</summary><div>Pas tant qu'on ne sait pas qui est n : c'est un prédicat. « 4² est pair » est une proposition (vraie).</div></details></li>
+<li>Avec trois propositions P, Q, R, combien y a-t-il de situations possibles ?<details><summary>Réponse</summary><div>2 × 2 × 2 = 8. Chaque lettre a 2 valeurs possibles. C'est le « 2³ » que tu as écrit dans la marge de l'exercice 2.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Non, et, ou : les connecteurs</h2>
+<p>Les <b>connecteurs</b> fabriquent de nouvelles propositions à partir d'anciennes, comme les opérations +, × fabriquent de nouveaux nombres. La valeur de vérité du résultat dépend seulement de celles de P et de Q. On décrit chaque connecteur par sa <b>table de vérité</b> : la liste de tous les cas possibles, avec le résultat.</p>
+
+<h3>3.1 La négation : non P, noté ¬P</h3>
+<p>¬P est vraie quand P est fausse, et fausse quand P est vraie. C'est l'interrupteur qui inverse. En Python : <code>not P</code>.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>¬P</th></tr>
+<tr><td class="v">V</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td></tr>
+</table></div>
+<p>Exemple : P = « il pleut ». ¬P = « il ne pleut pas ». Et ¬(¬P) = P : nier deux fois revient au départ (« il n'est pas vrai qu'il ne pleut pas » = « il pleut »).</p>
+<div class="box warn">
+<p class="lbl">Négation n'est pas « contraire » au sens courant</p>
+<p>La négation de « il fait chaud » n'est pas « il fait froid », c'est « il ne fait pas chaud » (il peut faire doux). La négation contient <b>tout</b> ce qui n'est pas P, pas seulement l'extrême opposé. C'est le même piège que <span class="mr">x &lt; 3</span> / <span class="mr">x ≥ 3</span> vu en 1.5.</p>
+</div>
+
+<h3>3.2 La conjonction : P et Q, noté P ∧ Q</h3>
+<p>P ∧ Q est vraie <b>seulement quand P et Q sont vraies toutes les deux</b>. Il suffit qu'une seule soit fausse pour que tout soit faux. En Python : <code>P and Q</code>.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>P ∧ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="v">V</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="f">F</td></tr>
+</table></div>
+
+<h3>3.3 La disjonction : P ou Q, noté P ∨ Q</h3>
+<p>P ∨ Q est vraie dès qu'<b>au moins une</b> des deux est vraie. Elle n'est fausse que si les deux sont fausses. En Python : <code>P or Q</code>.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>P ∨ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="v">V</td><td class="f">F</td><td class="v">V</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="f">F</td></tr>
+</table></div>
+<div class="box warn">
+<p class="lbl">Le « ou » des maths n'est pas celui du restaurant</p>
+<p>Au restaurant, « fromage ou dessert » veut dire l'un <i>ou</i> l'autre, pas les deux : c'est un « ou » <b>exclusif</b>. En mathématiques, « ou » est toujours <b>inclusif</b> : P ∨ Q est vraie aussi quand P et Q sont vraies en même temps (première ligne). « x ≤ 3 », c'est « x &lt; 3 ou x = 3 », et un nombre peut difficilement être les deux, mais la règle générale reste : les deux à la fois, c'est autorisé.</p>
+</div>
+
+<figure>
+<svg viewBox="0 0 440 175" role="img" aria-label="Circuit en série pour ET, circuit en parallèle pour OU">
+<!-- série -->
+<path class="st" d="M20,40 H50 M80,40 H120 M150,40 H200 V130 H122 M98,130 H20 V92 M20,82 V40"/>
+<path class="st" d="M50,40 L78,26 M120,40 L148,26"/>
+<path class="st" d="M8,82 H32 M13,92 H27" style="stroke-width:3"/>
+<circle cx="110" cy="130" r="11" style="fill:var(--soft-g);stroke:var(--ink);stroke-width:2"/>
+<path class="st" d="M102,122 L118,138 M118,122 L102,138" style="stroke-width:1.5"/>
+<text x="62" y="20" class="mt">P</text><text x="132" y="20" class="mt">Q</text>
+<text x="110" y="162" text-anchor="middle">ET : en série</text>
+<!-- parallèle -->
+<path class="st" d="M240,130 V92 M240,82 V50 H270 M270,30 V70 M270,30 H310 M340,30 H390 M270,70 H310 M340,70 H390 M390,30 V70 M390,50 H420 V130 H342 M318,130 H240"/>
+<path class="st" d="M310,30 L338,16 M310,70 L338,56"/>
+<path class="st" d="M228,82 H252 M233,92 H247" style="stroke-width:3"/>
+<circle cx="330" cy="130" r="11" style="fill:var(--soft-g);stroke:var(--ink);stroke-width:2"/>
+<path class="st" d="M322,122 L338,138 M338,122 L322,138" style="stroke-width:1.5"/>
+<text x="352" y="20" class="mt">P</text><text x="352" y="60" class="mt">Q</text>
+<text x="330" y="162" text-anchor="middle">OU : en parallèle</text>
+</svg>
+<figcaption>Toi qui as fait de l'électronique : P et Q sont deux interrupteurs (fermé = vrai), la lampe est le résultat. En série, la lampe ne s'allume que si P <b>et</b> Q sont fermés. En parallèle, il suffit de P <b>ou</b> de Q, et elle s'allume aussi si les deux sont fermés : c'est bien un « ou » inclusif.</figcaption>
+</figure>
+
+<h3 id="p3-tables">3.4 Construire une table de vérité, méthodiquement</h3>
+<p>Pour une formule plus compliquée, on procède comme pour un calcul avec des parenthèses : <b>de l'intérieur vers l'extérieur</b>, une colonne par étape. C'est exactement ce que tu as fait dans tes exercices 1 et 2, et tes tables sont justes.</p>
+<ol>
+<li><b>Compte les lignes :</b> avec n lettres, il y a 2ⁿ lignes (2 lettres → 4 lignes, 3 lettres → 8 lignes).</li>
+<li><b>Remplis les colonnes des lettres sans rien oublier.</b> Avec P, Q, R : la colonne P alterne par blocs de 4 (VVVVFFFF), Q par blocs de 2 (VVFFVVFF), R une fois sur deux (VFVFVFVF). Tu reconnais le principe : c'est comme compter en binaire, la dernière colonne change le plus vite.</li>
+<li><b>Ajoute une colonne par morceau de la formule</b>, en commençant par les plus petits.</li>
+</ol>
+<p>Exemple, qu'on va retrouver très bientôt : la table de <span class="mr">(¬P) ∨ Q</span>.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>¬P</th><th>(¬P) ∨ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="f">F</td><td class="v">V</td></tr>
+<tr><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="v">V</td></tr>
+</table></div>
+<p>Retiens la dernière colonne : <b>V, F, V, V</b>. Un seul F, à la deuxième ligne. Garde-la dans un coin de ta tête.</p>
+
+<h3>3.5 Tautologie, contradiction, formules équivalentes</h3>
+<ul>
+<li>Une <b>tautologie</b> est une formule toujours vraie, quelles que soient les valeurs des lettres. Tu l'as noté : « tautologie = tout le temps vrai ». Exemple : <span class="mr">P ∨ ¬P</span> (« il pleut ou il ne pleut pas ») : vraie dans les deux cas. C'est le tiers exclu.</li>
+<li>Une <b>contradiction</b> est une formule toujours fausse. Exemple : <span class="mr">P ∧ ¬P</span> (« il pleut et il ne pleut pas »).</li>
+<li>Deux formules sont <b>équivalentes</b> si elles ont <b>la même dernière colonne</b> dans leur table de vérité : elles disent la même chose, avec d'autres mots. On l'écrit avec le symbole ⇔. Par exemple <span class="mr">¬(¬P) ⇔ P</span>.</li>
+</ul>
+
+<details class="check"><summary>Vérifie-toi (partie 3)</summary><ol>
+<li>Construis la table de <span class="mr">P ∧ ¬Q</span>. Dans quelle(s) ligne(s) est-elle vraie ?<details><summary>Réponse</summary><div>Lignes (P, Q) = (V, V) : F ; (V, F) : <b>V</b> ; (F, V) : F ; (F, F) : F. Elle n'est vraie que quand P est vraie et Q fausse. Garde ce résultat aussi, il reviendra en partie 4.</div></details></li>
+<li>« 3 &lt; 5 ou 3 = 5 » est-elle vraie ?<details><summary>Réponse</summary><div>Oui : il suffit qu'une des deux soit vraie, et 3 &lt; 5 est vraie. C'est « 3 ≤ 5 ».</div></details></li>
+<li>Combien de lignes pour une formule avec P, Q, R, S ?<details><summary>Réponse</summary><div>2⁴ = 16.</div></details></li>
+<li>Traduis en Python : <span class="mr">¬(P ∧ Q) ∨ R</span>.<details><summary>Réponse</summary><div><code>(not (P and Q)) or R</code></div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>L'implication, pas à pas</h2>
+<p>On y est. C'est la partie la plus importante de tout le cours : prends ton temps, relis-la deux fois si besoin, et fais les exercices. Je vais te montrer l'implication sous cinq angles différents : une promesse, un argument mathématique, un dessin, un jeu de cartes, et une formule. Si un angle ne te parle pas, un autre te parlera.</p>
+
+<h3>4.1 L'implication, c'est une promesse</h3>
+<p>Je te fais cette promesse : <b>« Si tu as la moyenne au partiel, alors je t'offre un kebab. »</b></p>
+<p>Appelons P = « tu as la moyenne » et Q = « je t'offre un kebab ». Ma promesse, c'est <span class="mr">P ⇒ Q</span>. La question de la logique est : <b>dans quels cas ai-je menti ?</b> Il y a 4 scénarios possibles.</p>
+<ul>
+<li><b>Tu as la moyenne, je t'offre le kebab</b> (V, V). J'ai tenu parole. La promesse est <span class="v">vraie</span>.</li>
+<li><b>Tu as la moyenne, je ne t'offre rien</b> (V, F). Là, j'ai menti. La promesse est <span class="f">fausse</span>. C'est le <b>seul</b> cas de mensonge.</li>
+<li><b>Tu n'as pas la moyenne, je t'offre quand même le kebab</b>, pour te consoler (F, V). Ai-je menti ? Non : ma promesse ne disait rien sur ce qui se passe si tu rates. Elle est <span class="v">vraie</span>.</li>
+<li><b>Tu n'as pas la moyenne, je ne t'offre rien</b> (F, F). Ai-je menti ? Non plus : la condition n'était pas remplie, ma promesse n'a jamais été mise à l'épreuve. Elle est <span class="v">vraie</span>.</li>
+</ul>
+<p>Les deux derniers cas gênent souvent. Pense à un tribunal : on est <b>innocent tant qu'on n'a pas été pris en flagrant délit</b>. Une implication est considérée comme vraie tant qu'on ne l'a pas prise en défaut, et la seule façon de la prendre en défaut, c'est le cas « P vrai et Q faux ». Et comme en logique il n'existe que deux valeurs, « pas fausse » veut dire « vraie ».</p>
+
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>P ⇒ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr class="hl"><td class="v">V</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="v">V</td></tr>
+</table></div>
+<div class="box key">
+<p class="lbl">La table à connaître par cœur</p>
+<p><span class="mr">P ⇒ Q</span> est fausse <b>uniquement</b> quand P est vraie et Q est fausse. Dans les trois autres cas, elle est vraie. Compare avec la table de <span class="mr">(¬P) ∨ Q</span> en 3.4 : V, F, V, V. C'est exactement la même. On y reviendra en 4.8.</p>
+</div>
+
+<div class="box widget" id="promise">
+<p class="lbl">La machine à promesses</p>
+<p>Clique sur P et Q pour choisir ce qui s'est passé, et regarde le verdict.</p>
+<div class="toggles">
+<button type="button" class="tog" id="tP" aria-pressed="true"><b>P : tu as la moyenne</b><span class="val">VRAI</span></button>
+<button type="button" class="tog" id="tQ" aria-pressed="true"><b>Q : je t'offre le kebab</b><span class="val">VRAI</span></button>
+</div>
+<div class="verdict ok" id="pverdict" aria-live="polite"></div>
+</div>
+
+<h3>4.2 Pourquoi cette convention n'est pas un caprice</h3>
+<p>Tu te demandes peut-être : « D'accord pour les promesses, mais pourquoi les mathématiciens ont-ils choisi ça ? ». Voici la vraie raison. Prends cette phrase, que tout le monde trouve vraie :</p>
+<p class="eq">Pour tout réel x, si x &gt; 2, alors x² &gt; 4.</p>
+<p>« Pour tout réel x » veut dire que l'implication doit être vraie <b>pour chaque nombre</b>, sans exception. Testons-la sur trois nombres :</p>
+<div class="tw"><table class="c tight">
+<tr><th>x</th><th>P : x &gt; 2</th><th>Q : x² &gt; 4</th><th>P ⇒ Q doit valoir…</th></tr>
+<tr><td>3</td><td class="v">V</td><td class="v">V (9 &gt; 4)</td><td class="v">V</td></tr>
+<tr><td>−5</td><td class="f">F</td><td class="v">V (25 &gt; 4)</td><td class="v">V</td></tr>
+<tr><td>0</td><td class="f">F</td><td class="f">F (0 &gt; 4 est faux)</td><td class="v">V</td></tr>
+</table></div>
+<p>Si on décidait que « F ⇒ V » est faux, alors la phrase serait fausse à cause de x = −5. Si on décidait que « F ⇒ F » est faux, elle serait fausse à cause de x = 0. Absurde : −5 et 0 ne sont <b>pas concernés</b> par la phrase, puisqu'ils ne sont pas plus grands que 2. Ils ne doivent pas pouvoir la faire tomber.</p>
+<p>Le seul nombre qui pourrait faire tomber cette phrase serait un x qui vérifie x &gt; 2 <b>et</b> x² ≤ 4. Il n'en existe aucun. Et c'est exactement ce que la phrase affirme.</p>
+<div class="box key">
+<p class="lbl">La bonne façon de penser P ⇒ Q</p>
+<p><span class="mr">P ⇒ Q</span> n'affirme rien sur P tout seul, ni sur Q tout seul. Elle affirme une seule chose : <b>la situation « P vrai et Q faux » n'arrive pas.</b></p>
+</div>
+
+<h3>4.3 L'image des cercles : qui implique qui ?</h3>
+<p>Dans tes notes, il y a un dessin avec un petit cercle P à l'intérieur d'un grand cercle Q, et tu as écrit dans une marge « dans le cas du cercle, qui implique qui ». Voici la réponse, avec P = « habiter à Paris » et Q = « habiter en France ».</p>
+<figure>
+<svg viewBox="0 0 440 262" role="img" aria-label="Le cercle P, habiter à Paris, est à l'intérieur du cercle Q, habiter en France">
+<rect x="10" y="10" width="420" height="242" rx="14" class="sm"/>
+<text x="22" y="242" class="s tm">toutes les personnes</text>
+<circle cx="200" cy="140" r="102" class="sb" style="fill:var(--soft-b)"/>
+<circle cx="200" cy="164" r="52" class="sg" style="fill:var(--soft-g)"/>
+<text x="200" y="30" text-anchor="middle" class="tb">Q : habiter en France</text>
+<text x="200" y="92" text-anchor="middle" class="s">P faux, Q vrai (Lyon)</text>
+<text x="200" y="150" text-anchor="middle" class="tg">P : habiter</text>
+<text x="200" y="166" text-anchor="middle" class="tg">à Paris</text>
+<text x="200" y="188" text-anchor="middle" class="s">P vrai, Q vrai</text>
+<text x="362" y="206" text-anchor="middle" class="s">P faux, Q faux</text>
+<text x="362" y="222" text-anchor="middle" class="s">(Dakar)</text>
+</svg>
+<figcaption>Trois zones, qui correspondent aux trois lignes vraies de la table. La quatrième (P vrai et Q faux : habiter à Paris sans habiter en France) n'existe pas sur le dessin. C'est ce que dit P ⇒ Q.</figcaption>
+</figure>
+<div class="box key">
+<p class="lbl">Qui implique qui</p>
+<p><b>Le petit cercle implique le grand.</b> Être dans le petit cercle t'oblige à être dans le grand : P ⇒ Q. Le contraire ne marche pas : être dans le grand ne t'oblige pas à être dans le petit (on peut habiter à Lyon).</p>
+</div>
+<p>C'est aussi la définition de l'inclusion vue en 1.3 : « A ⊂ B » veut dire « pour tout x, si x ∈ A, alors x ∈ B ». Une inclusion d'ensembles et une implication, c'est la même idée, dessinée ou écrite.</p>
+
+<h3>4.4 Ce que l'implication ne dit pas</h3>
+<ul>
+<li><b>Elle ne dit pas que P est vraie.</b> « Si je gagne au loto, je m'achète une villa » ne dit pas que je vais gagner. Écrire <span class="mr">P ⇒ Q</span> dans une démonstration, ce n'est pas affirmer P.</li>
+<li><b>Elle ne dit pas que Q est vraie.</b> Pour obtenir Q, il faut <b>deux</b> ingrédients : savoir que P ⇒ Q, <b>et</b> savoir que P est vraie. Alors seulement, Q est vraie (regarde la table : la seule ligne où P et P ⇒ Q sont vraies toutes les deux est la première, où Q est vraie). C'est ça, le « donc » des démonstrations.</li>
+<li><b>Elle n'exprime pas une cause, ni un ordre dans le temps.</b> Sa valeur ne dépend que des valeurs V ou F de P et Q. « Si 2 + 2 = 4, alors Paris est en France » est vraie (V ⇒ V), même s'il n'y a aucun lien. « Si 2 + 2 = 5, alors je suis le pape » est vraie aussi (F ⇒ F). On raconte d'ailleurs que le philosophe Bertrand Russell, mis au défi, l'aurait « démontré » : si 2 + 2 = 5, en retirant 3 on obtient 1 = 2 ; le pape et moi sommes deux, donc nous sommes un. D'une hypothèse fausse, on peut tout tirer.</li>
+</ul>
+<p>Rassure-toi : en mathématiques, on n'écrit jamais d'implications absurdes comme celles-là. Mais c'est la table de vérité, et elle seule, qui décide si une implication est vraie.</p>
+
+<h3 id="p4-cns">4.5 Toutes les façons de dire P ⇒ Q</h3>
+<p>Ton polycopié donne plusieurs traductions en français. Les voici toutes, avec l'exemple P = « habiter à Paris » et Q = « habiter en France ». <b>Toutes ces phrases disent exactement la même chose.</b></p>
+<div class="tw"><table>
+<tr><th>Formulation</th><th>Avec l'exemple</th></tr>
+<tr><td>P implique Q</td><td>habiter à Paris implique habiter en France</td></tr>
+<tr><td>si P, alors Q</td><td>si tu habites à Paris, alors tu habites en France</td></tr>
+<tr><td>Q si P</td><td>tu habites en France si tu habites à Paris</td></tr>
+<tr><td>P <b>seulement si</b> Q</td><td>tu habites à Paris seulement si tu habites en France</td></tr>
+<tr><td>P est une condition <b>suffisante</b> pour Q</td><td>habiter à Paris suffit pour habiter en France</td></tr>
+<tr><td>Q est une condition <b>nécessaire</b> pour P</td><td>il faut habiter en France pour habiter à Paris</td></tr>
+</table></div>
+
+<p><b>Suffisant</b> veut dire « si tu as P, c'est assez : Q est garanti ». Habiter à Paris suffit pour habiter en France. Mais ce n'est pas nécessaire : on peut habiter en France sans habiter à Paris.</p>
+<p><b>Nécessaire</b> veut dire « obligatoire : sans Q, pas de P ». Habiter en France est nécessaire pour habiter à Paris : si tu n'habites pas en France, tu ne peux pas habiter à Paris. Mais ce n'est pas suffisant.</p>
+<p>Deux exemples de la vie courante, pour t'entraîner à placer la flèche :</p>
+<ul>
+<li>« Il faut avoir le code pour avoir le permis. » Le code est nécessaire. Donc : <span class="mr">avoir le permis ⇒ avoir le code</span>. Tous ceux qui ont le permis ont le code ; l'inverse est faux.</li>
+<li>« Pour voter en France, il faut avoir au moins 18 ans. » Donc : <span class="mr">voter ⇒ avoir au moins 18 ans</span>. Avoir 18 ans est nécessaire, pas suffisant (il faut aussi être inscrit sur les listes, par exemple).</li>
+</ul>
+<div class="box img">
+<p class="lbl">Le moyen mnémotechnique</p>
+<p><b>La flèche part du suffisant et pointe vers le nécessaire.</b> Le nécessaire est à la pointe de la flèche : c'est ce qui arrive forcément.</p>
+<p>Et « seulement si », le plus trompeur, introduit toujours le nécessaire : « tu peux conduire <i>seulement si</i> tu as le permis » donne <span class="mr">conduire ⇒ avoir le permis</span>.</p>
+</div>
+
+<h3 id="p4-rec">4.6 Réciproque et contraposée</h3>
+<div class="box widget" id="wason">
+<p class="lbl">Défi, avant de lire la suite</p>
+<p>Chaque carte a une lettre sur une face et un nombre sur l'autre. On affirme la règle : <b>« Si une carte a une voyelle sur une face, alors elle a un nombre pair sur l'autre. »</b></p>
+<p>Quelles cartes dois-tu <b>obligatoirement</b> retourner pour vérifier que la règle est respectée, sans en retourner d'inutiles ? Touche les cartes à retourner, puis vérifie.</p>
+<div class="cards">
+<button type="button" class="card" data-c="A" aria-pressed="false" aria-label="Carte A">A</button>
+<button type="button" class="card" data-c="K" aria-pressed="false" aria-label="Carte K">K</button>
+<button type="button" class="card" data-c="4" aria-pressed="false" aria-label="Carte 4">4</button>
+<button type="button" class="card" data-c="7" aria-pressed="false" aria-label="Carte 7">7</button>
+</div>
+<p class="center"><button type="button" class="btn" id="wcheck">Vérifier</button> <button type="button" class="btn ghost" id="wreset">Recommencer</button></p>
+<div class="fb" id="wfb" aria-live="polite"></div>
+</div>
+<p>Ce petit test, inventé par le psychologue Peter Wason, est raté par la grande majorité des gens, étudiants en maths compris. Si tu as choisi le 4, tu es tombé dans le piège de la <b>réciproque</b>. Si tu n'as pas pensé au 7, il te manquait la <b>contraposée</b>. Voyons les deux.</p>
+
+<h4>La réciproque : Q ⇒ P</h4>
+<p>La réciproque de <span class="mr">P ⇒ Q</span> est <span class="mr">Q ⇒ P</span> : on retourne la flèche. <b>Elle ne dit pas la même chose.</b></p>
+<ul>
+<li>« Si tu habites à Paris, tu habites en France » : vraie. Réciproque : « si tu habites en France, tu habites à Paris » : fausse.</li>
+<li>« Si n est un multiple de 4, alors n est pair » : vraie. Réciproque : « si n est pair, alors n est un multiple de 4 » : fausse, 6 est pair sans être multiple de 4.</li>
+<li>Tu as rencontré ce piège dans la discussion sur le rectangle : « carré ⇒ trois angles droits » est vraie, mais « trois angles droits ⇒ carré » est fausse.</li>
+</ul>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>P ⇒ Q</th><th>Q ⇒ P</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr class="hl"><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="v">V</td></tr>
+<tr class="hl"><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="v">V</td></tr>
+</table></div>
+<p>Les colonnes diffèrent sur deux lignes : une implication et sa réciproque ne sont pas équivalentes. Parfois les deux sont vraies (on aura alors une équivalence, partie 5), parfois une seule. <b>Utiliser la réciproque à la place de l'implication est l'erreur de raisonnement la plus fréquente</b>, en maths comme dans la vie.</p>
+
+<h4>La contraposée : ¬Q ⇒ ¬P</h4>
+<p>La contraposée de <span class="mr">P ⇒ Q</span> est <span class="mr">¬Q ⇒ ¬P</span> : on retourne la flèche <b>et</b> on nie les deux côtés. Et là, miracle : <b>elle dit exactement la même chose</b> que l'implication de départ.</p>
+<p>« Si tu habites à Paris, tu habites en France » a pour contraposée « si tu n'habites pas en France, alors tu n'habites pas à Paris ». Les deux sont vraies, et c'est logique : sur le dessin des cercles, un point <b>hors du grand cercle</b> est forcément <b>hors du petit</b>.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>¬Q</th><th>¬P</th><th>¬Q ⇒ ¬P</th><th>P ⇒ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="v">V</td><td class="f">F</td><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+</table></div>
+<p>Pour la colonne <span class="mr">¬Q ⇒ ¬P</span>, applique la règle de 4.1 avec ¬Q à la place de P et ¬P à la place de Q : elle n'est fausse que si ¬Q est vraie et ¬P fausse, c'est-à-dire à la deuxième ligne. Les deux dernières colonnes sont identiques : c'est la ligne « contraposition » de ton polycopié, <span class="mr">(P ⇒ Q) ⇔ (¬Q ⇒ ¬P)</span>.</p>
+<div class="box warn">
+<p class="lbl">Ne pas confondre avec ¬P ⇒ ¬Q</p>
+<p>« Si tu n'habites pas à Paris, alors tu n'habites pas en France » est fausse (Lyon). Nier sans retourner la flèche, ça ne marche pas : <span class="mr">¬P ⇒ ¬Q</span> est en fait la contraposée de la réciproque, donc elle dit la même chose que <span class="mr">Q ⇒ P</span>.</p>
+</div>
+<div class="tw"><table>
+<tr><th>Nom</th><th>Forme</th><th>Équivalente à P ⇒ Q ?</th></tr>
+<tr><td>implication de départ</td><td class="mr">P ⇒ Q</td><td>—</td></tr>
+<tr><td>contraposée</td><td class="mr">¬Q ⇒ ¬P</td><td><span class="v">oui, toujours</span></td></tr>
+<tr><td>réciproque</td><td class="mr">Q ⇒ P</td><td><span class="f">non, en général</span></td></tr>
+<tr><td>« fausse contraposée »</td><td class="mr">¬P ⇒ ¬Q</td><td><span class="f">non, en général</span> (elle équivaut à la réciproque)</td></tr>
+</table></div>
+<p>La contraposée est très utile en démonstration : quand <span class="mr">P ⇒ Q</span> est difficile à prouver directement, <span class="mr">¬Q ⇒ ¬P</span> est parfois beaucoup plus facile. On le verra en partie 9.</p>
+
+<h3 id="p4-neg">4.7 Nier une implication</h3>
+<p>Quand une promesse <span class="mr">P ⇒ Q</span> est-elle rompue ? Uniquement dans le cas « P vrai et Q faux ». Donc la négation de l'implication est vraie exactement dans ce cas-là, et c'est la définition de <span class="mr">P ∧ ¬Q</span> (tu l'as calculée dans la question 1 de la partie 3) :</p>
+<p class="eq">¬(P ⇒ Q) ⇔ P ∧ ¬Q</p>
+<p>C'est la troisième règle encadrée de ton polycopié. En français : le contraire de « s'il pleut, je prends mon parapluie », c'est « <b>il pleut, et</b> je ne prends pas mon parapluie ».</p>
+<div class="box warn">
+<p class="lbl">La négation d'une implication n'est pas une implication</p>
+<p>Deux mauvaises réponses très courantes : « s'il pleut, je ne prends pas mon parapluie » (<span class="mr">P ⇒ ¬Q</span>, c'est une autre promesse, pas le contraire de la première), et « s'il ne pleut pas, je ne prends pas mon parapluie » (<span class="mr">¬P ⇒ ¬Q</span>). La bonne négation contient un <b>et</b>, pas une flèche.</p>
+</div>
+<p>C'est aussi ce que montre ton exercice 1. Tu as calculé la colonne de <span class="mr">¬(P ⇒ Q)</span> : F, V, F, F. Et celle de <span class="mr">P ∨ (¬Q)</span> : V, V, F, V. Elles diffèrent, donc <span class="mr">P ∨ (¬Q)</span> n'est <b>pas</b> la négation de <span class="mr">P ⇒ Q</span>. (Petit bonus : <span class="mr">P ∨ ¬Q</span> équivaut en fait à <span class="mr">Q ⇒ P</span>, la réciproque. Tu comprendras pourquoi dans la section suivante.)</p>
+<p>Cette règle est l'origine du <b>contre-exemple</b> : pour montrer qu'une affirmation « pour tout x, si P(x) alors Q(x) » est fausse, il faut trouver <b>un</b> x qui vérifie P(x) et pas Q(x). On le reverra en parties 8 et 9.</p>
+
+<h3>4.8 L'implication écrite avec un « ou »</h3>
+<p>Tu te souviens de la table de <span class="mr">(¬P) ∨ Q</span> en 3.4 ? V, F, V, V. C'est exactement celle de <span class="mr">P ⇒ Q</span>. Les deux formules sont donc équivalentes :</p>
+<p class="eq">(P ⇒ Q) ⇔ (¬P ∨ Q)</p>
+<p>En français : « <b>ou bien</b> la condition P n'est pas remplie (et alors rien n'était promis), <b>ou bien</b> Q est vraie ». Pour la promesse : « soit tu n'as pas eu la moyenne, soit tu as ton kebab ». La seule façon de rendre cette phrase fausse, c'est que tu aies eu la moyenne sans avoir de kebab : on retrouve le même unique cas de mensonge.</p>
+<p>En Python, c'est la façon de programmer l'implication, qui n'existe pas comme opérateur :</p>
+<p><code>def implique(p, q): return (not p) or q</code></p>
+<div class="box key">
+<p class="lbl">Pourquoi cette règle est si utile</p>
+<p>Elle transforme une flèche, difficile à manipuler, en « non » et « ou », qu'on sait très bien manipuler (partie 7). C'est <b>le moteur de tes exercices 3 et 4</b> : ton enseignant a commencé chaque calcul en remplaçant les ⇒ par des ¬… ∨ …. Et elle explique le bonus de 4.7 : <span class="mr">P ∨ ¬Q</span> = <span class="mr">¬Q ∨ P</span> = « Q ⇒ P ».</p>
+</div>
+
+<h3>4.9 La phrase mystérieuse de ton polycopié</h3>
+<p>Ton polycopié dit : « Une implication est vraie si l'enchaînement logique "P implique Q" est vrai, quelles que soient les véracités de P et de Q ». Traduction : ce qui compte dans une implication, c'est le <b>lien</b> entre P et Q (« le cas P vrai, Q faux ne se produit pas »), pas la vérité de P ou de Q prises séparément. Une implication peut être vraie avec P fausse et Q fausse : relis 4.2, c'était le cas de x = 0.</p>
+
+<div class="box nts">
+<p class="lbl">Pourquoi tout le cours de suites en dépend</p>
+<p>Tu vas croiser des phrases comme « si une suite converge, alors elle est bornée » (vraie), dont la réciproque « si une suite est bornée, alors elle converge » est fausse, et dont la contraposée « si une suite n'est pas bornée, alors elle ne converge pas » est vraie et sert tout le temps. Et chaque démonstration par récurrence contient une implication « P(n) ⇒ P(n+1) » (partie 9). Tout ce que tu viens de lire va resservir.</p>
+</div>
+
+<details class="check"><summary>Vérifie-toi (partie 4) — la plus importante</summary><ol>
+<li>Vraie ou fausse : « Si 1 = 2, alors la Terre est plate » ?<details><summary>Réponse</summary><div>Vraie : F ⇒ F. L'hypothèse est fausse, l'implication ne peut pas être prise en défaut.</div></details></li>
+<li>Vraie ou fausse : « Si 2 est pair, alors 3 est pair » ?<details><summary>Réponse</summary><div>Fausse : V ⇒ F, c'est le seul cas faux.</div></details></li>
+<li>Tu sais que P ⇒ Q est vraie, et que Q est vraie. Que peux-tu dire de P ?<details><summary>Réponse</summary><div>Rien ! Regarde la table : P ⇒ Q et Q sont vraies à la ligne 1 (P vraie) et à la ligne 3 (P fausse). Exemple : tu habites en France. Est-ce que tu habites à Paris ? On ne peut pas savoir. Conclure « donc P » serait utiliser la réciproque.</div></details></li>
+<li>Tu sais que P ⇒ Q est vraie, et que Q est fausse. Que peux-tu dire de P ?<details><summary>Réponse</summary><div>P est fausse. C'est la contraposée : ¬Q ⇒ ¬P. Si tu n'habites pas en France, tu n'habites pas à Paris.</div></details></li>
+<li>Écris avec ⇒ : « Pour être admis en L2, il faut valider la L1 ».<details><summary>Réponse</summary><div>« être admis en L2 ⇒ avoir validé la L1 ». Valider la L1 est la condition nécessaire, elle est à la pointe de la flèche.</div></details></li>
+<li>Donne la réciproque et la contraposée de « si n est un multiple de 6, alors n est pair ». Lesquelles sont vraies ?<details><summary>Réponse</summary><div>Réciproque : « si n est pair, alors n est un multiple de 6 », fausse (4 est pair, pas multiple de 6). Contraposée : « si n n'est pas pair (donc impair), alors n n'est pas un multiple de 6 », vraie, comme l'implication de départ.</div></details></li>
+<li>Écris la négation de « s'il fait beau, je vais courir ».<details><summary>Réponse</summary><div>« Il fait beau et je ne vais pas courir. » Avec un « et », sans flèche.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>L'équivalence : la flèche dans les deux sens</h2>
+<p><span class="mr">P ⇔ Q</span> est vraie quand P et Q ont <b>la même valeur de vérité</b> : toutes les deux vraies, ou toutes les deux fausses.</p>
+<div class="tw"><table class="c tight">
+<tr><th>P</th><th>Q</th><th>P ⇒ Q</th><th>Q ⇒ P</th><th>(P ⇒ Q) ∧ (Q ⇒ P)</th><th>P ⇔ Q</th></tr>
+<tr><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+<tr><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="f">F</td><td class="f">F</td><td class="f">F</td></tr>
+<tr><td class="f">F</td><td class="f">F</td><td class="v">V</td><td class="v">V</td><td class="v">V</td><td class="v">V</td></tr>
+</table></div>
+<p>Les deux dernières colonnes sont identiques : c'est la règle « double implication » de ton polycopié, <span class="mr">(P ⇔ Q) ⇔ ((P ⇒ Q) ∧ (Q ⇒ P))</span>. Une équivalence, c'est une implication <b>et</b> sa réciproque, toutes les deux vraies.</p>
+
+<h3>Les façons de le dire</h3>
+<ul>
+<li>« P équivaut à Q », « P est équivalent à Q ».</li>
+<li>« P <b>si et seulement si</b> Q » (abrégé « ssi »). Décortiquons : « P si Q », c'est <span class="mr">Q ⇒ P</span> ; « P seulement si Q », c'est <span class="mr">P ⇒ Q</span> (4.5). Les deux ensemble donnent l'équivalence.</li>
+<li>« P est une condition <b>nécessaire et suffisante</b> pour Q ».</li>
+</ul>
+
+<h3>Exemples</h3>
+<ul>
+<li>Pythagore et sa réciproque, réunis : « le triangle ABC est rectangle en A <b>si et seulement si</b> <span class="mr">BC² = AB² + AC²</span> ».</li>
+<li>« n est pair ⇔ n² est pair ». On le démontrera en partie 9, en prouvant les deux sens séparément.</li>
+<li>« <span class="mr">x² = 4 ⇔ (x = 2 ou x = −2)</span> ».</li>
+<li>Contre-exemple : « <span class="mr">x &gt; 0 ⇔ x² &gt; 0</span> » est fausse pour les réels. Le sens ⇒ est vrai, mais le sens ⇐ est faux : pour x = −1, x² = 1 &gt; 0 alors que x n'est pas positif.</li>
+</ul>
+
+<div class="box key">
+<p class="lbl">Comment on démontre une équivalence</p>
+<p>Presque toujours en deux temps : on démontre <span class="mr">P ⇒ Q</span> (le « sens direct »), puis <span class="mr">Q ⇒ P</span> (le « sens réciproque »). Deux démonstrations pour le prix d'une phrase.</p>
+</div>
+
+<h3>Attention à ⇔ et ⇒ entre deux lignes de calcul</h3>
+<p>Quand on écrit ⇔ entre deux lignes, on promet que chaque étape <b>marche dans les deux sens</b>. Ce n'est pas toujours le cas. « <span class="mr">x = 2 ⇒ x² = 4</span> » est vrai, mais on ne peut pas écrire ⇔, car <span class="mr">x² = 4</span> n'oblige pas x à valoir 2 (il pourrait valoir −2). Mettre un ⇔ là où il n'y a qu'un ⇒, c'est perdre des solutions ou en inventer. Dans tes exercices 3 et 4, par contre, chaque étape est une règle d'équivalence, donc les ⇔ sont légitimes (partie 7).</p>
+
+<div class="box nts">
+<p class="lbl">Deux usages d'un même symbole</p>
+<p>Le symbole ⇔ sert à deux choses. Dans une formule, <span class="mr">P ⇔ Q</span> est une proposition qui peut être vraie ou fausse. Mais quand ton polycopié écrit <span class="mr">(P ⇒ Q) ⇔ (¬Q ⇒ ¬P)</span>, il affirme que ces deux formules sont <b>toujours</b> équivalentes, quelles que soient P et Q : la formule complète est une tautologie. C'est ce second sens qu'ont toutes les « règles logiques » du polycopié.</p>
+</div>
+
+<details class="check"><summary>Vérifie-toi (partie 5)</summary><ol>
+<li>Découpe en deux implications : « un triangle est équilatéral si et seulement si ses trois angles mesurent 60° ».<details><summary>Réponse</summary><div>« Si un triangle est équilatéral, alors ses trois angles mesurent 60° » et « si les trois angles d'un triangle mesurent 60°, alors il est équilatéral ». Les deux sont vraies.</div></details></li>
+<li>« n est multiple de 4 ⇔ n est pair » est-elle vraie ?<details><summary>Réponse</summary><div>Non. Le sens ⇒ est vrai, mais le sens ⇐ est faux (6 est pair, pas multiple de 4). Une seule flèche fausse suffit à rendre l'équivalence fausse.</div></details></li>
+<li>Complète : « avoir 20/20 est une condition … pour avoir la moyenne ».<details><summary>Réponse</summary><div>Suffisante (20/20 ⇒ moyenne), mais pas nécessaire.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Le labo : fais calculer les tables</h2>
+<p>Voici un outil pour vérifier tes propres tables de vérité. Tape une formule avec les lettres P, Q, R (ou d'autres majuscules), et les symboles ¬ ∧ ∨ ⇒ ⇔ (les boutons les insèrent pour toi). Tu peux aussi écrire <code>non</code>, <code>et</code>, <code>ou</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code>. L'outil affiche toutes les colonnes intermédiaires, comme dans tes exercices, et te dit si la formule est une tautologie.</p>
+<div class="box nts">
+<p class="lbl">Règle d'utilisation</p>
+<p>Fais d'abord la table à la main, puis vérifie ici. Si tu lis la réponse avant de chercher, tu n'apprends rien. Pour savoir si deux formules A et B sont équivalentes, tape <span class="mr">(A) ⇔ (B)</span> : si c'est une tautologie, elles le sont.</p>
+</div>
+<div class="box widget" id="lab">
+<div class="labin"><input id="lab-in" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" value="(P ⇒ Q) ⇔ (¬Q ⇒ ¬P)" aria-label="Formule logique"><button type="button" class="btn" id="lab-go">Calculer</button></div>
+<div class="keys" aria-label="Clavier logique">
+<button type="button" data-k="P">P</button><button type="button" data-k="Q">Q</button><button type="button" data-k="R">R</button>
+<button type="button" data-k="¬">¬</button><button type="button" data-k=" ∧ ">∧</button><button type="button" data-k=" ∨ ">∨</button>
+<button type="button" data-k=" ⇒ ">⇒</button><button type="button" data-k=" ⇔ ">⇔</button><button type="button" data-k="(">(</button><button type="button" data-k=")">)</button>
+<button type="button" class="w" data-k="BACK" aria-label="Effacer un caractère">⌫</button><button type="button" class="w" data-k="CLEAR">Effacer</button>
+</div>
+<p class="lbl" style="margin-top:6px">Exemples prêts à calculer</p>
+<div class="presets2">
+<button type="button" data-f="P ⇒ Q">P ⇒ Q</button>
+<button type="button" data-f="(P ⇒ Q) ⇔ (¬Q ⇒ ¬P)">contraposée</button>
+<button type="button" data-f="(P ⇒ Q) ⇔ (Q ⇒ P)">réciproque ?</button>
+<button type="button" data-f="¬(P ⇒ Q) ⇔ (P ∧ ¬Q)">négation de ⇒</button>
+<button type="button" data-f="¬(P ∧ Q) ⇔ (¬P ∨ ¬Q)">De Morgan</button>
+<button type="button" data-f="((P ⇒ Q) ∧ (Q ⇒ R)) ⇒ (P ⇒ R)">transitivité</button>
+<button type="button" data-f="P ∨ ¬P">tiers exclu</button>
+</div>
+<div id="lab-out" aria-live="polite"></div>
+</div>
+<p>Idées d'expériences : tape les deux formules de ton exercice 1 séparément et compare avec tes colonnes ; tape la formule de l'exercice 2 et vérifie tes 8 lignes ; tape <span class="mr">P ⇒ (Q ⇒ (P ∧ Q))</span> (exercice 4) et regarde le verdict.</p>
+</section>
+
+<!-- ============ PARTIE 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Les règles de calcul, et tes exercices 3 et 4</h2>
+<p>Les tables de vérité marchent toujours, mais elles deviennent vite longues (16 lignes avec 4 lettres). Alors on fait comme en algèbre : on apprend quelques <b>règles de transformation</b>, et on calcule. Chaque règle ci-dessous est une équivalence (tu peux toutes les vérifier dans le labo).</p>
+
+<h3>7.1 Les règles de base</h3>
+<div class="tw"><table>
+<tr><th>Nom</th><th>Règle</th><th>Comme en calcul…</th></tr>
+<tr><td>double négation</td><td class="mr">¬(¬P) ⇔ P</td><td>−(−a) = a</td></tr>
+<tr><td>commutativité</td><td class="mr">P ∧ Q ⇔ Q ∧ P<br>P ∨ Q ⇔ Q ∨ P</td><td>a + b = b + a</td></tr>
+<tr><td>associativité</td><td class="mr">(P ∨ Q) ∨ R ⇔ P ∨ (Q ∨ R)<br>(même chose avec ∧)</td><td>(a + b) + c = a + (b + c)</td></tr>
+<tr><td>distributivité</td><td class="mr">P ∧ (Q ∨ R) ⇔ (P ∧ Q) ∨ (P ∧ R)<br>P ∨ (Q ∧ R) ⇔ (P ∨ Q) ∧ (P ∨ R)</td><td>a × (b + c) = ab + ac</td></tr>
+</table></div>
+<ul>
+<li><b>Associativité</b> : quand il n'y a que des ∨ (ou que des ∧), les parenthèses ne servent à rien, on peut les déplacer. Mais <b>dès qu'on mélange ∧ et ∨, elles sont indispensables</b> : <span class="mr">(P ∧ Q) ∨ R</span> et <span class="mr">P ∧ (Q ∨ R)</span> ne disent pas la même chose (essaie P faux et R vrai).</li>
+<li><b>Distributivité</b> : la première ressemble à la règle de collège a × (b + c) = ab + ac. La seconde n'a pas d'équivalent en calcul ordinaire (a + b×c n'est pas égal à (a + b) × (a + c)) : en logique, les deux connecteurs se distribuent l'un sur l'autre.</li>
+<li><b>Attention :</b> l'implication n'est <b>pas</b> commutative. <span class="mr">P ⇒ Q</span> et <span class="mr">Q ⇒ P</span>, c'est l'implication et sa réciproque (4.6).</li>
+</ul>
+
+<h3>7.2 Les lois de De Morgan : nier un « et », nier un « ou »</h3>
+<p class="eq">¬(P ∧ Q) ⇔ ¬P ∨ ¬Q<br>¬(P ∨ Q) ⇔ ¬P ∧ ¬Q</p>
+<p>Tu as noté à côté : « on applique aussi la négation sur le signe ». C'est exactement ça : la négation <b>entre dans la parenthèse</b>, s'applique à chaque morceau, <b>et retourne le signe</b> (∧ devient ∨, ∨ devient ∧).</p>
+<ul>
+<li>« Il n'est pas vrai que je suis riche <b>et</b> célèbre » = « je ne suis pas riche, <b>ou</b> je ne suis pas célèbre » (il suffit qu'un des deux manque).</li>
+<li>« Il n'est pas vrai que j'ai un chat <b>ou</b> un chien » = « je n'ai pas de chat <b>et</b> je n'ai pas de chien ».</li>
+<li>Avec le circuit en série de la partie 3 : la lampe reste éteinte dès que P est ouvert <b>ou</b> que Q est ouvert.</li>
+<li>Avec des inégalités : nier « <span class="mr">0 ≤ x ≤ 1</span> », c'est nier « <span class="mr">0 ≤ x</span> et <span class="mr">x ≤ 1</span> », ce qui donne « <span class="mr">x &lt; 0</span> ou <span class="mr">x &gt; 1</span> ». Le « et » devient « ou », et chaque inégalité est niée sans oublier le cas d'égalité.</li>
+</ul>
+<p>En Python, tu as peut-être déjà simplifié une condition de cette façon : <code>not (a and b)</code> est équivalent à <code>(not a) or (not b)</code>.</p>
+
+<h3>7.3 La transitivité : les dominos</h3>
+<p class="eq">((P ⇒ Q) ∧ (Q ⇒ R)) ⇒ (P ⇒ R)</p>
+<p>Si P entraîne Q, et que Q entraîne R, alors P entraîne R. « Si tu travailles, tu comprends ; si tu comprends, tu réussis ; donc si tu travailles, tu réussis. » C'est la règle qui permet d'<b>enchaîner</b> les étapes d'une démonstration : chaque ligne implique la suivante, donc la première implique la dernière.</p>
+
+<h3 id="p7-ex">7.4 Tes exercices 3 et 4, ligne par ligne</h3>
+<p>Dans tes notes, les calculs sont justes, mais les lignes sont posées les unes sous les autres sans symbole entre elles et sans justification. C'est pour ça qu'ils sont difficiles à relire. Voici les mêmes calculs, avec un <b>⇔</b> entre chaque ligne et la règle utilisée à chaque étape. « Montrer que A équivaut à B », c'est construire une chaîne de ⇔ qui part de A et arrive à B.</p>
+
+<h4>Exercice 3.1 : P ⇒ (Q ⇒ R) équivaut à (P ∧ Q) ⇒ R</h4>
+<div class="steps">
+<span class="op"></span><span>P ⇒ (Q ⇒ R)</span>
+<span class="op">⇔</span><span>¬P ∨ (Q ⇒ R)</span>
+<span class="why">On remplace la grande flèche par « non… ou… » (règle 4.8), avec P comme hypothèse et tout le bloc (Q ⇒ R) comme conclusion.</span>
+<span class="op">⇔</span><span>¬P ∨ (¬Q ∨ R)</span>
+<span class="why">Même règle, appliquée à la petite flèche Q ⇒ R.</span>
+<span class="op">⇔</span><span>(¬P ∨ ¬Q) ∨ R</span>
+<span class="why">Associativité : il n'y a que des ∨, on déplace les parenthèses.</span>
+<span class="op">⇔</span><span>¬(P ∧ Q) ∨ R</span>
+<span class="why">De Morgan, lu de droite à gauche : ¬P ∨ ¬Q, c'est ¬(P ∧ Q).</span>
+<span class="op">⇔</span><span>(P ∧ Q) ⇒ R</span>
+<span class="why">Règle 4.8 à l'envers : « non A ou R », c'est « A ⇒ R », avec A = P ∧ Q.</span>
+</div>
+<p>En français : « <i>s'il pleut, alors s'il fait froid, je reste chez moi</i> » dit la même chose que « <i>s'il pleut et qu'il fait froid, je reste chez moi</i> ». Deux conditions emboîtées, c'est une double condition.</p>
+
+<h4>Exercice 3.2 : (P ∨ Q) ⇒ R équivaut à (P ⇒ R) ∧ (Q ⇒ R)</h4>
+<div class="steps">
+<span class="op"></span><span>(P ∨ Q) ⇒ R</span>
+<span class="op">⇔</span><span>¬(P ∨ Q) ∨ R</span>
+<span class="why">Règle 4.8, avec l'hypothèse (P ∨ Q).</span>
+<span class="op">⇔</span><span>(¬P ∧ ¬Q) ∨ R</span>
+<span class="why">De Morgan : la négation entre et retourne le ∨ en ∧.</span>
+<span class="op">⇔</span><span>(¬P ∨ R) ∧ (¬Q ∨ R)</span>
+<span class="why">Distributivité du ∨ sur le ∧ (la seconde ligne du tableau 7.1, écrite avec R à droite).</span>
+<span class="op">⇔</span><span>(P ⇒ R) ∧ (Q ⇒ R)</span>
+<span class="why">Règle 4.8 à l'envers, deux fois.</span>
+</div>
+<p>En français : « <i>s'il pleut ou s'il neige, je prends le bus</i> » dit la même chose que « <i>s'il pleut, je prends le bus, et s'il neige, je prends le bus</i> ». Garde cette règle en tête : c'est elle qui justifie le raisonnement par <b>disjonction de cas</b> (partie 9).</p>
+
+<h4>Exercice 4 : P ⇒ (Q ⇒ (P ∧ Q)) est une tautologie</h4>
+<div class="steps">
+<span class="op"></span><span>P ⇒ (Q ⇒ (P ∧ Q))</span>
+<span class="op">⇔</span><span>¬P ∨ (Q ⇒ (P ∧ Q))</span>
+<span class="why">Règle 4.8 sur la grande flèche.</span>
+<span class="op">⇔</span><span>¬P ∨ (¬Q ∨ (P ∧ Q))</span>
+<span class="why">Règle 4.8 sur la flèche du milieu.</span>
+<span class="op">⇔</span><span>(¬P ∨ ¬Q) ∨ (P ∧ Q)</span>
+<span class="why">Associativité du ∨.</span>
+<span class="op">⇔</span><span>¬(P ∧ Q) ∨ (P ∧ Q)</span>
+<span class="why">De Morgan, lu de droite à gauche.</span>
+</div>
+<p>Comme dans tes notes, pose <span class="mr">S = P ∧ Q</span>. La dernière ligne est <span class="mr">¬S ∨ S</span> : « S est fausse ou S est vraie ». C'est toujours vrai (tiers exclu, 3.5). La formule de départ est donc toujours vraie : c'est une tautologie.</p>
+<p>Deux remarques. Tu avais noté « faisable avec le tableau de vérité » : oui, et c'est une méthode tout aussi valable (4 lignes, toutes V). Et il y avait un raccourci : d'après l'exercice 3.1, la formule équivaut à <span class="mr">(P ∧ Q) ⇒ (P ∧ Q)</span>, de la forme « S ⇒ S », évidemment toujours vraie. En français : « si P est vraie, alors si Q est vraie, P et Q sont vraies ». Une fois traduit, c'est presque évident.</p>
+
+<details class="check"><summary>Vérifie-toi (partie 7)</summary><ol>
+<li>Nie « <span class="mr">x ≤ 0</span> ou <span class="mr">x ≥ 1</span> ».<details><summary>Réponse</summary><div>« <span class="mr">x &gt; 0</span> et <span class="mr">x &lt; 1</span> », autrement dit <span class="mr">0 &lt; x &lt; 1</span>. Le « ou » devient « et », chaque inégalité est niée.</div></details></li>
+<li>Retrouve par le calcul la règle <span class="mr">¬(P ⇒ Q) ⇔ P ∧ ¬Q</span>.<details><summary>Réponse</summary><div><span class="mr">¬(P ⇒ Q) ⇔ ¬(¬P ∨ Q) ⇔ ¬¬P ∧ ¬Q ⇔ P ∧ ¬Q</span>. Règle 4.8, puis De Morgan, puis double négation.</div></details></li>
+<li>Simplifie <span class="mr">¬(¬P ∧ Q)</span>.<details><summary>Réponse</summary><div>De Morgan : <span class="mr">¬¬P ∨ ¬Q</span>, puis double négation : <span class="mr">P ∨ ¬Q</span>.</div></details></li>
+<li>Défi : l'implication est-elle associative ? Compare <span class="mr">(P ⇒ Q) ⇒ R</span> et <span class="mr">P ⇒ (Q ⇒ R)</span>.<details><summary>Réponse</summary><div>Non. Avec P, Q, R tous faux : <span class="mr">(F ⇒ F) ⇒ F</span> donne <span class="mr">V ⇒ F</span>, donc F ; alors que <span class="mr">F ⇒ (…)</span> est V. Une seule ligne différente suffit. C'est pour ça qu'on met toujours des parenthèses autour des flèches.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Les quantificateurs : pour tout, il existe</h2>
+
+<h3>8.1 Le prédicat, une proposition avec un trou</h3>
+<p>« x &gt; 3 » n'est ni vrai ni faux tant qu'on ne sait pas qui est x (partie 2). C'est une proposition <b>avec un trou</b>, qu'on appelle un <b>prédicat</b> et qu'on note P(x). Donne-lui une valeur, il te rend V ou F : P(5) est vraie, P(1) est fausse.</p>
+<p>Pour toi, c'est une fonction qui renvoie un booléen : <code>def P(x): return x &gt; 3</code>.</p>
+<p>Il y a deux façons de « boucher le trou » pour obtenir une vraie proposition : dire que la propriété marche <b>pour tous</b> les x, ou dire qu'elle marche <b>pour au moins un</b> x.</p>
+
+<h3>8.2 ∀ et ∃</h3>
+<div class="tw"><table>
+<tr><th>Écriture</th><th>Lecture</th><th>En Python</th><th>Vraie quand…</th></tr>
+<tr><td class="mr">∀x ∈ E, P(x)</td><td>pour tout x appartenant à E, P(x)</td><td><code>all(P(x) for x in E)</code></td><td>P(x) est vraie pour <b>chaque</b> x de E, sans exception</td></tr>
+<tr><td class="mr">∃x ∈ E, P(x)</td><td>il existe (au moins) un x appartenant à E tel que P(x)</td><td><code>any(P(x) for x in E)</code></td><td>P(x) est vraie pour <b>au moins un</b> x de E</td></tr>
+<tr><td class="mr">∃!x ∈ E, P(x)</td><td>il existe un unique x de E tel que P(x)</td><td><code>sum(P(x) for x in E) == 1</code></td><td>P(x) est vraie pour <b>exactement un</b> x de E</td></tr>
+</table></div>
+<p>Des exemples, pour t'habituer à lire :</p>
+<ul>
+<li><span class="mr">∀x ∈ ℝ, x² ≥ 0</span> : « le carré de tout réel est positif ou nul ». <span class="v">Vraie.</span></li>
+<li><span class="mr">∀n ∈ ℕ, n est pair</span> : <span class="f">fausse</span>, 1 n'est pas pair. Un seul contre-exemple suffit à faire tomber un « pour tout ».</li>
+<li><span class="mr">∃n ∈ ℕ, n est pair</span> : <span class="v">vraie</span> (2 convient). « Il existe » veut dire « <b>au moins un</b> », même s'il y en a une infinité.</li>
+<li><span class="mr">∃x ∈ ℝ, x² = −1</span> : <span class="f">fausse</span>, un carré de réel n'est jamais négatif.</li>
+<li><span class="mr">∃x ∈ ℕ, x + 3 = 1</span> est <span class="f">fausse</span>, mais <span class="mr">∃x ∈ ℤ, x + 3 = 1</span> est <span class="v">vraie</span> (x = −2). <b>L'ensemble fait partie de la phrase</b> : changer E peut changer la réponse.</li>
+<li><span class="mr">∃!n ∈ ℕ, n² = 4</span> est <span class="v">vraie</span> (seul 2 convient, car −2 n'est pas dans ℕ). Dans ℤ, elle serait <span class="f">fausse</span> : il y aurait deux solutions.</li>
+</ul>
+<p>La lettre après ∀ ou ∃ est une <b>variable muette</b> : <span class="mr">∀x ∈ ℝ, x² ≥ 0</span> et <span class="mr">∀t ∈ ℝ, t² ≥ 0</span> disent exactement la même chose, comme tu peux renommer la variable d'une boucle <code>for</code> sans changer ce que fait ton programme.</p>
+
+<h3>8.3 « Pour tout » suivi d'une implication</h3>
+<p>La forme la plus fréquente d'un théorème est <span class="mr">∀x ∈ E, P(x) ⇒ Q(x)</span> : « pour tout x de E, si x vérifie P, alors x vérifie Q ». C'est exactement la phrase de 4.2. Et c'est là que la convention « faux ⇒ n'importe quoi est vrai » devient indispensable : les x qui ne vérifient pas P ne comptent pas.</p>
+<p>Conséquence amusante : « <i>tout réel x tel que x² &lt; 0 est égal à 42</i> » est une phrase <b>vraie</b>. Il n'existe aucun réel dont le carré est négatif, donc aucun x ne peut la prendre en défaut. De même, « tous les dragons de ma chambre sont verts » est vraie : il n'y a aucun dragon pour la contredire. On dit qu'elle est <b>vraie par vacuité</b> (vide). Garde cet exemple : il va servir pour l'exercice 5.</p>
+
+<h3>8.4 Nier une phrase avec des quantificateurs</h3>
+<p>Tu as écrit la bonne idée dans tes notes, à l'exercice 5 : la négation de « tout le monde a les yeux bleus » est « <b>il existe au moins une personne</b> qui n'a pas les yeux bleus ». Et surtout pas « personne n'a les yeux bleus » : pour contredire « tout le monde », il suffit d'<b>une</b> exception.</p>
+<p class="eq">¬(∀x ∈ E, P(x)) ⇔ ∃x ∈ E, ¬P(x)<br>¬(∃x ∈ E, P(x)) ⇔ ∀x ∈ E, ¬P(x)</p>
+<p>De même, la négation de « il existe un étudiant qui a eu 20 » est « aucun étudiant n'a eu 20 », c'est-à-dire « pour tout étudiant, il n'a pas eu 20 ».</p>
+<div class="box key">
+<p class="lbl">La méthode, pour les phrases à plusieurs quantificateurs</p>
+<p>On fait passer le ¬ de gauche à droite à travers toute la phrase. Chaque <b>∀ devient ∃</b>, chaque <b>∃ devient ∀</b>, et à la fin on nie la propriété, avec les règles déjà vues : « &lt; » devient « ≥ », « et » devient « ou », « P ⇒ Q » devient « P ∧ ¬Q ». <b>L'ensemble ne change pas</b> : <span class="mr">∀x ∈ ℝ</span> devient <span class="mr">∃x ∈ ℝ</span>, jamais <span class="mr">∃x ∉ ℝ</span>.</p>
+</div>
+<p>Exemple complet, tiré de ton polycopié (page des majorants). « A est majorée » veut dire : il existe un nombre M plus grand que tous les éléments de A.</p>
+<div class="steps">
+<span class="op"></span><span>A est majorée : ∃M ∈ ℝ, ∀x ∈ A, x ≤ M</span>
+<span class="op">¬</span><span>A n'est pas majorée : ∀M ∈ ℝ, ∃x ∈ A, x &gt; M</span>
+<span class="why">∃ devient ∀, ∀ devient ∃, et « x ≤ M » devient « x &gt; M ».</span>
+</div>
+<p>En français : « aussi grand que soit le nombre M que tu choisis, il y a un élément de A qui le dépasse ». Par exemple ℕ n'est pas majoré : pour n'importe quel M, l'entier juste au-dessus de M le dépasse.</p>
+<p>Pourquoi ça marche ? Parce que « pour tout » est un grand « et » (P(x₁) et P(x₂) et P(x₃)…), et « il existe » un grand « ou ». Nier un « pour tout », c'est appliquer De Morgan à un « et » géant : il devient un « ou » géant de négations, c'est-à-dire « il existe un x tel que non P(x) ».</p>
+<p>Enfin, la négation d'un théorème en « pour tout… si… alors » est une phrase en « il existe… et… » :</p>
+<p class="eq">¬(∀x ∈ E, P(x) ⇒ Q(x)) ⇔ ∃x ∈ E, P(x) ∧ ¬Q(x)</p>
+<p>C'est la définition exacte d'un <b>contre-exemple</b>. « Tout nombre premier est impair » est fausse, car il existe un nombre premier qui n'est pas impair : 2.</p>
+<div class="box warn">
+<p class="lbl">Le piège de la langue française</p>
+<p>« Tout ce qui brille n'est pas or » ne veut pas dire « rien de ce qui brille n'est de l'or », mais « <b>pas tout</b> ce qui brille est de l'or », c'est-à-dire « il existe des choses qui brillent sans être de l'or ». Le français place le « ne… pas » n'importe où, les maths non. Quand tu écris une négation, préfère toujours « il existe… qui ne… pas ». On retrouvera ce piège dans une phrase de ton polycopié (partie 10).</p>
+</div>
+
+<h3>8.5 L'ordre des quantificateurs change tout</h3>
+<figure>
+<svg viewBox="0 0 440 214" role="img" aria-label="À gauche chaque serrure a sa propre clé, à droite une seule clé passe-partout ouvre toutes les serrures">
+<text x="105" y="20" text-anchor="middle" class="tb">∀ serrure, ∃ clé</text>
+<use href="#key" x="16" y="42" width="44" height="22"/><use href="#key" x="16" y="104" width="44" height="22"/><use href="#key" x="16" y="166" width="44" height="22"/>
+<path class="sg" d="M66,53 H150 M66,115 H150 M66,177 H150" marker-end="url(#ah-g)"/>
+<use href="#lock" x="158" y="34" width="32" height="38"/><use href="#lock" x="158" y="96" width="32" height="38"/><use href="#lock" x="158" y="158" width="32" height="38"/>
+<line x1="220" y1="30" x2="220" y2="200" class="sm dash"/>
+<text x="330" y="20" text-anchor="middle" class="tb">∃ clé, ∀ serrure</text>
+<use href="#key" x="244" y="104" width="44" height="22"/>
+<path class="sg" d="M292,115 L370,55 M292,115 H370 M292,115 L370,175" marker-end="url(#ah-g)"/>
+<use href="#lock" x="380" y="34" width="32" height="38"/><use href="#lock" x="380" y="96" width="32" height="38"/><use href="#lock" x="380" y="158" width="32" height="38"/>
+</svg>
+<figcaption>À gauche : « pour toute serrure, il existe une clé qui l'ouvre ». Chaque serrure a sa clé, qui peut être différente. À droite : « il existe une clé qui ouvre toutes les serrures ». C'est un passe-partout : une phrase beaucoup plus forte, et en sécurité, un vrai problème.</figcaption>
+</figure>
+<p>Avec des nombres :</p>
+<ul>
+<li><span class="mr">∀x ∈ ℝ, ∃y ∈ ℝ, y &gt; x</span> : « pour tout réel, il existe un réel plus grand ». <span class="v">Vraie</span> : prends y = x + 1. Le y <b>dépend</b> de x.</li>
+<li><span class="mr">∃y ∈ ℝ, ∀x ∈ ℝ, y &gt; x</span> : « il existe un réel plus grand que tous les réels ». <span class="f">Fausse</span> : ce y devrait être plus grand que lui-même. Ici, y doit être choisi <b>une fois pour toutes, avant</b> de connaître x.</li>
+</ul>
+<p>C'est la remarque de ton polycopié : on peut échanger deux quantificateurs <b>de même espèce</b> (<span class="mr">∀x ∀y</span> ⇔ <span class="mr">∀y ∀x</span>, et pareil pour ∃), mais échanger un ∀ et un ∃ change le sens de la phrase. En Python, la différence saute aux yeux : <code>all(any(P(x, y) for y in E) for x in E)</code> n'est pas <code>any(all(P(x, y) for x in E) for y in E)</code>.</p>
+
+<h3>8.6 Lire les définitions de ton polycopié</h3>
+<p>Ton chapitre 1 est plein de phrases à quantificateurs. Voici comment les lire.</p>
+<ul>
+<li><b>Majorant</b> : « M est un majorant de A si <span class="mr">∀x ∈ A, x ≤ M</span> ». M est plus grand ou égal à tous les éléments de A. Pour A = [1, 2], les nombres 2, 3 et 100 sont des majorants, mais pas 1,5 (car 1,8 est dans A et dépasse 1,5).</li>
+<li><b>ℝ est archimédien</b> : « <span class="mr">∀X ∈ ℝ, ∀ε &gt; 0, ∃n ∈ ℕ, nε &gt; X</span> ». La lettre grecque ε (epsilon) désigne un nombre strictement positif, qu'on imagine tout petit. Lecture : « aussi loin que soit X, et aussi petit que soit le pas ε, il existe un nombre de pas n tel qu'en faisant n pas de longueur ε, on dépasse X ». Avec ε = 0,01 et X = 1 000, n = 100 001 convient. Remarque que n arrive après X et ε : il a le droit de dépendre d'eux.</li>
+</ul>
+<div class="box nts">
+<p class="lbl">Ce qui t'attend dans le cours de suites</p>
+<p>La définition de la limite d'une suite a exactement cette forme : « <span class="mr">∀ε &gt; 0, ∃N ∈ ℕ, ∀n ≥ N, |uₙ − ℓ| &lt; ε</span> ». Trois quantificateurs, dans un ordre précis, et un « <span class="mr">∀n ≥ N</span> » qui cache une implication (« pour tout n, si n ≥ N, alors… »). Tu n'as pas besoin de la comprendre aujourd'hui, mais tu sais maintenant la <b>lire</b>, et c'est la première étape.</p>
+</div>
+
+<details class="check"><summary>Vérifie-toi (partie 8)</summary><ol>
+<li>Vraie ou fausse : <span class="mr">∃x ∈ ℝ, x² = 2</span> ? Et <span class="mr">∃x ∈ ℚ, x² = 2</span> ?<details><summary>Réponse</summary><div>La première est vraie (x = √2). La seconde est fausse, parce que √2 n'est pas un rationnel : c'est exactement ce que te fait démontrer l'exercice 18.</div></details></li>
+<li>Écris la négation de « <span class="mr">∀x ∈ ℝ, x² + 1 &gt; 0</span> ».<details><summary>Réponse</summary><div>« <span class="mr">∃x ∈ ℝ, x² + 1 ≤ 0</span> ». (La phrase de départ est vraie, donc sa négation est fausse, mais on sait l'écrire.)</div></details></li>
+<li>Écris la négation de « <span class="mr">∀x ∈ ℝ, x &gt; 0 ⇒ x² &gt; 0</span> ».<details><summary>Réponse</summary><div>« <span class="mr">∃x ∈ ℝ, x &gt; 0 ∧ x² ≤ 0</span> ». Le ∀ devient ∃, et « P ⇒ Q » devient « P et non Q ».</div></details></li>
+<li>Vraies ou fausses : <span class="mr">∀n ∈ ℕ, ∃m ∈ ℕ, m &gt; n</span> ; <span class="mr">∃m ∈ ℕ, ∀n ∈ ℕ, m &gt; n</span>.<details><summary>Réponse</summary><div>La première est vraie (m = n + 1). La seconde est fausse : aucun entier n'est plus grand que tous les entiers, y compris lui-même.</div></details></li>
+<li>« A est minorée » s'écrit <span class="mr">∃m ∈ ℝ, ∀x ∈ A, x ≥ m</span>. Écris « A n'est pas minorée ».<details><summary>Réponse</summary><div><span class="mr">∀m ∈ ℝ, ∃x ∈ A, x &lt; m</span> : aussi bas que soit m, un élément de A passe en dessous. (L'exercice 9 te demande la même chose avec « bornée » : essaie seul avec cette méthode.)</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Les méthodes de démonstration</h2>
+
+<h3>9.1 Qu'est-ce qu'une démonstration ?</h3>
+<p>Une démonstration est une chaîne d'étapes qui part de choses <b>déjà sûres</b> (les hypothèses de l'énoncé, les définitions, les théorèmes déjà démontrés) et arrive à la conclusion. Chaque étape utilise le même mécanisme : « je sais que A est vraie, je sais que A ⇒ B, <b>donc</b> B est vraie ». Et par transitivité (7.3), le début de la chaîne implique la fin.</p>
+<p>Pourquoi ne pas se contenter de vérifier sur des exemples ? Regarde la formule <span class="mr">n² + n + 41</span>. Pour n = 0, 1, 2, 3… elle donne 41, 43, 47, 53, 61… tous des nombres premiers. Ça continue jusqu'à n = 39, soit 40 essais réussis d'affilée. Et pour n = 40 : <span class="mr">40² + 40 + 41 = 1681 = 41 × 41</span>, qui n'est pas premier. C'est ce que dit ton polycopié : « un nombre fini de cas ne suffit pas ». Toi qui codes, tu connais le principe : des tests qui passent sur 40 entrées ne prouvent pas que ta fonction marche sur toutes.</p>
+
+<h3>9.2 La démonstration directe d'une implication</h3>
+<p>Pour démontrer <span class="mr">P ⇒ Q</span>, on <b>suppose</b> que P est vraie, et on <b>montre</b> que Q est vraie. C'est la phrase de ton polycopié.</p>
+<p>Pourquoi a-t-on le droit de « supposer » P ? Parce que si P est fausse, l'implication est vraie de toute façon (4.1) : il n'y a rien à vérifier. Le seul cas dangereux est « P vraie », alors c'est le seul qu'on examine. Supposer P, ce n'est pas affirmer que P est vraie : c'est aller inspecter le seul endroit où la promesse pourrait être rompue.</p>
+<div class="redac">
+<p><b>Énoncé :</b> pour tout entier n, si n est pair, alors n² est pair.</p>
+<p>Soit n un entier. Supposons que n est pair.</p>
+<p>Alors il existe un entier k tel que n = 2k <span class="note">(définition de « pair », 1.6)</span>.</p>
+<p>Donc n² = (2k)² = 4k² = 2 × (2k²).</p>
+<p>Comme 2k² est un entier, n² s'écrit 2 × (un entier) : n² est pair.</p>
+<p class="note">Remarque la forme : une phrase par étape, un « donc » qui s'appuie sur une raison, et la définition utilisée à chaque fois. C'est ce qu'on attend de toi au partiel.</p>
+</div>
+
+<h3>9.3 Démontrer un « pour tout » : le sens de « soit »</h3>
+<p>Pour démontrer <span class="mr">∀x ∈ E, P(x)</span>, on écrit « <b>Soit x ∈ E</b> » : on prend un élément quelconque de E, sur lequel on ne sait <b>rien</b> d'autre que « il est dans E ». On n'a pas le droit de le choisir (« prenons x = 2 »). Si la démonstration marche pour cet x sans visage, elle marche pour tous.</p>
+<p>C'est exactement comme écrire une fonction qui prend un paramètre : ton code doit marcher pour n'importe quelle valeur d'entrée, tu ne choisis pas ce que l'utilisateur va envoyer.</p>
+
+<h3>9.4 Démontrer un « il existe », et le contre-exemple</h3>
+<p>Pour démontrer <span class="mr">∃x ∈ E, P(x)</span>, il suffit d'<b>en exhiber un</b> et de vérifier qu'il marche. Exemple : <span class="mr">∃n ∈ ℕ, n² &gt; 50</span> est vraie, car n = 8 convient (64 &gt; 50).</p>
+<p>Le <b>contre-exemple</b> est la même idée à l'envers. Pour montrer qu'un « pour tout » est faux, il suffit de trouver <b>un</b> élément qui ne vérifie pas la propriété, puisque <span class="mr">¬(∀x, P(x)) ⇔ ∃x, ¬P(x)</span> (8.4).</p>
+<ul>
+<li>« <span class="mr">∀n ∈ ℕ</span>, n² + n + 41 est premier » est fausse : contre-exemple n = 40.</li>
+<li>« <span class="mr">∀x ∈ ℝ, x² ≥ x</span> » est fausse : contre-exemple x = 1/2, car 1/4 &lt; 1/2.</li>
+</ul>
+<div class="box key">
+<p class="lbl">L'asymétrie à retenir</p>
+<p>Mille exemples ne démontrent pas un « pour tout ». Un seul contre-exemple le détruit.</p>
+</div>
+
+<h3>9.5 Le raisonnement par contraposition</h3>
+<p>Comme <span class="mr">P ⇒ Q</span> et <span class="mr">¬Q ⇒ ¬P</span> sont équivalentes (4.6), on peut démontrer la seconde à la place de la première quand elle est plus facile.</p>
+<div class="redac">
+<p><b>Énoncé :</b> pour tout entier n, si n² est pair, alors n est pair.</p>
+<p class="note">En direct, on serait coincé : de n² = 2k, on ne sait pas quoi tirer sur n. On passe donc par la contraposée : « si n n'est pas pair, alors n² n'est pas pair ». Pour un entier, « pas pair » veut dire « impair ».</p>
+<p>Soit n un entier. Supposons que n est impair.</p>
+<p>Alors il existe un entier k tel que n = 2k + 1.</p>
+<p>Donc n² = (2k + 1)² = 4k² + 4k + 1 = 2 × (2k² + 2k) + 1.</p>
+<p>Comme 2k² + 2k est un entier, n² est impair.</p>
+<p>On a montré « n impair ⇒ n² impair », qui est la contraposée de « n² pair ⇒ n pair ». Cette dernière est donc vraie.</p>
+</div>
+<p>Avec 9.2, on a maintenant les deux sens : <span class="mr">n pair ⇔ n² pair</span>. C'était la promesse de la partie 5. Et ce résultat est exactement la clé de l'exercice 18.</p>
+
+<h3>9.6 Le raisonnement par l'absurde</h3>
+<p>Pour démontrer une proposition R, on <b>suppose le contraire</b>, ¬R, et on en déduit quelque chose d'impossible : une <b>contradiction</b> (une affirmation et sa négation vraies en même temps, comme « n est pair et impair », ou « 0 = 1 »). Comme ¬R mène à l'impossible, ¬R est fausse, donc R est vraie (tiers exclu, partie 2).</p>
+<p>C'est le raisonnement du détective : « Supposons que le majordome soit coupable. Alors il était dans la cuisine à 21 h. Or à 21 h, les caméras le filment au supermarché. Contradiction : ce n'est pas lui. »</p>
+<div class="redac">
+<p><b>Énoncé :</b> il n'existe pas de plus grand entier naturel.</p>
+<p>Supposons par l'absurde qu'il existe un plus grand entier naturel, que l'on note N.</p>
+<p>Alors N + 1 est aussi un entier naturel, et N + 1 &gt; N.</p>
+<p>C'est une contradiction avec le fait que N est le plus grand.</p>
+<p>Donc notre supposition est fausse : il n'existe pas de plus grand entier naturel.</p>
+</div>
+<p>Différence avec la contraposition : la contraposition démontre une implication en démontrant une <b>autre implication</b>, avec un but précis (¬P). L'absurde suppose la négation de ce qu'on veut, et cherche <b>n'importe quelle</b> contradiction. L'exercice 18 (√2 n'est pas une fraction) est le grand classique de l'absurde.</p>
+
+<h3>9.7 La disjonction de cas, et ton exercice 5</h3>
+<p>Si une conclusion C est vraie dans le cas A <b>et</b> dans le cas ¬A, alors C est vraie tout court. Pourquoi ? D'après ton exercice 3.2, <span class="mr">(A ⇒ C) ∧ (¬A ⇒ C)</span> équivaut à <span class="mr">(A ∨ ¬A) ⇒ C</span>. Et <span class="mr">A ∨ ¬A</span> est toujours vraie. Donc C est vraie.</p>
+<div class="redac">
+<p><b>Énoncé :</b> pour tout entier n, n(n + 1) est pair.</p>
+<p>Soit n un entier. On distingue deux cas.</p>
+<p><b>Cas 1 : n est pair.</b> Alors n = 2k avec k entier, et n(n + 1) = 2 × [k(2k + 1)], qui est pair.</p>
+<p><b>Cas 2 : n est impair.</b> Alors n = 2k + 1, donc n + 1 = 2k + 2 = 2(k + 1), et n(n + 1) = 2 × [(2k + 1)(k + 1)], qui est pair.</p>
+<p>Dans les deux cas, n(n + 1) est pair. Comme tout entier est pair ou impair, c'est vrai pour tout n.</p>
+</div>
+
+<h4>L'exercice 5, guidé</h4>
+<p>L'énoncé : « dans un groupe de personnes non vide, il existe une personne P telle que : si P a les yeux bleus, alors tout le monde a les yeux bleus ». La phrase a l'air absurde, comme si une seule personne décidait des yeux de tout le monde. Elle est pourtant vraie, et <b>c'est uniquement une question d'implication</b>.</p>
+<p>La structure : il faut trouver une personne p pour laquelle l'implication « p a les yeux bleus ⇒ tout le monde a les yeux bleus » est vraie. Fais la disjonction de cas sur A = « tout le monde a les yeux bleus ».</p>
+<ul>
+<li><b>Indice pour le cas 1 (A vraie) :</b> la conclusion de l'implication est vraie. Que vaut « … ⇒ V », quoi qu'il y ait avant la flèche ? Et pourquoi a-t-on besoin que le groupe soit non vide ?</li>
+<li><b>Indice pour le cas 2 (A fausse) :</b> tu as déjà écrit la négation de A dans tes notes. Elle te donne une personne précise. Choisis-la comme p. Que vaut alors l'hypothèse « p a les yeux bleus » ? Et que vaut « F ⇒ … » ?</li>
+</ul>
+<details class="check"><summary>Voir la rédaction complète (après avoir cherché)</summary>
+<div class="redac" style="margin-top:4px">
+<p>Soit G un groupe de personnes non vide. On distingue deux cas.</p>
+<p><b>Cas 1 : tout le monde dans G a les yeux bleus.</b> Comme G est non vide, on peut choisir une personne p quelconque dans G. La conclusion « tout le monde a les yeux bleus » est vraie, donc l'implication « p a les yeux bleus ⇒ tout le monde a les yeux bleus » est vraie (une implication dont la conclusion est vraie est toujours vraie). La personne p convient.</p>
+<p><b>Cas 2 : ce n'est pas le cas.</b> Alors il existe au moins une personne p₀ dans G qui n'a pas les yeux bleus (négation d'un « pour tout »). Choisissons p = p₀. L'hypothèse « p₀ a les yeux bleus » est fausse, donc l'implication est vraie (F ⇒ n'importe quoi est vrai). La personne p₀ convient.</p>
+<p>Dans les deux cas, on a trouvé une personne qui convient. L'énoncé est démontré.</p>
+<p class="note">La phrase paraît magique parce qu'en français, « si… alors » sonne comme une cause. En logique, ce n'est qu'une affirmation sur des valeurs V et F : dans le cas 2, la personne choisie « rend l'implication vraie » simplement parce qu'elle n'a pas les yeux bleus. C'est la vérité par vacuité de 8.3.</p>
+</div>
+</details>
+
+<h3 id="p9-rec">9.8 Le raisonnement par récurrence</h3>
+<figure>
+<svg viewBox="0 0 440 175" role="img" aria-label="Une rangée de dominos : on pousse le premier, et chacun fait tomber le suivant">
+<line x1="10" y1="130" x2="430" y2="130" class="sm"/>
+<g transform="rotate(28 78 130)"><rect x="60" y="70" width="18" height="60" rx="3" class="sg thick" style="fill:var(--soft-g);stroke-width:2"/></g>
+<rect x="120" y="70" width="18" height="60" rx="3" class="st" style="fill:var(--card)"/>
+<rect x="180" y="70" width="18" height="60" rx="3" class="st" style="fill:var(--card)"/>
+<rect x="240" y="70" width="18" height="60" rx="3" class="st" style="fill:var(--card)"/>
+<rect x="300" y="70" width="18" height="60" rx="3" class="st" style="fill:var(--card)"/>
+<text x="370" y="110" class="mt">…</text>
+<path d="M20,78 L52,92" class="sr" marker-end="url(#ah-r)"/>
+<text x="14" y="66" class="s tr">on pousse</text>
+<path d="M136,62 Q160,40 186,62" class="sb" marker-end="url(#ah-b)"/>
+<path d="M196,62 Q220,40 246,62" class="sb" marker-end="url(#ah-b)"/>
+<path d="M256,62 Q280,40 306,62" class="sb" marker-end="url(#ah-b)"/>
+<text x="220" y="28" text-anchor="middle" class="s tb">hérédité : si le domino n tombe, le suivant tombe</text>
+<text x="75" y="150" text-anchor="middle" class="mt">P(0)</text><text x="129" y="150" text-anchor="middle" class="mt">P(1)</text><text x="189" y="150" text-anchor="middle" class="mt">P(2)</text><text x="249" y="150" text-anchor="middle" class="mt">P(3)</text><text x="309" y="150" text-anchor="middle" class="mt">P(4)</text>
+<text x="75" y="168" text-anchor="middle" class="s tr">initialisation</text>
+</svg>
+<figcaption>Pour être sûr que tous les dominos tombent, il faut deux choses : pousser le premier (initialisation), et que chaque domino fasse tomber le suivant (hérédité).</figcaption>
+</figure>
+<p>On veut démontrer une propriété P(n) pour tous les entiers n à partir d'un rang n₀. On procède en deux étapes :</p>
+<ol>
+<li><b>Initialisation :</b> on vérifie que P(n₀) est vraie (souvent n₀ = 0 ou 1).</li>
+<li><b>Hérédité :</b> on démontre que, pour tout n ≥ n₀, <span class="mr">P(n) ⇒ P(n + 1)</span>.</li>
+</ol>
+<p>Alors P(n) est vraie pour tout n ≥ n₀ : P(n₀) est vraie, donc P(n₀ + 1) aussi, donc P(n₀ + 2) aussi, et ainsi de suite (transitivité, 7.3).</p>
+<div class="box key">
+<p class="lbl">Là où l'implication est cruciale</p>
+<p>L'hérédité est une <b>implication</b>. Quand on écrit « supposons P(n) vraie », on ne prétend <b>pas</b> que P(n) est vraie : on démontre seulement la promesse « <i>si</i> le domino n tombe, <i>alors</i> le suivant tombe ». Ce n'est pas tricher, c'est exactement la démonstration directe de 9.2. C'est très probablement ce passage qui t'a perdu en cours : sans l'implication, la récurrence ressemble à un raisonnement circulaire.</p>
+</div>
+<div class="redac">
+<p><b>Énoncé :</b> pour tout n ∈ ℕ, 2ⁿ ≥ n + 1.</p>
+<p>Pour n ∈ ℕ, notons P(n) la propriété « 2ⁿ ≥ n + 1 ».</p>
+<p><b>Initialisation.</b> Pour n = 0 : 2⁰ = 1 et 0 + 1 = 1, donc 2⁰ ≥ 0 + 1. P(0) est vraie.</p>
+<p><b>Hérédité.</b> Soit n ∈ ℕ. Supposons P(n) vraie, c'est-à-dire 2ⁿ ≥ n + 1 (c'est l'<i>hypothèse de récurrence</i>). Montrons P(n + 1), c'est-à-dire 2ⁿ⁺¹ ≥ n + 2.</p>
+<p>On a 2ⁿ⁺¹ = 2 × 2ⁿ ≥ 2(n + 1), en multipliant l'hypothèse de récurrence par 2, qui est positif <span class="note">(règle de ton polycopié : pour α ≥ 0, a ≤ b ⇒ αa ≤ αb)</span>.</p>
+<p>Et 2(n + 1) = 2n + 2 ≥ n + 2, car n ≥ 0.</p>
+<p>Donc 2ⁿ⁺¹ ≥ n + 2 : P(n + 1) est vraie.</p>
+<p><b>Conclusion.</b> P(0) est vraie et P est héréditaire, donc par récurrence, P(n) est vraie pour tout n ∈ ℕ.</p>
+</div>
+<div class="box warn">
+<p class="lbl">Ne jamais oublier l'initialisation</p>
+<p>Prends P(n) : « n = n + 1 ». L'hérédité marche : si n = n + 1, en ajoutant 1 des deux côtés, n + 1 = n + 2. Donc <span class="mr">P(n) ⇒ P(n + 1)</span> est vraie pour tout n ! Mais P(0) dit « 0 = 1 », qui est faux, et P(n) n'est vraie pour aucun n. Des dominos bien alignés, mais que personne ne pousse. L'exercice 13 joue exactement sur cette idée : commence par calculer P(n) pour n = 0, 1, 2, …, 6 dans un petit tableau.</p>
+</div>
+<p><b>Variantes que tu croiseras sur ta feuille.</b> Dans la <b>récurrence double</b> (exercices 10 et 11, où chaque terme dépend des deux précédents), on initialise deux rangs, et on suppose P(n) et P(n + 1) pour démontrer P(n + 2). Dans la <b>récurrence forte</b> (exercices 12 et 14), on suppose P vraie à tous les rangs de n₀ jusqu'à n pour démontrer P(n + 1). C'est d'ailleurs la formulation de ton polycopié : « supposant Pₙ vraie <i>jusqu'au</i> rang n ».</p>
+
+<h3>9.9 Le principe des tiroirs</h3>
+<p>Si tu ranges n + 1 paires de chaussettes dans n tiroirs, un tiroir en contient au moins deux. Sinon, chaque tiroir en contiendrait au plus une, et il y aurait au plus n paires : absurde. Exemple : parmi 13 personnes, deux au moins sont nées le même mois, car il n'y a que 12 mois. Ça paraît évident, et pourtant c'est un outil très puissant (exercices 15 à 17).</p>
+
+<details class="check"><summary>Vérifie-toi (partie 9)</summary><ol>
+<li>Quelle méthode pour montrer que « <span class="mr">∀x ∈ ℝ, x² ≥ x</span> » est fausse ? Et que « <span class="mr">∀x ∈ ℝ, x² + 1 &gt; 0</span> » est vraie ?<details><summary>Réponse</summary><div>La première : un contre-exemple (x = 1/2). La seconde : une démonstration directe avec « Soit x ∈ ℝ. On a x² ≥ 0, donc x² + 1 ≥ 1 &gt; 0. » Des exemples ne suffiraient pas.</div></details></li>
+<li>Pour démontrer « si n² est impair, alors n est impair » par contraposition, que supposes-tu, et que dois-tu montrer ?<details><summary>Réponse</summary><div>On suppose n pair (négation de la conclusion), et on montre que n² est pair (négation de l'hypothèse). C'est exactement 9.2.</div></details></li>
+<li>Dans une récurrence, pourquoi « supposons P(n) vraie » n'est-il pas un raisonnement circulaire ?<details><summary>Réponse</summary><div>Parce qu'on démontre l'implication P(n) ⇒ P(n + 1), pas P(n) elle-même. La vérité de P vient de l'initialisation, puis se transmet de proche en proche.</div></details></li>
+<li>Pour démontrer par l'absurde que √2 est irrationnel (exercice 18), que suppose-t-on au départ ?<details><summary>Réponse</summary><div>Le contraire : que √2 est rationnel, c'est-à-dire qu'il existe deux entiers p et q (q non nul) tels que √2 = p/q. C'est la première ligne de l'exercice.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Relecture de tes notes</h2>
+<h3>Ce qui est juste</h3>
+<ul>
+<li><b>Tes tables des exercices 1 et 2 sont entièrement justes.</b> J'ai vérifié les 4 lignes de l'exercice 1 et les 8 lignes de l'exercice 2, colonne par colonne. La mécanique est donc en place : ce qui manquait, c'était le sens, et c'est l'objet de la partie 4.</li>
+<li>Les calculs des exercices 3 et 4 sont justes. Ce qui leur manque, ce sont les ⇔ entre les lignes et la règle utilisée à chaque étape : c'est fait en 7.4.</li>
+<li>« Tautologie = tout le temps vrai » : exact.</li>
+<li>Dans l'exercice 5, ta négation de « tout le monde a les yeux bleus » est parfaite. La fin de l'exercice est en 9.7.</li>
+<li>Le dessin du petit cercle p dans le grand cercle q, et ta question « qui implique qui » : le petit implique le grand (4.3).</li>
+</ul>
+
+</section>
+
+<!-- ============ PARTIE 11 ============ -->
+<section id="p11">
+<h2><span class="num">11</span>Ta feuille d'exercices, et ta checklist</h2>
+<div class="tw"><table>
+<tr><th>Exercices</th><th>Ce qu'il faut</th><th>Dans ce cours</th></tr>
+<tr><td>1 à 4</td><td>tables de vérité, règles de calcul</td><td>parties 3, 4 et 7. Refais-les seul, sans tes notes, en justifiant chaque ligne</td></tr>
+<tr><td>5</td><td>disjonction de cas, implication à hypothèse fausse</td><td>8.3 et 9.7</td></tr>
+<tr><td>6</td><td>écrire une phrase avec ∀ et ∃, puis la nier</td><td>8.2 et 8.4. « Au moins un jour » est un ∃</td></tr>
+<tr><td>7</td><td>traduire des relations entre ensembles</td><td>1.3 et 8.2. Par exemple, <span class="mr">A ∩ B ≠ ∅</span> veut dire « A et B ont au moins un élément en commun »</td></tr>
+<tr><td>8</td><td>lire un ensemble défini avec ∃ ou ∀</td><td>1.4, 8.2 et 8.5. Teste des valeurs (x = 0, x = 1/2, x = 1) avant de conclure</td></tr>
+<tr><td>9</td><td>écrire et nier des définitions</td><td>8.4 et 8.6 (le modèle « majorée / pas majorée »)</td></tr>
+<tr><td>10 à 14</td><td>récurrence simple, double, forte</td><td>9.8. Commence par le 13</td></tr>
+<tr><td>15 à 17</td><td>principe des tiroirs, absurde</td><td>9.6 et 9.9</td></tr>
+<tr><td>18</td><td>absurde et contraposition</td><td>9.5 (la question 3 utilise « n² pair ⇒ n pair ») et 9.6</td></tr>
+</table></div>
+<p>Honnêtement : les exercices 1 à 9 sont à ta portée après ce cours. Les exercices de récurrence (10 à 14) et les exercices 16 et 17 demandent plus d'entraînement, surtout pour les calculs. S'ils résistent, ce n'est pas un signe que tu n'as pas compris la logique, c'est normal à ce stade.</p>
+
+<div class="box key">
+<p class="lbl">Avant le prochain cours, tu dois pouvoir…</p>
+<ul>
+<li>écrire la table de ⇒ sans hésiter, et expliquer pourquoi « F ⇒ F » est vrai, avec l'exemple x &gt; 2 ;</li>
+<li>transformer « condition nécessaire / suffisante » et « seulement si » en flèche dans le bon sens ;</li>
+<li>donner la réciproque et la contraposée d'une implication, et dire laquelle lui est équivalente ;</li>
+<li>nier une implication, un « pour tout », un « il existe » ;</li>
+<li>refaire les exercices 1 à 4 seul, en nommant la règle utilisée à chaque ligne ;</li>
+<li>expliquer l'exercice 5 à voix haute, comme si tu l'enseignais ;</li>
+<li>rédiger une récurrence avec initialisation, hérédité et conclusion.</li>
+</ul>
+</div>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes notes et du polycopié de Suites numériques (chapitre 0 et feuille 1 de logique), Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- Machine à promesses ---------- */
+  var tP = $('tP'), tQ = $('tQ'), pv = $('pverdict');
+  var TXT = {
+    VV: ['ok', '<b>P ⇒ Q est vraie.</b> Tu as eu la moyenne et tu as ton kebab : promesse tenue.'],
+    VF: ['ko', '<b>P ⇒ Q est fausse.</b> Tu as eu la moyenne et je ne t’offre rien : j’ai menti. C’est le seul cas où l’implication est fausse.'],
+    FV: ['ok', '<b>P ⇒ Q est vraie.</b> Tu n’as pas eu la moyenne, mais je t’offre quand même un kebab pour te consoler. Ma promesse ne disait rien sur ce cas : je n’ai pas menti.'],
+    FF: ['ok', '<b>P ⇒ Q est vraie.</b> Tu n’as pas eu la moyenne et tu n’as pas de kebab. La condition n’était pas remplie : ma promesse n’a pas été mise à l’épreuve, je n’ai pas menti.']
+  };
+  function pUpd(){
+    var k = (tP.getAttribute('aria-pressed') === 'true' ? 'V' : 'F') + (tQ.getAttribute('aria-pressed') === 'true' ? 'V' : 'F');
+    pv.className = 'verdict ' + TXT[k][0];
+    pv.innerHTML = TXT[k][1];
+  }
+  function pTog(b){
+    var v = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', v ? 'true' : 'false');
+    b.querySelector('.val').textContent = v ? 'VRAI' : 'FAUX';
+    pUpd();
+  }
+  if (tP && tQ && pv){
+    tP.addEventListener('click', function(){ pTog(tP); });
+    tQ.addEventListener('click', function(){ pTog(tQ); });
+    pUpd();
+  }
+
+  /* ---------- Cartes de Wason ---------- */
+  var cards = document.querySelectorAll('#wason .card'), wfb = $('wfb');
+  var EXPL = {
+    'A': [true,  'A est une voyelle : l’hypothèse est vraie. Si derrière il y a un nombre impair, on est dans le cas « V ⇒ F » et la règle est violée. Il faut la retourner.'],
+    'K': [false, 'K est une consonne : l’hypothèse est fausse. La règle ne dit rien sur les consonnes (« F ⇒ … » est toujours vrai). Inutile de la retourner.'],
+    '4': [false, '4 est pair : la conclusion est vraie. Voyelle derrière (V ⇒ V) ou consonne (F ⇒ V), la règle est respectée. Inutile. C’est le piège de la réciproque : la règle ne dit pas « pair ⇒ voyelle ».'],
+    '7': [true,  '7 est impair : la conclusion est fausse. S’il y a une voyelle derrière, on est dans le cas « V ⇒ F ». Il faut la retourner. C’est la contraposée : « impair ⇒ consonne ».']
+  };
+  Array.prototype.forEach.call(cards, function(c){
+    c.addEventListener('click', function(){
+      c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+  });
+  if ($('wcheck')){
+    $('wcheck').addEventListener('click', function(){
+      var ok = true, html = '';
+      Array.prototype.forEach.call(cards, function(c){
+        var k = c.getAttribute('data-c'), sel = c.getAttribute('aria-pressed') === 'true';
+        if (sel !== EXPL[k][0]) ok = false;
+      });
+      html += ok
+        ? '<p class="good">Bravo, c’est exactement A et 7.</p>'
+        : '<p class="bad">Pas tout à fait. La bonne réponse est A et 7. Lis pourquoi, carte par carte :</p>';
+      ['A','K','4','7'].forEach(function(k){
+        html += '<p><b>' + k + ' :</b> ' + EXPL[k][1] + '</p>';
+      });
+      wfb.innerHTML = html;
+    });
+    $('wreset').addEventListener('click', function(){
+      Array.prototype.forEach.call(cards, function(c){ c.setAttribute('aria-pressed', 'false'); });
+      wfb.innerHTML = '';
+    });
+  }
+
+  /* ---------- Labo : tables de vérité ---------- */
+  var inp = $('lab-in'), lout = $('lab-out');
+  if (!inp) return;
+  var caret = inp.value.length;
+  ['input','click','keyup','select'].forEach(function(ev){
+    inp.addEventListener(ev, function(){ caret = inp.selectionStart == null ? inp.value.length : inp.selectionStart; });
+  });
+
+  function LErr(msg, pos){ this.msg = msg; this.pos = pos; }
+
+  function tokenize(s){
+    var toks = [], i = 0, m;
+    while (i < s.length){
+      var c = s.charAt(i), rest = s.slice(i);
+      if (/\s/.test(c)){ i++; continue; }
+      if ((m = rest.match(/^(<=>|<->|⇔|⟺|↔)/))){ toks.push({t:'EQ', p:i}); i += m[0].length; continue; }
+      if ((m = rest.match(/^(=>|->|⇒|⟹|→)/))){ toks.push({t:'IMP', p:i}); i += m[0].length; continue; }
+      if ((m = rest.match(/^(¬|~|!|⌉)/))){ toks.push({t:'NOT', p:i}); i += m[0].length; continue; }
+      if ((m = rest.match(/^(∧|&&|&)/))){ toks.push({t:'AND', p:i}); i += m[0].length; continue; }
+      if ((m = rest.match(/^(∨|\|\||\|)/))){ toks.push({t:'OR', p:i}); i += m[0].length; continue; }
+      if (c === '(' || c === ')'){ toks.push({t:c, p:i}); i++; continue; }
+      var prev = i > 0 ? s.charAt(i-1) : ' ';
+      if (!/[A-Za-zÀ-ÿ]/.test(prev) && (m = rest.match(/^(non|et|ou)(?![A-Za-zÀ-ÿ])/i))){
+        var w = m[0].toLowerCase();
+        toks.push({t: w === 'non' ? 'NOT' : (w === 'et' ? 'AND' : 'OR'), p:i});
+        i += m[0].length; continue;
+      }
+      if (/[A-Za-z]/.test(c)){ toks.push({t:'VAR', n:c.toUpperCase(), p:i}); i++; continue; }
+      throw new LErr('symbole inconnu « ' + c + ' »', i);
+    }
+    return toks;
+  }
+
+  function parse(s){
+    var toks = tokenize(s), k = 0;
+    if (!toks.length) throw new LErr('la formule est vide', 0);
+    function peek(){ return toks[k]; }
+    function at(t){ return k < toks.length && toks[k].t === t; }
+    function posHere(){ return k < toks.length ? toks[k].p : s.length; }
+    function pEq(){ var a = pImp(); while (at('EQ')){ k++; a = {t:'eq', a:a, b:pImp()}; } return a; }
+    function pImp(){ var a = pOr(); if (at('IMP')){ k++; return {t:'imp', a:a, b:pImp()}; } return a; }
+    function pOr(){ var a = pAnd(); while (at('OR')){ k++; a = {t:'or', a:a, b:pAnd()}; } return a; }
+    function pAnd(){ var a = pNot(); while (at('AND')){ k++; a = {t:'and', a:a, b:pNot()}; } return a; }
+    function pNot(){ if (at('NOT')){ k++; return {t:'not', a:pNot()}; } return pAtom(); }
+    function pAtom(){
+      var tk = peek();
+      if (!tk) throw new LErr('la formule s’arrête trop tôt : il manque une lettre ou une parenthèse à la fin', s.length);
+      if (tk.t === 'VAR'){ k++; return {t:'var', n:tk.n}; }
+      if (tk.t === '('){
+        k++; var e = pEq();
+        if (!at(')')) throw new LErr('une parenthèse ouverte n’est pas refermée', posHere());
+        k++; return e;
+      }
+      throw new LErr('j’attendais une lettre ou « ( »', tk.p);
+    }
+    var root = pEq();
+    if (k < toks.length) throw new LErr('il y a un symbole en trop (une parenthèse fermante de trop, ou deux lettres collées ?)', toks[k].p);
+    return root;
+  }
+
+  var OPS = {and:'∧', or:'∨', imp:'⇒', eq:'⇔'};
+  function str(n, top){
+    if (n.t === 'var') return n.n;
+    if (n.t === 'not') return '¬' + ((n.a.t === 'var' || n.a.t === 'not') ? str(n.a) : '(' + str(n.a, true) + ')');
+    var x = str(n.a, false) + ' ' + OPS[n.t] + ' ' + str(n.b, false);
+    return top ? x : '(' + x + ')';
+  }
+  function ev(n, env){
+    switch (n.t){
+      case 'var': return env[n.n];
+      case 'not': return !ev(n.a, env);
+      case 'and': return ev(n.a, env) && ev(n.b, env);
+      case 'or':  return ev(n.a, env) || ev(n.b, env);
+      case 'imp': return (!ev(n.a, env)) || ev(n.b, env);
+      case 'eq':  return ev(n.a, env) === ev(n.b, env);
+    }
+  }
+  function vars(n, acc){
+    if (n.t === 'var'){ if (acc.indexOf(n.n) < 0) acc.push(n.n); }
+    else { vars(n.a, acc); if (n.b) vars(n.b, acc); }
+    return acc;
+  }
+  function subs(n, acc, seen){
+    if (n.t === 'var') return acc;
+    subs(n.a, acc, seen); if (n.b) subs(n.b, acc, seen);
+    var key = str(n, true);
+    if (!seen[key]){ seen[key] = 1; acc.push(n); }
+    return acc;
+  }
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function cell(b){ return b ? '<td class="v">V</td>' : '<td class="f">F</td>'; }
+
+  function run(showErrors){
+    var s = inp.value, root;
+    try { root = parse(s); }
+    catch (e){
+      if (!(e instanceof LErr)) throw e;
+      var near = s.slice(Math.max(0, e.pos - 6), e.pos + 6);
+      lout.innerHTML = showErrors
+        ? '<p class="err">Je n’ai pas compris : ' + esc(e.msg) + (near.trim() ? ' (près de « ' + esc(near) + ' »)' : '') + '.</p>'
+        : '<p class="tm">Formule incomplète… continue à écrire, ou appuie sur « Calculer ».</p>';
+      return;
+    }
+    var vs = vars(root, []).sort();
+    if (vs.length > 5){ lout.innerHTML = '<p class="err">Trop de lettres : 5 au maximum (32 lignes).</p>'; return; }
+    var cols = subs(root, [], {});
+    var nrows = Math.pow(2, vs.length), html = '<div class="tw"><table class="c tight"><tr>';
+    vs.forEach(function(v){ html += '<th>' + v + '</th>'; });
+    cols.forEach(function(c){ html += '<th>' + esc(str(c, true)) + '</th>'; });
+    html += '</tr>';
+    var allT = true, allF = true;
+    for (var i = 0; i < nrows; i++){
+      var env = {};
+      vs.forEach(function(v, j){ env[v] = !((i >> (vs.length - 1 - j)) & 1); });
+      var r = ev(root, env);
+      if (r) allF = false; else allT = false;
+      html += '<tr' + (r ? '' : ' class="hl"') + '>';
+      vs.forEach(function(v){ html += cell(env[v]); });
+      cols.forEach(function(c){ html += cell(ev(c, env)); });
+      html += '</tr>';
+    }
+    html += '</table></div>';
+    var msg, cls;
+    if (allT){
+      cls = 'ok';
+      msg = root.t === 'eq'
+        ? '<b>Tautologie :</b> la formule est vraie dans tous les cas. Les deux côtés du ⇔ sont donc équivalents : ils disent la même chose.'
+        : '<b>Tautologie :</b> la formule est vraie dans tous les cas.';
+    } else if (allF){
+      cls = 'ko';
+      msg = '<b>Contradiction :</b> la formule est fausse dans tous les cas.';
+    } else {
+      cls = 'ko';
+      msg = root.t === 'eq'
+        ? '<b>Pas une tautologie :</b> les deux côtés du ⇔ ne sont pas équivalents. Sur les lignes surlignées, ils n’ont pas la même valeur.'
+        : '<b>Ni tautologie, ni contradiction :</b> la valeur dépend des lettres. Les lignes surlignées sont celles où la formule est fausse.';
+    }
+    lout.innerHTML = html + '<div class="verdict ' + cls + '">' + msg + '</div>';
+  }
+
+  function insert(t){
+    var s = inp.value, p = Math.min(caret, s.length);
+    inp.value = s.slice(0, p) + t + s.slice(p);
+    caret = p + t.length;
+    run(false);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#lab .keys button'), function(b){
+    b.addEventListener('click', function(){
+      var k = b.getAttribute('data-k'), s = inp.value;
+      if (k === 'BACK'){
+        var p = Math.min(caret, s.length);
+        if (p > 0){
+          var cut = 1;
+          if (s.charAt(p-1) === ' ' && p >= 3 && /[∧∨⇒⇔]/.test(s.charAt(p-2)) && s.charAt(p-3) === ' ') cut = 3;
+          inp.value = s.slice(0, p - cut) + s.slice(p); caret = p - cut;
+        }
+        run(false);
+      } else if (k === 'CLEAR'){
+        inp.value = ''; caret = 0; lout.innerHTML = '';
+      } else insert(k);
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#lab .presets2 button'), function(b){
+    b.addEventListener('click', function(){ inp.value = b.getAttribute('data-f'); caret = inp.value.length; run(true); });
+  });
+  $('lab-go').addEventListener('click', function(){ run(true); });
+  inp.addEventListener('input', function(){ run(false); });
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); run(true); } });
+  run(true);
+})();
+</script>
+</body>
+</html>

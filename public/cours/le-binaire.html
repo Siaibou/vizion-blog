@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>Le binaire, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Cahier à grands carreaux : même identité que les cours de maths (papier ligné, marge rouge, Atkinson + STIX),
+   avec une police à chasse fixe pour les bits, et les couleurs de fils de Logisim (vert vif = 1, vert sombre = 0). */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  --w1:#1fbf4a; --w0:#0f5a2c; --wz:#2f6fe0; --wx:#d33a2c; --w-off:#c9d2e3;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:780px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:780px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.mr{font-family:var(--serif);font-size:1.1em}
+.eq{font-family:var(--serif);font-size:1.25rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+code,.bits{font-family:var(--mono);font-size:.86em}
+code{background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.bits{white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+sub{font-size:.7em}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}.c-m{color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;white-space:nowrap}
+table.c td.bits{font-size:.95rem}
+table.tight{width:auto;margin:0 auto}
+table.c tr.hl td{background:var(--soft-a)}
+table.c td.v,td.one{color:var(--green);font-weight:700}
+td.zero{color:var(--muted)}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:var(--serif)}
+.blk a:hover{border-color:var(--blue)}
+details.check{margin:22px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem;overflow-x:auto}
+.steps{font-family:var(--serif);font-size:1.08rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:var(--sans);font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.05em;font-family:var(--sans);font-weight:700}
+.steps .bits{font-size:.92em}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.9rem}
+.note{font-size:.92rem;color:var(--muted)}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:780px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+/* questions guidées */
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.mq{border-top:1px solid var(--line);padding:10px 0 6px}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+
+/* boutons et champs communs aux laboratoires */
+.lab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:18px 0}
+.lab>.lbl{color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0}
+.row>*{min-width:0}
+.fld{display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:var(--muted);font-weight:700}
+.fld input,.fld select{font-family:var(--mono);font-size:1.05rem;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px;min-width:0;width:100%}
+.fld select{font-family:var(--sans)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.92rem;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:38px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--soft-b);color:var(--blue);font-weight:700}
+.out{margin-top:10px}
+.msg{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:.98rem}
+.msg>:first-child{margin-top:0}.msg>:last-child{margin-bottom:0}
+.msg.ok{background:var(--soft-g)}.msg.ko{background:var(--soft-r)}.msg.info{background:var(--soft-b)}.msg.meh{background:var(--soft-a)}
+.pill{display:inline-block;font-size:.82rem;font-weight:700;border-radius:999px;padding:1px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}.pill.n{background:var(--soft-b);color:var(--blue)}
+/* ---- opérations posées ---- */
+.pose-w{overflow-x:auto;margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+table.pose{border-collapse:collapse;width:auto;background:none;font-family:var(--mono);font-size:1.12rem;font-variant-numeric:tabular-nums}
+table.pose td{border:0;padding:0 .14em;text-align:center;line-height:1.55;vertical-align:baseline;min-width:.9em}
+table.pose td.g{padding-left:.75em}
+table.pose tr.cr td{font-size:.68rem;color:var(--red);line-height:1.1;font-weight:700}
+table.pose tr.res td.d{border-top:2px solid var(--ink);font-weight:700}
+table.pose td.op{color:var(--blue);padding-right:.45em;font-weight:700}
+table.pose td.x{color:var(--ink)}
+table.pose td.lost{color:var(--muted);text-decoration:line-through;font-weight:400}
+table.pose td.nt{font-family:var(--sans);font-size:.88rem;color:var(--muted);text-align:left;padding-left:1.3em;white-space:nowrap;font-weight:400}
+table.pose tr.cr td.nt{color:var(--red);font-size:.75rem}
+table.pose td.cur{background:var(--soft-a)}
+table.pose td.hid{color:transparent}
+.pose-cap{font-size:.9rem;color:var(--muted);margin:8px 0 0}
+
+/* ---- paquets de bits ---- */
+.grpw{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:14px 0;overflow-x:auto}
+.grpt{margin:6px 0 2px;font-size:.9rem;color:var(--muted);font-weight:700}
+.grp{display:flex;gap:6px;flex-wrap:nowrap;margin:2px 0 8px}
+.gcell{display:flex;flex-direction:column;align-items:center;border:1.5px solid var(--blue);border-radius:8px;padding:2px 8px;background:var(--soft-b)}
+.gcell:nth-child(even){border-color:var(--green);background:var(--soft-g)}
+.gb{font-family:var(--mono);font-size:1.05rem;letter-spacing:.06em}
+.gb .pad{color:var(--muted);opacity:.6}
+.gd{font-family:var(--mono);font-weight:700;color:var(--ink);font-size:1.05rem}
+
+table.divs td.rest{color:var(--red);font-weight:700;font-family:var(--mono)}
+table.hex16 th{white-space:nowrap}
+table.hex16 td{padding:6px 6px;font-size:.92rem}
+table.r4 tr.neg td{background:var(--soft-b)}
+table.r4 td,table.r4 th{padding:5px 12px}
+
+/* ---- octet ---- */
+.oct-bits{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;max-width:440px;margin:6px auto 4px}
+.oct-w{font-size:.74rem;color:var(--muted);text-align:center;font-family:var(--mono);line-height:1.2;min-height:1.2em}
+.oct-b{font-family:var(--mono);font-size:1.35rem;font-weight:700;height:52px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer;width:100%;padding:0}
+.oct-b[aria-pressed="true"]{border-color:var(--w1);background:var(--soft-g);color:var(--green)}
+.oct-b:hover{border-color:var(--blue)}
+.oct-sum{text-align:center;font-family:var(--serif);font-size:1.12rem;margin:8px 0 2px;overflow-x:auto}
+.oct-sum b{font-size:1.25em}
+.oct-tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+table.oct-read{max-width:520px;margin:8px auto 0}
+table.oct-read td:last-child{font-family:var(--serif);font-size:1.05rem;white-space:nowrap}
+table.oct-read td.how{color:var(--muted);font-size:.86rem}
+
+/* ---- compteur ---- */
+.odo{display:flex;justify-content:center;gap:5px;margin:10px 0 2px;flex-wrap:nowrap}
+.odo-c{display:flex;flex-direction:column;align-items:center;gap:3px}
+.odo-d{width:38px;height:52px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--mono);font-size:1.6rem;font-weight:700}
+.odo-d.flip{animation:flip .45s ease}
+@keyframes flip{0%{transform:translateY(-35%);opacity:.2;background:var(--green)}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.odo-d.flip{animation:none;outline:3px solid var(--green)}}
+.odo-w{font-size:.7rem;color:var(--muted);font-family:var(--mono)}
+.odo-read{text-align:center;font-family:var(--serif);font-size:1.05rem;overflow-x:auto;margin:6px 0}
+@media (max-width:420px){.odo-d{width:32px;height:46px;font-size:1.35rem}}
+
+/* ---- convertisseur ---- */
+.cv-grid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;background:var(--paper);border-radius:8px;padding:10px 14px;align-items:baseline}
+.cv-grid b{font-size:.9rem;color:var(--muted)}
+.cv-grid span{font-family:var(--mono);font-size:1.08rem;overflow-wrap:anywhere}
+
+/* ---- cercle ---- */
+.ring-fig svg{display:block;width:100%;max-width:400px;height:auto;margin:0 auto}
+.ring-fig text{font-family:var(--mono);font-size:12px;fill:var(--ink)}
+.ring-fig text.u{fill:var(--blue);font-family:var(--sans);font-size:13px;font-weight:700}
+.ring-fig text.s{fill:var(--amber);font-family:var(--sans);font-size:13px;font-weight:700}
+.ring-fig text.ctr{font-size:22px;font-weight:700}
+.ring-fig text.ctrl{font-family:var(--sans);font-size:11px;fill:var(--muted)}
+.ring-fig .cell{fill:var(--card);stroke:var(--line);stroke-width:1.5;cursor:pointer}
+.ring-fig .cell:hover{stroke:var(--blue)}
+.ring-fig .cell.a{stroke:var(--blue);stroke-width:3}
+.ring-fig .cell.r{fill:var(--soft-g);stroke:var(--green);stroke-width:3}
+.ring-fig .arc-u{fill:none;stroke:var(--blue);stroke-width:3}
+.ring-fig .arc-s{fill:none;stroke:var(--amber);stroke-width:3}
+.ring-fig .bnd{stroke:var(--red);stroke-width:2;stroke-dasharray:5 4}
+.ring-fig .bndt{fill:var(--red);font-family:var(--sans);font-size:12px;font-weight:700}
+.ring-b{display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0}
+.ring-b .oct-b{width:46px;height:46px;font-size:1.2rem}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center;font-size:.88rem;color:var(--muted);margin:4px 0}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+
+/* ---- UAL ---- */
+.alu-in{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+.alu-in .seg{align-self:end;margin-bottom:2px}
+@media (max-width:460px){.alu-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.alu-in .seg{grid-column:1 / -1;justify-self:center;order:3}}
+.flags{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.flag{border-radius:10px;padding:6px 12px;border:1.5px solid var(--line);background:var(--paper);font-size:.95rem}
+.flag b{font-family:var(--mono);font-size:1.1rem;margin-right:6px}
+.flag.on{border-color:var(--red);background:var(--soft-r)}
+table.alu-r td{vertical-align:middle}
+
+/* ---- exercices ---- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px 14px;margin:18px 0}
+.ex h3{margin-top:14px}
+.ck{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:10px 0}
+.ck .fld{flex:1 1 220px}
+.ckr{flex-basis:100%;font-size:.95rem}
+.ckr:empty{display:none}
+.hints p{display:none;background:var(--soft-b);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:.96rem}
+.hints p.shown{display:block}
+.hints .btn{margin-top:6px}
+table.pose td.eac{color:var(--amber);font-weight:700}
+table.pose td.nt{white-space:normal;min-width:9em;max-width:17em;line-height:1.3}
+.alu-op{background:var(--paper);border-radius:8px;padding:6px 12px;margin:8px 0}
+.alu-op p{margin:4px 0}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:780px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/informatique">← Vizion.Blog / Informatique</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »). Dans cette version publique, j'ai retiré ma feuille d'exercices, qui est peut-être notée.</p>
+</div>
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Architecture des ordinateurs, séances du 21 et du 28 septembre</p>
+<h1>Le binaire, depuis le tout début<small>Bits, bases, conversions, nombres négatifs, et les calculs que fait vraiment le processeur.</small></h1>
+<p class="lede">Tes notes contiennent presque tout le programme des deux premières séances, mais dans l'ordre où le cours s'est déroulé, avec des essais, des ratures et quelques erreurs. On reprend tout dans l'ordre logique : ce qu'est un bit, comment on écrit un nombre dans n'importe quelle base, comment on calcule, et surtout comment une machine qui ne connaît que 0 et 1 représente un nombre négatif. Six laboratoires te laissent manipuler les bits toi-même.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Lis dans l'ordre.</b> Les sections 1 à 5 couvrent la séance du 21 septembre, les sections 6 à 8 celle du 28.</li>
+<li><b>Garde une feuille à côté.</b> Pose chaque calcul à la main avant de regarder le mien ou d'utiliser un laboratoire.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b> Une erreur ici ne coûte rien.</li>
+<li><b>Vérifie toujours en décimal.</b> Un calcul binaire se contrôle en vingt secondes en repassant en base 10. C'est ton test unitaire.</li>
+<li><b>Rythme conseillé :</b> sections 1 à 4 à une première séance, 5 à 7 à une deuxième (la 7 est la plus importante), puis 8 et 9.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Où ça se place dans le semestre</p>
+<p>D'après le plan de ta prof, le 5 octobre est consacré aux portes logiques, et le 19 octobre tu construiras dans Logisim un additionneur capable de soustraire. Cet additionneur calcule exactement comme dans la section 7 de cette page : les deux cours vont ensemble. Les portes logiques ont leur propre page : <a href="/cours/les-portes-logiques.html">Les portes logiques, depuis le tout début</a>.</p>
+</div>
+<h3>Les mots, et où ils sont expliqués</h3>
+<ul class="blk">
+<li><a href="#p1"><b>•</b>Bit, octet, mot</a></li>
+<li><a href="#p1-nb"><b>•</b>Combien de bits faut-il ?</a></li>
+<li><a href="#p2"><b>•</b>Bases 2, 8, 10 et 16</a></li>
+<li><a href="#p3"><b>•</b>Les conversions</a></li>
+<li><a href="#p4"><b>•</b>Addition et soustraction</a></li>
+<li><a href="#p5"><b>•</b>Taille fixe, retenue sortante</a></li>
+<li><a href="#p6-sva"><b>•</b>Signe et valeur absolue</a></li>
+<li><a href="#p6-c1"><b>•</b>Complément à un</a></li>
+<li><a href="#p6-c2"><b>•</b>Complément à deux</a></li>
+<li><a href="#p7"><b>•</b>Calculer avec des signés</a></li>
+<li><a href="#p7-flags"><b>•</b>Retenue ou débordement ?</a></li>
+<li><a href="#p8"><b>•</b>Caractères et nombres à virgule</a></li>
+<li><a href="#p9"><b>•</b>Relecture de tes notes</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Le bit, l'octet, le mot</h2>
+
+<h3>1.1 Le bit</h3>
+<p>Un processeur contient des milliards de minuscules interrupteurs électroniques, les transistors. Chacun est dans un état parmi deux. Tes notes le disent ainsi : 0, le courant ne passe pas ; 1, le courant passe. En réalité, on mesure plutôt une tension : basse pour 0, haute pour 1. L'idée reste la même : deux états, faciles à distinguer.</p>
+<p>Un chiffre qui ne peut valoir que 0 ou 1 s'appelle un <b>bit</b> (<i>binary digit</i>, chiffre binaire). C'est la plus petite quantité d'information possible : la réponse à une question par oui ou par non.</p>
+<div class="box img">
+<p class="lbl">Pourquoi deux états, et pas dix ?</p>
+<p>Distinguer dix niveaux de tension serait fragile : avec un peu de bruit électrique, un 6 deviendrait un 7. Avec deux niveaux très éloignés, l'erreur est presque impossible. C'est le principe d'un interrupteur de lumière : il n'a pas de position « à moitié allumé ».</p>
+</div>
+
+<h3>1.2 Octet et mot</h3>
+<div class="tw"><table>
+<tr><th>Nom</th><th>Taille</th><th>Exemple, usage</th></tr>
+<tr><td>bit (<i>bit</i>)</td><td>1 bit</td><td><span class="bits">0</span> ou <span class="bits">1</span></td></tr>
+<tr><td>quartet (<i>nibble</i>)</td><td>4 bits</td><td><span class="bits">1011</span> ; exactement un chiffre hexadécimal (section 3.4)</td></tr>
+<tr><td>octet (<i>byte</i>)</td><td>8 bits</td><td><span class="bits">1010 0111</span> ; la plus petite case de la mémoire qui a sa propre adresse</td></tr>
+<tr><td>mot (<i>word</i>)</td><td>16, 32 ou 64 bits selon la machine</td><td>la taille des nombres que le processeur traite en une seule opération</td></tr>
+</table></div>
+<p>Ton i5-1135G7 est un processeur 64 bits : ses registres de calcul contiennent des mots de 64 bits. En français, un octet fait toujours 8 bits, alors que la taille d'un mot dépend de la machine. C'est pourquoi on précise toujours le nombre de bits.</p>
+<p class="note">Attention aux outils x86 (débogueurs, désassembleurs) : par tradition, WORD y désigne 16 bits, DWORD 32 bits et QWORD 64 bits, quel que soit le processeur.</p>
+<p>On écrit les bits par paquets de 4 pour les lire plus facilement, comme on écrit 65 536 avec une espace : <span class="bits">1010 0111</span> plutôt que <span class="bits">10100111</span>.</p>
+
+<h3 id="p1-nb">1.3 Combien de valeurs avec n bits ?</h3>
+<p>Avec 1 bit, on écrit 2 valeurs : 0 et 1. Avec 2 bits, 4 valeurs : 00, 01, 10, 11. Chaque bit ajouté double le nombre de possibilités : on reprend toutes les combinaisons précédentes, une fois avec un 0 devant, une fois avec un 1 devant.</p>
+<div class="box key">
+<p class="lbl">À retenir</p>
+<p>Avec n bits, on peut écrire <b>2<sup>n</sup></b> combinaisons différentes. Utilisées pour des entiers positifs, elles vont de <b>0 à 2<sup>n</sup> − 1</b>.</p>
+</div>
+<p>Pourquoi « − 1 » ? Parce qu'on commence à 0. Avec 3 chiffres décimaux, il y a 10³ = 1 000 combinaisons, de 000 à 999 : la plus grande vaut 1 000 − 1. Pour l'octet, 2⁸ = 256 combinaisons, de 0 à 255 : c'est le « de 0 à 255 » de tes notes.</p>
+<div class="tw"><table class="c">
+<tr><th>n bits</th><th>2<sup>n</sup> valeurs</th><th>entiers de 0 à</th><th>où on le rencontre</th></tr>
+<tr><td>1</td><td>2</td><td>1</td><td style="text-align:left">vrai ou faux</td></tr>
+<tr><td>4</td><td>16</td><td>15</td><td style="text-align:left">un chiffre hexadécimal</td></tr>
+<tr><td>8</td><td>256</td><td>255</td><td style="text-align:left">un octet ; une composante de couleur en CSS</td></tr>
+<tr><td>10</td><td>1 024</td><td>1 023</td><td style="text-align:left">2¹⁰ = 1 024 ≈ 1 000 : d'où le préfixe « kibi » (Ki)</td></tr>
+<tr><td>16</td><td>65 536</td><td>65 535</td><td style="text-align:left">un numéro de port TCP ou UDP</td></tr>
+<tr><td>32</td><td>4 294 967 296</td><td>4 294 967 295</td><td style="text-align:left">une adresse IPv4</td></tr>
+<tr><td>64</td><td>≈ 1,8 × 10¹⁹</td><td>≈ 1,8 × 10¹⁹</td><td style="text-align:left">un registre de ton processeur</td></tr>
+</table></div>
+<p>Les puissances de 2 de ton cours sont à connaître par cœur, au moins jusqu'à 2¹⁰ : 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1 024.</p>
+
+<h4>La question inverse : combien de bits faut-il ?</h4>
+<p>Elle revient sans cesse en TD. Pour représenter N valeurs différentes, il faut le plus petit n tel que <b>2<sup>n</sup> ≥ N</b>.</p>
+<ul>
+<li>Numéroter les 30 étudiants d'un groupe : 2⁴ = 16 ne suffit pas, 2⁵ = 32 suffit. Il faut <b>5 bits</b> (numéros 0 à 29).</li>
+<li>Écrire tous les entiers de 0 à 200 : cela fait 201 valeurs. 2⁷ = 128 ne suffit pas, 2⁸ = 256 suffit. Il faut <b>8 bits</b>.</li>
+<li>Distinguer 1 000 valeurs : 2¹⁰ = 1 024, donc <b>10 bits</b>.</li>
+</ul>
+<div class="box warn">
+<p class="lbl">Le piège du « + 1 »</p>
+<p>Pour écrire les entiers de 0 à N, il y a N + 1 valeurs. Pour aller jusqu'à 256 inclus, 8 bits ne suffisent pas : 256 s'écrit <span class="bits">1 0000 0000</span>, avec 9 bits.</p>
+</div>
+<div class="box nts">
+<p class="lbl">ko ou Kio ?</p>
+<p>Un Kio (kibioctet) vaut 1 024 octets, un ko (kilooctet) vaut 1 000 octets. Les fabricants de disques comptent en puissances de 10, beaucoup de logiciels en puissances de 2. C'est pourquoi un SSD de 512 Go s'affiche autour de 477 Gio : 512 × 10⁹ / 2³⁰ ≈ 476,8.</p>
+</div>
+
+<h3>1.4 Laboratoire : l'octet</h3>
+<p>Clique sur les bits pour les allumer ou les éteindre. Chaque bit allumé ajoute son poids, écrit au-dessus. Essaie d'écrire 167, puis 255, puis 128.</p>
+<div class="lab octet" id="oct1" data-mode="simple" data-v="167"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 1)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Combien de valeurs différentes peut-on écrire avec 6 bits ?</p>
+<div class="mq-c"><button type="button" data-fb="Chaque bit double le nombre de possibilités : ce n'est pas une addition.">6</button><button type="button" data-fb="2 × 6 additionne les bits au lieu de doubler à chaque bit.">12</button><button type="button">64</button><button type="button" data-fb="63 est le plus grand entier qu'on peut écrire, pas le nombre de valeurs : il faut compter le 0.">63</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2⁶ = 64 valeurs, de 0 à 63.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de bits faut-il au minimum pour numéroter 100 objets ?</p>
+<div class="mq-c"><button type="button" data-fb="2⁶ = 64 : il manque 36 numéros.">6</button><button type="button">7</button><button type="button" data-fb="8 bits marchent, mais ce n'est pas le minimum.">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2⁶ = 64 &lt; 100 ≤ 128 = 2⁷. Donc 7 bits.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Quel est le plus grand entier qu'on peut écrire sur 16 bits, en non signé ?</p>
+<div class="mq-c"><button type="button" data-fb="65 536, c'est le nombre de valeurs. Comme on commence à 0, la plus grande est une de moins.">65 536</button><button type="button">65 535</button><button type="button" data-fb="Ce sera la réponse pour les nombres signés en complément à deux (section 6). Ici, les nombres sont positifs.">32 767</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2¹⁶ − 1 = 65 535, le plus grand numéro de port.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Un mot de 32 bits, c'est combien d'octets ?</p>
+<div class="mq-c"><button type="button">4</button><button type="button" data-fb="Un octet fait 8 bits.">32</button><button type="button" data-fb="Un octet fait 8 bits, pas 2.">16</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">32 / 8 = 4 octets.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>La numération positionnelle</h2>
+
+<h3>2.1 Ce que veut dire « 2026 »</h3>
+<p>Tu as écrit cet exemple dans tes notes. On le reprend, parce que tout le reste en découle.</p>
+<div class="steps">
+<span class="op"></span><span>2026 = 2 × 10³ + 0 × 10² + 2 × 10¹ + 6 × 10⁰</span>
+<span class="op">=</span><span>2 000 + 0 + 20 + 6</span>
+</div>
+<p>Chaque chiffre est multiplié par une puissance de 10 qui dépend de sa <b>position</b>. On numérote les positions à partir de la droite, en commençant à 0, comme les indices d'une liste en Python. Le même chiffre 2 vaut 2 000 en position 3, et 20 en position 1. C'est pour ça qu'on parle de <b>numération positionnelle</b> (<i>positional notation</i>). Les chiffres romains, eux, ne sont pas positionnels : dans XXX, chaque X vaut dix, quelle que soit sa place.</p>
+
+<h3>2.2 Changer de base</h3>
+<p>Le nombre 10 n'a rien de spécial : il vient de nos dix doigts. On peut remplacer 10 par n'importe quel entier b ≥ 2, qu'on appelle la <b>base</b>.</p>
+<div class="box key">
+<p class="lbl">Numération en base b</p>
+<p>On utilise b chiffres, de 0 à b − 1. Le chiffre placé en position k vaut <b>chiffre × b<sup>k</sup></b>, et la valeur du nombre est la somme de ces produits :</p>
+<p class="eq">(c<sub>n−1</sub> … c<sub>1</sub> c<sub>0</sub>)<sub>b</sub> = c<sub>n−1</sub> × b<sup>n−1</sup> + … + c<sub>1</sub> × b + c<sub>0</sub></p>
+<p>C'est la formule encadrée dans tes notes : « chiffre × base<sup>position</sup> ».</p>
+</div>
+<div class="tw"><table>
+<tr><th>Base</th><th>Nom</th><th>Chiffres</th><th>Poids des positions</th></tr>
+<tr><td>2</td><td>binaire</td><td><span class="bits">0 1</span></td><td>1, 2, 4, 8, 16, 32…</td></tr>
+<tr><td>8</td><td>octal</td><td><span class="bits">0 1 2 3 4 5 6 7</span></td><td>1, 8, 64, 512…</td></tr>
+<tr><td>10</td><td>décimal</td><td><span class="bits">0 1 … 9</span></td><td>1, 10, 100, 1 000…</td></tr>
+<tr><td>16</td><td>hexadécimal</td><td><span class="bits">0 … 9 A B C D E F</span></td><td>1, 16, 256, 4 096…</td></tr>
+</table></div>
+<p>En base 16, il faut seize chiffres, et nos chiffres s'arrêtent à 9. On emprunte donc des lettres : <b>A = 10, B = 11, C = 12, D = 13, E = 14, F = 15</b>. Chacune est <i>un seul</i> chiffre : dans (1A)₁₆, le A vaut 10 unités, et le nombre vaut 1 × 16 + 10 = 26.</p>
+<p>On écrit la base en indice : (1010)₂ = (10)₁₀. Sans indice, « 10 » est ambigu : dix en décimal, deux en binaire, huit en octal, seize en hexadécimal.</p>
+<div class="box nts">
+<p class="lbl">Dans tes outils de tous les jours</p>
+<ul>
+<li><b>En Python</b>, les préfixes <code>0b</code>, <code>0o</code> et <code>0x</code> indiquent la base : <code>0b1010 == 10</code>. Les fonctions <code>bin(167)</code>, <code>oct(167)</code>, <code>hex(167)</code> convertissent, et <code>int('5D7', 16)</code> fait l'inverse. Sers-t'en pour vérifier tes calculs, jamais pour les faire à ta place.</li>
+<li><b>En CSS</b>, dans ton cours de site personnel, une couleur <code>#FF8800</code> est trois octets écrits en hexadécimal : rouge FF = 255, vert 88 = 136, bleu 00 = 0.</li>
+</ul>
+</div>
+
+<h3>2.3 Compter : le compteur kilométrique</h3>
+<p>Un compteur kilométrique a des roues numérotées de 0 à 9. Quand une roue passe de 9 à 0, elle fait avancer d'un cran la roue de gauche : c'est la <b>retenue</b> (<i>carry</i>). En base b, c'est pareil, mais chaque roue n'a que b chiffres. En binaire, une roue n'a que 0 et 1 : dès qu'elle dépasse 1, elle repasse à 0 et pousse sa voisine. C'est pourquoi <span class="bits">0111 + 1 = 1000</span> : trois roues repassent à 0 d'un coup, exactement comme 999 + 1 = 1 000.</p>
+<div class="lab" id="odo"></div>
+<p>Ton tableau de 0 à 21 se lit avec cette image. La colonne de droite alterne 0, 1, 0, 1. La suivante change tous les 2 nombres, la suivante tous les 4, puis tous les 8. Chaque colonne change deux fois moins souvent que sa voisine de droite.</p>
+
+<h3>2.4 Pourquoi l'octal et l'hexadécimal ?</h3>
+<p>Le binaire est long à écrire et facile à mal recopier : 1 495 s'écrit <span class="bits">101 1101 0111</span>. L'octal et l'hexadécimal servent d'abréviations, parce que <b>8 = 2³ et 16 = 2⁴</b>. Un chiffre octal remplace exactement 3 bits, et un chiffre hexadécimal exactement 4 bits (section 3.4). Un octet s'écrit donc toujours avec 2 chiffres hexadécimaux, de 00 à FF.</p>
+<p>C'est pour ça que les adresses mémoire s'écrivent en hexadécimal, comme tu l'as noté. Dans un débogueur, ou sur Root-Me, tu verras des adresses comme <code>0x7ffd3a2c1e40</code>.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Que vaut (25)₉ en décimal ?</p>
+<div class="mq-c"><button type="button" data-fb="Le 2 est en position 1 : il vaut 2 × 9, pas 2 × 10.">25</button><button type="button">23</button><button type="button" data-fb="Le 5 est en position 0 : il vaut 5 × 9⁰ = 5, pas 5 × 9.">47</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2 × 9 + 5 × 1 = 23. C'est l'exemple de tes notes.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut (10)₁₆ en décimal ?</p>
+<div class="mq-c"><button type="button" data-fb="Le 1 est en position 1, il vaut 1 × 16.">10</button><button type="button" data-fb="A vaut 10. Ici, c'est 1 suivi de 0.">A</button><button type="button">16</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 × 16 + 0 = 16. En toute base b, « 10 » désigne le nombre b lui-même.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Quel est le plus grand chiffre en base 8 ?</p>
+<div class="mq-c"><button type="button">7</button><button type="button" data-fb="En base 10, le plus grand chiffre est 9, pas 10. En base 8, c'est donc…">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les chiffres vont de 0 à b − 1, donc de 0 à 7.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Dans (1000)₂, combien vaut le 1 ?</p>
+<div class="mq-c"><button type="button" data-fb="Il est en position 3.">1</button><button type="button" data-fb="Il est en position 3 : 2³, pas 10³.">1000</button><button type="button">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Position 3, donc 2³ = 8.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Les conversions</h2>
+
+<h3>3.1 D'une base b vers la base 10</h3>
+<p>On applique la définition : chaque chiffre, multiplié par la base puissance sa position, puis on additionne.</p>
+<div class="steps">
+<span class="op"></span><span>(1011011)₂ = 64 + 16 + 8 + 2 + 1 = 91</span>
+<span class="why">Comme dans tes notes : on écrit les poids 64, 32, 16, 8, 4, 2, 1 au-dessus des bits, et on additionne ceux qui sont sous un 1.</span>
+<span class="op"></span><span>(247)₈ = 2 × 64 + 4 × 8 + 7 = 128 + 32 + 7 = 167</span>
+<span class="op"></span><span>(5D7)₁₆ = 5 × 256 + 13 × 16 + 7 = 1 280 + 208 + 7 = 1 495</span>
+<span class="why">D vaut 13. Pense à remplacer les lettres avant de multiplier.</span>
+<span class="op"></span><span>(25)₉ = 2 × 9 + 5 = 23</span>
+</div>
+<div class="box img">
+<p class="lbl">La méthode du programmeur (Horner)</p>
+<p>On lit les chiffres de gauche à droite, et on fait à chaque fois : valeur = valeur × base + chiffre. Pour (1011011)₂ : 1, puis 1 × 2 + 0 = 2, puis 2 × 2 + 1 = 5, puis 11, 22, 45, 91. Pas besoin de connaître les puissances, et c'est exactement ce que fait <code>int('1011011', 2)</code> :</p>
+<pre class="code"><code>def vers_decimal(chiffres, base):
+    valeur = 0
+    for c in chiffres:
+        valeur = valeur * base + int(c, 16)
+    return valeur</code></pre>
+</div>
+
+<h3>3.2 De la base 10 vers une base b : les divisions successives</h3>
+<p>On divise le nombre par b et on note le reste. On recommence avec le quotient, jusqu'à obtenir un quotient nul. Le résultat s'écrit avec les restes, <b>lus du dernier au premier</b>. Voici ton exemple de 72 en binaire :</p>
+<div class="tw"><table class="c tight divs">
+<tr><th>division</th><th>quotient</th><th>reste</th></tr>
+<tr><td>72 ÷ 2</td><td>36</td><td class="rest">0</td></tr>
+<tr><td>36 ÷ 2</td><td>18</td><td class="rest">0</td></tr>
+<tr><td>18 ÷ 2</td><td>9</td><td class="rest">0</td></tr>
+<tr><td>9 ÷ 2</td><td>4</td><td class="rest">1</td></tr>
+<tr><td>4 ÷ 2</td><td>2</td><td class="rest">0</td></tr>
+<tr><td>2 ÷ 2</td><td>1</td><td class="rest">0</td></tr>
+<tr><td>1 ÷ 2</td><td>0</td><td class="rest">1</td></tr>
+</table></div>
+<p>On lit la colonne des restes de bas en haut : (72)₁₀ = (1001000)₂, soit <span class="bits">0100 1000</span> sur 8 bits. Vérification : 64 + 8 = 72.</p>
+<p><b>Pourquoi lire à l'envers ?</b> Fais la même chose en base 10 avec 2026 : 2026 ÷ 10 = 202, reste 6. Le reste, c'est le chiffre le plus à droite, et diviser par 10 décale le nombre d'un cran vers la droite. En base 2, c'est pareil : le premier reste, 72 mod 2, est le chiffre des unités (position 0). Les restes sortent donc de droite à gauche, et il faut les relire dans l'autre sens. En Python :</p>
+<pre class="code"><code>def vers_base(n, b):
+    chiffres = ""
+    while n &gt; 0:
+        chiffres = "0123456789ABCDEF"[n % b] + chiffres   # on ajoute à GAUCHE
+        n = n // b
+    return chiffres or "0"</code></pre>
+<p>La méthode marche pour toutes les bases. Ton exemple en base 8 : 167 ÷ 8 = 20 reste 7 ; 20 ÷ 8 = 2 reste 4 ; 2 ÷ 8 = 0 reste 2. Donc (167)₁₀ = (247)₈.</p>
+
+<h3>3.3 Méthode 2 : retirer les puissances</h3>
+<p>Imagine que tu dois payer 167 € avec des billets de 128, 64, 32, 16, 8, 4, 2 et 1 €, chaque billet au plus une fois. Tu prends le plus gros billet possible, puis le suivant, et ainsi de suite. C'est ce que tu as fait pour 167 :</p>
+<div class="steps">
+<span class="op">128</span><span>oui : il reste 167 − 128 = 39</span>
+<span class="op">64</span><span>non (64 &gt; 39)</span>
+<span class="op">32</span><span>oui : il reste 39 − 32 = 7</span>
+<span class="op">16, 8</span><span>non</span>
+<span class="op">4, 2, 1</span><span>oui, oui, oui : 7 = 4 + 2 + 1</span>
+</div>
+<p>Les billets pris donnent les 1 : (167)₁₀ = <span class="bits">1010 0111</span>. Cette méthode est la plus rapide quand tu connais tes puissances de 2. Pour les bases 8 et 16, les divisions sont plus sûres.</p>
+
+<h3>3.4 Binaire, octal, hexadécimal : les paquets</h3>
+<div class="box key">
+<p class="lbl">La méthode des paquets</p>
+<p><b>Binaire vers octal :</b> on coupe le nombre en paquets de 3 bits <b>en partant de la droite</b>, on complète le dernier paquet à gauche avec des zéros, et on remplace chaque paquet par son chiffre (de 0 à 7).</p>
+<p><b>Binaire vers hexadécimal :</b> pareil, avec des paquets de 4 bits.</p>
+<p><b>Dans l'autre sens,</b> on remplace chaque chiffre par son paquet de 3 ou 4 bits.</p>
+</div>
+<p>Ton exemple, 1 495 = <span class="bits">10111010111</span>. Les zéros ajoutés à gauche sont en gris.</p>
+<div class="grpw">
+<p class="grpt">paquets de 3 bits → (2727)₈</p>
+<div class="grp" role="img" aria-label="10111010111 en paquets de 3 bits"><span class="gcell"><span class="gb"><span class="pad">0</span>10</span><span class="gd">2</span></span><span class="gcell"><span class="gb">111</span><span class="gd">7</span></span><span class="gcell"><span class="gb">010</span><span class="gd">2</span></span><span class="gcell"><span class="gb">111</span><span class="gd">7</span></span></div>
+<p class="grpt">paquets de 4 bits → (5D7)₁₆</p>
+<div class="grp" role="img" aria-label="10111010111 en paquets de 4 bits"><span class="gcell"><span class="gb"><span class="pad">0</span>101</span><span class="gd">5</span></span><span class="gcell"><span class="gb">1101</span><span class="gd">D</span></span><span class="gcell"><span class="gb">0111</span><span class="gd">7</span></span></div>
+</div>
+<p><b>Pourquoi ça marche ?</b> Un paquet de 3 bits vaut de 0 à 7, exactement un chiffre octal. Et les paquets successifs, en partant de la droite, pèsent 2⁰, 2³, 2⁶, c'est-à-dire 1, 8, 64 : les puissances de 8. Le découpage ne change pas le nombre, il le relit seulement par blocs.</p>
+<div class="box warn">
+<p class="lbl">Toujours couper depuis la droite</p>
+<p>Si tu coupes <span class="bits">10111010111</span> depuis la gauche (101 110 101 11), tu obtiens n'importe quoi. C'est la position 0, les unités, qui doit tomber dans le premier paquet.</p>
+</div>
+<p>Le tableau à connaître par cœur, avec les 16 paquets de 4 bits. Les 8 premiers donnent aussi les paquets de 3 bits de l'octal (on enlève le 0 de tête).</p>
+<div class="tw"><table class="c hex16">
+<tr><th>hexa</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+<tr><th>décimal</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+<tr><th>binaire</th><td class="bits">0000</td><td class="bits">0001</td><td class="bits">0010</td><td class="bits">0011</td><td class="bits">0100</td><td class="bits">0101</td><td class="bits">0110</td><td class="bits">0111</td><td class="bits">1000</td><td class="bits">1001</td><td class="bits">1010</td><td class="bits">1011</td><td class="bits">1100</td><td class="bits">1101</td><td class="bits">1110</td><td class="bits">1111</td></tr>
+</table></div>
+<p>Ton deuxième exemple, 267 = <span class="bits">1 0000 1011</span> : en paquets de 3, <span class="bits">100 001 011</span> donne (413)₈ ; en paquets de 4, <span class="bits">0001 0000 1011</span> donne (10B)₁₆.</p>
+
+<h3>3.5 Entre octal et hexadécimal : le binaire sert de pont</h3>
+<p>8 et 16 ne sont pas des puissances l'une de l'autre, il n'y a donc pas de raccourci direct. On passe par le binaire, comme dans tes notes avec (ACDC)₁₆ :</p>
+<div class="steps">
+<span class="op"></span><span>(ACDC)₁₆ = <span class="bits">1010 1100 1101 1100</span></span>
+<span class="why">Chaque chiffre hexadécimal devient son paquet de 4 bits.</span>
+<span class="op">=</span><span><span class="bits">1 010 110 011 011 100</span></span>
+<span class="why">On recoupe en paquets de 3, toujours depuis la droite.</span>
+<span class="op">=</span><span>(126334)₈</span>
+</div>
+
+<h3>3.6 Laboratoire : le convertisseur</h3>
+<p>Tape un nombre et choisis sa base. La page affiche ses quatre écritures, les paquets de bits, et les divisions successives vers la base de ton choix. Fais toujours la conversion à la main d'abord.</p>
+<div class="lab" id="conv"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Que vaut (1101)₂ en décimal ?</p>
+<div class="mq-c"><button type="button" data-fb="Tu as lu les bits à l'envers : le bit de droite est en position 0.">11</button><button type="button">13</button><button type="button" data-fb="Regarde les poids : 8, 4, 2, 1.">14</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">8 + 4 + 1 = 13.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Comment s'écrit (7F)₁₆ en binaire ?</p>
+<div class="mq-c"><button type="button"><span class="bits">0111 1111</span></button><button type="button" data-fb="F vaut 15 = 1111, et 7 = 0111. Chaque chiffre hexadécimal fait exactement 4 bits.">111 1111 1111</button><button type="button" data-fb="Ça, c'est (FF)₁₆ = 255.">1111 1111</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">7 → 0111, F → 1111. (7F)₁₆ = 127, le plus grand entier positif d'un octet signé (section 6).</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Comment s'écrit (101110)₂ en octal ?</p>
+<div class="mq-c"><button type="button" data-fb="Tu as fait des paquets de 4 (10 1110 → 2E) : c'est l'hexadécimal.">2E</button><button type="button" data-fb="Le paquet 110 vaut 6, pas 5.">55</button><button type="button">56</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">101 | 110 → 5 et 6. Vérification : 5 × 8 + 6 = 46 = 32 + 8 + 4 + 2.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Pour convertir 1 000 en binaire par divisions, le premier reste obtenu est…</p>
+<div class="mq-c"><button type="button" data-fb="Le premier reste vient de la première division, celle du nombre entier : il donne le chiffre le plus à droite.">le bit de gauche</button><button type="button">le bit des unités (position 0)</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 000 mod 2 = 0 : c'est le bit de droite, et 1 000 est pair. D'où la lecture de bas en haut.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Additionner et soustraire, dans n'importe quelle base</h2>
+
+<h3>4.1 L'addition binaire</h3>
+<p>On pose l'addition en colonnes, comme à l'école, en partant de la droite. Il n'y a que quatre cas à connaître :</p>
+<div class="tw"><table class="c tight">
+<tr><th>calcul</th><th>résultat</th><th>j'écris</th><th>je retiens</th></tr>
+<tr><td>0 + 0</td><td class="bits">0</td><td>0</td><td>0</td></tr>
+<tr><td>0 + 1 ou 1 + 0</td><td class="bits">1</td><td>1</td><td>0</td></tr>
+<tr><td>1 + 1</td><td class="bits">10</td><td>0</td><td>1</td></tr>
+<tr><td>1 + 1 + 1 (avec une retenue)</td><td class="bits">11</td><td>1</td><td>1</td></tr>
+</table></div>
+<p>« 1 + 1 = 10 » se lit « un plus un égale deux », écrit en binaire : j'écris 0, je retiens 1. Les deux additions de tes notes, avec leurs retenues en rouge :</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="nt">11</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">7</td></tr><tr class="res"><td class="op"></td><td class="x d">1</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="nt">18</td></tr></table></div>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class=""></td><td class=""></td><td class="">1</td><td class="g">1</td><td class="">1</td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="nt">14</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">15</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="d g">1</td><td class="d">1</td><td class="d">0</td><td class="d">1</td><td class="nt">29</td></tr></table></div>
+
+<h3>4.2 La même règle dans toutes les bases</h3>
+<div class="box key">
+<p class="lbl">Addition en base b</p>
+<p>Dans chaque colonne, on additionne les deux chiffres et la retenue éventuelle. Si la somme est plus petite que b, on l'écrit. Sinon, on écrit <b>somme − b</b> et on retient 1.</p>
+<p>C'est la phrase de tes notes : « si on dépasse, on écrit de combien on dépasse, et on retient 1 ».</p>
+</div>
+<p>Ton addition en octal, colonne par colonne en partant de la droite (les sommes de chaque colonne sont faites en décimal, de tête) : 2 + 4 = 6 ; 7 + 3 = 10, qui dépasse 8, donc j'écris 10 − 8 = 2 et je retiens 1 ; 6 + 3 + 1 = 10, j'écris 2, je retiens 1 ; 5 + 6 + 1 = 12, j'écris 4, je retiens 1 ; 2 + 2 + 1 = 5 ; 1 + 1 = 2.</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class="">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">2</td><td class="">5</td><td class="">6</td><td class="">7</td><td class="">2</td><td class="nt">(ABBA)₁₆ = 43 962</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">2</td><td class="">6</td><td class="">3</td><td class="">3</td><td class="">4</td><td class="nt">(ACDC)₁₆ = 44 252</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">2</td><td class="d">5</td><td class="d">4</td><td class="d">2</td><td class="d">2</td><td class="d">6</td><td class="nt">88 214</td></tr></table></div>
+<p>Ton addition en hexadécimal : A + C = 10 + 12 = 22, j'écris 22 − 16 = 6, je retiens 1 ; B + D + 1 = 11 + 13 + 1 = 25, j'écris 9 ; B + C + 1 = 24, j'écris 8 ; A + A + 1 = 21, j'écris 5, et la dernière retenue donne un chiffre de plus.</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">A</td><td class="">B</td><td class="">B</td><td class="">A</td><td class="nt">43 962</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">A</td><td class="">C</td><td class="">D</td><td class="">C</td><td class="nt">44 252</td></tr><tr class="res"><td class="op"></td><td class="x d">1</td><td class="d">5</td><td class="d">8</td><td class="d">9</td><td class="d">6</td><td class="nt">88 214</td></tr></table></div>
+
+<h3>4.3 La soustraction : l'emprunt</h3>
+<p>Quand le chiffre du haut est trop petit, on emprunte 1 à la colonne de gauche. Ce 1 vaut une base entière dans la colonne actuelle : 10 en décimal, 2 en binaire, 8 en octal, 16 en hexadécimal. C'est ta note : « on ajoute 16 à celui qui emprunte, on retire 1 à sa voisine ».</p>
+<div class="box key">
+<p class="lbl">Soustraction en base b</p>
+<p>Si le chiffre du haut est plus petit que celui du bas, on lui ajoute b, et on retire 1 au chiffre du haut de la colonne de gauche.</p>
+<p>Si cette colonne de gauche contient 0, elle emprunte à son tour à sa propre voisine, et <b>le 0 traversé devient b − 1</b> : 9 en décimal, 1 en binaire, 7 en octal, F en hexadécimal. C'est le piège de 100 − 1 = 99.</p>
+</div>
+<p>C'est la soustraction qu'on a faite ensemble. Les « −1 » marquent les colonnes qui ont prêté 1 à leur voisine de droite. À la position 3, on emprunte à travers la position 4, qui vaut 0 et devient 1 :</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class="">−1</td><td class="">−1</td><td class="">−1</td><td class=""></td><td class=""></td><td class=""></td><td class="nt">emprunts</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="nt">43</td></tr><tr><td class="op">−</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="nt">13</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">0</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">30</td></tr></table></div>
+<p>Ton exemple en hexadécimal : 9 − A est impossible, donc 9 + 16 = 25 et 25 − 10 = 15 = F ; le E a prêté, il devient D, et D − 8 = 5 ; enfin 1 − 0 = 1.</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class="">−1</td><td class=""></td><td class="nt">emprunts</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">E</td><td class="">9</td><td class="nt">489</td></tr><tr><td class="op">−</td><td class="x"></td><td class="">0</td><td class="">8</td><td class="">A</td><td class="nt">138</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">1</td><td class="d">5</td><td class="d">F</td><td class="nt">351</td></tr></table></div>
+
+<h3>4.4 Laboratoire : poser une opération</h3>
+<p>Choisis une base et une opération, tape deux nombres, et suis le calcul colonne par colonne avec le bouton « Colonne suivante ».</p>
+<div class="lab" id="poseur"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">(111)₂ + (1)₂ = ?</p>
+<div class="mq-c"><button type="button" data-fb="1 + 1 = 10 : il y a une retenue, qui se propage.">112</button><button type="button" data-fb="Les retenues se propagent jusqu'au bout : un chiffre de plus apparaît à gauche.">000</button><button type="button">(1000)₂</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">7 + 1 = 8. Comme 999 + 1 = 1 000 : toutes les roues repassent à 0.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">En hexadécimal, 9 + 8 = ?</p>
+<div class="mq-c"><button type="button" data-fb="17 est l'écriture décimale. En base 16, 17 = 16 + 1.">17</button><button type="button">(11)₁₆</button><button type="button" data-fb="F vaut 15, pas 17.">F</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">17 ≥ 16 : on écrit 17 − 16 = 1 et on retient 1. Résultat (11)₁₆.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">En binaire, 1000 − 1 = ?</p>
+<div class="mq-c"><button type="button">111</button><button type="button" data-fb="Les zéros traversés par l'emprunt deviennent 1 (la base moins 1), pas 0.">0001</button><button type="button" data-fb="Les zéros traversés deviennent 1 en binaire, pas 9.">999</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">8 − 1 = 7 = (111)₂. Les trois zéros traversés deviennent des 1.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Taille fixe : ce que fait vraiment la machine</h2>
+<p>Sur papier, quand une addition dépasse, on ajoute un chiffre à gauche. Une machine ne peut pas : un registre de 8 bits a 8 cases, pas une de plus. Le bit qui devrait sortir à gauche est perdu pour le résultat. On l'appelle la <b>retenue sortante</b> (<i>carry out</i>).</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">255</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">1</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="nt">0 : la retenue est sortie</td></tr></table></div>
+<p>Sur 8 bits, 255 + 1 donne 0. Le compteur kilométrique fait pareil : après 999 999 km, il affiche 000 000.</p>
+<div class="box key">
+<p class="lbl">Entiers non signés (<i>unsigned</i>) sur n bits</p>
+<p>Ils vont de 0 à 2<sup>n</sup> − 1. Quand une addition produit une retenue sortante, le résultat affiché est faux : le vrai résultat ne tient pas sur n bits. Le processeur range ce bit dans un indicateur (<i>flag</i>) appelé <b>C</b>, pour <i>carry</i>.</p>
+</div>
+<p>Autrement dit, sur n bits, la machine calcule <b>modulo 2<sup>n</sup></b> : elle ne garde que le reste de la division par 2<sup>n</sup>. 255 + 1 = 256, et 256 modulo 256 = 0. Retiens bien cette idée : c'est elle qui va permettre de représenter les nombres négatifs.</p>
+<p>En Python, les entiers n'ont pas de taille fixe : <code>255 + 1</code> donne 256. Mais en C, en Java, ou avec NumPy, les entiers ont une taille fixe et ce phénomène arrive vraiment (section 7.6).</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Les nombres négatifs</h2>
+
+<h3>6.1 Le problème</h3>
+<p>En mémoire, il n'y a pas de signe « − » : il n'y a que des bits. Il faut donc une <b>convention</b>, une règle fixée à l'avance qui dit quelles suites de bits représentent des nombres négatifs. Tes notes en contiennent trois, présentées dans un ordre logique : chacune corrige un défaut de la précédente.</p>
+<div class="box key">
+<p class="lbl">Le principe le plus important de cette page</p>
+<p>Une suite de bits ne veut rien dire toute seule. <span class="bits">1001 0110</span> vaut 150, −22, −105 ou −106 selon la convention avec laquelle on la lit. Ce n'est pas la mémoire qui décide, c'est le programme, à travers le type de la variable.</p>
+</div>
+<p>C'est comme la date 03/04 : le 3 avril en France, le 4 mars aux États-Unis. Les chiffres sont les mêmes, la convention de lecture change tout.</p>
+
+<h3 id="p6-sva">6.2 Signe et valeur absolue</h3>
+<p>C'est la première idée de tes notes (page 5) : on réserve le bit de gauche, appelé <b>bit de poids fort</b> (<i>most significant bit</i>), au signe. 0 pour +, 1 pour −. Les 7 autres bits donnent la valeur absolue (<i>sign-magnitude</i>).</p>
+<div class="tw"><table class="c tight">
+<tr><th>nombre</th><th>signe</th><th>valeur absolue sur 7 bits</th><th>sur 8 bits</th></tr>
+<tr><td>+5</td><td>0</td><td class="bits">000 0101</td><td class="bits">0000 0101</td></tr>
+<tr><td>−5</td><td>1</td><td class="bits">000 0101</td><td class="bits">1000 0101</td></tr>
+<tr><td>−1</td><td>1</td><td class="bits">000 0001</td><td class="bits">1000 0001</td></tr>
+</table></div>
+<p>Sur 8 bits, on va de −127 à +127. C'est simple à lire, mais il y a deux défauts graves.</p>
+<ul>
+<li><b>Deux zéros</b> : <span class="bits">0000 0000</span> (+0) et <span class="bits">1000 0000</span> (−0, dans tes notes). Pour tester si un nombre est nul, il faudrait vérifier deux motifs.</li>
+<li><b>L'addition ordinaire ne marche plus.</b> Avec l'additionneur de la section 4, 1 + (−1) donne −2 :</li>
+</ul>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">+1</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">−1 en signe et valeur absolue</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="nt">−2 : faux</td></tr></table></div>
+<p>Il faudrait un circuit spécial qui compare les signes, puis additionne ou soustrait les valeurs absolues. C'est faisable, mais lourd.</p>
+
+<h3 id="p6-c1">6.3 Complément à un</h3>
+<p>Deuxième idée, avec ta définition : « je prends la valeur positive et je l'inverse ». Pour obtenir −x, on <b>inverse chaque bit</b> de x : les 0 deviennent 1 et les 1 deviennent 0 (<i>ones' complement</i>).</p>
+<div class="steps">
+<span class="op">7</span><span><span class="bits">0000 0111</span></span>
+<span class="op">−7</span><span><span class="bits">1111 1000</span></span>
+<span class="why">Chaque bit est changé sur place.</span>
+</div>
+<div class="box warn">
+<p class="lbl">Inverser n'est pas retourner</p>
+<p>Page 6 de tes notes, tu as écrit −7 = <span class="bits">1110 0000</span> en complément à un. C'est <span class="bits">0000 0111</span> lu dans un miroir : tu as retourné l'ordre des bits. Inverser, c'est changer chaque bit <b>sans le déplacer</b>. Tu l'as d'ailleurs corrigé un peu plus bas, avec −7 = <span class="bits">1111 1000</span>.</p>
+</div>
+<p>Le bit de gauche indique toujours le signe, et on va encore de −127 à +127. Il reste deux zéros : <span class="bits">0000 0000</span> et <span class="bits">1111 1111</span> (le « −0 = 1111 1111 » de tes notes).</p>
+<p>L'addition marche presque, à une correction près, la <b>retenue circulaire</b> (<i>end-around carry</i>) : si une retenue sort à gauche, on ne la jette pas, on la rajoute au résultat. Exemple, 5 + (−3) :</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="nt">5</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">−3 en complément à un</td></tr><tr class="res"><td class="op"></td><td class="x eac" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="nt">une retenue sort : on la garde</td></tr></table></div>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">résultat sans la retenue</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">+ la retenue circulaire</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="nt">2 : juste</td></tr></table></div>
+<p><b>Pourquoi ce + 1 ?</b> Inverser 8 bits, c'est calculer 255 − x : on soustrait x de <span class="bits">1111 1111</span>, colonne par colonne, sans jamais d'emprunt. Donc en complément à un, −3 est codé par 255 − 3. Quand la somme dépasse 255, la retenue qui sort fait perdre 256, soit 1 de trop par rapport aux 255 utilisés. On rend ce 1 en l'ajoutant.</p>
+<p>C'est l'exemple sur 16 bits en bas de la page 8 de tes notes : 3 292 + (−1 406) = 1 886.</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g"></td><td class=""></td><td class=""></td><td class="">1</td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">3 292</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="g">1</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">−1 406 en complément à un</td></tr><tr class="res"><td class="op"></td><td class="x eac" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d g">0</td><td class="d">1</td><td class="d">0</td><td class="d">1</td><td class="d g">1</td><td class="d">1</td><td class="d">0</td><td class="d">1</td><td class="nt">une retenue sort</td></tr></table></div>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">0</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="nt">résultat sans la retenue</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">+ la retenue circulaire, une fois</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d g">0</td><td class="d">1</td><td class="d">0</td><td class="d">1</td><td class="d g">1</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">1 886</td></tr></table></div>
+<div class="box warn">
+<p class="lbl">Une seule retenue circulaire</p>
+<p>La retenue circulaire s'ajoute une seule fois. Dans tes notes, tu as ajouté 1 une deuxième fois, dans le cadre du bas, et obtenu <span class="bits">0000 0111 0101 1111</span>. Ce deuxième + 1 est en trop : le résultat est <span class="bits">0000 0111 0101 1110</span> = 1 886.</p>
+</div>
+<p>Restent deux défauts : deux zéros, et une addition qui demande parfois un deuxième passage dans l'additionneur.</p>
+
+<h3 id="p6-c2">6.4 Complément à deux</h3>
+<p>C'est la convention de tous les processeurs actuels, le tien compris. Pour obtenir −x, on <b>inverse tous les bits, puis on ajoute 1</b> (<i>two's complement</i>). C'est la ligne de tes notes : « complément à 1, et je rajoute 1 à la fin ».</p>
+<div class="steps">
+<span class="op">7</span><span><span class="bits">0000 0111</span></span>
+<span class="op">inversé</span><span><span class="bits">1111 1000</span></span>
+<span class="op">+ 1</span><span><span class="bits">1111 1001</span> = −7</span>
+</div>
+<div class="tw"><table class="c tight">
+<tr><th>x</th><th>x en binaire</th><th>inversé</th><th>+ 1 = −x</th></tr>
+<tr><td>1</td><td class="bits">0000 0001</td><td class="bits">1111 1110</td><td class="bits">1111 1111</td></tr>
+<tr><td>7</td><td class="bits">0000 0111</td><td class="bits">1111 1000</td><td class="bits">1111 1001</td></tr>
+<tr><td>32</td><td class="bits">0010 0000</td><td class="bits">1101 1111</td><td class="bits">1110 0000</td></tr>
+<tr><td>58</td><td class="bits">0011 1010</td><td class="bits">1100 0101</td><td class="bits">1100 0110</td></tr>
+<tr><td>100</td><td class="bits">0110 0100</td><td class="bits">1001 1011</td><td class="bits">1001 1100</td></tr>
+<tr><td>127</td><td class="bits">0111 1111</td><td class="bits">1000 0000</td><td class="bits">1000 0001</td></tr>
+</table></div>
+<p>Les lignes 32 et 58 sont dans tes notes, et elles sont justes.</p>
+<ul>
+<li><b>Un seul zéro.</b> Comme dans tes notes : on inverse <span class="bits">0000 0000</span>, on obtient <span class="bits">1111 1111</span>, on ajoute 1 et on obtient <span class="bits">1 0000 0000</span>. Sur 8 bits, le 1 de gauche tombe : −0 = 0.</li>
+<li><b>De −128 à +127</b> sur 8 bits. En général, de −2<sup>n−1</sup> à 2<sup>n−1</sup> − 1 sur n bits. Il y a un négatif de plus que de positifs, parce que 0 occupe une place du côté où le bit de gauche vaut 0.</li>
+<li><b>−128 = <span class="bits">1000 0000</span></b> est un cas spécial : son opposé est lui-même (inverser donne <span class="bits">0111 1111</span>, + 1 redonne <span class="bits">1000 0000</span>). Sur 8 bits, +128 n'existe pas.</li>
+</ul>
+
+<h4>Pourquoi « inverser puis ajouter 1 » donne l'opposé</h4>
+<p>Reviens à la section 5 : sur 8 bits, la machine calcule modulo 256. Ajouter 256 ne change rien, puisque ce 256 est une retenue qui tombe à gauche. Pour la machine, −7 et 256 − 7 = 249 sont donc le même nombre. On représente −7 par le motif de 249 : <span class="bits">1111 1001</span>.</p>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">7</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="nt">249, c'est-à-dire −7</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="nt">0 (la retenue tombe)</td></tr></table></div>
+<p>Ajouté à 7, ce motif donne 0 : il se comporte exactement comme −7. Et « inverser puis + 1 » calcule justement 256 − x : inverser donne 255 − x (section 6.3), et ajouter 1 donne 256 − x.</p>
+<div class="box img">
+<p class="lbl">L'image de l'horloge</p>
+<p>Sur une horloge de 12 heures, reculer de 3 heures ou avancer de 9 heures mène à la même heure : pour l'horloge, −3 et +9 sont le même déplacement. Sur 8 bits, l'horloge a 256 positions, et −7 se confond avec +249. Le laboratoire de la section 7.4 dessine cette horloge pour 4 bits.</p>
+</div>
+
+<h4>Lire un nombre négatif</h4>
+<ul>
+<li><b>Méthode 1 : refaire « inverser + 1 ».</b> L'opération est son propre inverse, puisque l'opposé de l'opposé est le nombre de départ. Pour <span class="bits">1100 0110</span> : inversé <span class="bits">0011 1001</span>, + 1 donne <span class="bits">0011 1010</span> = 58. Donc <span class="bits">1100 0110</span> = −58.</li>
+<li><b>Méthode 2 : le bit de gauche pèse −128.</b> En complément à deux, les poids sont −128, 64, 32, 16, 8, 4, 2, 1. Ainsi <span class="bits">1111 1001</span> = −128 + 64 + 32 + 16 + 8 + 1 = −7. C'est la méthode la plus rapide, et elle explique pourquoi le bit de gauche donne le signe : les 7 autres bits valent au plus 127, ce qui ne compense jamais −128.</li>
+</ul>
+<div class="box img">
+<p class="lbl">Astuce de calcul</p>
+<p>Pour obtenir −x plus vite : en partant de la droite, recopie les bits jusqu'au premier 1 inclus, puis inverse tous les autres. Pour 58 = <span class="bits">0011 1010</span>, on recopie « 10 », on inverse « 001110 » en « 110001 », et on obtient <span class="bits">1100 0110</span>.</p>
+</div>
+
+<h3>6.5 Les trois conventions côte à côte, sur 4 bits</h3>
+<p>Les lignes grisées commencent par un 1 : ce sont celles que chaque convention lit comme négatives, ou comme −0 (sauf en non signé, bien sûr).</p>
+<div class="tw"><table class="c tight r4"><tr><th>bits</th><th>non signé</th><th>signe et valeur absolue</th><th>complément à un</th><th>complément à deux</th></tr><tr><td class="bits">0000</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td class="bits">0001</td><td>1</td><td>1</td><td>1</td><td>1</td></tr><tr><td class="bits">0010</td><td>2</td><td>2</td><td>2</td><td>2</td></tr><tr><td class="bits">0011</td><td>3</td><td>3</td><td>3</td><td>3</td></tr><tr><td class="bits">0100</td><td>4</td><td>4</td><td>4</td><td>4</td></tr><tr><td class="bits">0101</td><td>5</td><td>5</td><td>5</td><td>5</td></tr><tr><td class="bits">0110</td><td>6</td><td>6</td><td>6</td><td>6</td></tr><tr><td class="bits">0111</td><td>7</td><td>7</td><td>7</td><td>7</td></tr><tr class="neg"><td class="bits">1000</td><td>8</td><td>−0</td><td>−7</td><td>−8</td></tr><tr class="neg"><td class="bits">1001</td><td>9</td><td>−1</td><td>−6</td><td>−7</td></tr><tr class="neg"><td class="bits">1010</td><td>10</td><td>−2</td><td>−5</td><td>−6</td></tr><tr class="neg"><td class="bits">1011</td><td>11</td><td>−3</td><td>−4</td><td>−5</td></tr><tr class="neg"><td class="bits">1100</td><td>12</td><td>−4</td><td>−3</td><td>−4</td></tr><tr class="neg"><td class="bits">1101</td><td>13</td><td>−5</td><td>−2</td><td>−3</td></tr><tr class="neg"><td class="bits">1110</td><td>14</td><td>−6</td><td>−1</td><td>−2</td></tr><tr class="neg"><td class="bits">1111</td><td>15</td><td>−7</td><td>−0</td><td>−1</td></tr></table></div>
+<p>Regarde la dernière colonne : de 0000 à 0111, on compte de 0 à 7 ; puis à 1000, on saute à −8 et on remonte jusqu'à −1. Les négatifs sont les grands nombres non signés, décalés de 16 : 1001 vaut 9 en non signé et 9 − 16 = −7 en complément à deux.</p>
+
+<h3>6.6 Laboratoire : une même suite de bits, plusieurs lectures</h3>
+<p>C'est un savoir-faire demandé par ta prof : interpréter une même suite de bits selon différentes conventions. Clique sur les bits et compare les lectures.</p>
+<div class="lab octet" id="oct2" data-mode="full" data-v="150"></div>
+
+<h3>6.7 Passer de 8 à 16 bits : l'extension de signe</h3>
+<p>Pour écrire un nombre signé sur plus de bits, on recopie le bit de signe à gauche (<i>sign extension</i>) :</p>
+<div class="steps">
+<span class="op">+7</span><span><span class="bits">0000 0111</span> → <span class="bits">0000 0000 0000 0111</span></span>
+<span class="op">−7</span><span><span class="bits">1111 1001</span> → <span class="bits">1111 1111 1111 1001</span></span>
+</div>
+<p>Compléter un négatif avec des zéros changerait sa valeur : <span class="bits">0000 0000 1111 1001</span> vaut 249. Avec des 1, c'est juste : sur 16 bits, −7 se code par 65 536 − 7 = 65 529, qui s'écrit bien <span class="bits">1111 1111 1111 1001</span>.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 6)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">En complément à deux sur 8 bits, quel est l'opposé de <span class="bits">0001 0100</span> (20) ?</p>
+<div class="mq-c"><button type="button" data-fb="Ça, c'est seulement l'inversion : le complément à un. Il manque le + 1.">1110 1011</button><button type="button">1110 1100</button><button type="button" data-fb="Ça, c'est le signe et valeur absolue.">1001 0100</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Inversé : 1110 1011, puis + 1 : 1110 1100. Vérifie : −128 + 64 + 32 + 8 + 4 = −20.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut <span class="bits">1111 1111</span> en complément à deux ?</p>
+<div class="mq-c"><button type="button" data-fb="255, c'est la lecture non signée.">255</button><button type="button" data-fb="−0, c'est la lecture en complément à un.">−0</button><button type="button">−1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">−128 + 127 = −1. C'est dans tes notes : « −1 = 1111 1111 ».</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Sur 8 bits en complément à deux, la plage est…</p>
+<div class="mq-c"><button type="button">de −128 à 127</button><button type="button" data-fb="C'est la plage du signe et valeur absolue et du complément à un, qui ont deux zéros.">de −127 à 127</button><button type="button" data-fb="Ça, c'est le non signé.">de 0 à 255</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">256 motifs : 128 négatifs (−128 à −1), le zéro, et 127 positifs.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de zéros différents y a-t-il en complément à un ?</p>
+<div class="mq-c"><button type="button" data-fb="Inverse 0000 0000 : que trouves-tu ?">un seul</button><button type="button">deux</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0000 0000 et 1111 1111. C'est un des défauts que le complément à deux corrige.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Pour passer −3 (<span class="bits">1111 1101</span>) de 8 à 16 bits, on écrit…</p>
+<div class="mq-c"><button type="button"><span class="bits">1111 1111 1111 1101</span></button><button type="button" data-fb="Ce nombre vaut 253 : compléter un négatif avec des zéros change sa valeur.">0000 0000 1111 1101</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">On recopie le bit de signe : extension de signe.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Additionner et soustraire des nombres signés</h2>
+
+<h3>7.1 La bonne nouvelle</h3>
+<p>En complément à deux, on additionne <b>exactement comme en non signé</b>, avec le même circuit, et on ignore la retenue qui sort à gauche. Sur 8 bits, elle vaut 256, et l'enlever ne change rien au calcul modulo 256 (section 6.4).</p>
+<p>Et la soustraction n'a pas besoin de circuit à elle : <b>A − B se calcule comme A + (−B)</b>. C'est la raison pour laquelle tous les processeurs utilisent le complément à deux : un seul additionneur fait les additions et les soustractions, sur les nombres signés comme non signés. Ta note sur l'UAL, « addition seulement », vient de là (on la précise en section 9).</p>
+
+<h3>7.2 La méthode, en six étapes</h3>
+<div class="box key">
+<p class="lbl">Calculer A + B ou A − B en complément à deux sur n bits</p>
+<ol>
+<li><b>Fixe la taille</b> n (8 bits, sauf indication contraire), et vérifie que A et B tiennent dans la plage, de −128 à 127 sur 8 bits.</li>
+<li><b>Code chaque nombre.</b> Un positif s'écrit en binaire, complété à gauche par des 0. Un négatif : on code sa valeur absolue, on inverse, on ajoute 1.</li>
+<li><b>Si c'est une soustraction, remplace − B par + (−B)</b>, en prenant le complément à deux de B.</li>
+<li><b>Additionne</b> colonne par colonne, et <b>ignore la retenue</b> qui sort à gauche.</li>
+<li><b>Contrôle le débordement</b> : si A et (±B) ont le même signe et que le résultat a le signe opposé, il est faux (section 7.4). Cas particulier : −(−128) n'existe pas sur 8 bits, donc soustraire −128 déborde dès que A est positif ou nul.</li>
+<li><b>Lis le résultat</b> (si le bit de gauche vaut 1, il est négatif : section 6.4) <b>et vérifie en décimal.</b></li>
+</ol>
+</div>
+<p class="note">Règle d'or de l'étape 2 : on ne prend l'opposé que des nombres précédés d'un signe −. Dans 32 + (−58), seul 58 est négatif.</p>
+
+<h3>7.3 Cinq exemples détaillés</h3>
+<h4>Exemple 1 : 32 + (−58), l'exemple de tes notes</h4>
+<div class="steps">
+<span class="op">32</span><span><span class="bits">0010 0000</span></span>
+<span class="op">−58</span><span><span class="bits">1100 0110</span></span>
+<span class="why">58 = 0011 1010, inversé 1100 0101, + 1.</span>
+</div>
+<div class="pose-w"><table class="pose"><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="nt">32</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="nt">−58</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="d g">0</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">−26</td></tr></table></div>
+<p>Le bit de gauche vaut 1 : le résultat est négatif. On refait « inverser + 1 » : <span class="bits">0001 1001</span> + 1 = <span class="bits">0001 1010</span> = 26. Le résultat est −26, et 32 − 58 = −26.</p>
+<div class="box warn">
+<p class="lbl">Ce qui s'est passé dans tes notes</p>
+<p>Tu as posé <span class="bits">1110 0000 + 1100 0110</span>, c'est-à-dire (−32) + (−58). Ton addition est juste (elle donne −90, voir l'exemple 3), mais ce n'était pas le calcul demandé : dans 32 + (−58), le 32 est positif. Plus bas, pour 58 + (−32), tu as de nouveau pris −58 au lieu de 58.</p>
+</div>
+
+<h4>Exemple 2 : 58 + (−32), avec une retenue qui sort</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="nt">58</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="nt">−32</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="d g">1</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="nt">26 (retenue ignorée)</td></tr></table></div>
+<p>Une retenue sort à gauche. En complément à deux, ce n'est pas une erreur : on l'ignore, et le résultat <span class="bits">0001 1010</span> = 26 est juste.</p>
+
+<h4>Exemple 3 : (−32) + (−58), le calcul que tu as fait</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class=""></td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="nt">−32</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="nt">−58</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">1</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="d g">0</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">−90 (retenue ignorée)</td></tr></table></div>
+<p>Lecture : −128 + 32 + 4 + 2 = −90. Deux négatifs donnent un négatif : tout va bien.</p>
+
+<h4>Exemple 4 : une soustraction, 45 − 100</h4>
+<div class="steps">
+<span class="op"></span><span>45 − 100 = 45 + (−100)</span>
+<span class="op">45</span><span><span class="bits">0010 1101</span></span>
+<span class="op">−100</span><span><span class="bits">1001 1100</span></span>
+<span class="why">100 = 0110 0100, inversé 1001 1011, + 1.</span>
+</div>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="nt">45</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">−100</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="d">0</td><td class="d g">1</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="nt">−55</td></tr></table></div>
+<p>Lecture : −128 + 64 + 8 + 1 = −55. Et 45 − 100 = −55.</p>
+
+<h4>Exemple 5 : soustraire un négatif, −20 − (−50)</h4>
+<div class="steps">
+<span class="op"></span><span>−20 − (−50) = −20 + 50</span>
+<span class="why">Soustraire −50, c'est ajouter son opposé, +50.</span>
+<span class="op">−20</span><span><span class="bits">1110 1100</span></span>
+<span class="op">50</span><span><span class="bits">0011 0010</span></span>
+</div>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">−20</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="g">0</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="nt">50</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="d g">1</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">30 (retenue ignorée)</td></tr></table></div>
+<p>Retenue ignorée, résultat <span class="bits">0001 1110</span> = 30.</p>
+
+<h3 id="p7-flags">7.4 Retenue ou débordement ?</h3>
+<p>Ta prof demande de distinguer ces deux phénomènes, que presque tout le monde confond au début.</p>
+<div class="tw"><table>
+<tr><th></th><th>Retenue (<i>carry</i>), indicateur C</th><th>Débordement (<i>overflow</i>), indicateur V</th></tr>
+<tr><th>Ce que c'est</th><td>le bit qui sort à gauche de l'addition</td><td>le vrai résultat signé sort de la plage (−128 à 127 sur 8 bits)</td></tr>
+<tr><th>Qui est concerné</th><td>les entiers non signés</td><td>les entiers signés en complément à deux</td></tr>
+<tr><th>Comment le repérer</th><td>une retenue sort de la colonne de gauche</td><td>deux nombres de même signe donnent un résultat de signe opposé</td></tr>
+<tr><th>Ce qu'il signifie</th><td>en addition, le résultat <b>non signé</b> est faux</td><td>le résultat <b>signé</b> est faux</td></tr>
+</table></div>
+<p class="note">Ce sens de C vaut pour l'addition. Après une soustraction faite comme A + (−B), la retenue change de sens : sur les processeurs ARM, C = 1 veut dire « pas d'emprunt », et les processeurs x86 l'inversent. Pour une soustraction, retiens surtout V.</p>
+<div class="box key">
+<p class="lbl">La règle du débordement</p>
+<p>Il y a débordement quand on additionne deux nombres <b>de même signe</b> et qu'on obtient un résultat <b>de l'autre signe</b> : positif + positif = négatif, ou négatif + négatif = positif.</p>
+<p>Si les deux nombres sont de signes opposés, le débordement est impossible : le résultat est entre les deux, donc il tient forcément.</p>
+<p>Le circuit utilise une règle équivalente : il y a débordement quand la retenue qui <b>entre</b> dans la colonne de gauche est différente de celle qui en <b>sort</b>. « Différent », c'est la porte XOR de la <a href="/cours/les-portes-logiques.html">page sur les portes logiques</a>.</p>
+</div>
+<p>Les quatre cas possibles, sur 8 bits. Chaque addition est lue deux fois : en non signé et en signé.</p>
+<h4>C = 0, V = 0 : 5 + 3</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class=""></td><td class=""></td><td class=""></td><td class=""></td><td class="g">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">0</td><td class="">1</td><td class="nt">5</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">0</td><td class="">0</td><td class="g">0</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="nt">3</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="d g">1</td><td class="d">0</td><td class="d">0</td><td class="d">0</td><td class="nt">8 : juste dans les deux lectures</td></tr></table></div>
+<h4>C = 1, V = 0 : (−1) + (−1)</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">255 non signé, −1 signé</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="nt">255 non signé, −1 signé</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d">1</td><td class="d g">1</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">non signé 254 : faux ; signé −2 : juste</td></tr></table></div>
+<p>En signé, le résultat −2 est juste. En non signé, ces bits valent 255 + 255 = 510, qui ne tient pas sur 8 bits : la retenue le signale.</p>
+<h4>C = 0, V = 1 : 100 + 50</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x"></td><td class="">1</td><td class="">1</td><td class=""></td><td class=""></td><td class="g"></td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">0</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="g">0</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">100</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">0</td><td class="">0</td><td class="">1</td><td class="">1</td><td class="g">0</td><td class="">0</td><td class="">1</td><td class="">0</td><td class="nt">50</td></tr><tr class="res"><td class="op"></td><td class="x"></td><td class="d">1</td><td class="d">0</td><td class="d">0</td><td class="d">1</td><td class="d g">0</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="nt">non signé 150 : juste ; signé −106 : faux</td></tr></table></div>
+<p>Positif + positif donne un nombre qui commence par 1 : négatif. Le vrai résultat, 150, dépasse 127. En non signé, en revanche, 100 + 50 = 150 est juste.</p>
+<h4>C = 1, V = 1 : (−100) + (−50)</h4>
+<div class="pose-w"><table class="pose"><tr class="cr"><td class="op"></td><td class="x">1</td><td class=""></td><td class=""></td><td class="">1</td><td class="">1</td><td class="g">1</td><td class=""></td><td class=""></td><td class=""></td><td class="nt">retenues</td></tr><tr><td class="op"></td><td class="x"></td><td class="">1</td><td class="">0</td><td class="">0</td><td class="">1</td><td class="g">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="nt">156 non signé, −100 signé</td></tr><tr><td class="op">+</td><td class="x"></td><td class="">1</td><td class="">1</td><td class="">0</td><td class="">0</td><td class="g">1</td><td class="">1</td><td class="">1</td><td class="">0</td><td class="nt">206 non signé, −50 signé</td></tr><tr class="res"><td class="op"></td><td class="x lost" title="retenue sortante">1</td><td class="d">0</td><td class="d">1</td><td class="d">1</td><td class="d">0</td><td class="d g">1</td><td class="d">0</td><td class="d">1</td><td class="d">0</td><td class="nt">non signé 106 : faux ; signé 106 : faux</td></tr></table></div>
+<p>Négatif + négatif donne un positif : −150 est en dessous de −128. Faux dans les deux lectures.</p>
+
+<h4>Laboratoire : le cercle des 4 bits</h4>
+<p>Voici l'horloge de la section 6.4, pour 4 bits. À l'extérieur, la lecture non signée (0 à 15) ; à l'intérieur, le complément à deux (−8 à 7). Clique sur une case pour choisir A, et règle B avec ses 4 bits. L'arc extérieur montre l'addition non signée : s'il franchit la frontière du haut (15 → 0), C = 1. L'arc intérieur montre l'addition signée : s'il franchit la frontière du bas (7 → −8), V = 1. Les deux arcs arrivent sur la même case : ce sont les mêmes bits, lus de deux façons.</p>
+<div class="lab" id="ring"></div>
+
+<h3>7.5 Laboratoire : une mini-UAL sur 8 bits</h3>
+<p>Tape deux nombres entre −128 et 255, ou deux suites de 8 bits, puis choisis + ou −. La page applique la méthode de la section 7.2 et affiche les indicateurs C et V, avec les deux lectures du résultat.</p>
+<div class="lab" id="alu"></div>
+
+<h3>7.6 Pourquoi ça compte en sécurité</h3>
+<div class="box nts">
+<p class="lbl">Débordement d'entier (<i>integer overflow</i>)</p>
+<p>En Python, un entier grandit autant qu'il faut : pas de débordement. Mais dans les langages où les entiers ont une taille fixe (C, C++, Java, Rust compilé en mode <i>release</i>), un débordement peut passer inaperçu. C'est une famille de failles bien connue, répertoriée sous le nom <b>CWE-190</b> (<i>Integer Overflow or Wraparound</i>) : un calcul de taille qui déborde donne un petit nombre, et un test de sécurité passe alors qu'il devrait échouer. En C ou en C++, le programme peut alors écrire en dehors de la mémoire prévue ; Java et Rust vérifient les bornes des tableaux et s'arrêtent sur une erreur. En C, le débordement d'un entier signé n'est même pas garanti de « faire le tour » : c'est un comportement indéfini.</p>
+<p>Et ça te concerne aussi en IA : les modèles quantifiés stockent leurs poids en <code>int8</code>, c'est-à-dire en complément à deux sur 8 bits, de −128 à 127. Tu peux le voir sur ta machine :</p>
+<pre class="code"><code>&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; np.array([127], dtype=np.int8) + 1
+array([-128], dtype=int8)</code></pre>
+<p>127 + 1 = −128 : on vient de franchir la frontière du bas du cercle.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 7)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Sur 8 bits en complément à deux, que donne 100 + 100 ?</p>
+<div class="mq-c"><button type="button" data-fb="200 dépasse 127 : il ne tient pas en complément à deux sur 8 bits.">200, sans problème</button><button type="button">un débordement : les bits se lisent −56</button><button type="button" data-fb="Pose l'addition : 0110 0100 + 0110 0100. Aucune retenue ne sort à gauche.">une retenue sortante, C = 1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0110 0100 + 0110 0100 = 1100 1000 = −56 : positif + positif = négatif, V = 1. Et C = 0.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Peut-il y avoir débordement en calculant 120 + (−120) ?</p>
+<div class="mq-c"><button type="button" data-fb="Les deux nombres sont de signes opposés : le résultat est entre eux deux.">oui</button><button type="button">non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Signes opposés : jamais de débordement. Il y aura une retenue sortante, mais elle est ignorée.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Pour calculer 30 − 12 en complément à deux, la machine calcule…</p>
+<div class="mq-c"><button type="button" data-fb="Le processeur n'a pas de circuit de soustraction séparé.">30 − 12 avec des emprunts</button><button type="button" data-fb="Seul 12 change de signe.">(−30) + (−12)</button><button type="button">30 + (−12)</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">A − B = A + (−B), avec −12 = 1111 0100.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Une retenue sort à gauche pendant une addition en complément à deux. Le résultat signé est…</p>
+<div class="mq-c"><button type="button">peut-être juste : il faut regarder V</button><button type="button" data-fb="Revois l'exemple 2 (58 + (−32)) : une retenue sort et le résultat est juste.">forcément faux</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">En signé, la retenue sortante ne veut rien dire. Seul le débordement V compte.</div>
+</div>
+</div>
+<details class="check"><summary>À poser sur ta feuille, puis à vérifier</summary><ol>
+<li>Calcule 75 − 90 sur 8 bits.<details><summary>Réponse</summary><div>75 = <span class="bits">0100 1011</span> ; −90 = <span class="bits">1010 0110</span> (90 = 0101 1010, inversé 1010 0101, + 1). Somme : <span class="bits">1111 0001</span>, pas de retenue, pas de débordement. Lecture : −128 + 64 + 32 + 16 + 1 = −15.</div></details></li>
+<li>Calcule −100 − 30 sur 8 bits. Que remarques-tu ?<details><summary>Réponse</summary><div>−100 = <span class="bits">1001 1100</span> ; −30 = <span class="bits">1110 0010</span>. Somme : <span class="bits">1 0111 1110</span>, on ignore la retenue : <span class="bits">0111 1110</span> = 126. Négatif + négatif = positif : débordement, V = 1. Le vrai résultat, −130, est en dessous de −128.</div></details></li>
+<li>Calcule 127 + 1 sur 8 bits, et compare avec la sortie de NumPy en 7.6.<details><summary>Réponse</summary><div><span class="bits">0111 1111 + 0000 0001 = 1000 0000</span> = −128. Débordement : c'est exactement ce qu'affiche NumPy.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Aperçu : caractères et nombres à virgule</h2>
+<p>Le programme de la séance du 28 septembre mentionne un « aperçu » de ces deux codages. Voici l'essentiel.</p>
+
+<h3>8.1 Les caractères</h3>
+<p>Un texte est une suite de nombres : chaque caractère a un numéro, fixé par une table. La plus ancienne, <b>ASCII</b>, numérote 128 caractères sur 7 bits.</p>
+<div class="tw"><table class="c tight">
+<tr><th>caractère</th><th>décimal</th><th>hexa</th><th>binaire</th></tr>
+<tr><td>espace</td><td>32</td><td>20</td><td class="bits">0010 0000</td></tr>
+<tr><td>'0'</td><td>48</td><td>30</td><td class="bits">0011 0000</td></tr>
+<tr><td>'9'</td><td>57</td><td>39</td><td class="bits">0011 1001</td></tr>
+<tr><td>'A'</td><td>65</td><td>41</td><td class="bits">0100 0001</td></tr>
+<tr><td>'Z'</td><td>90</td><td>5A</td><td class="bits">0101 1010</td></tr>
+<tr><td>'a'</td><td>97</td><td>61</td><td class="bits">0110 0001</td></tr>
+</table></div>
+<ul>
+<li>Le caractère '7' n'est pas le nombre 7 : il vaut 55. Pour retrouver le chiffre, on soustrait le code de '0' : 55 − 48 = 7.</li>
+<li>Une minuscule et sa majuscule diffèrent de 32 = <span class="bits">0010 0000</span> : un seul bit. Changer la casse, c'est inverser ce bit.</li>
+<li>En Python, <code>ord('A')</code> donne 65 et <code>chr(97)</code> donne 'a'.</li>
+</ul>
+<p>Aujourd'hui, on utilise <b>Unicode</b>, qui numérote plus de 150 000 caractères, et <b>UTF-8</b>, qui les écrit sur 1 à 4 octets. Les caractères ASCII gardent leur octet unique ; « é » prend 2 octets, <code>C3 A9</code>. Si un texte UTF-8 est relu octet par octet comme un ancien codage (Latin-1), chaque octet devient un caractère, et « é » s'affiche « Ã© ». Tu as sûrement déjà vu ce bug sur des sites mal configurés.</p>
+
+<h3>8.2 Les nombres à virgule</h3>
+<p><b>Virgule fixe.</b> On prolonge les poids après la virgule : 2⁻¹ = 0,5, 2⁻² = 0,25, 2⁻³ = 0,125… Ainsi (101,1)₂ = 4 + 1 + 0,5 = 5,5.</p>
+<p><b>Virgule flottante</b> (<i>floating point</i>). On écrit le nombre comme en notation scientifique, 6,02 × 10²³, mais en base 2 : un bit de signe, un exposant, et une mantisse (<i>significand</i>) qui contient les chiffres significatifs. La norme <b>IEEE 754</b> fixe deux formats courants :</p>
+<div class="tw"><table class="c tight">
+<tr><th>format</th><th>total</th><th>signe</th><th>exposant</th><th>mantisse</th></tr>
+<tr><td>simple précision (<code>float</code>)</td><td>32 bits</td><td>1</td><td>8</td><td>23</td></tr>
+<tr><td>double précision (<code>double</code>, le <code>float</code> de Python)</td><td>64 bits</td><td>1</td><td>11</td><td>52</td></tr>
+</table></div>
+<p>Conséquence importante : 0,1 n'a pas d'écriture binaire finie. Il s'écrit (0,000110011001100…)₂, avec une suite qui se répète sans fin, comme 1/3 = 0,333… en décimal. La machine doit arrondir, et :</p>
+<pre class="code"><code>&gt;&gt;&gt; 0.1 + 0.2
+0.30000000000000004
+&gt;&gt;&gt; 0.1 + 0.2 == 0.3
+False</code></pre>
+<p>Évite donc de comparer deux flottants avec <code>==</code>. En Python, utilise plutôt <code>math.isclose</code>.</p>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Relecture de tes notes</h2>
+<h3>Ce qui est juste</h3>
+<ul>
+<li>Toutes tes conversions : (1011011)₂ = 91, 110110 = 54, 72 = <span class="bits">0100 1000</span>, 167 = <span class="bits">1010 0111</span> = (247)₈, 1 495 = (2727)₈ = (5D7)₁₆, 267 = (413)₈ = (10B)₁₆, (25)₉ = 23, (ACDC)₁₆ = (126334)₈.</li>
+<li>Ton tableau des entiers de 0 à 21, et les règles « paquets de 3 pour l'octal, paquets de 4 pour l'hexadécimal ».</li>
+<li>Les additions binaires (1011 + 0111, 7 + 9, 14 + 15), l'addition ABBA + ACDC en hexadécimal, les soustractions 1E9 − 8A = 15F et 2026 − 1999 = 27.</li>
+<li>Les compléments à deux de −32 et de −58, et le « un seul zéro » du complément à deux.</li>
+</ul>
+<h3>Ce qu'il faut corriger</h3>
+<ol>
+<li><b>−7 en complément à un (page 6).</b> <span class="bits">1110 0000</span> est le miroir de <span class="bits">0000 0111</span>, pas son inversion. Complément à un : <span class="bits">1111 1000</span> ; complément à deux : <span class="bits">1111 1001</span> (section 6.3).</li>
+<li><b>La liste de −7 à −11 (page 6).</b> Les valeurs <span class="bits">1111 1000</span>, <span class="bits">1111 0111</span>, <span class="bits">1111 0110</span>, <span class="bits">1111 0101</span>, <span class="bits">1111 0100</span> sont en <b>complément à un</b>. Écris-le à côté. En complément à deux, chaque valeur a 1 de plus : −7 = <span class="bits">1111 1001</span>, −8 = <span class="bits">1111 1000</span>, −9 = <span class="bits">1111 0111</span>, −10 = <span class="bits">1111 0110</span>, −11 = <span class="bits">1111 0101</span>. Complète les lignes −12 à −15, restées vides, dans les deux conventions.</li>
+<li><b>32 + (−58) et 58 + (−32) (page 7).</b> Tu as utilisé −32 au lieu de 32, puis −58 au lieu de 58. Tes additions calculent en fait (−32) + (−58) = −90 (section 7.3).</li>
+<li><b>L'addition en octal (page 8).</b> 125672 + 126334 = <b>254226</b>, pas 154226 : dans la colonne de gauche, 1 + 1 = 2. Vérification : 43 962 + 44 252 = 88 214 = (254226)₈.</li>
+<li><b>Un titre inversé (page 7).</b> <span class="bits">1010 1011 1011 1010</span> → (125672)₈ est la conversion de ABBA, pas de ACDC.</li>
+<li><b>Le complément à un sur 16 bits (page 8).</b> La retenue circulaire s'ajoute une seule fois : le résultat est <span class="bits">0000 0111 0101 1110</span> = 1 886 (section 6.3).</li>
+<li><b>« 1000 0000 = −0 », « 1000 0001 = −1 » (page 5)</b> : c'est juste, mais seulement en signe et valeur absolue. « −0 = 1111 1111 » est du complément à un, et « −1 = 1111 1111 » du complément à deux. Écris toujours la convention à côté d'un nombre signé : la même suite de bits change de valeur d'une convention à l'autre.</li>
+<li><b>« UAL : addition seulement » (page 5).</b> L'UAL (unité arithmétique et logique, <i>ALU</i>) fait aussi des opérations logiques (ET, OU, XOR…) : c'est le L de UAL. Ce qui est vrai, c'est qu'il n'y a pas de circuit de soustraction séparé (section 7.1).</li>
+<li><b>« RAM : donne les instructions au processeur » (page 5).</b> La RAM ne fait rien d'elle-même : elle stocke les instructions et les données, et c'est le processeur qui va les chercher. Tu verras ce cycle le 16 novembre.</li>
+<li><b>« 32 cases = 2³¹ » (page 5).</b> Sur 32 bits, il y a 2³² motifs. L'idée de tes notes, c'est qu'un bit sert au signe : en complément à deux, on va de −2³¹ à 2³¹ − 1, soit environ ± 2,1 milliards.</li>
+</ol>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p11">
+<h2><span class="num">10</span>Bilan</h2>
+<div class="box key">
+<p class="lbl">Avant l'évaluation du 2 novembre, tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>dire combien de valeurs on écrit avec n bits, et combien de bits il faut pour N valeurs ;</li>
+<li>convertir entre les bases 2, 8, 10 et 16 dans tous les sens, et expliquer pourquoi on lit les restes de bas en haut ;</li>
+<li>poser une addition et une soustraction en base 2, 8 et 16, avec retenues et emprunts ;</li>
+<li>coder un entier en signe et valeur absolue, en complément à un et en complément à deux, et dire les défauts des deux premiers ;</li>
+<li>expliquer pourquoi « inverser puis + 1 » donne l'opposé (l'horloge modulo 256) ;</li>
+<li>calculer A + B et A − B en complément à deux, et dire s'il y a retenue, débordement, les deux ou aucun ;</li>
+<li>lire une même suite de bits en non signé et en complément à deux.</li>
+</ul>
+</div>
+<p>La suite : la page <a href="/cours/les-portes-logiques.html">Les portes logiques, depuis le tout début</a>, pour la séance du 5 octobre. Tu y verras comment deux portes suffisent pour additionner deux bits.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes notes d'Architecture des ordinateurs (séances des 21 et 28 septembre) et du plan de séances de ta prof, Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+var DIG = "0123456789ABCDEF";
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function grp(s, g){
+  if (!g || g < 2) return s;
+  var out = '', n = s.length;
+  for (var i = 0; i < n; i++){ if (i > 0 && (n - i) % g === 0) out += ' '; out += s.charAt(i); }
+  return out;
+}
+function pad(s, n){ while (s.length < n) s = '0' + s; return s; }
+function toBase(v, b){ if (v === 0) return '0'; var s = ''; while (v > 0){ s = DIG.charAt(v % b) + s; v = Math.floor(v / b); } return s; }
+function nb(v){
+  var s = String(Math.abs(v)), out = '';
+  for (var i = 0; i < s.length; i++){ if (i > 0 && (s.length - i) % 3 === 0) out += ' '; out += s.charAt(i); }
+  return (v < 0 ? '−' : '') + out;
+}
+function sgn(v){ return String(v).replace('-', '−'); }
+function sub(b){ return '<sub>' + b + '</sub>'; }
+function bitsSpan(s, g){ return '<span class="bits">' + grp(s, g === undefined ? 4 : g) + '</span>'; }
+function s8(u){ return u > 127 ? u - 256 : u; }
+function u8(v){ return ((v % 256) + 256) % 256; }
+function b8(u){ return pad(u.toString(2), 8); }
+
+/* ---------- questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la section juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+
+/* ---------- opérations posées (même rendu que les exemples statiques) ---------- */
+function poseData(a, b, base, op){
+  var n = Math.max(a.length, b.length); a = pad(a, n); b = pad(b, n);
+  var res = [], marks = [], steps = [], k, da, db, c = 0, br = 0;
+  for (k = 0; k <= n; k++) marks.push('');
+  for (k = 0; k < n; k++){
+    da = DIG.indexOf(a.charAt(n - 1 - k)); db = DIG.indexOf(b.charAt(n - 1 - k));
+    if (op === '+'){
+      var s = da + db + c, d = s % base, cn = Math.floor(s / base);
+      steps.push({k:k, da:da, db:db, cin:c, s:s, d:d, cout:cn});
+      res[k] = d; c = cn; if (c) marks[k + 1] = '1';
+    } else {
+      var t = da - db - br, bo = t < 0 ? 1 : 0, d2 = t < 0 ? t + base : t;
+      if (br) marks[k] = '−1';
+      steps.push({k:k, da:da, db:db, bin:br, d:d2, bout:bo});
+      res[k] = d2; br = bo;
+    }
+  }
+  return {n:n, a:a, b:b, res:res, marks:marks, cout:(op === '+' ? c : 0), steps:steps};
+}
+function poseHTML(P, op, group, o){
+  o = o || {};
+  var n = P.n, upto = (o.upto === undefined ? n : o.upto), i, k, h = [];
+  var g = function(i){ return (group > 1 && i > 0 && (n - i) % group === 0) ? 'g' : ''; };
+  var anyMark = P.marks.some(function(m){ return m; });
+  h.push('<div class="pose-w"><table class="pose">');
+  if (anyMark){
+    var r = '<tr class="cr"><td class="op"></td><td class="x">' + (op === '+' && upto === n ? P.marks[n] : '') + '</td>';
+    for (i = 0; i < n; i++){ k = n - 1 - i; r += '<td class="' + g(i) + '">' + (k <= upto ? P.marks[k] : '') + '</td>'; }
+    h.push(r + '<td class="nt">' + (op === '+' ? 'retenues' : 'emprunts') + '</td></tr>');
+  }
+  var row = function(str, sym, note){
+    var r = '<tr><td class="op">' + sym + '</td><td class="x"></td>';
+    for (i = 0; i < n; i++){ k = n - 1 - i; r += '<td class="' + g(i) + (o.step && k === upto - 1 ? ' cur' : '') + '">' + str.charAt(i) + '</td>'; }
+    return r + '<td class="nt">' + (note || '') + '</td></tr>';
+  };
+  h.push(row(P.a, '', o.na));
+  h.push(row(P.b, op === '+' ? '+' : '−', o.nb));
+  var x = '<td class="x"></td>';
+  if (P.cout && upto === n) x = o.fixed ? '<td class="x lost" title="retenue sortante">1</td>' : '<td class="x d">1</td>';
+  var rr = '<tr class="res"><td class="op"></td>' + x;
+  for (i = 0; i < n; i++){
+    k = n - 1 - i;
+    var vis = k < upto;
+    rr += '<td class="d ' + g(i) + (o.step && k === upto - 1 ? ' cur' : '') + (vis ? '' : ' hid') + '">' + (vis ? DIG.charAt(P.res[k]) : '0') + '</td>';
+  }
+  h.push(rr + '<td class="nt">' + (o.nr || '') + '</td></tr></table></div>');
+  return h.join('');
+}
+function dl(d, base){ return (base === 16 && d > 9) ? DIG.charAt(d) + ' (' + d + ')' : String(d); }
+function stepText(st, base, op){
+  var pos = 'Position ' + st.k + ' : ';
+  if (op === '+'){
+    var t = dl(st.da, base) + ' + ' + dl(st.db, base) + (st.cin ? ' + 1 (retenue)' : '') + ' = ' + st.s;
+    if (st.s >= base) return pos + t + ', qui atteint la base ' + base + ' : j\'écris ' + st.s + ' − ' + base + ' = ' + dl(st.d, base) + ', je retiens 1.';
+    return pos + t + ' : j\'écris ' + dl(st.d, base) + '.';
+  }
+  var top = st.da - st.bin;
+  var tt = dl(st.da, base) + (st.bin ? ' (moins 1 prêté à droite)' : '');
+  if (top >= st.db) return pos + tt + ' − ' + dl(st.db, base) + ' = ' + dl(st.d, base) + '.';
+  if (st.da === 0 && st.bin) return pos + 'le chiffre du haut vaut 0 et doit déjà 1 : il emprunte à son tour à gauche, et devient ' + base + ' − 1 = ' + dl(base - 1, base) + '. Puis ' + dl(base - 1, base) + ' − ' + dl(st.db, base) + ' = ' + dl(st.d, base) + '.';
+  return pos + tt + ' est plus petit que ' + dl(st.db, base) + ' : j\'emprunte 1 à gauche, qui vaut ' + base + ' ici. ' + top + ' + ' + base + ' − ' + st.db + ' = ' + dl(st.d, base) + '.';
+}
+
+/* ---------- l'octet ---------- */
+function initOctet(root){
+  var full = root.getAttribute('data-mode') === 'full', v = +root.getAttribute('data-v') || 0, id = root.id;
+  var h = '<p class="lbl">' + (full ? 'Une suite de 8 bits, plusieurs lectures' : 'L\'octet') + '</p><div class="oct-bits">';
+  var i;
+  for (i = 7; i >= 0; i--) h += '<div class="oct-w">' + (full && i === 7 ? '128 | −128' : (1 << i)) + '</div>';
+  for (i = 7; i >= 0; i--) h += '<button type="button" class="oct-b" data-i="' + i + '" aria-label="bit de poids ' + (1 << i) + '"></button>';
+  h += '</div><div class="oct-sum" aria-live="polite"></div>';
+  if (full) h += '<div class="oct-tools"><button type="button" class="btn ghost" data-t="inv">Inverser les bits</button><button type="button" class="btn ghost" data-t="inc">Ajouter 1</button><button type="button" class="btn ghost" data-t="neg">Opposé (complément à deux)</button><button type="button" class="btn ghost" data-t="zero">Remettre à 0</button></div><div class="tw"><table class="oct-read"></table></div>';
+  else h += '<div class="oct-tools"><button type="button" class="btn ghost" data-t="zero">Remettre à 0</button><button type="button" class="btn ghost" data-t="max">Tout à 1</button></div>';
+  root.innerHTML = h;
+  var btns = root.querySelectorAll('.oct-b'), sum = root.querySelector('.oct-sum'), tab = root.querySelector('.oct-read');
+  function render(){
+    each(btns, function(b){ var on = (v >> +b.getAttribute('data-i')) & 1; b.textContent = on; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    var parts = [];
+    for (var j = 7; j >= 0; j--) if ((v >> j) & 1) parts.push(1 << j);
+    var bits = b8(v);
+    sum.innerHTML = bitsSpan(bits) + ' = ' + (parts.length ? parts.join(' + ') + ' = ' : '') + '<b>' + v + '</b>' + ' = (' + toBase(v, 16) + ')' + sub(16) + ' = (' + toBase(v, 8) + ')' + sub(8);
+    if (!tab) return;
+    var neg = v >= 128, mag = v & 127;
+    var sva = neg ? (mag === 0 ? '−0' : '−' + mag) : String(mag);
+    var c1 = neg ? (((~v) & 255) === 0 ? '−0' : '−' + ((~v) & 255)) : String(v);
+    var c2 = neg ? v - 256 : v;
+    var rows = [
+      ['non signé', 'somme des poids 128, 64, …, 1', String(v)],
+      ['signe et valeur absolue', neg ? 'bit de gauche 1 → négatif ; valeur absolue sur 7 bits : ' + mag : 'bit de gauche 0 → positif', sgn(sva)],
+      ['complément à un', neg ? 'négatif : on inverse les bits → ' + b8((~v) & 255).replace(/(\d{4})(\d{4})/, '$1 $2') + ' = ' + ((~v) & 255) : 'positif : se lit normalement', sgn(c1)],
+      ['complément à deux', neg ? 'le bit de gauche pèse −128 : −128 + ' + (v - 128) : 'positif : se lit normalement', sgn(c2)],
+      ['caractère ASCII', v >= 32 && v < 127 ? 'code ' + v : (v < 32 ? 'caractère de contrôle (invisible)' : 'hors de la table ASCII (au-delà de 127)'), v >= 32 && v < 127 ? '\'' + esc(String.fromCharCode(v)) + '\'' : '—']
+    ];
+    tab.innerHTML = '<tr><th>convention</th><th>comment on lit</th><th>valeur</th></tr>' + rows.map(function(r){ return '<tr><td>' + r[0] + '</td><td class="how">' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('');
+  }
+  each(btns, function(b){ b.addEventListener('click', function(){ v ^= (1 << +b.getAttribute('data-i')); render(); }); });
+  each(root.querySelectorAll('[data-t]'), function(b){
+    b.addEventListener('click', function(){
+      var t = b.getAttribute('data-t');
+      if (t === 'inv') v = (~v) & 255; else if (t === 'inc') v = (v + 1) & 255; else if (t === 'neg') v = (256 - v) & 255;
+      else if (t === 'zero') v = 0; else if (t === 'max') v = 255;
+      render();
+    });
+  });
+  render();
+}
+each(document.querySelectorAll('.octet'), initOctet);
+
+/* ---------- le compteur kilométrique ---------- */
+(function(){
+  var root = $('odo'); if (!root) return;
+  var base = 2, v = 5, timer = null;
+  function wheels(){ return base === 2 ? 8 : 4; }
+  root.innerHTML = '<p class="lbl">Le compteur kilométrique</p>'
+    + '<div class="row"><span class="seg" role="group" aria-label="Base">' + [2, 8, 10, 16].map(function(b){ return '<button type="button" data-b="' + b + '" aria-pressed="' + (b === 2) + '">base ' + b + '</button>'; }).join('') + '</span></div>'
+    + '<div class="odo" aria-live="polite"></div><div class="odo-read"></div>'
+    + '<div class="row" style="justify-content:center"><button type="button" class="btn ghost" id="odo-m">− 1</button><button type="button" class="btn" id="odo-p">+ 1</button><button type="button" class="btn ghost" id="odo-a">Compter tout seul</button><button type="button" class="btn ghost" id="odo-z">Remettre à 0</button></div>'
+    + '<div class="odo-msg"></div>';
+  var box = root.querySelector('.odo'), rd = root.querySelector('.odo-read'), msg = root.querySelector('.odo-msg');
+  var prev = '';
+  function render(changedAll){
+    var w = wheels(), s = pad(toBase(v, base), w), html = '';
+    for (var i = 0; i < w; i++){
+      var k = w - 1 - i, ch = s.charAt(i);
+      var flip = !changedAll && prev.length === w && prev.charAt(i) !== ch;
+      html += '<div class="odo-c"><div class="odo-d' + (flip ? ' flip' : '') + '">' + ch + '</div><div class="odo-w">' + Math.pow(base, k) + '</div></div>';
+    }
+    box.innerHTML = html;
+    var terms = [];
+    for (var j = 0; j < w; j++){ var d = DIG.indexOf(s.charAt(j)); if (d) terms.push((base === 16 && d > 9 ? DIG.charAt(d) + '(' + d + ')' : d) + ' × ' + Math.pow(base, w - 1 - j)); }
+    rd.innerHTML = '(' + s + ')' + sub(base) + ' = ' + (terms.length ? terms.join(' + ') : '0') + ' = <b>' + v + '</b> en décimal';
+    prev = s;
+  }
+  function step(d){
+    var max = Math.pow(base, wheels());
+    var nv = v + d;
+    msg.innerHTML = '';
+    if (nv >= max){ nv = 0; msg.innerHTML = '<div class="msg meh">Toutes les roues sont repassées à 0 : la retenue est sortie à gauche et s\'est perdue. C\'est la retenue sortante de la section 5.</div>'; }
+    if (nv < 0){ nv = max - 1; msg.innerHTML = '<div class="msg meh">Le compteur est passé de 0 à son maximum, comme un compteur qu\'on ferait reculer.</div>'; }
+    v = nv; render(false);
+  }
+  function stop(){ if (timer){ clearInterval(timer); timer = null; $('odo-a').textContent = 'Compter tout seul'; } }
+  $('odo-p').addEventListener('click', function(){ step(1); });
+  $('odo-m').addEventListener('click', function(){ step(-1); });
+  $('odo-z').addEventListener('click', function(){ stop(); v = 0; msg.innerHTML = ''; render(true); });
+  $('odo-a').addEventListener('click', function(){
+    if (timer){ stop(); return; }
+    $('odo-a').textContent = 'Arrêter';
+    timer = setInterval(function(){ step(1); }, 650);
+  });
+  each(root.querySelectorAll('.seg button'), function(b){
+    b.addEventListener('click', function(){
+      stop();
+      base = +b.getAttribute('data-b');
+      each(root.querySelectorAll('.seg button'), function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      v = base === 2 ? 5 : (base === 16 ? 250 : (base === 8 ? 60 : 995));
+      msg.innerHTML = ''; prev = ''; render(true);
+    });
+  });
+  render(true);
+})();
+
+/* ---------- le convertisseur ---------- */
+(function(){
+  var root = $('conv'); if (!root) return;
+  root.innerHTML = '<p class="lbl">Le convertisseur</p>'
+    + '<div class="row"><label class="fld" style="flex:2 1 180px">nombre<input id="cv-in" type="text" value="1495" autocomplete="off" spellcheck="false"></label>'
+    + '<label class="fld" style="flex:1 1 120px">écrit en base<select id="cv-b"><option value="2">2</option><option value="8">8</option><option value="10" selected>10</option><option value="16">16</option></select></label></div>'
+    + '<div class="row"><span class="note" style="margin:0">Divisions successives vers la base :</span><span class="seg" id="cv-t" role="group" aria-label="Base cible des divisions"><button type="button" data-b="2" aria-pressed="true">2</button><button type="button" data-b="8" aria-pressed="false">8</button><button type="button" data-b="16" aria-pressed="false">16</button></span></div>'
+    + '<div class="out" id="cv-out" aria-live="polite"></div>';
+  var inp = $('cv-in'), sel = $('cv-b'), out = $('cv-out'), target = 2;
+  function groupsHTML(bits, size){
+    var p = (size - bits.length % size) % size, s = pad(bits, bits.length + p), h = '<div class="grp">';
+    for (var i = 0; i < s.length; i += size){
+      var ch = s.substr(i, size), shown = '';
+      for (var j = 0; j < size; j++) shown += (i + j < p) ? '<span class="pad">' + ch.charAt(j) + '</span>' : ch.charAt(j);
+      h += '<span class="gcell"><span class="gb">' + shown + '</span><span class="gd">' + DIG.charAt(parseInt(ch, 2)) + '</span></span>';
+    }
+    return h + '</div>';
+  }
+  function run(){
+    var b = +sel.value, raw = inp.value.replace(/\s+/g, '').toUpperCase();
+    if (!raw){ out.innerHTML = ''; return; }
+    var ok = raw.split('').every(function(c){ var d = DIG.indexOf(c); return d >= 0 && d < b; });
+    if (!ok){ out.innerHTML = '<div class="msg ko">« ' + esc(raw) + ' » n\'est pas un nombre en base ' + b + '. En base ' + b + ', les chiffres vont de 0 à ' + DIG.charAt(b - 1) + '.</div>'; return; }
+    var v = parseInt(raw, b);
+    if (v > 4294967295){ out.innerHTML = '<div class="msg ko">Nombre trop grand pour ce laboratoire (32 bits au maximum).</div>'; return; }
+    var bin = toBase(v, 2), h = '<div class="cv-grid">';
+    h += '<b>base 10</b><span>' + nb(v) + '</span>';
+    h += '<b>base 2</b><span>' + grp(bin, 4) + '</span>';
+    h += '<b>base 8</b><span>' + toBase(v, 8) + '</span>';
+    h += '<b>base 16</b><span>' + toBase(v, 16) + '</span></div>';
+    if (bin.length <= 24){
+      h += '<p class="grpt">paquets de 3 bits → (' + toBase(v, 8) + ')' + sub(8) + '</p>' + groupsHTML(bin, 3);
+      h += '<p class="grpt">paquets de 4 bits → (' + toBase(v, 16) + ')' + sub(16) + '</p>' + groupsHTML(bin, 4);
+    }
+    var rows = '', q = v, guard = 0;
+    if (q === 0) rows = '<tr><td>0 ÷ ' + target + '</td><td>0</td><td class="rest">0</td></tr>';
+    while (q > 0 && guard++ < 40){ var nq = Math.floor(q / target), r = q % target; rows += '<tr><td>' + nb(q) + ' ÷ ' + target + '</td><td>' + nb(nq) + '</td><td class="rest">' + DIG.charAt(r) + (target === 16 && r > 9 ? ' (' + r + ')' : '') + '</td></tr>'; q = nq; }
+    h += '<p class="grpt">divisions successives par ' + target + ' (restes à lire de bas en haut)</p><div class="tw"><table class="c tight divs"><tr><th>division</th><th>quotient</th><th>reste</th></tr>' + rows + '</table></div>';
+    h += '<p>Restes lus de bas en haut : (' + toBase(v, target) + ')' + sub(target) + '.</p>';
+    out.innerHTML = h;
+  }
+  inp.addEventListener('input', run); sel.addEventListener('change', run);
+  each($('cv-t').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){
+      target = +btn.getAttribute('data-b');
+      each($('cv-t').querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); });
+      run();
+    });
+  });
+  run();
+})();
+
+/* ---------- poser une opération ---------- */
+(function(){
+  var root = $('poseur'); if (!root) return;
+  var base = 2, op = '-', upto = null, P = null;
+  root.innerHTML = '<p class="lbl">Poser une opération</p>'
+    + '<div class="row"><span class="seg" id="ps-b" role="group" aria-label="Base">' + [2, 8, 10, 16].map(function(b){ return '<button type="button" data-b="' + b + '" aria-pressed="' + (b === 2) + '">base ' + b + '</button>'; }).join('') + '</span>'
+    + '<span class="seg" id="ps-o" role="group" aria-label="Opération"><button type="button" data-o="+" aria-pressed="false">addition</button><button type="button" data-o="-" aria-pressed="true">soustraction</button></span></div>'
+    + '<div class="row"><label class="fld" style="flex:1 1 150px">nombre du haut<input id="ps-a" type="text" value="101011" autocomplete="off" spellcheck="false"></label><label class="fld" style="flex:1 1 150px">nombre du bas<input id="ps-c" type="text" value="1101" autocomplete="off" spellcheck="false"></label></div>'
+    + '<div class="row"><button type="button" class="btn" id="ps-go">Poser</button><button type="button" class="btn ghost" id="ps-step">Colonne suivante</button><button type="button" class="btn ghost" id="ps-all">Tout afficher</button></div>'
+    + '<div class="out" id="ps-out" aria-live="polite"></div>';
+  var out = $('ps-out');
+  function setSeg(id, attr, val){ each($(id).querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', x.getAttribute(attr) === String(val) ? 'true' : 'false'); }); }
+  function prepare(){
+    var a = $('ps-a').value.replace(/\s+/g, '').toUpperCase(), b = $('ps-c').value.replace(/\s+/g, '').toUpperCase();
+    P = null;
+    if (!a || !b){ out.innerHTML = '<div class="msg info">Tape deux nombres.</div>'; return false; }
+    var bad = (a + b).split('').filter(function(c){ var d = DIG.indexOf(c); return d < 0 || d >= base; });
+    if (bad.length){ out.innerHTML = '<div class="msg ko">En base ' + base + ', les chiffres vont de 0 à ' + DIG.charAt(base - 1) + ' : « ' + esc(bad[0]) + ' » n\'est pas permis.</div>'; return false; }
+    if (a.length > 16 || b.length > 16){ out.innerHTML = '<div class="msg ko">16 chiffres au maximum.</div>'; return false; }
+    var va = parseInt(a, base), vb = parseInt(b, base);
+    if (op === '-' && va < vb){ out.innerHTML = '<div class="msg meh">Le nombre du haut est plus petit que celui du bas : le résultat serait négatif. En non signé, c\'est impossible. Pour les nombres négatifs, voir les sections 6 et 7.</div>'; return false; }
+    var n = Math.max(a.length, b.length);
+    P = poseData(pad(a, n), pad(b, n), base, op);
+    P.va = va; P.vb = vb;
+    return true;
+  }
+  function render(){
+    if (!P) return;
+    var n = P.n, u = upto === null ? n : upto;
+    var g = base === 2 ? 4 : 1;
+    var h = poseHTML(P, op, g, {upto:u, step:(upto !== null && u < n)});
+    var items = '';
+    for (var i = 0; i < Math.min(u, n); i++) items += '<li>' + stepText(P.steps[i], base, op) + '</li>';
+    if (op === '+' && P.cout && u === n) items += '<li>Il reste une retenue : elle devient un chiffre de plus, à gauche.</li>';
+    h += '<ol class="note" style="color:var(--ink)">' + items + '</ol>';
+    if (u === n){
+      var r = op === '+' ? P.va + P.vb : P.va - P.vb;
+      h += '<div class="msg ok"><p>Vérification en décimal : ' + nb(P.va) + (op === '+' ? ' + ' : ' − ') + nb(P.vb) + ' = ' + nb(r) + ', et (' + toBase(r, base) + ')' + sub(base) + ' = ' + nb(r) + '.</p></div>';
+    } else h += '<p class="note">Colonne ' + (u + 1) + ' sur ' + n + ' à venir. Calcule-la sur ta feuille avant de cliquer.</p>';
+    out.innerHTML = h;
+  }
+  $('ps-go').addEventListener('click', function(){ if (prepare()){ upto = 0; render(); } });
+  $('ps-step').addEventListener('click', function(){
+    if (!P && !prepare()) return;
+    if (upto === null) upto = 0; else if (upto < P.n) upto++;
+    render();
+  });
+  $('ps-all').addEventListener('click', function(){ if (prepare()){ upto = null; render(); } });
+  each($('ps-b').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ base = +b.getAttribute('data-b'); setSeg('ps-b', 'data-b', base); P = null; out.innerHTML = '<div class="msg info">Tape deux nombres en base ' + base + ', puis « Poser ».</div>'; }); });
+  each($('ps-o').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ op = b.getAttribute('data-o'); setSeg('ps-o', 'data-o', op); P = null; out.innerHTML = '<div class="msg info">Clique sur « Poser » pour commencer.</div>'; }); });
+  ['ps-a', 'ps-c'].forEach(function(id){ $(id).addEventListener('input', function(){ P = null; }); $(id).addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); if (prepare()){ upto = null; render(); } } }); });
+  if (prepare()){ upto = null; render(); }
+})();
+
+/* ---------- le cercle des 4 bits ---------- */
+(function(){
+  var root = $('ring'); if (!root) return;
+  var A = 5, B = 4, NS = 'http://www.w3.org/2000/svg';
+  root.innerHTML = '<p class="lbl">Le cercle des 4 bits</p><div class="ring-fig"></div>'
+    + '<div class="ring-b" role="group" aria-label="Bits de B"><span class="note" style="margin:0">B =</span></div>'
+    + '<div class="legend"><span><i style="background:var(--blue)"></i>arc non signé (A + B, de 0 à 15)</span><span><i style="background:var(--amber)"></i>arc signé (de −8 à 7)</span><span><i style="background:var(--red)"></i>frontières</span></div>'
+    + '<div class="out" aria-live="polite"></div>';
+  var fig = root.querySelector('.ring-fig'), bb = root.querySelector('.ring-b'), out = root.querySelector('.out');
+  for (var i = 3; i >= 0; i--) bb.insertAdjacentHTML('beforeend', '<button type="button" class="oct-b" data-i="' + i + '" aria-label="bit de poids ' + (1 << i) + ' de B"></button>');
+  var ang = function(i){ return (-90 + i * 22.5) * Math.PI / 180; };
+  var P = function(i, r){ return [r * Math.cos(ang(i)), r * Math.sin(ang(i))]; };
+  var f = function(x){ return x.toFixed(1); };
+  function arc(from, steps, r, cls, mk){
+    if (!steps) return '';
+    var s = P(from, r), e = P(from + steps, r), large = Math.abs(steps) * 22.5 > 180 ? 1 : 0, sweep = steps > 0 ? 1 : 0;
+    return '<path class="' + cls + '" d="M' + f(s[0]) + ',' + f(s[1]) + ' A' + r + ',' + r + ' 0 ' + large + ' ' + sweep + ' ' + f(e[0]) + ',' + f(e[1]) + '" marker-end="url(#' + mk + ')"/>';
+  }
+  function bnd(at, r1, r2, label, ly){
+    var a = (-90 + at * 22.5) * Math.PI / 180;
+    return '<line class="bnd" x1="' + f(r1 * Math.cos(a)) + '" y1="' + f(r1 * Math.sin(a)) + '" x2="' + f(r2 * Math.cos(a)) + '" y2="' + f(r2 * Math.sin(a)) + '"/>'
+      + '<text class="bndt" x="' + f(r2 * Math.cos(a) + (at < 8 ? 6 : -6)) + '" y="' + f(ly) + '" text-anchor="' + (at < 8 ? 'start' : 'end') + '">' + label + '</text>';
+  }
+  function render(){
+    var bs = B > 7 ? B - 16 : B, as = A > 7 ? A - 16 : A, R = (A + B) % 16, C = A + B >= 16, rs = R > 7 ? R - 16 : R, V = (as + bs) !== rs;
+    var s = '<svg viewBox="-200 -200 400 400" role="img" aria-label="Cercle des 16 valeurs sur 4 bits. A vaut ' + A + ', B vaut ' + B + ', le résultat ' + R + '">'
+      + '<defs><marker id="mk-u" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--blue)"/></marker>'
+      + '<marker id="mk-s" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--amber)"/></marker></defs>';
+    s += bnd(-0.5, 58, 182, 'C : 15 → 0', -186);
+    s += bnd(7.5, 58, 182, 'V : 7 → −8', 194);
+    for (var i = 0; i < 16; i++){
+      var c = P(i, 118), u = P(i, 166), si = P(i, 72);
+      s += '<g data-i="' + i + '"><circle class="cell' + (i === A ? ' a' : '') + (i === R ? ' r' : '') + '" cx="' + f(c[0]) + '" cy="' + f(c[1]) + '" r="19"/>'
+        + '<text x="' + f(c[0]) + '" y="' + f(c[1] + 4) + '" text-anchor="middle" pointer-events="none">' + pad(i.toString(2), 4) + '</text></g>'
+        + '<text class="u" x="' + f(u[0]) + '" y="' + f(u[1] + 5) + '" text-anchor="middle">' + i + '</text>'
+        + '<text class="s" x="' + f(si[0]) + '" y="' + f(si[1] + 5) + '" text-anchor="middle">' + (i > 7 ? '−' + (16 - i) : i) + '</text>';
+    }
+    s += arc(A, B, 144, 'arc-u', 'mk-u') + arc(A, bs, 92, 'arc-s', 'mk-s');
+    s += '<text class="ctrl" x="0" y="-14" text-anchor="middle">A + B =</text><text class="ctr" x="0" y="14" text-anchor="middle">' + pad(R.toString(2), 4) + '</text>';
+    s += '</svg>';
+    fig.innerHTML = s;
+    each(fig.querySelectorAll('g[data-i]'), function(g){ g.addEventListener('click', function(){ A = +g.getAttribute('data-i'); render(); }); });
+    each(bb.querySelectorAll('.oct-b'), function(b){ var on = (B >> +b.getAttribute('data-i')) & 1; b.textContent = on; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    var h = '<div class="tw"><table class="c tight"><tr><th></th><th>bits</th><th>non signé</th><th>signé (C2)</th></tr>'
+      + '<tr><th>A</th><td class="bits">' + pad(A.toString(2), 4) + '</td><td>' + A + '</td><td>' + sgn(as) + '</td></tr>'
+      + '<tr><th>B</th><td class="bits">' + pad(B.toString(2), 4) + '</td><td>' + B + '</td><td>' + sgn(bs) + '</td></tr>'
+      + '<tr><th>A + B</th><td class="bits">' + pad(R.toString(2), 4) + '</td><td>' + R + '</td><td>' + sgn(rs) + '</td></tr></table></div>';
+    h += '<div class="flags"><span class="flag' + (C ? ' on' : '') + '"><b>C = ' + (C ? 1 : 0) + '</b>' + (C ? 'l\'arc bleu franchit 15 → 0 : en non signé, ' + A + ' + ' + B + ' = ' + (A + B) + ' ne tient pas sur 4 bits' : 'en non signé, ' + A + ' + ' + B + ' = ' + (A + B) + ' : juste') + '</span>'
+      + '<span class="flag' + (V ? ' on' : '') + '"><b>V = ' + (V ? 1 : 0) + '</b>' + (V ? 'l\'arc orange franchit 7 → −8 : en signé, ' + sgn(as) + ' + ' + (bs < 0 ? '(' + sgn(bs) + ')' : bs) + ' = ' + sgn(as + bs) + ' sort de −8…7' : 'en signé, ' + sgn(as) + ' + ' + (bs < 0 ? '(' + sgn(bs) + ')' : bs) + ' = ' + sgn(as + bs) + ' : juste') + '</span></div>';
+    out.innerHTML = h;
+  }
+  each(bb.querySelectorAll('.oct-b'), function(b){ b.addEventListener('click', function(){ B ^= (1 << +b.getAttribute('data-i')); render(); }); });
+  render();
+})();
+
+/* ---------- la mini-UAL ---------- */
+(function(){
+  var root = $('alu'); if (!root) return;
+  var op = '+';
+  root.innerHTML = '<p class="lbl">Mini-UAL 8 bits</p>'
+    + '<div class="alu-in"><label class="fld">A (−128 à 255, ou 8 bits)<input id="alu-a" type="text" value="32" autocomplete="off" spellcheck="false"></label>'
+    + '<span class="seg" id="alu-o" role="group" aria-label="Opération"><button type="button" data-o="+" aria-pressed="true">+</button><button type="button" data-o="-" aria-pressed="false">−</button></span>'
+    + '<label class="fld">B (−128 à 255, ou 8 bits)<input id="alu-b" type="text" value="-58" autocomplete="off" spellcheck="false"></label></div>'
+    + '<div class="out" id="alu-out" aria-live="polite"></div>';
+  var out = $('alu-out');
+  function parse(s){
+    var t = s.replace(/\s+/g, '').replace('−', '-');
+    if (/^[01]{8}$/.test(t)) return {u:parseInt(t, 2), bits:true};
+    if (/^[+-]?\d+$/.test(t)){ var v = parseInt(t, 10); if (v >= -128 && v <= 255) return {u:u8(v), bits:false, v:v}; return {err:'« ' + esc(s) + ' » sort de la plage −128 à 255.'}; }
+    return {err:'« ' + esc(s) + ' » n\'est ni un entier entre −128 et 255, ni une suite de 8 bits.'};
+  }
+  function code(x, name){
+    var s = s8(x.u), how;
+    if (x.bits) how = 'donné directement en bits';
+    else if (x.v < 0) how = 'négatif : ' + Math.abs(x.v) + ' = ' + bitsSpan(b8(-x.v)) + ', inversé ' + bitsSpan(b8((~(-x.v)) & 255)) + ', puis + 1';
+    else if (x.v > 127) how = 'plus grand que 127 : entier non signé, que le complément à deux lit ' + sgn(s);
+    else how = 'positif : binaire complété à gauche par des 0';
+    return '<div class="alu-op"><p><b>' + name + '</b> = ' + bitsSpan(b8(x.u)) + ' <span class="note">(non signé ' + x.u + ', signé ' + sgn(s) + ')</span></p><p class="note">' + how + '</p></div>';
+  }
+  function run(){
+    var a = parse($('alu-a').value), b = parse($('alu-b').value);
+    if (a.err || b.err){ out.innerHTML = '<div class="msg ko">' + (a.err || b.err) + '</div>'; return; }
+    var h = code(a, 'A') + code(b, 'B');
+    var bb = b.u, opB = 'B';
+    if (op === '-'){
+      bb = (256 - b.u) & 255; opB = '−B';
+      h += '<div class="steps"><span class="op">−B</span><span>A − B = A + (−B). On inverse B : ' + bitsSpan(b8((~b.u) & 255)) + ', puis + 1 : ' + bitsSpan(b8(bb)) + '</span>';
+      if (b.u === 128) h += '<span class="why">B = −128 est son propre opposé : +128 n\'existe pas sur 8 bits. Le résultat signé débordera, sauf si A est négatif.</span>';
+      h += '</div>';
+    }
+    var P = poseData(b8(a.u), b8(bb), 2, '+');
+    var R = (a.u + bb) & 255, C = (a.u + bb) > 255;
+    var trueS = op === '+' ? s8(a.u) + s8(b.u) : s8(a.u) - s8(b.u);
+    var trueU = op === '+' ? a.u + b.u : a.u - b.u;
+    var V = trueS < -128 || trueS > 127;
+    h += poseHTML(P, '+', 4, {fixed:true, na:'A', nb:opB, nr:(C && op === '+' ? 'retenue sortante ignorée' : '')});
+    h += '<div class="flags">' + (op === '+' ? '<span class="flag' + (C ? ' on' : '') + '"><b>C = ' + (C ? 1 : 0) + '</b>' + (C ? 'une retenue sort à gauche' : 'aucune retenue ne sort') + '</span>' : '')
+      + '<span class="flag' + (V ? ' on' : '') + '"><b>V = ' + (V ? 1 : 0) + '</b>' + (V ? 'débordement : le vrai résultat signé, ' + sgn(trueS) + ', sort de −128…127' : 'pas de débordement') + '</span></div>';
+    var uOk = trueU >= 0 && trueU <= 255;
+    var pill = function(ok){ return ok ? '<span class="pill v">juste</span>' : '<span class="pill f">faux</span>'; };
+    h += '<div class="alu-op"><p><b>Lecture non signée :</b> ' + bitsSpan(b8(R)) + ' = ' + R + '. Vrai résultat : ' + a.u + (op === '+' ? ' + ' : ' − ') + b.u + ' = ' + sgn(trueU) + '. ' + pill(uOk) + '</p>'
+      + '<p><b>Lecture signée :</b> ' + bitsSpan(b8(R)) + ' = ' + sgn(s8(R)) + '. Vrai résultat : ' + sgn(s8(a.u)) + (op === '+' ? ' + ' : ' − ') + (s8(b.u) < 0 ? '(' + sgn(s8(b.u)) + ')' : s8(b.u)) + ' = ' + sgn(trueS) + '. ' + pill(!V) + '</p></div>';
+    if (op === '-') h += '<p class="note">En soustraction, on ne lit que V : la retenue sortante n\'a pas le même sens qu\'en addition, et les processeurs ne l\'interprètent pas tous de la même façon (section 7.4). C\'est pourquoi le laboratoire ne l\'affiche pas ici.</p>';
+    out.innerHTML = h;
+  }
+  each($('alu-o').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ op = b.getAttribute('data-o'); each($('alu-o').querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); run(); }); });
+  $('alu-a').addEventListener('input', run); $('alu-b').addEventListener('input', run);
+  run();
+})();
+
+/* ---------- vérificateur des exercices ---------- */
+function utf8(s){ return unescape(encodeURIComponent(s)); }
+function fnv(s){
+  var h = 0x811c9dc5, b = utf8('archi|' + s);
+  for (var i = 0; i < b.length; i++){ h ^= b.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return ('00000000' + h.toString(16)).slice(-8);
+}
+function normalize(raw, mode){
+  var s = String(raw).replace(/\s+/g, '').replace(/_/g, '');
+  if (mode === 'txt') return {v:s.toLowerCase()};
+  if (mode === 'bits8'){ if (!/^[01]{8}$/.test(s)) return {err:'Écris exactement 8 bits (des 0 et des 1).'}; return {v:s}; }
+  s = s.toUpperCase();
+  if (!/^[0-9A-F]+$/.test(s)) return {err:'Écris seulement des chiffres (et des lettres A à F en hexadécimal), sans indice de base.'};
+  s = s.replace(/^0+(?=.)/, '');
+  return {v:s};
+}
+each(document.querySelectorAll('.ck'), function(ck){
+  var field = ck.querySelector('input,select'), btn = ck.querySelector('button'), r = ck.querySelector('.ckr');
+  var diag = {};
+  (ck.getAttribute('data-diag') || '').split(';').forEach(function(p){ var i = p.indexOf('='); if (i > 0) diag[p.slice(0, i)] = p.slice(i + 1); });
+  function check(){
+    var n = normalize(field.value, ck.getAttribute('data-norm'));
+    if (!field.value){ r.innerHTML = '<span class="pill n">écris d\'abord ta réponse</span>'; return; }
+    if (n.err){ r.innerHTML = '<span class="pill n">' + n.err + '</span>'; return; }
+    var h = fnv(n.v);
+    if (h === ck.getAttribute('data-h')) r.innerHTML = '<span class="pill v">juste</span>';
+    else if (diag[h]) r.innerHTML = '<span class="pill f">pas encore</span> ' + diag[h];
+    else r.innerHTML = '<span class="pill f">pas encore</span> Relis l\'indice suivant, ou refais le calcul de contrôle.';
+  }
+  btn.addEventListener('click', check);
+  if (field.tagName === 'INPUT') field.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); check(); } });
+});
+each(document.querySelectorAll('.hints'), function(hs){
+  var ps = hs.querySelectorAll('p'), n = 0;
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn ghost';
+  function lab(){ b.textContent = n < ps.length ? 'Indice ' + (n + 1) + ' sur ' + ps.length : 'Tous les indices sont affichés'; b.disabled = n >= ps.length; }
+  b.addEventListener('click', function(){ if (n < ps.length){ ps[n].classList.add('shown'); n++; lab(); } });
+  lab();
+  hs.appendChild(b);
+});
+})();
+</script>
+</body>
+</html>

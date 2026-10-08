@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>Le calcul, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout : la page de cahier de la série « depuis le tout début » ; une colonne de lecture de 760px,
+   marge rouge à gauche, lignes bleues très pâles, encadrés par rôle (règle, image, piège, note). */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  --f-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-math:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --f-code:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  color-scheme:dark;
+}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--f-body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px;letter-spacing:.02em}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3,h4{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--f-math)}
+h3{font-size:1.22rem;margin:38px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.mr{font-family:var(--f-math);font-size:1.1em;white-space:nowrap}
+.mw{font-family:var(--f-math);font-size:1.1em}
+.eq{font-family:var(--f-math);font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.6}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+code{font-family:var(--f-code);font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+pre.code{font-family:var(--f-code);font-size:.88rem;line-height:1.5;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;overflow-x:auto;margin:14px 0}
+pre.code .cm{color:var(--muted)}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}.c-a{color:var(--amber);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+td.mr,th.mr{white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.6em;font-family:var(--f-math)}
+.blk a:hover{border-color:var(--blue)}
+/* calculs pas à pas : une ligne par étape, la justification en dessous */
+.steps{font-family:var(--f-math);font-size:1.12rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps>span{min-width:0}
+.steps .why{font-family:var(--f-body);font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.05em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.redac .note{font-size:.9rem;color:var(--muted)}
+/* questions de fin de partie : énoncés visibles, réponses repliées */
+.check{margin:30px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:6px 16px 10px}
+.check>.lbl{font-size:1.02rem;margin:8px 0 2px}
+.check ol{padding-left:1.3em;margin:6px 0}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary,.ex details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div,.ex details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* feuille d'entraînement */
+.ex{counter-reset:ex;list-style:none;padding:0;margin:10px 0}
+.ex>li{counter-increment:ex;position:relative;padding-left:2.3em;margin:14px 0}
+.ex>li::before{content:counter(ex) ".";position:absolute;left:0;top:0;font-family:var(--f-math);font-weight:600;color:var(--margin);width:1.9em;text-align:right}
+.lvl{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 9px;margin-left:6px;vertical-align:middle}
+.lvl1{background:var(--soft-g);color:var(--green)}.lvl2{background:var(--soft-a);color:var(--amber)}.lvl3{background:var(--soft-r);color:var(--red)}
+/* SVG */
+svg text{font-family:var(--f-body);font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:var(--f-math);font-style:italic;font-size:17px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)} svg text.ta{fill:var(--amber)}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}.fsa{fill:var(--soft-a)}.fcard{fill:var(--card)}
+/* widgets */
+.widget .ctrl{max-width:460px;margin:12px auto 0;display:grid;gap:10px}
+.widget label{font-weight:700;display:flex;justify-content:space-between;gap:12px}
+.widget input[type=range]{width:100%;accent-color:var(--blue);height:32px}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:var(--f-math);font-size:1.08rem;background:var(--paper);border-radius:8px;padding:10px 14px;margin-top:12px}
+.readout>span{min-width:0}
+.readout b{font-weight:600}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+/* test de positionnement */
+.qz{display:grid;gap:12px;margin:14px 0}
+.qz-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.qz-q{margin:0 0 8px;font-weight:700}
+.qz-q .mr{font-weight:400}
+.qz-c{display:flex;flex-wrap:wrap;gap:8px}
+.qz-c button{font-family:var(--f-math);font-size:1.12rem;min-width:64px;min-height:42px;padding:4px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.qz-c button:hover:not(:disabled){border-color:var(--blue)}
+.qz-c button:disabled{cursor:default}
+.qz-c button.ok{border-color:var(--green);background:var(--soft-g)}
+.qz-c button.ko{border-color:var(--red);background:var(--soft-r)}
+.qz-fb{margin:8px 0 0;font-size:.95rem}
+.qz-fb:empty{display:none}
+.qz-fb .good{color:var(--green);font-weight:700}
+.qz-fb .bad{color:var(--red);font-weight:700}
+.qz-sum{background:var(--soft-b);border-radius:10px;padding:10px 14px}
+.qz-sum:empty{display:none}
+.qz-sum p{margin:6px 0}
+/* labo */
+.lab-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.lab-tabs button{font:inherit;font-size:.95rem;font-weight:700;border-radius:999px;padding:6px 16px;min-height:38px;cursor:pointer;border:1.5px solid var(--blue);background:transparent;color:var(--blue)}
+.lab-tabs button[aria-pressed="true"]{background:var(--blue);color:var(--paper)}
+.lab-row{display:grid;gap:6px;margin:10px 0}
+.lab-row label{font-weight:700;font-size:.95rem}
+.lab-row input{width:100%;font-family:var(--f-math);font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.lab-row input:focus{border-color:var(--blue)}
+.lab-row .hint{font-size:.85rem;color:var(--muted)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.presets button{font-family:var(--f-math);font-size:.95rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+.lab-out{margin-top:12px}
+.lab-out .verdict{border-radius:10px;padding:10px 14px;margin:8px 0}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+.verdict.mid{background:var(--soft-a)}
+.verdict p{margin:4px 0}
+.lab-out .read{font-size:.9rem;color:var(--muted)}
+.lab-out .err{color:var(--red);font-weight:700}
+.center{text-align:center}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/mathematiques">← Vizion.Blog / Mathématiques</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »).</p>
+</div>
+<header class="hero" id="haut">
+<p class="kicker">Remise à niveau : les chapitres 1 à 3 de ta liste</p>
+<h1>Le calcul, depuis le tout début<small>Nombres, calcul littéral et équations : les gestes que tous tes cours de maths supposent acquis.</small></h1>
+<p class="lede">Développer, factoriser, résoudre une équation : ces gestes sont enseignés au collège, puis utilisés partout sans jamais être réexpliqués. On les reprend un par un, en justifiant chaque règle. Aucune n'est à apprendre « parce que c'est comme ça » : chacune vient d'une idée simple que tu pourras retrouver le jour où tu l'oublies.</p>
+</header>
+
+<main>
+
+<!-- ============ PARTIE 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<p>Dans ton cours de Fonctions élémentaires, une ligne comme « on factorise, puis on étudie le signe » suppose que factoriser est devenu automatique. Si ce n'est pas le cas, tu dois comprendre deux choses à la fois : la notion du cours, et les calculs qui l'entourent. C'est épuisant, et ça donne l'impression de ne rien comprendre, alors que le blocage vient souvent des calculs, pas de la notion. Ce cours s'occupe des calculs.</p>
+
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Crayon et feuille obligatoires.</b> Refais chaque exemple sur ta feuille avant de lire la solution. En calcul, on apprend en faisant, pas en lisant.</li>
+<li><b>Les questions de fin de partie :</b> réponds par écrit avant d'ouvrir les réponses.</li>
+<li><b>Le labo de la partie 7</b> vérifie tes calculs. Tu tapes ton expression de départ et ton résultat : il te dit s'ils sont égaux, et sinon, il te donne une valeur qui le prouve. Sers-t'en pour tous les exercices.</li>
+<li><b>Rythme conseillé, une heure par jour :</b> jour 1, le test et la partie 1 ; jour 2, les parties 2 et 3 ; jour 3, la partie 4 ; jour 4, la partie 5 ; jours 5 et 6, la partie 6 ; ensuite, la feuille d'entraînement, par petits morceaux. Ne passe à la partie suivante que si tu réussis les questions de la précédente.</li>
+</ul>
+</div>
+
+<div class="box nts">
+<p class="lbl">Où se situe ce cours</p>
+<p>C'est le premier d'une série de remise à niveau. Les chapitres sont rangés dans l'ordre où chacun s'appuie sur le précédent :</p>
+<ol>
+<li><b>le calcul avec les nombres</b> (ce cours, partie 1) ;</li>
+<li><b>le calcul littéral</b> (ce cours, parties 2 à 5) ;</li>
+<li><b>les équations</b> (ce cours, partie 6) ;</li>
+<li>les inéquations et les tableaux de signes, avec la valeur absolue ;</li>
+<li>les fonctions : vocabulaire, courbes, variations, fonctions de référence ;</li>
+<li>le second degré : discriminant, factorisation, signe ;</li>
+<li>la dérivation ;</li>
+<li>les suites arithmétiques et géométriques ;</li>
+<li>l'exponentielle, le logarithme et les limites.</li>
+</ol>
+<p>Il renvoie souvent à ton cours <a href="/cours/la-logique.html">La logique, depuis le tout début</a> : une équation est un prédicat, et une erreur de calcul se prouve par un contre-exemple.</p>
+</div>
+
+<h3 id="test">Le test de positionnement</h3>
+<p>Dix questions de calcul sur des nombres, sans calculatrice. Le test ne compte pas : il sert à savoir où commencer. Réponds sans chercher trop longtemps, et ne réponds pas au hasard : une réponse devinée fausserait le résultat. À la fin, il t'indique les parties à travailler en priorité.</p>
+<div class="qz" id="quiz" aria-live="polite"></div>
+<div class="qz-sum" id="quiz-sum" aria-live="polite"></div>
+<p class="center"><button type="button" class="btn ghost" id="quiz-reset">Recommencer le test</button></p>
+
+<h3>Où trouver quoi</h3>
+<ul class="blk">
+<li><a href="#p1-prio"><b>1.1</b>Les priorités de calcul</a></li>
+<li><a href="#p1-rel"><b>1.2</b>Les nombres relatifs</a></li>
+<li><a href="#p1-frac"><b>1.3</b>Les fractions</a></li>
+<li><a href="#p1-pui"><b>1.4</b>Les puissances</a></li>
+<li><a href="#p1-rac"><b>1.5</b>La racine carrée</a></li>
+<li><a href="#p2"><b>2</b>Les lettres dans les calculs</a></li>
+<li><a href="#p3"><b>3</b>Développer</a></li>
+<li><a href="#p4"><b>4</b>Les identités remarquables</a></li>
+<li><a href="#p5"><b>5</b>Factoriser</a></li>
+<li><a href="#p6"><b>6</b>Résoudre une équation</a></li>
+<li><a href="#p7"><b>7</b>Le labo : vérifie tes calculs</a></li>
+<li><a href="#p8"><b>8</b>La feuille d'entraînement</a></li>
+</ul>
+</section>
+
+<!-- ============ PARTIE 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Les outils de base : calculer avec des nombres</h2>
+<p>Le calcul littéral, c'est du calcul avec des lettres qui remplacent des nombres. Ses règles sont exactement celles du calcul ordinaire : si une règle est floue avec des nombres, elle le sera encore plus avec des lettres. On fait donc d'abord le point sur cinq outils. Si le test t'a donné tout juste sur l'un d'eux, lis sa sous-partie rapidement.</p>
+
+<h3 id="p1-prio">1.1 Les priorités de calcul</h3>
+<p>Quand un calcul contient plusieurs opérations, l'ordre dans lequel on les fait change le résultat : <span class="mr">(2 + 3) × 4 = 20</span>, mais <span class="mr">2 + (3 × 4) = 14</span>. Sans parenthèses, il faut donc une règle pour savoir quoi faire en premier. Cette règle est une convention, comme le code de la route : tout le monde l'applique, pour que <span class="mr">2 + 3 × 4</span> ait la même valeur pour tout le monde.</p>
+<div class="box key">
+<p class="lbl">L'ordre des opérations (operator precedence)</p>
+<ol>
+<li>ce qui est entre parenthèses ;</li>
+<li>les puissances ;</li>
+<li>les multiplications et les divisions, de gauche à droite ;</li>
+<li>les additions et les soustractions, de gauche à droite.</li>
+</ol>
+</div>
+<div class="steps">
+<span class="op"></span><span>5 + 2 × 3²</span>
+<span class="op">=</span><span>5 + 2 × 9</span>
+<span class="why">D'abord la puissance : 3² = 9.</span>
+<span class="op">=</span><span>5 + 18</span>
+<span class="why">Puis la multiplication.</span>
+<span class="op">=</span><span>23</span>
+<span class="why">Enfin l'addition.</span>
+</div>
+<p>« De gauche à droite » compte aussi : <span class="mr">12 ÷ 3 × 2 = 4 × 2 = 8</span>, et non <span class="mr">12 ÷ 6 = 2</span>. De même, <span class="mr">10 − 4 − 3 = 6 − 3 = 3</span>, et non <span class="mr">10 − 1 = 9</span>.</p>
+<div class="box nts">
+<p class="lbl">Tu connais déjà cette règle</p>
+<p>Python applique exactement le même ordre : <code>2 + 3 * 4</code> donne 14, et <code>2 ** 3 * 2</code> donne 16. En Racket, la question ne se pose jamais, parce que chaque opération a ses propres parenthèses : <span class="mr">2 + 3 × 4</span> s'écrit <code>(+ 2 (* 3 4))</code>, et l'écriture dit elle-même quoi faire en premier. Les priorités servent justement à économiser ces parenthèses : <span class="mr">2 + 3 × 4</span> est un raccourci pour <span class="mr">2 + (3 × 4)</span>.</p>
+</div>
+
+<h3 id="p1-rel">1.2 Les nombres relatifs</h3>
+<h4>Additionner et soustraire</h4>
+<p>Pense à un compte en banque. Un nombre positif, c'est de l'argent que tu as ; un nombre négatif, une dette. Ajouter, c'est recevoir ; soustraire, c'est dépenser.</p>
+<ul>
+<li><span class="mr">4 − 9 = −5</span> : tu as 4 €, tu dépenses 9 €, tu es à découvert de 5 €.</li>
+<li><span class="mr">−2 − 5 = −7</span> : tu dois déjà 2 €, tu dépenses encore 5 €, tu dois 7 €.</li>
+<li><span class="mr">−2 + 5 = 3</span> : tu dois 2 €, tu reçois 5 €, il te reste 3 €.</li>
+</ul>
+<p>L'<b>opposé</b> d'un nombre, c'est le même nombre avec l'autre signe : l'opposé de 3 est −3, et l'opposé de −3 est 3. On l'écrit avec un signe moins : <span class="mr">−(−3) = 3</span>.</p>
+<div class="box key">
+<p class="lbl">Soustraire, c'est ajouter l'opposé</p>
+<p class="eq" style="margin:6px 0">a − b = a + (−b)</p>
+<p>D'où <span class="mr">7 − (−3) = 7 + 3 = 10</span> : enlever une dette, c'est s'enrichir.</p>
+</div>
+
+<h4>Multiplier et diviser : la règle des signes</h4>
+<div class="tw"><table style="width:auto;margin:0 auto">
+<tr><th>×</th><th>positif</th><th>négatif</th></tr>
+<tr><th>positif</th><td>positif</td><td>négatif</td></tr>
+<tr><th>négatif</th><td>négatif</td><td>positif</td></tr>
+</table></div>
+<p>Deux nombres de même signe donnent un produit positif ; deux nombres de signes différents, un produit négatif. La division suit la même règle : <span class="mr">(−12) ÷ (−3) = 4</span> et <span class="mr">(−12) ÷ 3 = −4</span>.</p>
+<p>Pourquoi « moins par moins donne plus » ? Regarde la table de multiplication de −3, en faisant descendre le second nombre :</p>
+<div class="steps">
+<span class="op"></span><span>(−3) × 3 = −9</span>
+<span class="op"></span><span>(−3) × 2 = −6</span>
+<span class="op"></span><span>(−3) × 1 = −3</span>
+<span class="op"></span><span>(−3) × 0 = 0</span>
+<span class="op"></span><span>(−3) × (−1) = ?</span>
+<span class="op"></span><span>(−3) × (−2) = ?</span>
+</div>
+<p>À chaque ligne, le résultat augmente de 3. Pour que la table continue de la même façon, il faut <span class="mr">(−3) × (−1) = 3</span>, puis <span class="mr">(−3) × (−2) = 6</span>. « Moins par moins donne plus » est la seule règle qui garde la table cohérente. Un exercice de la feuille d'entraînement le démontre proprement, avec la distributivité de la partie 3.</p>
+<p>Avec plusieurs facteurs, compte les signes moins : un nombre pair de signes moins donne un résultat positif, un nombre impair un résultat négatif. <span class="mr">(−1) × (−2) × (−3) = −6</span>, puisqu'il y a trois signes moins.</p>
+
+<h4>Le signe moins devant une parenthèse</h4>
+<p><span class="mr">−(…)</span> veut dire « l'opposé de ce qu'il y a dans la parenthèse ». Pour enlever une parenthèse précédée d'un signe moins, on change le signe de <b>tout</b> ce qu'elle contient :</p>
+<p class="eq">10 − (3 − 1) = 10 − 3 + 1 = 8</p>
+<p>Vérifie : la parenthèse vaut 2, et <span class="mr">10 − 2 = 8</span>. L'erreur classique est de ne changer que le premier signe : <span class="mr">10 − 3 − 1 = 6</span>, faux. La partie 3 expliquera pourquoi tous les signes changent : c'est la distributivité. Un signe plus devant une parenthèse, lui, ne change rien : <span class="mr">10 + (3 − 1) = 10 + 3 − 1</span>.</p>
+
+<h3 id="p1-frac">1.3 Les fractions</h3>
+<p><span class="mr">a/b</span>, ou <span class="mr"><span class="q"><span>a</span><span>b</span></span></span>, veut dire <span class="mr">a ÷ b</span>. Le nombre du haut est le <b>numérateur</b> (numerator), celui du bas le <b>dénominateur</b> (denominator). Le dénominateur n'est jamais 0 : diviser par 0 n'a pas de sens, et Python le refuse avec <code>ZeroDivisionError</code>.</p>
+
+<h4>Simplifier</h4>
+<p>On peut multiplier ou diviser le numérateur et le dénominateur par un même nombre non nul : la fraction ne change pas. Couper une pizza en 6 parts et en prendre 4, ou la couper en 3 parts et en prendre 2, c'est la même quantité de pizza.</p>
+<p class="eq"><span class="q"><span>12</span><span>18</span></span> = <span class="q"><span>6 × 2</span><span>6 × 3</span></span> = <span class="q"><span>2</span><span>3</span></span></p>
+<p>Pour simplifier, on cherche un <b>facteur</b> commun au numérateur et au dénominateur (ici 6), et on le barre en haut et en bas.</p>
+<div class="box warn">
+<p class="lbl">On simplifie des facteurs, jamais des termes</p>
+<p><span class="mr">(2 × 5)/2 = 5</span> : le 2 multiplie, c'est un facteur, on peut le barrer. Mais <span class="mr">(2 + 5)/2 = 7/2 = 3,5</span>, et non 5 : dans une somme, le 2 est ajouté, c'est un terme, et on ne peut pas le barrer. Cette règle reviendra sans cesse avec les lettres : <span class="mr">(x + 3)/x</span> ne se simplifie pas en 3.</p>
+</div>
+
+<h4>Multiplier</h4>
+<p>On multiplie les numérateurs entre eux, et les dénominateurs entre eux :</p>
+<p class="eq"><span class="q"><span>2</span><span>3</span></span> × <span class="q"><span>5</span><span>7</span></span> = <span class="q"><span>2 × 5</span><span>3 × 7</span></span> = <span class="q"><span>10</span><span>21</span></span></p>
+<p>Pour multiplier par un nombre entier, écris-le comme une fraction : <span class="mr">4 × 2/3 = 4/1 × 2/3 = 8/3</span>.</p>
+
+<h4>Additionner et soustraire</h4>
+<p>Là, il faut un <b>dénominateur commun</b>. On ne peut pas additionner directement des moitiés et des tiers, comme on n'additionne pas des euros et des dollars sans convertir. On découpe donc tout en sixièmes :</p>
+<p class="eq"><span class="q"><span>1</span><span>2</span></span> + <span class="q"><span>1</span><span>3</span></span> = <span class="q"><span>3</span><span>6</span></span> + <span class="q"><span>2</span><span>6</span></span> = <span class="q"><span>5</span><span>6</span></span></p>
+<p>Pour passer de 1/2 à 3/6, on a multiplié le numérateur et le dénominateur par 3 : c'est la règle de simplification, lue à l'envers. Une fois les dénominateurs égaux, on additionne les numérateurs et on garde le dénominateur. Le produit des deux dénominateurs est toujours un dénominateur commun, même si ce n'est pas toujours le plus petit : <span class="mw">3/4 − 1/6 = 18/24 − 4/24 = 14/24 = 7/12</span>. Avec 12 directement : <span class="mr">9/12 − 2/12 = 7/12</span>.</p>
+<div class="box warn">
+<p class="lbl">1/2 + 1/3 n'est pas 2/5</p>
+<p>On n'additionne pas les numérateurs entre eux et les dénominateurs entre eux. Contrôle de bon sens : 2/5 est plus petit que 1/2, alors qu'on a ajouté un nombre positif à 1/2. C'est impossible.</p>
+</div>
+
+<h4>Diviser</h4>
+<p>Diviser par une fraction, c'est multiplier par son <b>inverse</b>, c'est-à-dire par la fraction retournée :</p>
+<p class="eq"><span class="q"><span>2</span><span>3</span></span> ÷ <span class="q"><span>4</span><span>5</span></span> = <span class="q"><span>2</span><span>3</span></span> × <span class="q"><span>5</span><span>4</span></span> = <span class="q"><span>10</span><span>12</span></span> = <span class="q"><span>5</span><span>6</span></span></p>
+<p>Pourquoi ? Diviser par 2, c'est prendre la moitié, donc multiplier par 1/2 : l'inverse de 2 est 1/2, parce que <span class="mr">2 × 1/2 = 1</span>. De même, l'inverse de 4/5 est 5/4, parce que <span class="mr">4/5 × 5/4 = 1</span>. Diviser par un nombre et multiplier par son inverse donnent toujours le même résultat.</p>
+<div class="box nts">
+<p class="lbl">Avec les machines</p>
+<p>Python calcule les fractions en décimal approché : <code>1/2 + 1/3</code> donne <code>0.8333333333333333</code>. Racket calcule exactement : <code>(+ 1/2 1/3)</code> donne <code>5/6</code>, comme dans ton premier chapitre de Racket. En maths, on garde les fractions exactes : 5/6 est plus précis que 0,83.</p>
+</div>
+
+<h3 id="p1-pui">1.4 Les puissances</h3>
+<p><span class="mr">aⁿ</span> (« a puissance n », ou « a exposant n ») est le produit de n facteurs égaux à a. a est la <b>base</b>, n l'<b>exposant</b> (exponent) :</p>
+<p class="eq">2⁵ = 2 × 2 × 2 × 2 × 2 = 32</p>
+<p><span class="mr">a²</span> se lit « a au carré », <span class="mr">a³</span> « a au cube ». Par convention, <span class="mr">a¹ = a</span> et <span class="mr">a⁰ = 1</span> (pour a non nul). En Python, <span class="mr">aⁿ</span> s'écrit <code>a ** n</code> ; en Racket, <code>(expt a n)</code>.</p>
+
+<h4>Les règles viennent toutes d'une seule idée : compter les facteurs</h4>
+<p class="eq">2³ × 2⁴ = (2 × 2 × 2) × (2 × 2 × 2 × 2) = 2⁷</p>
+<div class="tw"><table>
+<tr><th>Règle</th><th>Pourquoi</th><th>Exemple</th></tr>
+<tr><td class="mr">aⁿ × aᵐ = a<sup>n + m</sup></td><td>n facteurs, puis m facteurs : n + m en tout</td><td class="mr">2³ × 2⁴ = 2⁷</td></tr>
+<tr><td class="mr">aⁿ ÷ aᵐ = a<sup>n − m</sup></td><td>les m facteurs du bas se simplifient avec m facteurs du haut</td><td class="mr">2⁵ ÷ 2³ = 2²</td></tr>
+<tr><td class="mr">(aⁿ)ᵐ = a<sup>n × m</sup></td><td>m paquets de n facteurs</td><td class="mr">(2³)² = 2⁶</td></tr>
+<tr><td class="mr">(a × b)ⁿ = aⁿ × bⁿ</td><td>on regroupe les a d'un côté, les b de l'autre</td><td class="mr">(2 × 5)³ = 2³ × 5³</td></tr>
+</table></div>
+<p>Les trois premières règles demandent la même base : <span class="mr">2³ × 3⁴</span> ne se simplifie pas.</p>
+<div class="box warn">
+<p class="lbl">Aucune règle pour l'addition</p>
+<p><span class="mr">2³ + 2⁴ = 8 + 16 = 24</span>, et non <span class="mr">2⁷ = 128</span>. De même, <span class="mr">(a + b)²</span> n'est pas <span class="mr">a² + b²</span> : c'est tout le sujet de la partie 4.</p>
+</div>
+
+<h4>Les puissances et le signe moins</h4>
+<p class="eq">(−3)² = (−3) × (−3) = 9 &nbsp;&nbsp; mais &nbsp;&nbsp; −3² = −(3 × 3) = −9</p>
+<p>Dans <span class="mr">−3²</span>, la puissance passe avant le signe moins (priorités, 1.1) : le carré ne porte que sur 3. Pour élever −3 au carré, il faut des parenthèses. Python suit la même règle : <code>-3 ** 2</code> donne <code>-9</code>, et <code>(-3) ** 2</code> donne <code>9</code>.</p>
+<p>Une puissance paire d'un nombre négatif est positive, une puissance impaire est négative : <span class="mr">(−2)⁴ = 16</span> et <span class="mr">(−2)³ = −8</span>. C'est la règle des signes : on compte les signes moins. Ce point reviendra avec les lettres : si x vaut −3, alors <span class="mr">x² = (−3)² = 9</span>, mais <span class="mr">−x² = −9</span>.</p>
+
+<h3 id="p1-rac">1.5 La racine carrée</h3>
+<p>La <b>racine carrée</b> (square root) de a, notée <span class="mr">√a</span>, est le nombre <b>positif</b> dont le carré vaut a :</p>
+<p class="eq">√49 = 7, &nbsp;car 7² = 49 et 7 est positif</p>
+<p>−7 a aussi pour carré 49, mais <span class="mr">√49</span> désigne, par définition, la réponse positive. Ce détail comptera pour les équations : <span class="mr">x² = 49</span> a deux solutions, 7 et −7, alors que <span class="mr">√49</span> vaut seulement 7 (partie 6.5).</p>
+<p><span class="mr">√a</span> n'existe que pour a positif ou nul, puisqu'aucun carré n'est négatif. Python refuse <code>math.sqrt(-4)</code> avec <code>ValueError: math domain error</code>. Racket, lui, répond <code>0+2i</code> : c'est un nombre complexe, hors programme.</p>
+<p>Les carrés parfaits à connaître : 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144. Les autres racines, comme <span class="mr">√2</span> ou <span class="mr">√5</span>, ne tombent pas juste : on les garde sous cette forme, comme on garde 1/3 plutôt que 0,333.</p>
+<p>Deux règles utiles : <span class="mr">√(a × b) = √a × √b</span> (pour a et b positifs), par exemple <span class="mr">√36 = √(4 × 9) = 2 × 3 = 6</span> ; et <span class="mr">(√a)² = a</span>.</p>
+<div class="box warn">
+<p class="lbl">La racine d'une somme n'est pas la somme des racines</p>
+<p><span class="mr">√(9 + 16) = √25 = 5</span>, alors que <span class="mr">√9 + √16 = 3 + 4 = 7</span>. C'est la même famille d'erreurs que <span class="mr">(a + b)² = a² + b²</span> : une règle vraie pour les produits, appliquée à tort à une somme.</p>
+</div>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 1)</p>
+<ol>
+<li>Calcule <span class="mr">7 + 3 × (5 − 2)²</span>.<details><summary>Réponse</summary><div><span class="mw">7 + 3 × 3² = 7 + 3 × 9 = 7 + 27 = 34</span>. La parenthèse d'abord, puis le carré, puis la multiplication, enfin l'addition.</div></details></li>
+<li>Calcule <span class="mr">−4 − 6</span>, puis <span class="mr">−4 − (−6)</span>.<details><summary>Réponse</summary><div><span class="mr">−4 − 6 = −10</span> (tu dois 4, tu dépenses 6). <span class="mr">−4 − (−6) = −4 + 6 = 2</span> (soustraire −6, c'est ajouter 6).</div></details></li>
+<li>Calcule <span class="mr">(−2) × 5 × (−3)</span>, puis <span class="mr">(−2) × (−5) × (−3)</span>.<details><summary>Réponse</summary><div>30 (deux signes moins), puis −30 (trois signes moins).</div></details></li>
+<li>Calcule <span class="mr">2/5 + 1/3</span>, puis <span class="mr">2/5 × 1/3</span>, puis <span class="mr">2/5 ÷ 1/3</span>.<details><summary>Réponse</summary><div><span class="mr">6/15 + 5/15 = 11/15</span> ; <span class="mr">2/15</span> ; <span class="mr">2/5 × 3/1 = 6/5</span>.</div></details></li>
+<li>Simplifie <span class="mr">15/25</span>. Pourquoi <span class="mr">(5 + 3)/5</span> ne vaut-il pas 3 ?<details><summary>Réponse</summary><div><span class="mw">15/25 = (5 × 3)/(5 × 5) = 3/5</span>. Dans <span class="mr">5 + 3</span>, le 5 est un terme, pas un facteur : on ne peut pas le barrer. <span class="mr">(5 + 3)/5 = 8/5</span>.</div></details></li>
+<li>Calcule <span class="mr">(−2)³</span>, <span class="mr">−2⁴</span> et <span class="mr">(−2)⁴</span>.<details><summary>Réponse</summary><div>−8 ; −16 (la puissance ne porte que sur 2) ; 16.</div></details></li>
+<li>Écris <span class="mr">3⁴ × 3²</span> et <span class="mr">(5²)³</span> sous la forme d'une seule puissance.<details><summary>Réponse</summary><div><span class="mr">3⁶</span> (4 + 2 facteurs) et <span class="mr">5⁶</span> (3 paquets de 2 facteurs).</div></details></li>
+<li>Calcule <span class="mr">√81</span>, <span class="mr">√(36 + 64)</span> et <span class="mr">√36 + √64</span>.<details><summary>Réponse</summary><div>9 ; <span class="mr">√100 = 10</span> ; <span class="mr">6 + 8 = 14</span>. Les deux derniers résultats diffèrent : la racine d'une somme n'est pas la somme des racines.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Les lettres dans les calculs</h2>
+
+<h3>2.1 Pourquoi des lettres ?</h3>
+<p>Une lettre remplace un nombre. Elle peut jouer deux rôles :</p>
+<ul>
+<li><b>un nombre quelconque.</b> Dans la formule de l'aire d'un rectangle, <span class="mr">A = L × l</span>, les lettres valent pour tous les rectangles. C'est un paramètre de fonction : en Python, <code>def aire(L, l): return L * l</code> marche avec toutes les valeurs qu'on lui donnera.</li>
+<li><b>un nombre inconnu, qu'on cherche.</b> Dans l'équation <span class="mr">3x + 5 = 20</span>, x désigne le nombre qu'on veut trouver. Ce sera la partie 6.</li>
+</ul>
+<p>Une <b>expression</b> (expression), comme <span class="mr">3x + 5</span>, est un calcul qui contient des lettres. Tu peux la voir comme une fonction qui attend une valeur de x : en Python <code>lambda x: 3*x + 5</code>, en Racket <code>(lambda (x) (+ (* 3 x) 5))</code>.</p>
+
+<h3>2.2 Les conventions d'écriture</h3>
+<p>Les mathématiciens écrivent vite, et ont pris quelques habitudes. Il faut savoir les lire :</p>
+<div class="tw"><table>
+<tr><th>On écrit</th><th>Ça veut dire</th><th>La règle</th></tr>
+<tr><td class="mr">3x</td><td class="mr">3 × x</td><td>pas de × entre un nombre et une lettre</td></tr>
+<tr><td class="mr">ab</td><td class="mr">a × b</td><td>ni entre deux lettres</td></tr>
+<tr><td class="mr">2(x + 1)</td><td class="mr">2 × (x + 1)</td><td>ni devant une parenthèse</td></tr>
+<tr><td class="mr">(x + 1)(x − 1)</td><td class="mr">(x + 1) × (x − 1)</td><td>ni entre deux parenthèses</td></tr>
+<tr><td class="mr">x</td><td class="mr">1 × x</td><td>on n'écrit pas le coefficient 1</td></tr>
+<tr><td class="mr">−x</td><td class="mr">(−1) × x</td><td>ni le 1 de −1</td></tr>
+<tr><td class="mr">x²</td><td class="mr">x × x</td><td>et <span class="mr">x³ = x × x × x</span></td></tr>
+<tr><td class="mr">3x²</td><td class="mr">3 × x × x</td><td>le carré ne porte que sur x : <span class="mr">(3x)²</span>, c'est autre chose</td></tr>
+</table></div>
+<p>Le nombre s'écrit devant la lettre : on écrit <span class="mr">3x</span>, jamais <span class="mr">x3</span>, qui ressemble trop à <span class="mr">x³</span>. Python, lui, ne comprend aucun de ces raccourcis : <code>3x</code> est une erreur de syntaxe, il faut écrire <code>3*x</code>, et <span class="mr">3x²</span> s'écrit <code>3*x**2</code>.</p>
+
+<h3>2.3 Évaluer une expression</h3>
+<p>Évaluer une expression, c'est remplacer chaque lettre par un nombre, puis calculer. C'est exactement appeler une fonction avec un argument. Prenons <span class="mr">A = 3x² − 2x + 1</span>, avec x = 2 :</p>
+<div class="steps">
+<span class="op">A =</span><span>3 × 2² − 2 × 2 + 1</span>
+<span class="op">=</span><span>3 × 4 − 4 + 1</span>
+<span class="why">Priorités : le carré, puis les multiplications.</span>
+<span class="op">=</span><span>9</span>
+</div>
+<p>Tu as déjà rencontré cette expression : c'est <code>(+ (* 3 x x) (* -2 x) 1)</code>, la fonction que tu as décomposée dans ton premier chapitre de Racket. Avec x = −1 :</p>
+<div class="steps">
+<span class="op">A =</span><span>3 × (−1)² − 2 × (−1) + 1</span>
+<span class="op">=</span><span>3 × 1 + 2 + 1</span>
+<span class="why">(−1)² = 1, et −2 × (−1) = 2 : moins par moins donne plus.</span>
+<span class="op">=</span><span>6</span>
+</div>
+<div class="box warn">
+<p class="lbl">Remplace toujours une lettre par un nombre entre parenthèses</p>
+<p>Sans parenthèses, <span class="mr">3 × −1²</span> se lit <span class="mr">3 × (−(1²)) = −3</span>, et tout le calcul est faux. Avec, <span class="mr">(−1)² = 1</span>. Une parenthèse de trop ne coûte rien ; une parenthèse oubliée coûte le résultat.</p>
+</div>
+
+<h3 id="p2-nature">2.4 Termes et facteurs : la nature d'une expression</h3>
+<p>Deux mots reviennent dans tout le cours, et il faut les distinguer :</p>
+<ul>
+<li>les <b>termes</b> (terms) sont ce qu'on additionne. Dans <span class="mr">3x² − 2x + 1</span>, les termes sont <span class="mr">3x²</span>, <span class="mr">−2x</span> et <span class="mr">1</span>. Le signe fait partie du terme : le deuxième est <span class="mr">−2x</span>, pas <span class="mr">2x</span> ;</li>
+<li>les <b>facteurs</b> (factors) sont ce qu'on multiplie. Dans <span class="mr">3x²</span>, les facteurs sont 3 et <span class="mr">x²</span>. Dans <span class="mr">2(x + 1)</span>, ce sont 2 et <span class="mr">(x + 1)</span> ;</li>
+<li>le <b>coefficient</b> (coefficient) est le nombre qui multiplie la partie en lettres : 3 dans <span class="mr">3x²</span>, −2 dans <span class="mr">−2x</span>.</li>
+</ul>
+<p>Une expression est une <b>somme</b> ou un <b>produit</b> selon la dernière opération qu'on effectuerait pour la calculer. Ton cours de Racket donne un moyen infaillible de le voir : écris l'expression en Racket, et regarde ce qui vient en tête.</p>
+<div class="tw"><table>
+<tr><th>Expression</th><th>En Racket</th><th>Nature</th></tr>
+<tr><td class="mr">3x² − 2x + 1</td><td><code>(+ (* 3 x x) (* -2 x) 1)</code></td><td>une somme de trois termes</td></tr>
+<tr><td class="mr">2(x + 1)</td><td><code>(* 2 (+ x 1))</code></td><td>un produit de deux facteurs</td></tr>
+<tr><td class="mr">(x + 1)(x − 1)</td><td><code>(* (+ x 1) (- x 1))</code></td><td>un produit de deux facteurs</td></tr>
+<tr><td class="mr">2(x + 1) + 5</td><td><code>(+ (* 2 (+ x 1)) 5)</code></td><td>une somme de deux termes</td></tr>
+</table></div>
+<p>La dernière ligne est une somme, même si elle contient un produit : sa dernière opération est l'addition de 5.</p>
+<div class="box key">
+<p class="lbl">La distinction qui organise toute la suite</p>
+<p><b>Développer</b> (expand) transforme un produit en somme. <b>Factoriser</b> (factor) transforme une somme en produit. Ce sont les deux sens d'un même trajet.</p>
+</div>
+
+<h3>2.5 Réduire une expression</h3>
+<p><b>Réduire</b> une expression (simplify), c'est regrouper ses termes semblables. Deux termes sont <b>semblables</b> quand ils ont exactement la même partie en lettres : <span class="mr">3x</span> et <span class="mr">5x</span> sont semblables, <span class="mr">2x²</span> et <span class="mr">−x²</span> aussi, mais <span class="mr">x</span> et <span class="mr">x²</span> ne le sont pas.</p>
+<p>C'est un inventaire : 3 pommes + 5 pommes = 8 pommes, mais 3 pommes + 2 poires reste 3 pommes + 2 poires. Ici, les termes en x sont les pommes, les termes en x² les poires, et les nombres seuls une troisième sorte de fruit.</p>
+<div class="steps">
+<span class="op"></span><span>4x + 3 − x + 7</span>
+<span class="op">=</span><span>(4x − x) + (3 + 7)</span>
+<span class="why">On regroupe les termes en x, puis les nombres seuls.</span>
+<span class="op">=</span><span>3x + 10</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>2x² + 5x − x² + 3x − 4</span>
+<span class="op">=</span><span>(2x² − x²) + (5x + 3x) − 4</span>
+<span class="op">=</span><span>x² + 8x − 4</span>
+<span class="why">On range par puissances décroissantes : x², puis x, puis le nombre seul.</span>
+</div>
+<p>Ranger les termes par puissances décroissantes n'est pas obligatoire, mais tout le monde le fait : ça rend les résultats faciles à comparer. Et pourquoi a-t-on le droit d'écrire <span class="mr">3x + 5x = 8x</span> ? Parce que <span class="mr">3x + 5x = (3 + 5)x</span> : c'est la distributivité de la partie 3, lue à l'envers.</p>
+<div class="box warn">
+<p class="lbl">Trois erreurs classiques</p>
+<p><span class="mr">3x + 2</span> n'est pas <span class="mr">5x</span> : un nombre seul n'est pas semblable à x. <span class="mr">x + x = 2x</span>, mais <span class="mr">x × x = x²</span>. Et <span class="mr">3x + 2x²</span> ne se réduit pas.</p>
+</div>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 2)</p>
+<ol>
+<li>Écris avec tous les signes × : <span class="mr">5ab</span>, <span class="mr">−x</span>, <span class="mr">4(x − 2)</span>, <span class="mr">2x³</span>.<details><summary>Réponse</summary><div><span class="mr">5 × a × b</span> ; <span class="mr">(−1) × x</span> ; <span class="mr">4 × (x − 2)</span> ; <span class="mr">2 × x × x × x</span>.</div></details></li>
+<li>Calcule <span class="mr">2x² − 5x + 3</span> pour x = 3, puis pour x = −2.<details><summary>Réponse</summary><div><span class="mr">2 × 9 − 15 + 3 = 6</span> ; <span class="mw">2 × (−2)² − 5 × (−2) + 3 = 8 + 10 + 3 = 21</span>.</div></details></li>
+<li>Pour x = −3, que valent <span class="mr">x²</span>, <span class="mr">−x²</span> et <span class="mr">(−x)²</span> ?<details><summary>Réponse</summary><div>9 ; −9 ; 9. Dans <span class="mr">−x²</span>, le carré passe avant le signe moins ; dans <span class="mr">(−x)²</span>, <span class="mr">−x</span> vaut 3, et son carré 9.</div></details></li>
+<li>Somme ou produit ? <span class="mr">3(x + 2)</span> ; <span class="mr">3x + 2</span> ; <span class="mr">(x − 1)(x + 4)</span> ; <span class="mr">x(x − 1) − 2</span>.<details><summary>Réponse</summary><div>Produit ; somme ; produit ; somme (la dernière opération est la soustraction de 2).</div></details></li>
+<li>Réduis : <span class="mr">5x − 3 + 2x + 8</span> ; <span class="mr">x² + 4x − 3x² + x</span>.<details><summary>Réponse</summary><div><span class="mr">7x + 5</span> ; <span class="mr">−2x² + 5x</span>.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Développer</h2>
+<p><b>Développer</b> (expand), c'est transformer un produit en somme : faire disparaître les parenthèses en effectuant les multiplications. On le fait pour simplifier une expression, ou pour comparer deux expressions entre elles.</p>
+
+<h3>3.1 La distributivité simple</h3>
+<div class="box key">
+<p class="lbl">La distributivité (distributive property)</p>
+<p class="eq" style="margin:6px 0">k(a + b) = ka + kb &nbsp;&nbsp;&nbsp; k(a − b) = ka − kb</p>
+<p>Le facteur k se « distribue » sur chaque terme de la parenthèse, comme un facteur distribue le courrier dans chaque boîte aux lettres.</p>
+</div>
+<figure>
+<svg viewBox="0 0 440 200" role="img" aria-label="Un rectangle de hauteur k et de longueur a plus b, coupé en deux rectangles de longueurs a et b">
+<rect x="60" y="50" width="200" height="100" class="st fsb"/>
+<rect x="260" y="50" width="140" height="100" class="st fsg"/>
+<path class="sm" d="M60,36 V30 H260 V36 M260,30 V24 M260,36 V30 H400 V36"/>
+<text x="160" y="22" text-anchor="middle" class="mt tb">a</text>
+<text x="330" y="22" text-anchor="middle" class="mt tg">b</text>
+<path class="sm" d="M46,50 H40 V150 H46"/>
+<text x="26" y="106" text-anchor="middle" class="mt">k</text>
+<text x="160" y="106" text-anchor="middle" class="mt">k × a</text>
+<text x="330" y="106" text-anchor="middle" class="mt">k × b</text>
+<text x="230" y="182" text-anchor="middle" class="s tm">longueur totale : a + b</text>
+</svg>
+<figcaption>L'aire du grand rectangle se calcule de deux façons : <span class="mr">k × (a + b)</span>, en une fois, ou <span class="mr">k × a + k × b</span>, morceau par morceau. C'est la même aire : voilà la distributivité.</figcaption>
+</figure>
+<p>Tu l'utilises déjà en calcul mental : <span class="mw">7 × 102 = 7 × (100 + 2) = 700 + 14 = 714</span>. Et dans la vie : 3 menus composés chacun d'un burger et d'une boisson, c'est 3 burgers et 3 boissons.</p>
+<div class="steps">
+<span class="op"></span><span>3(x + 4) = 3 × x + 3 × 4 = 3x + 12</span>
+<span class="op"></span><span>5(2x − 1) = 5 × 2x − 5 × 1 = 10x − 5</span>
+<span class="op"></span><span>x(x + 3) = x × x + x × 3 = x² + 3x</span>
+<span class="op"></span><span>2x(3x − 4) = 2x × 3x − 2x × 4 = 6x² − 8x</span>
+<span class="why">2x × 3x = 2 × 3 × x × x = 6x² : on multiplie les nombres entre eux, et les lettres entre elles.</span>
+<span class="op"></span><span>−2(x − 5) = (−2) × x + (−2) × (−5) = −2x + 10</span>
+<span class="why">Le facteur −2 multiplie aussi le −5, et moins par moins donne plus.</span>
+</div>
+<p>Le dernier exemple est celui qui provoque le plus d'erreurs. Pour ne pas te tromper de signe, considère que chaque terme emporte son signe avec lui : dans <span class="mr">(x − 5)</span>, les termes sont <span class="mr">x</span> et <span class="mr">−5</span>.</p>
+
+<h3>3.2 Le signe moins devant une parenthèse</h3>
+<p><span class="mr">−(a + b)</span>, c'est <span class="mr">(−1) × (a + b)</span>. En distribuant −1 sur chaque terme :</p>
+<p class="eq">−(a + b) = −a − b &nbsp;&nbsp;&nbsp; −(a − b) = −a + b</p>
+<p>Voilà pourquoi, en partie 1.2, tous les signes de la parenthèse changeaient.</p>
+<div class="steps">
+<span class="op"></span><span>5 − (2x − 3)</span>
+<span class="op">=</span><span>5 − 2x + 3</span>
+<span class="why">Le signe moins change le signe de chaque terme de la parenthèse : −2x et +3.</span>
+<span class="op">=</span><span>−2x + 8</span>
+</div>
+<p>L'erreur classique, <span class="mr">5 − 2x − 3</span>, oublie de changer le signe du 3.</p>
+
+<h3>3.3 La double distributivité</h3>
+<div class="box key">
+<p class="lbl">La double distributivité</p>
+<p class="eq" style="margin:6px 0">(a + b)(c + d) = ac + ad + bc + bd</p>
+<p>Chaque terme de la première parenthèse multiplie chaque terme de la seconde.</p>
+</div>
+<p>Ce n'est pas une nouvelle règle : c'est la distributivité simple, appliquée deux fois. On traite d'abord <span class="mr">(c + d)</span> comme un seul bloc :</p>
+<div class="steps">
+<span class="op"></span><span>(a + b)(c + d)</span>
+<span class="op">=</span><span>a(c + d) + b(c + d)</span>
+<span class="why">Le bloc (c + d) se distribue sur a et sur b.</span>
+<span class="op">=</span><span>ac + ad + bc + bd</span>
+<span class="why">Puis a se distribue sur c et d, et b aussi.</span>
+</div>
+<figure>
+<svg viewBox="0 0 440 260" role="img" aria-label="Un rectangle de côtés a plus b et c plus d, découpé en quatre rectangles ac, bc, ad et bd">
+<rect x="70" y="40" width="200" height="110" class="st fsb"/>
+<rect x="270" y="40" width="130" height="110" class="st fsg"/>
+<rect x="70" y="150" width="200" height="80" class="st fsa"/>
+<rect x="270" y="150" width="130" height="80" class="st fsr"/>
+<text x="170" y="28" text-anchor="middle" class="mt">a</text>
+<text x="335" y="28" text-anchor="middle" class="mt">b</text>
+<text x="50" y="100" text-anchor="middle" class="mt">c</text>
+<text x="50" y="195" text-anchor="middle" class="mt">d</text>
+<text x="170" y="100" text-anchor="middle" class="mt">ac</text>
+<text x="335" y="100" text-anchor="middle" class="mt">bc</text>
+<text x="170" y="195" text-anchor="middle" class="mt">ad</text>
+<text x="335" y="195" text-anchor="middle" class="mt">bd</text>
+</svg>
+<figcaption>Le grand rectangle mesure <span class="mr">(a + b)</span> sur <span class="mr">(c + d)</span>. Découpé, il donne quatre rectangles : quatre produits.</figcaption>
+</figure>
+<p>Avec deux termes dans chaque parenthèse, on obtient 2 × 2 = 4 produits. C'est une double boucle : <code>for p in (a, b): for q in (c, d): total += p * q</code>. Avec 2 termes et 3 termes, il y aurait 6 produits.</p>
+<div class="steps">
+<span class="op"></span><span>(x + 2)(x + 5)</span>
+<span class="op">=</span><span>x × x + x × 5 + 2 × x + 2 × 5</span>
+<span class="why">Les 4 produits, écrits sans rien calculer de tête.</span>
+<span class="op">=</span><span>x² + 5x + 2x + 10</span>
+<span class="op">=</span><span>x² + 7x + 10</span>
+<span class="why">On réduit : 5x + 2x = 7x.</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>(2x − 1)(x + 4)</span>
+<span class="op">=</span><span>2x × x + 2x × 4 + (−1) × x + (−1) × 4</span>
+<span class="why">Le −1 emporte son signe avec lui.</span>
+<span class="op">=</span><span>2x² + 8x − x − 4</span>
+<span class="op">=</span><span>2x² + 7x − 4</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>(x − 3)(x − 2) = x² − 2x − 3x + 6 = x² − 5x + 6</span>
+<span class="why">(−3) × (−2) = +6 : moins par moins donne plus.</span>
+<span class="op"></span><span>(3 − x)(2x + 1) = 6x + 3 − 2x² − x = −2x² + 5x + 3</span>
+</div>
+<div class="redac">
+<p><b>La méthode, à suivre à chaque fois</b></p>
+<p>1. Écris les produits, chacun avec son signe, sans rien calculer de tête.</p>
+<p>2. Calcule chaque produit.</p>
+<p>3. Réduis, puis range par puissances décroissantes.</p>
+<p>4. Vérifie avec une valeur (partie 3.5).</p>
+<p class="note">Sauter l'étape 1 pour aller plus vite est la source de la plupart des erreurs de signe.</p>
+</div>
+
+<h3>3.4 Développer une expression plus longue</h3>
+<p>Quand une expression contient plusieurs produits, on développe chacun d'eux, puis on réduit. Attention au signe moins devant un produit : garde le résultat du développement entre parenthèses, puis enlève-les en changeant tous les signes (3.2).</p>
+<div class="steps">
+<span class="op">A =</span><span>3(x + 1) − (x − 2)(x + 4)</span>
+<span class="op">=</span><span>3x + 3 − (x² + 4x − 2x − 8)</span>
+<span class="why">On développe chaque produit ; le second reste entre parenthèses, à cause du signe moins.</span>
+<span class="op">=</span><span>3x + 3 − (x² + 2x − 8)</span>
+<span class="op">=</span><span>3x + 3 − x² − 2x + 8</span>
+<span class="why">Le signe moins change le signe de chaque terme de la parenthèse.</span>
+<span class="op">=</span><span>−x² + x + 11</span>
+</div>
+<p>Sans la parenthèse de la deuxième ligne, on écrirait <span class="mr">3x + 3 − x² + 2x − 8</span> : seul le premier terme aurait changé de signe, et le résultat serait faux.</p>
+
+<h3 id="p3-test">3.5 Vérifier un développement avec une valeur</h3>
+<p>Développer ne change pas la valeur d'une expression : ça la réécrit. L'expression de départ et le résultat doivent donc donner le même nombre, quelle que soit la valeur de x. C'est un test très efficace, comme un test unitaire (unit test) en programmation. Avec x = 3 :</p>
+<ul>
+<li>départ : <span class="mw">3(3 + 1) − (3 − 2)(3 + 4) = 12 − 7 = 5</span> ;</li>
+<li>résultat : <span class="mw">−3² + 3 + 11 = −9 + 3 + 11 = 5</span>.</li>
+</ul>
+<p>Les deux valent 5. Si elles avaient différé, il y aurait une erreur, à coup sûr : c'est le contre-exemple de ton cours de logique, où une seule valeur qui ne marche pas suffit. Si elles sont égales, il n'y a très probablement pas d'erreur : une erreur qui tombe juste par hasard est rare. Pour plus de sûreté, teste deux valeurs.</p>
+<p>Choisis des valeurs simples, mais évite 0 et 1, qui cachent certaines erreurs : avec x = 1, <span class="mr">x²</span> et <span class="mr">x</span> valent tous les deux 1, et une confusion entre les deux passe inaperçue. Évite aussi une valeur qui annule une parenthèse (ici x = 2 annule <span class="mr">x − 2</span>, et le test ne vérifierait plus ce produit). Le labo de la partie 7 fait ce test pour toi, avec beaucoup de valeurs à la fois.</p>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 3)</p>
+<ol>
+<li>Développe : <span class="mr">4(2x − 3)</span> ; <span class="mr">−3(x + 5)</span> ; <span class="mr">x(2x − 7)</span>.<details><summary>Réponse</summary><div><span class="mr">8x − 12</span> ; <span class="mr">−3x − 15</span> ; <span class="mr">2x² − 7x</span>.</div></details></li>
+<li>Enlève les parenthèses et réduis : <span class="mr">8 − (3x − 5)</span> ; <span class="mr">2x + (x − 4)</span> ; <span class="mr">−(−x + 2)</span>.<details><summary>Réponse</summary><div><span class="mr">8 − 3x + 5 = −3x + 13</span> ; <span class="mr">3x − 4</span> ; <span class="mr">x − 2</span>.</div></details></li>
+<li>Développe et réduis : <span class="mr">(x + 3)(x + 4)</span> ; <span class="mr">(2x + 1)(x − 5)</span> ; <span class="mr">(x − 6)(3 − x)</span>.<details><summary>Réponse</summary><div><span class="mr">x² + 7x + 12</span> ; <span class="mw">2x² − 10x + x − 5 = 2x² − 9x − 5</span> ; <span class="mw">3x − x² − 18 + 6x = −x² + 9x − 18</span>.</div></details></li>
+<li>Développe et réduis <span class="mw">B = 2(x − 1) − (x + 3)(x − 1)</span>.<details><summary>Réponse</summary><div><span class="mw">B = 2x − 2 − (x² + 2x − 3) = 2x − 2 − x² − 2x + 3 = −x² + 1</span>.</div></details></li>
+<li>Vérifie ton résultat de la question 4 avec x = 3.<details><summary>Réponse</summary><div>Départ : <span class="mr">2 × 2 − 6 × 2 = 4 − 12 = −8</span>. Résultat : <span class="mr">−9 + 1 = −8</span>. Les deux concordent.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Les identités remarquables</h2>
+<p>Trois produits reviennent si souvent qu'on apprend leur développement par cœur, pour ne pas refaire la double distributivité à chaque fois. On les appelle les <b>identités remarquables</b> (special products). Ce sont des raccourcis, comme les fonctions toutes faites d'un langage : tu pourrais réécrire <code>sum()</code> avec une boucle, mais la connaître te fait gagner du temps. Et comme pour une fonction toute faite, tu dois savoir ce qu'il y a dedans : chacune se redémontre en trois lignes.</p>
+
+<h3>4.1 Le carré d'une somme</h3>
+<div class="steps">
+<span class="op"></span><span>(a + b)²</span>
+<span class="op">=</span><span>(a + b)(a + b)</span>
+<span class="why">Le carré d'un nombre, c'est ce nombre multiplié par lui-même.</span>
+<span class="op">=</span><span>a × a + a × b + b × a + b × b</span>
+<span class="why">La double distributivité : les 4 produits.</span>
+<span class="op">=</span><span>a² + 2ab + b²</span>
+<span class="why">ab et ba sont semblables : ab + ba = 2ab, le « double produit ».</span>
+</div>
+<div class="box key">
+<p class="lbl">Première identité</p>
+<p class="eq" style="margin:6px 0">(a + b)² = a² + 2ab + b²</p>
+</div>
+
+<div class="box widget" id="sq">
+<p class="lbl">Le carré, découpé</p>
+<p>Fais varier a et b. Le grand carré de côté <span class="mr">a + b</span> se découpe toujours en un carré <span class="mr">a²</span>, un carré <span class="mr">b²</span>, et <b>deux</b> rectangles <span class="mr">ab</span>.</p>
+<svg viewBox="0 0 300 300" role="img" aria-label="Carré de côté a plus b découpé en un carré a au carré, un carré b au carré et deux rectangles a fois b" id="sq-svg" style="display:block;width:100%;max-width:340px;height:auto;margin:6px auto 0">
+<rect id="sq-a2" x="30" y="30" width="156" height="156" class="st fsb"/>
+<rect id="sq-ab1" x="186" y="30" width="104" height="156" class="st fsg"/>
+<rect id="sq-ab2" x="30" y="186" width="156" height="104" class="st fsg"/>
+<rect id="sq-b2" x="186" y="186" width="104" height="104" class="st fsr"/>
+<text id="sq-t-a2" x="108" y="114" text-anchor="middle" class="mt">a²</text>
+<text id="sq-t-ab1" x="238" y="114" text-anchor="middle" class="mt">ab</text>
+<text id="sq-t-ab2" x="108" y="244" text-anchor="middle" class="mt">ab</text>
+<text id="sq-t-b2" x="238" y="244" text-anchor="middle" class="mt">b²</text>
+<text id="sq-top-a" x="108" y="22" text-anchor="middle" class="mt tb">a</text>
+<text id="sq-top-b" x="238" y="22" text-anchor="middle" class="mt tr">b</text>
+<text id="sq-left-a" x="16" y="114" text-anchor="middle" class="mt tb">a</text>
+<text id="sq-left-b" x="16" y="244" text-anchor="middle" class="mt tr">b</text>
+</svg>
+<div class="ctrl">
+<label for="sq-ra">a <span id="sq-va" class="mr">3</span></label>
+<input type="range" id="sq-ra" min="1" max="9" step="1" value="3">
+<label for="sq-rb">b <span id="sq-vb" class="mr">2</span></label>
+<input type="range" id="sq-rb" min="1" max="9" step="1" value="2">
+</div>
+<div class="readout" id="sq-out">
+<b>(a + b)²</b><span>= (3 + 2)² = 5² = 25</span>
+<b>a² + 2ab + b²</b><span>= 9 + 12 + 4 = 25</span>
+<b>a² + b²</b><span>= 13 : il manque 2ab = 12</span>
+</div>
+</div>
+
+<div class="box warn">
+<p class="lbl">(a + b)² n'est pas a² + b²</p>
+<p>C'est l'erreur la plus fréquente de tout le calcul littéral, au lycée comme en licence. Un contre-exemple suffit à la réfuter : <span class="mr">(3 + 4)² = 7² = 49</span>, alors que <span class="mr">3² + 4² = 9 + 16 = 25</span>. Il manque <span class="mr">2 × 3 × 4 = 24</span> : les deux rectangles du dessin. Le carré se distribue sur un produit, <span class="mr">(ab)² = a²b²</span>, mais jamais sur une somme.</p>
+</div>
+
+<h3>4.2 Le carré d'une différence</h3>
+<div class="steps">
+<span class="op"></span><span>(a − b)²</span>
+<span class="op">=</span><span>(a − b)(a − b)</span>
+<span class="op">=</span><span>a × a + a × (−b) + (−b) × a + (−b) × (−b)</span>
+<span class="op">=</span><span>a² − ab − ab + b²</span>
+<span class="why">(−b) × (−b) = b² : moins par moins donne plus.</span>
+<span class="op">=</span><span>a² − 2ab + b²</span>
+</div>
+<div class="box key">
+<p class="lbl">Deuxième identité</p>
+<p class="eq" style="margin:6px 0">(a − b)² = a² − 2ab + b²</p>
+<p>Seul le double produit change de signe. Le dernier terme, <span class="mr">b²</span>, reste positif. C'est d'ailleurs la première identité, avec −b à la place de b.</p>
+</div>
+
+<h3>4.3 Le produit d'une somme par une différence</h3>
+<div class="steps">
+<span class="op"></span><span>(a + b)(a − b)</span>
+<span class="op">=</span><span>a² − ab + ba − b²</span>
+<span class="op">=</span><span>a² − b²</span>
+<span class="why">Les deux termes du milieu s'annulent : −ab + ba = 0. Il ne reste que deux termes.</span>
+</div>
+<div class="box key">
+<p class="lbl">Troisième identité</p>
+<p class="eq" style="margin:6px 0">(a + b)(a − b) = a² − b²</p>
+</div>
+<p>Elle donne des calculs mentaux spectaculaires : <span class="mw">49 × 51 = (50 − 1)(50 + 1) = 50² − 1² = 2 500 − 1 = 2 499</span>, et <span class="mw">98 × 102 = 100² − 2² = 10 000 − 4 = 9 996</span>.</p>
+
+<div class="tw"><table>
+<tr><th>Identité</th><th>Son nom</th><th>Exemple</th></tr>
+<tr><td class="mr">(a + b)² = a² + 2ab + b²</td><td>le carré d'une somme</td><td class="mr">(x + 3)² = x² + 6x + 9</td></tr>
+<tr><td class="mr">(a − b)² = a² − 2ab + b²</td><td>le carré d'une différence</td><td class="mr">(x − 5)² = x² − 10x + 25</td></tr>
+<tr><td class="mr">(a + b)(a − b) = a² − b²</td><td>le produit d'une somme par une différence</td><td class="mr">(x + 4)(x − 4) = x² − 16</td></tr>
+</table></div>
+
+<h3>4.4 Reconnaître a et b</h3>
+<p>Dans les identités, a et b peuvent être n'importe quoi : un nombre, x, 3x, ou toute une expression. Il faut d'abord reconnaître la forme, puis identifier a et b. C'est du filtrage par motif (pattern matching), comme le <code>match</code> de ta cheatsheet Racket : on compare l'expression au modèle <span class="mr">(a + b)²</span>, et on en déduit ce que valent a et b. Ensuite, on remplace a et b par leurs valeurs, <b>entre parenthèses</b>, comme pour évaluer une expression (2.3).</p>
+<div class="steps">
+<span class="op"></span><span>(3x + 5)²</span>
+<span class="why">C'est la forme (a + b)², avec a = 3x et b = 5.</span>
+<span class="op">=</span><span>(3x)² + 2 × 3x × 5 + 5²</span>
+<span class="op">=</span><span>9x² + 30x + 25</span>
+<span class="why">(3x)² = 3x × 3x = 9x² : le carré porte aussi sur le 3. L'erreur classique est d'écrire 3x².</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>(2x − 5)² = (2x)² − 2 × 2x × 5 + 5² = 4x² − 20x + 25</span>
+<span class="op"></span><span>(3x − 2)(3x + 2) = (3x)² − 2² = 9x² − 4</span>
+<span class="op"></span><span>101² = (100 + 1)² = 10 000 + 200 + 1 = 10 201</span>
+</div>
+<p>En programmation, une identité remarquable est une fonction dont on connaît la sortie : <code>carre_somme(a, b)</code> renvoie <span class="mr">a² + 2ab + b²</span>. L'appeler avec a = 3x et b = 5, c'est exactement le calcul ci-dessus.</p>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 4)</p>
+<ol>
+<li>Développe avec une identité : <span class="mr">(x + 7)²</span> ; <span class="mr">(x − 4)²</span> ; <span class="mr">(x + 6)(x − 6)</span>.<details><summary>Réponse</summary><div><span class="mr">x² + 14x + 49</span> ; <span class="mr">x² − 8x + 16</span> ; <span class="mr">x² − 36</span>.</div></details></li>
+<li>Développe : <span class="mr">(2x + 3)²</span> ; <span class="mr">(5x − 1)²</span> ; <span class="mr">(4 − 3x)(4 + 3x)</span>.<details><summary>Réponse</summary><div><span class="mr">4x² + 12x + 9</span> ; <span class="mr">25x² − 10x + 1</span> ; <span class="mr">16 − 9x²</span> (ici a = 4 et b = 3x).</div></details></li>
+<li>Un camarade écrit <span class="mr">(x + 5)² = x² + 25</span>. Donne une valeur de x qui prouve qu'il a tort.<details><summary>Réponse</summary><div>Avec x = 1 : <span class="mr">(1 + 5)² = 36</span>, mais <span class="mr">1 + 25 = 26</span>. N'importe quelle valeur non nulle convient. Attention, x = 0 ne prouve rien : les deux côtés valent 25, parce que le terme oublié, <span class="mr">10x</span>, est nul.</div></details></li>
+<li>Calcule de tête <span class="mr">31²</span>, puis <span class="mr">29 × 31</span>.<details><summary>Réponse</summary><div><span class="mw">(30 + 1)² = 900 + 60 + 1 = 961</span> ; <span class="mw">(30 − 1)(30 + 1) = 900 − 1 = 899</span>.</div></details></li>
+<li>Développe et réduis <span class="mr">(x + 2)² − (x − 2)²</span>.<details><summary>Réponse</summary><div><span class="mw">x² + 4x + 4 − (x² − 4x + 4) = x² + 4x + 4 − x² + 4x − 4 = 8x</span>. Garde bien la deuxième identité entre parenthèses, à cause du signe moins.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Factoriser</h2>
+
+<h3>5.1 Ce que veut dire factoriser</h3>
+<p><b>Factoriser</b> (factor), c'est transformer une somme en produit : le chemin inverse du développement. On part de <span class="mr">ka + kb</span>, et on revient à <span class="mr">k(a + b)</span>. C'est la distributivité, lue de droite à gauche.</p>
+<p>En programmation, tu factorises quand un morceau de code se répète à plusieurs endroits et que tu le mets en commun dans une variable ou une fonction : c'est le principe DRY (Don't Repeat Yourself). En maths, c'est pareil : on repère le facteur qui se répète dans chaque terme, et on le met en commun, devant une parenthèse.</p>
+<p>Pourquoi se donner ce mal ? Parce qu'un produit dit des choses qu'une somme cache. L'équation <span class="mr">x² − 5x = 0</span> ne se résout pas directement, mais sous la forme <span class="mr">x(x − 5) = 0</span>, elle se résout en une ligne (partie 6.4). Tu factoriseras aussi pour étudier le signe d'une expression, dans le prochain cours, et pour simplifier des fractions.</p>
+
+<h3>5.2 Première méthode : le facteur commun</h3>
+<div class="redac">
+<p><b>La méthode</b></p>
+<p>1. Écris chaque terme comme un produit, de façon à faire apparaître ce qui se répète.</p>
+<p>2. Repère le facteur commun à tous les termes.</p>
+<p>3. Écris-le devant une parenthèse, et mets dans la parenthèse ce qui reste de chaque terme.</p>
+<p>4. Vérifie en redéveloppant.</p>
+</div>
+<div class="steps">
+<span class="op"></span><span>5x + 10 = 5 × x + 5 × 2 = 5(x + 2)</span>
+<span class="op"></span><span>x² + 7x = x × x + 7 × x = x(x + 7)</span>
+<span class="op"></span><span>6x² − 9x = 3x × 2x − 3x × 3 = 3x(2x − 3)</span>
+<span class="why">On prend le plus grand facteur commun. 3(2x² − 3x) est juste, mais pas fini : il reste un facteur x commun dans la parenthèse.</span>
+<span class="op"></span><span>4x + 4 = 4 × x + 4 × 1 = 4(x + 1)</span>
+<span class="why">Le 1 est indispensable : quand un terme est égal au facteur commun, il laisse 1 dans la parenthèse, pas 0 et pas rien. Vérification : 4(x + 1) = 4x + 4.</span>
+</div>
+
+<h4>Quand le facteur commun est une parenthèse</h4>
+<p>Le facteur commun peut être une expression entière. Pour le voir, donne-lui un nom, comme à une variable en programmation : appelons A l'expression <span class="mr">x + 1</span>.</p>
+<div class="steps">
+<span class="op"></span><span>(x + 1)(2x − 3) + (x + 1)(x + 4)</span>
+<span class="op">=</span><span>A(2x − 3) + A(x + 4)</span>
+<span class="why">Avec A = x + 1, le facteur commun saute aux yeux.</span>
+<span class="op">=</span><span>A[(2x − 3) + (x + 4)]</span>
+<span class="op">=</span><span>(x + 1)(3x + 1)</span>
+<span class="why">On remet x + 1 à la place de A, et on réduit le crochet : 2x − 3 + x + 4 = 3x + 1.</span>
+</div>
+<p>Avec un signe moins entre les deux produits, garde le deuxième reste entre parenthèses : le signe moins s'applique à tout ce qu'il contient.</p>
+<div class="steps">
+<span class="op"></span><span>(x − 2)(x + 5) − (x − 2)(3x − 1)</span>
+<span class="op">=</span><span>(x − 2)[(x + 5) − (3x − 1)]</span>
+<span class="op">=</span><span>(x − 2)(x + 5 − 3x + 1)</span>
+<span class="why">Le signe moins change les signes de 3x et de −1.</span>
+<span class="op">=</span><span>(x − 2)(−2x + 6)</span>
+</div>
+<p>On peut aller plus loin, puisque <span class="mr">−2x + 6 = 2(3 − x)</span> : l'expression vaut aussi <span class="mr">2(x − 2)(3 − x)</span>. Un facteur commun peut aussi se cacher dans un carré, puisque <span class="mr">(x + 3)² = (x + 3)(x + 3)</span> :</p>
+<div class="steps">
+<span class="op"></span><span>(x + 3)² + 2(x + 3)</span>
+<span class="op">=</span><span>(x + 3)(x + 3) + 2(x + 3)</span>
+<span class="op">=</span><span>(x + 3)[(x + 3) + 2]</span>
+<span class="op">=</span><span>(x + 3)(x + 5)</span>
+</div>
+
+<h3>5.3 Deuxième méthode : les identités remarquables à l'envers</h3>
+<p>Quand il n'y a pas de facteur commun, la deuxième piste est de reconnaître une identité remarquable sous sa forme développée, et de remonter au produit.</p>
+<h4>Une différence de deux carrés : a² − b² = (a − b)(a + b)</h4>
+<div class="steps">
+<span class="op"></span><span>x² − 9 = x² − 3² = (x − 3)(x + 3)</span>
+<span class="op"></span><span>4x² − 25 = (2x)² − 5² = (2x − 5)(2x + 5)</span>
+<span class="op"></span><span>(x + 1)² − 16 = (x + 1)² − 4² = [(x + 1) − 4][(x + 1) + 4] = (x − 3)(x + 5)</span>
+<span class="why">Dans le dernier exemple, a est toute l'expression x + 1.</span>
+</div>
+<h4>Trois termes, dont deux carrés : a² ± 2ab + b² = (a ± b)²</h4>
+<p>Pour <span class="mr">x² + 6x + 9</span> : <span class="mr">x²</span> est le carré de x, et 9 est le carré de 3. Reste à vérifier le terme du milieu : <span class="mr">2 × x × 3 = 6x</span>. C'est bien lui, donc <span class="mr">x² + 6x + 9 = (x + 3)²</span>. De même :</p>
+<p class="eq">4x² − 12x + 9 = (2x)² − 2 × 2x × 3 + 3² = (2x − 3)²</p>
+<div class="box warn">
+<p class="lbl">Vérifie toujours le terme du milieu</p>
+<p><span class="mr">x² + 5x + 9</span> contient bien deux carrés, <span class="mr">x²</span> et 9. Mais <span class="mr">2 × x × 3 = 6x</span>, et non 5x : ce n'est pas une identité remarquable.</p>
+<p>Et une <b>somme</b> de deux carrés, comme <span class="mr">x² + 9</span>, ne se factorise pas avec ces outils. Ne cherche pas : aucune identité ne donne <span class="mr">x² + 9</span>. Elle ne se factorise d'ailleurs pas du tout avec des nombres réels, puisque <span class="mr">x² + 9</span> n'est jamais nul.</p>
+</div>
+
+<h3>5.4 Le plan d'attaque</h3>
+<p>Face à une expression à factoriser, pose-toi les questions dans cet ordre :</p>
+<ol>
+<li>Y a-t-il un facteur commun à tous les termes (un nombre, x, une parenthèse) ? Si oui, mets-le en facteur.</li>
+<li>Sinon, est-ce une identité remarquable ? Deux carrés séparés par un moins : <span class="mr">a² − b²</span>. Trois termes, dont deux carrés : vérifie le double produit.</li>
+<li>Une fois un facteur sorti, regarde si ce qui reste se factorise encore.</li>
+<li>Vérifie toujours en redéveloppant, ou avec le labo.</li>
+</ol>
+<div class="steps">
+<span class="op"></span><span>3x² − 12</span>
+<span class="op">=</span><span>3(x² − 4)</span>
+<span class="why">Étape 1 : le facteur commun 3.</span>
+<span class="op">=</span><span>3(x − 2)(x + 2)</span>
+<span class="why">Étape 3 : ce qui reste est une différence de deux carrés.</span>
+</div>
+<p>Certaines expressions ne relèvent d'aucune de ces deux méthodes, et se factorisent pourtant : <span class="mr">x² + 5x + 6 = (x + 2)(x + 3)</span>. La méthode générale, avec le discriminant Δ, viendra dans le cours sur le second degré. D'ici là, retiens qu'on peut toujours vérifier une factorisation proposée en la développant.</p>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 5)</p>
+<ol>
+<li>Factorise : <span class="mr">7x − 14</span> ; <span class="mr">x² − 3x</span> ; <span class="mr">10x² + 15x</span> ; <span class="mr">2x + 2</span>.<details><summary>Réponse</summary><div><span class="mr">7(x − 2)</span> ; <span class="mr">x(x − 3)</span> ; <span class="mr">5x(2x + 3)</span> ; <span class="mr">2(x + 1)</span>.</div></details></li>
+<li>Factorise : <span class="mw">(x + 4)(x − 1) + (x + 4)(2x + 3)</span> ; <span class="mr">(2x − 1)² − (2x − 1)(x + 2)</span>.<details><summary>Réponse</summary><div><span class="mw">(x + 4)[(x − 1) + (2x + 3)] = (x + 4)(3x + 2)</span>. <span class="mw">(2x − 1)[(2x − 1) − (x + 2)] = (2x − 1)(x − 3)</span>.</div></details></li>
+<li>Factorise : <span class="mr">x² − 49</span> ; <span class="mr">9x² − 1</span> ; <span class="mr">x² − 10x + 25</span> ; <span class="mr">16x² + 8x + 1</span>.<details><summary>Réponse</summary><div><span class="mr">(x − 7)(x + 7)</span> ; <span class="mr">(3x − 1)(3x + 1)</span> ; <span class="mr">(x − 5)²</span> ; <span class="mr">(4x + 1)²</span>, car <span class="mr">2 × 4x × 1 = 8x</span>.</div></details></li>
+<li>Factorise complètement : <span class="mr">2x² − 18</span> ; <span class="mr">x³ − x</span>.<details><summary>Réponse</summary><div><span class="mr">2(x² − 9) = 2(x − 3)(x + 3)</span> ; <span class="mr">x(x² − 1) = x(x − 1)(x + 1)</span>.</div></details></li>
+<li>Un camarade factorise <span class="mr">6x + 6</span> en <span class="mr">6x</span>. Où est l'erreur ?<details><summary>Réponse</summary><div>Il a oublié le 1 : <span class="mw">6x + 6 = 6 × x + 6 × 1 = 6(x + 1)</span>. En redéveloppant <span class="mr">6x</span>, on ne retrouve pas <span class="mr">6x + 6</span> : la vérification aurait montré l'erreur.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Résoudre une équation</h2>
+
+<h3>6.1 Qu'est-ce qu'une équation ?</h3>
+<p>Une <b>équation</b> (equation) est une égalité qui contient une <b>inconnue</b> (unknown), en général x. C'est une question : « pour quelles valeurs de x cette égalité est-elle vraie ? »</p>
+<p>Prenons <span class="mr">3x + 5 = 20</span>. Avec x = 5 : <span class="mr">3 × 5 + 5 = 20</span>, l'égalité est vraie, donc 5 est une <b>solution</b> (solution). Avec x = 2 : <span class="mr">3 × 2 + 5 = 11</span>, qui n'est pas 20, donc 2 n'est pas solution.</p>
+<p><b>Résoudre</b> l'équation, c'est trouver <b>toutes</b> ses solutions, sans en oublier, et sans en ajouter de fausses. On note S l'ensemble des solutions : ici, <span class="mr">S = {5}</span>. Ton cours de logique appelait ce genre de phrase un prédicat (partie 8.1) : « 3x + 5 = 20 » est une proposition avec un trou, vraie pour certaines valeurs de x et fausse pour les autres. Résoudre, c'est trouver exactement les valeurs qui la rendent vraie.</p>
+<div class="box nts">
+<p class="lbl">Pourquoi ne pas essayer toutes les valeurs ?</p>
+<p>En Python, tu pourrais chercher les solutions entières en les essayant toutes : <code>[x for x in range(-100, 101) if 3*x + 5 == 20]</code> donne <code>[5]</code>. Mais cette méthode rate les solutions qui ne sont pas entières, comme 7/2 ou √5, et celles qui sont hors de l'intervalle testé. Le calcul les trouve toutes, et prouve qu'il n'y en a pas d'autre.</p>
+</div>
+<p><b>Vérifier</b> une solution, c'est remplacer x par la valeur trouvée dans l'équation de départ : c'est le test de ta réponse. Fais-le à chaque fois.</p>
+
+<h3>6.2 La balance</h3>
+<p>Une équation est une balance à l'équilibre : les deux côtés du signe = pèsent la même chose. Pour trouver x, on transforme l'équation sans jamais rompre l'équilibre, jusqu'à ce que x soit seul d'un côté.</p>
+<figure>
+<svg viewBox="0 0 440 200" role="img" aria-label="Une balance à l'équilibre, avec 3x plus 5 sur le plateau de gauche et 20 sur le plateau de droite">
+<line x1="96" y1="56" x2="344" y2="56" class="st" style="stroke-width:3"/>
+<line x1="220" y1="56" x2="220" y2="168" class="st" style="stroke-width:3"/>
+<path d="M190,184 L250,184 L220,166 Z" class="fi"/>
+<circle cx="220" cy="56" r="5" class="fi"/>
+<path d="M110,56 L70,116 M110,56 L150,116 M330,56 L290,116 M330,56 L370,116" class="sm"/>
+<path d="M60,116 H160 Q110,142 60,116 Z" class="st fsb"/>
+<path d="M280,116 H380 Q330,142 280,116 Z" class="st fsb"/>
+<text x="110" y="106" text-anchor="middle" class="mt">3x + 5</text>
+<text x="330" y="106" text-anchor="middle" class="mt">20</text>
+</svg>
+<figcaption>On enlève 5 de chaque plateau : la balance reste à l'équilibre, et il reste <span class="mr">3x = 15</span>. On partage ensuite chaque plateau en trois : <span class="mr">x = 5</span>.</figcaption>
+</figure>
+<div class="box key">
+<p class="lbl">Les deux règles de la balance</p>
+<p><b>1.</b> On peut ajouter ou soustraire le même nombre, ou la même expression, des deux côtés.</p>
+<p><b>2.</b> On peut multiplier ou diviser les deux côtés par le même nombre, à condition qu'il ne soit <b>pas nul</b>.</p>
+<p>Chaque étape donne une équation <b>équivalente</b> : elle a exactement les mêmes solutions que la précédente. C'est pour ça qu'on écrit ⇔ entre les lignes (ton cours de logique, partie 5).</p>
+</div>
+<p>Pourquoi « pas nul » ? Multiplier les deux côtés par 0 donne <span class="mr">0 = 0</span> : une égalité toujours vraie, qui ne dit plus rien sur x. Et diviser par 0 est impossible. Ces deux opérations détruisent l'information, comme écraser un fichier.</p>
+<p>Le raccourci « on fait passer de l'autre côté » cache ces deux règles. Un terme ajouté passe de l'autre côté en étant soustrait (règle 1) ; un facteur qui multiplie passe de l'autre côté en divisant (règle 2). L'erreur classique est de confondre les deux : dans <span class="mr">3x = 15</span>, le 3 multiplie x, il passe donc en divisant. <span class="mr">x = 15 ÷ 3 = 5</span>, et non <span class="mr">x = 15 − 3</span>.</p>
+
+<h3>6.3 Les équations du premier degré</h3>
+<p>Une équation est du <b>premier degré</b> quand x n'y apparaît qu'à la puissance 1 : pas de <span class="mr">x²</span>, pas de x au dénominateur.</p>
+<div class="redac">
+<p><b>La méthode</b></p>
+<p>1. Si besoin, développe et réduis chaque côté.</p>
+<p>2. Regroupe les termes en x d'un côté, et les nombres seuls de l'autre (règle 1).</p>
+<p>3. Divise par le coefficient de x (règle 2).</p>
+<p>4. Vérifie dans l'équation de départ.</p>
+</div>
+<div class="steps">
+<span class="op"></span><span>3x + 5 = 20</span>
+<span class="op">⇔</span><span>3x = 15</span>
+<span class="why">On soustrait 5 des deux côtés.</span>
+<span class="op">⇔</span><span>x = 5</span>
+<span class="why">On divise les deux côtés par 3. S = {5}.</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>7x − 4 = 3x + 10</span>
+<span class="op">⇔</span><span>7x − 3x = 10 + 4</span>
+<span class="why">On soustrait 3x et on ajoute 4 des deux côtés : les x à gauche, les nombres à droite.</span>
+<span class="op">⇔</span><span>4x = 14</span>
+<span class="op">⇔</span><span>x = 14/4 = 7/2</span>
+<span class="why">Vérification : 7 × 7/2 − 4 = 41/2, et 3 × 7/2 + 10 = 41/2. S = {7/2}.</span>
+</div>
+<p>Garde la fraction exacte, 7/2, ou 3,5. Pour une solution comme 7/3, une valeur approchée, 2,33, serait fausse : 7/3 n'est pas égal à 2,33.</p>
+<div class="steps">
+<span class="op"></span><span>2(x − 3) = 4x + 1</span>
+<span class="op">⇔</span><span>2x − 6 = 4x + 1</span>
+<span class="why">On développe d'abord.</span>
+<span class="op">⇔</span><span>2x − 4x = 1 + 6</span>
+<span class="op">⇔</span><span>−2x = 7</span>
+<span class="op">⇔</span><span>x = −7/2</span>
+<span class="why">On divise par −2 : le signe moins fait partie du coefficient. Vérification : 2(−7/2 − 3) = −13 et 4 × (−7/2) + 1 = −13.</span>
+</div>
+<p>Avec des fractions, commence par multiplier les deux côtés par un multiple commun des dénominateurs : elles disparaissent.</p>
+<div class="steps">
+<span class="op"></span><span>x/3 + 1/2 = 2</span>
+<span class="op">⇔</span><span>6 × x/3 + 6 × 1/2 = 6 × 2</span>
+<span class="why">On multiplie les deux côtés par 6, multiple de 3 et de 2. Chaque terme est multiplié, pas seulement le premier.</span>
+<span class="op">⇔</span><span>2x + 3 = 12</span>
+<span class="op">⇔</span><span>2x = 9</span>
+<span class="op">⇔</span><span>x = 9/2</span>
+<span class="why">Vérification : (9/2) ÷ 3 = 3/2, et 3/2 + 1/2 = 2.</span>
+</div>
+<div class="box nts">
+<p class="lbl">Quand les x disparaissent</p>
+<p><span class="mr">2x + 3 = 2x + 5 ⇔ 0 = 2</span> : c'est faux, quelle que soit la valeur de x. L'équation n'a aucune solution : <span class="mr">S = ∅</span>, l'ensemble vide.</p>
+<p><span class="mr">3(x + 2) = 3x + 6 ⇔ 0 = 0</span> : c'est vrai pour tout x. Tous les nombres réels sont solutions : <span class="mr">S = ℝ</span>. L'« équation » était en fait une identité, comme celles de la partie 4.</p>
+</div>
+
+<h3 id="p6-pn">6.4 L'équation produit nul</h3>
+<div class="box key">
+<p class="lbl">La propriété du produit nul (zero product property)</p>
+<p class="eq" style="margin:6px 0">A × B = 0 &nbsp;⇔&nbsp; A = 0 ou B = 0</p>
+<p>Un produit est nul si et seulement si l'un de ses facteurs est nul.</p>
+</div>
+<p>Pourquoi ? Deux nombres non nuls ont toujours un produit non nul. Donc, si un produit est nul, au moins un de ses facteurs l'est. Le « ou » est celui de ton cours de logique : inclusif. Les deux facteurs peuvent être nuls en même temps.</p>
+<div class="steps">
+<span class="op"></span><span>(x − 2)(3x + 1) = 0</span>
+<span class="op">⇔</span><span>x − 2 = 0 &nbsp;ou&nbsp; 3x + 1 = 0</span>
+<span class="op">⇔</span><span>x = 2 &nbsp;ou&nbsp; x = −1/3</span>
+<span class="why">S = {−1/3 ; 2}. Deux équations du premier degré ont remplacé une équation difficile.</span>
+</div>
+<p>C'est tout l'intérêt de factoriser : un produit nul se découpe en équations simples, alors qu'une somme nulle ne se découpe pas.</p>
+<div class="box warn">
+<p class="lbl">Ça ne marche qu'avec 0</p>
+<p><span class="mr">A × B = 6</span> ne donne pas « A = 6 ou B = 6 » : <span class="mr">2 × 3 = 6</span>, et aucun des deux facteurs ne vaut 6. Seul le zéro a cette propriété.</p>
+</div>
+
+<h4>La stratégie pour les équations avec des x²</h4>
+<div class="redac">
+<p>1. Ramène tout du même côté, pour obtenir « … = 0 ».</p>
+<p>2. Factorise ce côté (partie 5).</p>
+<p>3. Applique le produit nul.</p>
+</div>
+<div class="steps">
+<span class="op"></span><span>x² = 5x</span>
+<span class="op">⇔</span><span>x² − 5x = 0</span>
+<span class="why">On soustrait 5x des deux côtés.</span>
+<span class="op">⇔</span><span>x(x − 5) = 0</span>
+<span class="why">Le facteur commun x.</span>
+<span class="op">⇔</span><span>x = 0 &nbsp;ou&nbsp; x = 5</span>
+<span class="why">S = {0 ; 5}.</span>
+</div>
+<div class="box warn">
+<p class="lbl">Ne divise jamais par une expression qui peut être nulle</p>
+<p>La tentation est de diviser les deux côtés de <span class="mr">x² = 5x</span> par x, pour obtenir <span class="mr">x = 5</span>. Mais on vient de perdre la solution 0 : quand x vaut 0, diviser par x, c'est diviser par 0, ce que la règle 2 interdit. Le produit nul ne perd aucune solution.</p>
+</div>
+<div class="steps">
+<span class="op"></span><span>(x + 1)(2x − 3) = (x + 1)(x + 4)</span>
+<span class="op">⇔</span><span>(x + 1)(2x − 3) − (x + 1)(x + 4) = 0</span>
+<span class="op">⇔</span><span>(x + 1)[(2x − 3) − (x + 4)] = 0</span>
+<span class="op">⇔</span><span>(x + 1)(x − 7) = 0</span>
+<span class="op">⇔</span><span>x = −1 &nbsp;ou&nbsp; x = 7</span>
+<span class="why">Diviser par (x + 1) aurait fait perdre la solution −1.</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>x² − 9 = 0 ⇔ (x − 3)(x + 3) = 0 ⇔ x = 3 ou x = −3</span>
+<span class="op"></span><span>4x² − 12x + 9 = 0 ⇔ (2x − 3)² = 0 ⇔ 2x − 3 = 0 ⇔ x = 3/2</span>
+<span class="why">Un carré est nul seulement si ce qu'il contient est nul : une seule solution.</span>
+</div>
+
+<h3 id="p6-carre">6.5 Les équations x² = a</h3>
+<p>Combien de nombres ont pour carré 49 ? Deux : 7 et −7. Plus généralement :</p>
+<div class="box key">
+<p class="lbl">Les solutions de x² = a</p>
+<p>Si <span class="mr">a > 0</span> : <span class="mr">x = √a</span> ou <span class="mr">x = −√a</span>, deux solutions.</p>
+<p>Si <span class="mr">a = 0</span> : <span class="mr">x = 0</span>, une seule solution.</p>
+<p>Si <span class="mr">a &lt; 0</span> : aucune solution, puisqu'un carré n'est jamais négatif.</p>
+</div>
+<p>Pourquoi, pour a positif ? <span class="mw">x² = a ⇔ x² − (√a)² = 0 ⇔ (x − √a)(x + √a) = 0</span> : une différence de deux carrés (5.3), puis le produit nul.</p>
+<div class="steps">
+<span class="op"></span><span>x² = 49 ⇔ x = 7 ou x = −7</span>
+<span class="op"></span><span>x² = 5 ⇔ x = √5 ou x = −√5</span>
+<span class="op"></span><span>x² = −4 : aucune solution, S = ∅</span>
+<span class="op"></span><span>2x² − 18 = 0 ⇔ 2x² = 18 ⇔ x² = 9 ⇔ x = 3 ou x = −3</span>
+<span class="op"></span><span>(x − 1)² = 16 ⇔ x − 1 = 4 ou x − 1 = −4 ⇔ x = 5 ou x = −3</span>
+<span class="why">Dans la dernière, c'est x − 1 qui joue le rôle de x.</span>
+</div>
+<div class="box warn">
+<p class="lbl">N'oublie pas la solution négative</p>
+<p>Écrire seulement « x = 7 » pour <span class="mr">x² = 49</span> oublie une solution. L'erreur vient de la racine : <span class="mr">√49</span> vaut seulement 7 (partie 1.5), mais l'équation <span class="mr">x² = 49</span> a deux solutions.</p>
+</div>
+
+<h3>6.6 Les équations avec x au dénominateur</h3>
+<p>Quand x apparaît au dénominateur, certaines valeurs de x sont interdites : celles qui annulent un dénominateur, puisqu'on ne divise pas par 0. On les appelle les <b>valeurs interdites</b> (excluded values). Une valeur interdite ne peut jamais être solution, même si le calcul la fait apparaître.</p>
+<div class="box key">
+<p class="lbl">Un quotient nul</p>
+<p class="eq" style="margin:6px 0">A/B = 0 &nbsp;⇔&nbsp; A = 0 et B ≠ 0</p>
+<p>Une fraction est nulle quand son numérateur est nul, à condition que son dénominateur ne le soit pas.</p>
+</div>
+<div class="redac">
+<p><b>La méthode</b></p>
+<p>1. Cherche les valeurs interdites : celles qui annulent un dénominateur.</p>
+<p>2. Résous l'équation.</p>
+<p>3. Retire des solutions trouvées les valeurs interdites.</p>
+</div>
+<p><b>Exemple 1</b> : <span class="mr">(x − 3)/(x + 2) = 0</span>. Valeur interdite : <span class="mr">x + 2 = 0 ⇔ x = −2</span>. Numérateur nul : <span class="mr">x − 3 = 0 ⇔ x = 3</span>, qui n'est pas interdite. <span class="mr">S = {3}</span>.</p>
+<p><b>Exemple 2</b> : <span class="mr">(x² − 4)/(x − 2) = 0</span>. Valeur interdite : x = 2. Numérateur nul : <span class="mw">x² − 4 = 0 ⇔ (x − 2)(x + 2) = 0 ⇔ x = 2 ou x = −2</span>. Mais 2 est interdite : en x = 2, l'expression n'existe même pas, et Python lèverait <code>ZeroDivisionError</code>. <span class="mr">S = {−2}</span>.</p>
+<p><b>Exemple 3</b> : <span class="mr">(2x + 1)/(x − 1) = 3</span>. Valeur interdite : x = 1. Pour x ≠ 1, le facteur <span class="mr">x − 1</span> n'est pas nul, et la règle 2 permet de multiplier les deux côtés par lui :</p>
+<div class="steps">
+<span class="op"></span><span>(2x + 1)/(x − 1) = 3</span>
+<span class="op">⇔</span><span>2x + 1 = 3(x − 1)</span>
+<span class="why">On multiplie les deux côtés par (x − 1), non nul puisque x ≠ 1.</span>
+<span class="op">⇔</span><span>2x + 1 = 3x − 3</span>
+<span class="op">⇔</span><span>−x = −4</span>
+<span class="op">⇔</span><span>x = 4</span>
+<span class="why">4 n'est pas interdite. Vérification : (2 × 4 + 1)/(4 − 1) = 9/3 = 3. S = {4}.</span>
+</div>
+
+<h3>6.7 Le plan d'attaque</h3>
+<div class="tw"><table>
+<tr><th>L'équation contient…</th><th>La méthode</th><th>Exemple</th></tr>
+<tr><td>x seulement à la puissance 1</td><td>premier degré : isoler x (6.3)</td><td class="mr">7x − 4 = 3x + 10</td></tr>
+<tr><td>des x², ou des produits de parenthèses</td><td>tout d'un côté, factoriser, produit nul (6.4)</td><td class="mr">x² = 5x</td></tr>
+<tr><td>la forme x² = un nombre</td><td>deux, une ou aucune solution (6.5)</td><td class="mr">x² = 49</td></tr>
+<tr><td>x au dénominateur</td><td>les valeurs interdites d'abord (6.6)</td><td class="mr">(2x + 1)/(x − 1) = 3</td></tr>
+</table></div>
+<p>Dans tous les cas, finis en vérifiant tes solutions dans l'équation de départ. Et si une équation avec des x² ne se factorise avec aucun des outils de la partie 5, comme <span class="mr">x² + 5x + 6 = 0</span> tant que tu ne vois pas sa factorisation, attends le cours sur le second degré : le discriminant la résout à coup sûr.</p>
+
+<div class="check">
+<p class="lbl">Vérifie-toi (partie 6)</p>
+<ol>
+<li>Résous : <span class="mr">5x − 3 = 12</span> ; <span class="mr">4 − 2x = 10</span> ; <span class="mr">3x + 7 = x − 5</span>.<details><summary>Réponse</summary><div><span class="mr">5x = 15 ⇔ x = 3</span> ; <span class="mr">−2x = 6 ⇔ x = −3</span> ; <span class="mr">2x = −12 ⇔ x = −6</span>.</div></details></li>
+<li>Résous : <span class="mr">3(x + 2) = 5x − 4</span> ; <span class="mr">x/2 − 1/3 = 1</span>.<details><summary>Réponse</summary><div><span class="mw">3x + 6 = 5x − 4 ⇔ −2x = −10 ⇔ x = 5</span>. En multipliant par 6 : <span class="mw">3x − 2 = 6 ⇔ 3x = 8 ⇔ x = 8/3</span>.</div></details></li>
+<li>Résous : <span class="mr">(2x − 6)(x + 5) = 0</span> ; <span class="mr">x² + 4x = 0</span> ; <span class="mr">x² − 25 = 0</span>.<details><summary>Réponse</summary><div><span class="mr">x = 3</span> ou <span class="mr">x = −5</span> ; <span class="mr">x(x + 4) = 0</span>, donc <span class="mr">x = 0</span> ou <span class="mr">x = −4</span> ; <span class="mr">(x − 5)(x + 5) = 0</span>, donc <span class="mr">x = 5</span> ou <span class="mr">x = −5</span>.</div></details></li>
+<li>Résous : <span class="mr">x² = 81</span> ; <span class="mr">x² = 7</span> ; <span class="mr">x² + 1 = 0</span> ; <span class="mr">(x + 2)² = 9</span>.<details><summary>Réponse</summary><div><span class="mr">x = 9</span> ou <span class="mr">x = −9</span> ; <span class="mr">x = √7</span> ou <span class="mr">x = −√7</span> ; aucune solution, car <span class="mr">x² = −1</span> ; <span class="mr">x + 2 = 3</span> ou <span class="mr">x + 2 = −3</span>, donc <span class="mr">x = 1</span> ou <span class="mr">x = −5</span>.</div></details></li>
+<li>Résous : <span class="mr">(x + 4)/(x − 1) = 0</span> ; <span class="mr">(x² − 1)/(x + 1) = 0</span>.<details><summary>Réponse</summary><div>Valeur interdite 1, numérateur nul pour <span class="mr">x = −4</span> : <span class="mr">S = {−4}</span>. Valeur interdite −1 ; le numérateur s'annule pour 1 et pour −1, mais −1 est interdite : <span class="mr">S = {1}</span>.</div></details></li>
+<li>Pourquoi est-ce une erreur de diviser par x les deux côtés de <span class="mr">x² = 3x</span> ? Résous correctement.<details><summary>Réponse</summary><div>Quand x vaut 0, diviser par x, c'est diviser par 0 : on perd la solution 0. Correctement : <span class="mw">x² − 3x = 0 ⇔ x(x − 3) = 0 ⇔ x = 0 ou x = 3</span>.</div></details></li>
+</ol>
+</div>
+</section>
+
+<!-- ============ PARTIE 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Le labo : vérifie tes calculs</h2>
+<p>Le labo fait pour toi le test de la partie 3.5, avec beaucoup de valeurs à la fois. Il ne donne pas les réponses : il te dit si la tienne est juste, comme le fichier d'autocorrection de ton cours de Racket. Utilise-le après avoir fini un calcul à la main, jamais à sa place.</p>
+
+<div class="box widget" id="lab">
+<div class="lab-tabs" role="group" aria-label="Choisir le test">
+<button type="button" id="tab-cmp" aria-pressed="true">Deux expressions sont-elles égales ?</button>
+<button type="button" id="tab-sol" aria-pressed="false">Une valeur est-elle solution ?</button>
+</div>
+
+<div id="pane-cmp">
+<div class="lab-row">
+<label for="lab-a">Expression de départ</label>
+<input id="lab-a" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="(x+3)^2">
+</div>
+<div class="lab-row">
+<label for="lab-b">Ton résultat (développé ou factorisé)</label>
+<input id="lab-b" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="x^2+9">
+</div>
+<p class="lbl" style="margin-top:6px">Exemples prêts à tester</p>
+<div class="presets" id="pre-cmp">
+<button type="button" data-a="(x+3)^2" data-b="x^2+9">(x + 3)² et x² + 9</button>
+<button type="button" data-a="(x+3)^2" data-b="x^2+6x+9">(x + 3)² et x² + 6x + 9</button>
+<button type="button" data-a="(2x-1)(x+4)" data-b="2x^2+7x-4">(2x − 1)(x + 4)</button>
+<button type="button" data-a="x^2-9" data-b="(x-3)(x+3)">x² − 9</button>
+<button type="button" data-a="(a+b)^2" data-b="a^2+2ab+b^2">(a + b)²</button>
+<button type="button" data-a="(x^2-4)/(x-2)" data-b="x+2">(x² − 4)/(x − 2)</button>
+</div>
+<p><button type="button" class="btn" id="go-cmp">Comparer</button></p>
+<div class="lab-out" id="out-cmp" aria-live="polite"></div>
+</div>
+
+<div id="pane-sol" hidden>
+<div class="lab-row">
+<label for="lab-eq">Équation</label>
+<input id="lab-eq" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="x^2 = 5x">
+</div>
+<div class="lab-row">
+<label for="lab-vals">Valeurs de x à tester</label>
+<input id="lab-vals" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="0 ; 5">
+<span class="hint">Sépare les valeurs par des points-virgules. Les fractions et les racines sont acceptées : 7/2 ; -1/3 ; sqrt(5).</span>
+</div>
+<p class="lbl" style="margin-top:6px">Exemples prêts à tester</p>
+<div class="presets" id="pre-sol">
+<button type="button" data-e="5x - 7 = 2x + 8" data-v="5">5x − 7 = 2x + 8</button>
+<button type="button" data-e="x^2 = 5x" data-v="0 ; 5">x² = 5x</button>
+<button type="button" data-e="x^2 = 49" data-v="7 ; -7">x² = 49</button>
+<button type="button" data-e="(x^2-4)/(x-2) = 0" data-v="2 ; -2">(x² − 4)/(x − 2) = 0</button>
+</div>
+<p><button type="button" class="btn" id="go-sol">Tester</button></p>
+<div class="lab-out" id="out-sol" aria-live="polite"></div>
+</div>
+</div>
+
+<div class="box nts">
+<p class="lbl">Comment écrire</p>
+<p><code>3x</code> ou <code>3*x</code> pour 3x ; <code>x^2</code> ou <code>x²</code> pour x² ; <code>(x+1)(x-1)</code> pour un produit de parenthèses ; <code>/</code> pour une fraction, avec des parenthèses autour du numérateur et du dénominateur s'ils contiennent plusieurs termes : <code>(x+1)/(x-2)</code> ; <code>sqrt(5)</code> ou <code>√5</code> pour une racine. Les virgules décimales sont acceptées : <code>2,5</code>. Tu peux utiliser d'autres lettres que x, par exemple a et b pour vérifier une identité.</p>
+<p>Le labo t'affiche aussi comment il a lu ce que tu as tapé : si sa lecture n'est pas celle que tu voulais, ajoute des parenthèses.</p>
+</div>
+<div class="box">
+<p class="lbl">Comment il décide</p>
+<p>Le labo remplace chaque lettre par une trentaine de valeurs, entières et décimales, et compare les résultats. Une seule différence suffit à prouver que deux expressions ne sont pas égales : il t'affiche alors la valeur en cause, pour que tu refasses le calcul à la main avec elle. Si toutes les valeurs concordent, tes deux expressions sont égales, avec une quasi-certitude : pour les calculs de ce cours, une erreur qui passerait tous ces tests est extrêmement improbable. Ce n'est pas une démonstration, c'est un test, comme les tests unitaires d'un programme.</p>
+<p>Pour une équation, il remplace x par chacune de tes valeurs, et compare les deux côtés. Il ne te dit pas si tu as trouvé <b>toutes</b> les solutions : ça, seul le calcul peut le garantir.</p>
+</div>
+</section>
+
+<!-- ============ PARTIE 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>La feuille d'entraînement</h2>
+<p>Les exercices sont rangés par thème, du plus facile au plus difficile : <span class="lvl lvl1">niveau 1</span> une application directe, <span class="lvl lvl2">niveau 2</span> deux étapes, <span class="lvl lvl3">niveau 3</span> de la réflexion. Fais-les sur papier, vérifie avec le labo, puis compare avec la solution. N'essaie pas de tout faire d'un coup : cinq exercices par jour, c'est très bien.</p>
+
+<h3>A. Les nombres</h3>
+<ol class="ex">
+<li>Calcule <span class="mr">18 − 3 × (4 − 6)²</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">(4 − 6)² = (−2)² = 4</span>, puis <span class="mr">3 × 4 = 12</span>, et <span class="mr">18 − 12 = 6</span>.</div></details></li>
+<li>Calcule <span class="mr">3/4 + 5/6</span>, puis <span class="mr">3/4 × 5/6</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">9/12 + 10/12 = 19/12</span> ; <span class="mr">15/24 = 5/8</span>.</div></details></li>
+<li>Calcule <span class="mr">(1/2 − 1/3) ÷ 1/4</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mr">1/2 − 1/3 = 3/6 − 2/6 = 1/6</span>, puis <span class="mw">1/6 ÷ 1/4 = 1/6 × 4 = 4/6 = 2/3</span>.</div></details></li>
+<li>Écris sous la forme d'une seule puissance de 2 : <span class="mr">2⁵ × 2³ ÷ 2⁴</span>, puis <span class="mr">(2²)³ × 2</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mr">2<sup>5 + 3 − 4</sup> = 2⁴</span> ; <span class="mr">2⁶ × 2¹ = 2⁷</span>.</div></details></li>
+<li>Démontre que <span class="mr">(−1) × (−1) = 1</span>, en calculant de deux façons <span class="mr">(−1) × (1 + (−1))</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div>D'un côté, <span class="mr">1 + (−1) = 0</span>, donc le produit vaut <span class="mr">(−1) × 0 = 0</span>. De l'autre, par distributivité, il vaut <span class="mw">(−1) × 1 + (−1) × (−1) = −1 + (−1) × (−1)</span>. Les deux calculs donnent le même nombre, donc <span class="mr">−1 + (−1) × (−1) = 0</span>, c'est-à-dire <span class="mr">(−1) × (−1) = 1</span>. La règle des signes est une conséquence de la distributivité.</div></details></li>
+</ol>
+
+<h3>B. Développer</h3>
+<ol class="ex" start="6" style="counter-reset:ex 5">
+<li>Développe et réduis <span class="mr">5(3x − 2) − 2(x + 4)</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">15x − 10 − 2x − 8 = 13x − 18</span>.</div></details></li>
+<li>Développe <span class="mr">(x + 6)(x − 2)</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mw">x² − 2x + 6x − 12 = x² + 4x − 12</span>.</div></details></li>
+<li>Développe <span class="mr">(3x − 2)(2x − 5)</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">6x² − 15x − 4x + 10 = 6x² − 19x + 10</span>. Le dernier produit, <span class="mr">(−2) × (−5)</span>, vaut +10.</div></details></li>
+<li>Développe et réduis <span class="mw">(x + 1)(x + 2) − (x − 3)(x + 4)</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">(x² + 3x + 2) − (x² + x − 12) = x² + 3x + 2 − x² − x + 12 = 2x + 14</span>.</div></details></li>
+<li>Développe <span class="mr">(x + 1)(x² − x + 1)</span>. Combien de produits faut-il écrire ? <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div>2 × 3 = 6 produits : <span class="mw">x³ − x² + x + x² − x + 1 = x³ + 1</span>. Presque tout s'annule.</div></details></li>
+</ol>
+
+<h3>C. Les identités remarquables</h3>
+<ol class="ex" style="counter-reset:ex 10">
+<li>Développe <span class="mr">(x + 9)²</span>, <span class="mr">(x − 1)²</span> et <span class="mr">(x − 8)(x + 8)</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">x² + 18x + 81</span> ; <span class="mr">x² − 2x + 1</span> ; <span class="mr">x² − 64</span>.</div></details></li>
+<li>Développe <span class="mr">(3x + 4)²</span>, <span class="mr">(2 − 5x)²</span> et <span class="mr">(x/2 + 1)(x/2 − 1)</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mr">9x² + 24x + 16</span> ; <span class="mr">4 − 20x + 25x²</span>, soit <span class="mr">25x² − 20x + 4</span> ; <span class="mr">(x/2)² − 1² = x²/4 − 1</span>.</div></details></li>
+<li>Calcule de tête <span class="mr">99²</span> et <span class="mr">103 × 97</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">(100 − 1)² = 10 000 − 200 + 1 = 9 801</span> ; <span class="mw">(100 + 3)(100 − 3) = 10 000 − 9 = 9 991</span>.</div></details></li>
+<li>Montre que, pour tout nombre n, <span class="mr">(n + 1)² − n² = 2n + 1</span>. Déduis-en <span class="mr">51²</span>, sachant que <span class="mr">50² = 2 500</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div><span class="mw">(n + 1)² − n² = n² + 2n + 1 − n² = 2n + 1</span>. Avec n = 50 : <span class="mw">51² = 50² + 2 × 50 + 1 = 2 500 + 101 = 2 601</span>.</div></details></li>
+</ol>
+
+<h3>D. Factoriser</h3>
+<ol class="ex" style="counter-reset:ex 14">
+<li>Factorise <span class="mr">12x + 18</span>, <span class="mr">5x² − x</span> et <span class="mr">8x³ + 4x²</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">6(2x + 3)</span> ; <span class="mr">x(5x − 1)</span> ; <span class="mr">4x²(2x + 1)</span>.</div></details></li>
+<li>Factorise <span class="mr">x² − 64</span>, <span class="mr">25 − x²</span> et <span class="mr">x² + 14x + 49</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">(x − 8)(x + 8)</span> ; <span class="mr">(5 − x)(5 + x)</span> ; <span class="mr">(x + 7)²</span>, car <span class="mr">2 × x × 7 = 14x</span>.</div></details></li>
+<li>Factorise <span class="mw">(3x + 1)(x − 2) − (3x + 1)(2x + 5)</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">(3x + 1)[(x − 2) − (2x + 5)] = (3x + 1)(x − 2 − 2x − 5) = (3x + 1)(−x − 7)</span>, qu'on peut aussi écrire <span class="mr">−(3x + 1)(x + 7)</span>.</div></details></li>
+<li>Factorise <span class="mr">(x − 4)² − 9</span> et <span class="mr">9x² − 6x + 1</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">[(x − 4) − 3][(x − 4) + 3] = (x − 7)(x − 1)</span> ; <span class="mw">(3x)² − 2 × 3x × 1 + 1² = (3x − 1)²</span>.</div></details></li>
+<li>Factorise <span class="mr">(2x + 3)² − (x + 1)²</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div>C'est <span class="mr">a² − b²</span> avec <span class="mr">a = 2x + 3</span> et <span class="mr">b = x + 1</span> : <span class="mw">[(2x + 3) − (x + 1)][(2x + 3) + (x + 1)] = (x + 2)(3x + 4)</span>.</div></details></li>
+<li>Factorise complètement <span class="mr">5x³ − 20x</span> et <span class="mr">x⁴ − 1</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div><span class="mw">5x(x² − 4) = 5x(x − 2)(x + 2)</span>. <span class="mw">x⁴ − 1 = (x²)² − 1² = (x² − 1)(x² + 1) = (x − 1)(x + 1)(x² + 1)</span> ; le dernier facteur, une somme de carrés, ne se factorise pas.</div></details></li>
+</ol>
+
+<h3>E. Les équations</h3>
+<ol class="ex" style="counter-reset:ex 20">
+<li>Résous <span class="mr">6x − 7 = 2x + 9</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mr">4x = 16 ⇔ x = 4</span>.</div></details></li>
+<li>Résous <span class="mr">4(2x − 1) = 3(x + 2)</span>. <span class="lvl lvl1">niveau 1</span><details><summary>Solution</summary><div><span class="mw">8x − 4 = 3x + 6 ⇔ 5x = 10 ⇔ x = 2</span>.</div></details></li>
+<li>Résous <span class="mr">(x + 1)/4 − x/6 = 1</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div>En multipliant par 12 : <span class="mw">3(x + 1) − 2x = 12 ⇔ 3x + 3 − 2x = 12 ⇔ x = 9</span>. Vérification : <span class="mr">10/4 − 9/6 = 2,5 − 1,5 = 1</span>.</div></details></li>
+<li>Résous <span class="mr">(4x − 3)(x + 7) = 0</span>, puis <span class="mr">3x² = 12x</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mr">x = 3/4</span> ou <span class="mr">x = −7</span>. Puis <span class="mw">3x² − 12x = 0 ⇔ 3x(x − 4) = 0 ⇔ x = 0 ou x = 4</span> ; diviser par x aurait perdu la solution 0.</div></details></li>
+<li>Résous <span class="mr">x² − 6x + 9 = 0</span>, puis <span class="mr">9x² = 4</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mr">(x − 3)² = 0 ⇔ x = 3</span>. Puis <span class="mw">x² = 4/9 ⇔ x = 2/3 ou x = −2/3</span>.</div></details></li>
+<li>Résous <span class="mw">(x − 1)(x + 2) = (x − 1)(3x − 4)</span>. <span class="lvl lvl2">niveau 2</span><details><summary>Solution</summary><div><span class="mw">(x − 1)[(x + 2) − (3x − 4)] = 0 ⇔ (x − 1)(−2x + 6) = 0 ⇔ x = 1 ou x = 3</span>.</div></details></li>
+<li>Résous <span class="mr">(x − 2)/(x + 3) = 2</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div>Valeur interdite : −3. Pour x ≠ −3 : <span class="mw">x − 2 = 2(x + 3) ⇔ x − 2 = 2x + 6 ⇔ −x = 8 ⇔ x = −8</span>. Vérification : <span class="mr">(−10)/(−5) = 2</span>.</div></details></li>
+<li>Résous <span class="mr">(x² − 9)/(x + 3) = 0</span>, puis <span class="mr">(x + 5)² = (2x + 1)²</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div>Valeur interdite −3 ; le numérateur s'annule pour 3 et −3, donc <span class="mr">S = {3}</span>. Puis <span class="mw">(x + 5)² − (2x + 1)² = 0 ⇔ [(x + 5) − (2x + 1)][(x + 5) + (2x + 1)] = 0 ⇔ (−x + 4)(3x + 6) = 0 ⇔ x = 4 ou x = −2</span>.</div></details></li>
+<li>Un rectangle a une longueur égale à sa largeur plus 3 cm, et une aire de 40 cm². Trouve ses dimensions. Indice : appelle x la largeur, et vérifie en développant que <span class="mw">x² + 3x − 40 = (x − 5)(x + 8)</span>. <span class="lvl lvl3">niveau 3</span><details><summary>Solution</summary><div><span class="mw">x(x + 3) = 40 ⇔ x² + 3x − 40 = 0 ⇔ (x − 5)(x + 8) = 0 ⇔ x = 5 ou x = −8</span>. Une largeur ne peut pas être négative : le rectangle mesure 5 cm sur 8 cm, et <span class="mr">5 × 8 = 40</span>. L'équation a deux solutions, mais le problème n'en garde qu'une.</div></details></li>
+</ol>
+
+<div class="box key">
+<p class="lbl">Avant de passer au cours suivant, tu dois pouvoir…</p>
+<ul>
+<li>appliquer les priorités et la règle des signes, et calculer avec des fractions, sans calculatrice ;</li>
+<li>dire si une expression est une somme ou un produit ;</li>
+<li>développer un produit de deux parenthèses sans erreur de signe ;</li>
+<li>réciter les trois identités remarquables, les redémontrer, et reconnaître a et b ;</li>
+<li>factoriser avec un facteur commun ou une identité remarquable, puis vérifier ;</li>
+<li>résoudre une équation du premier degré, une équation produit nul, une équation x² = a, et une équation avec x au dénominateur ;</li>
+<li>expliquer pourquoi on ne divise jamais les deux côtés d'une équation par x.</li>
+</ul>
+</div>
+
+<h3>Et ensuite ?</h3>
+<p>Le chapitre suivant de ta liste porte sur les inéquations et les tableaux de signes. Résoudre <span class="mr">3x − 6 > 0</span> ressemble beaucoup à résoudre une équation, à une différence près, qui piège tout le monde : multiplier ou diviser par un nombre négatif retourne le sens de l'inégalité. Les tableaux de signes, eux, reposent directement sur la partie 5 : pour connaître le signe d'un produit, on étudie le signe de chacun de ses facteurs. C'est pour ça qu'on factorise autant.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes questions et du programme de ta spécialisation en mathématiques (Fonctions élémentaires, Suites numériques), dans la continuité de « La logique, depuis le tout début ». Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ================= Test de positionnement ================= */
+  var QUIZ = [
+    {q:'<span class="mr">2 + 3 × 4</span> =', c:['20','14','24'], a:1, sec:'p1-prio', t:'1.1 Les priorités de calcul',
+     ok:'La multiplication passe avant l’addition : 2 + 12 = 14.',
+     ko:['Tu as calculé 2 + 3 en premier. La multiplication passe avant l’addition : 2 + 12 = 14.', '', 'La multiplication passe avant l’addition : 3 × 4 = 12, puis 2 + 12 = 14.']},
+    {q:'<span class="mr">10 − 4 − 3</span> =', c:['9','3','17'], a:1, sec:'p1-prio', t:'1.1 Les priorités de calcul',
+     ok:'De gauche à droite : 10 − 4 = 6, puis 6 − 3 = 3.',
+     ko:['Tu as calculé 4 − 3 en premier. Les soustractions se font de gauche à droite : 10 − 4 = 6, puis 6 − 3 = 3.', '', 'Les deux nombres sont soustraits : 10 − 4 = 6, puis 6 − 3 = 3.']},
+    {q:'<span class="mr">−2 − 5</span> =', c:['−7','3','−3','7'], a:0, sec:'p1-rel', t:'1.2 Les nombres relatifs',
+     ok:'Tu dois 2 €, tu dépenses encore 5 € : tu dois 7 €.',
+     ko:['', 'Tu dois 2 €, et tu dépenses encore 5 € : tu dois 7 €. Le résultat est −7.', 'Les deux nombres vont dans le même sens : une dette de 2, plus une dépense de 5, donne −7.', 'Tu dois 2 €, et tu dépenses encore 5 € : tu dois 7 €, donc −7.']},
+    {q:'<span class="mr">(−3) × (−5)</span> =', c:['−15','15','−8'], a:1, sec:'p1-rel', t:'1.2 Les nombres relatifs',
+     ok:'Deux facteurs négatifs donnent un produit positif.',
+     ko:['Deux facteurs de même signe donnent un produit positif : (−3) × (−5) = 15.', '', 'C’est une multiplication, pas une addition : 3 × 5 = 15, et moins par moins donne plus.']},
+    {q:'<span class="mr">10 − (3 − 1)</span> =', c:['6','8','12'], a:1, sec:'p1-rel', t:'1.2 Les nombres relatifs',
+     ok:'La parenthèse vaut 2, et 10 − 2 = 8.',
+     ko:['La parenthèse vaut 3 − 1 = 2, donc le résultat est 10 − 2 = 8. En enlevant la parenthèse, il faut changer tous ses signes : 10 − 3 + 1.', '', 'La parenthèse vaut 2, et on la soustrait : 10 − 2 = 8.']},
+    {q:'<span class="mr">1/2 + 1/3</span> =', c:['2/5','5/6','1/6'], a:1, sec:'p1-frac', t:'1.3 Les fractions',
+     ok:'Avec un dénominateur commun : 3/6 + 2/6 = 5/6.',
+     ko:['On n’additionne pas les numérateurs et les dénominateurs entre eux. Avec un dénominateur commun : 3/6 + 2/6 = 5/6. D’ailleurs, 2/5 est plus petit que 1/2 : impossible.', '', '1/6 est le produit 1/2 × 1/3. Pour l’addition, il faut un dénominateur commun : 3/6 + 2/6 = 5/6.']},
+    {q:'<span class="mr">2/3 ÷ 4/5</span> =', c:['8/15','5/6','6/5'], a:1, sec:'p1-frac', t:'1.3 Les fractions',
+     ok:'On multiplie par l’inverse : 2/3 × 5/4 = 10/12 = 5/6.',
+     ko:['8/15 est le produit 2/3 × 4/5. Diviser par 4/5, c’est multiplier par son inverse, 5/4 : 2/3 × 5/4 = 10/12 = 5/6.', '', 'Tu as retourné la mauvaise fraction. On garde 2/3, et on multiplie par l’inverse de 4/5 : 2/3 × 5/4 = 10/12 = 5/6.']},
+    {q:'<span class="mr">−3²</span> =', c:['9','−9','−6'], a:1, sec:'p1-pui', t:'1.4 Les puissances',
+     ok:'Le carré ne porte que sur 3 : −(3 × 3) = −9.',
+     ko:['Le carré ne porte que sur 3, pas sur le signe moins : −3² = −(3 × 3) = −9. C’est (−3)² qui vaut 9.', '', '3² veut dire 3 × 3, et non 3 × 2 : −3² = −9.']},
+    {q:'<span class="mr">2³ × 2⁴</span> =', c:['2⁷','2¹²','4⁷'], a:0, sec:'p1-pui', t:'1.4 Les puissances',
+     ok:'3 facteurs 2, puis 4 facteurs 2 : 7 facteurs en tout.',
+     ko:['', 'On compte les facteurs : 3 + 4 = 7, donc 2⁷. On multiplie les exposants seulement pour une puissance de puissance, comme (2³)⁴.', 'La base reste 2 : il y a 3 + 4 = 7 facteurs égaux à 2, donc 2⁷.']},
+    {q:'<span class="mr">√(9 + 16)</span> =', c:['7','5','25'], a:1, sec:'p1-rac', t:'1.5 La racine carrée',
+     ok:'√25 = 5, car 5² = 25.',
+     ko:['La racine d’une somme n’est pas la somme des racines : √(9 + 16) = √25 = 5, alors que √9 + √16 = 7.', '', '25 est ce qu’il y a sous la racine. √25 = 5, car 5² = 25.']}
+  ];
+  var answers = [];
+
+  function renderQuiz(){
+    var box = $('quiz'); if(!box) return;
+    box.innerHTML = ''; answers = []; $('quiz-sum').innerHTML = '';
+    QUIZ.forEach(function(item, i){
+      var d = document.createElement('div'); d.className = 'qz-item';
+      d.innerHTML = '<p class="qz-q">' + (i + 1) + '. ' + item.q + '</p><div class="qz-c"></div><p class="qz-fb"></p>';
+      var cbox = d.querySelector('.qz-c'), fb = d.querySelector('.qz-fb');
+      item.c.forEach(function(choice, j){
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = choice;
+        b.addEventListener('click', function(){
+          if (answers[i] !== undefined) return;
+          answers[i] = (j === item.a);
+          Array.prototype.forEach.call(cbox.querySelectorAll('button'), function(x, k){
+            x.disabled = true;
+            if (k === item.a) x.classList.add('ok');
+          });
+          if (j !== item.a){ b.classList.add('ko'); fb.innerHTML = '<span class="bad">Pas tout à fait.</span> ' + esc(item.ko[j] || ''); }
+          else { fb.innerHTML = '<span class="good">Juste.</span> ' + esc(item.ok); }
+          summary();
+        });
+        cbox.appendChild(b);
+      });
+      box.appendChild(d);
+    });
+  }
+  function summary(){
+    var done = 0, good = 0, miss = {}, order = [];
+    for (var i = 0; i < QUIZ.length; i++){
+      if (answers[i] === undefined) continue;
+      done++;
+      if (answers[i]) good++;
+      else {
+        var it = QUIZ[i];
+        if (!miss[it.sec]){ miss[it.sec] = {t: it.t, q: []}; order.push(it.sec); }
+        miss[it.sec].q.push(i + 1);
+      }
+    }
+    var out = $('quiz-sum');
+    if (done < QUIZ.length){ out.innerHTML = ''; return; }
+    var h = '<p><b>Score : ' + good + ' sur ' + QUIZ.length + '.</b></p>';
+    if (good === QUIZ.length){
+      h += '<p>Tout est juste. Lis la partie 1 en diagonale, puis commence vraiment à la partie 2.</p>';
+    } else {
+      h += '<p>À travailler en priorité :</p><ul>';
+      order.forEach(function(sec){
+        var m = miss[sec];
+        h += '<li><a href="#' + sec + '">' + esc(m.t) + '</a> (question' + (m.q.length > 1 ? 's ' : ' ') + m.q.join(' et ') + ')</li>';
+      });
+      h += '</ul>';
+      h += good <= 5
+        ? '<p>Prends le temps de lire toute la partie 1, et de faire ses questions : c’est elle qui rendra la suite facile.</p>'
+        : '<p>Lis ces sous-parties en entier ; le reste de la partie 1 peut se lire plus vite.</p>';
+    }
+    out.innerHTML = h;
+  }
+  if ($('quiz')){
+    renderQuiz();
+    $('quiz-reset').addEventListener('click', renderQuiz);
+  }
+
+  /* ================= Le carré (a + b)² ================= */
+  var ra = $('sq-ra'), rb = $('sq-rb');
+  function setR(id, x, y, w, h){ var r = $(id); r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', w); r.setAttribute('height', h); }
+  function setT(id, x, y, small){ var t = $(id); t.setAttribute('x', x); t.setAttribute('y', y); t.style.fontSize = small ? '13px' : ''; }
+  function sqUpd(){
+    var a = +ra.value, b = +rb.value, S = 260, u = S / (a + b), x0 = 30, y0 = 30, A = a * u, B = b * u;
+    setR('sq-a2', x0, y0, A, A); setR('sq-ab1', x0 + A, y0, B, A);
+    setR('sq-ab2', x0, y0 + A, A, B); setR('sq-b2', x0 + A, y0 + A, B, B);
+    setT('sq-t-a2', x0 + A / 2, y0 + A / 2 + 6, A < 34);
+    setT('sq-t-ab1', x0 + A + B / 2, y0 + A / 2 + 6, B < 34 || A < 34);
+    setT('sq-t-ab2', x0 + A / 2, y0 + A + B / 2 + 6, B < 34 || A < 34);
+    setT('sq-t-b2', x0 + A + B / 2, y0 + A + B / 2 + 6, B < 34);
+    setT('sq-top-a', x0 + A / 2, 22); setT('sq-top-b', x0 + A + B / 2, 22);
+    setT('sq-left-a', 16, y0 + A / 2 + 6); setT('sq-left-b', 16, y0 + A + B / 2 + 6);
+    $('sq-va').textContent = a; $('sq-vb').textContent = b;
+    var s = a + b;
+    $('sq-out').innerHTML =
+      '<b>(a + b)²</b><span>= (' + a + ' + ' + b + ')² = ' + s + '² = ' + (s * s) + '</span>' +
+      '<b>a² + 2ab + b²</b><span>= ' + (a * a) + ' + ' + (2 * a * b) + ' + ' + (b * b) + ' = ' + (s * s) + '</span>' +
+      '<b>a² + b²</b><span>= ' + (a * a + b * b) + ' : il manque 2ab = ' + (2 * a * b) + '</span>';
+  }
+  if (ra && rb){ ra.addEventListener('input', sqUpd); rb.addEventListener('input', sqUpd); sqUpd(); }
+
+  /* ================= Le labo ================= */
+  function LErr(msg, pos){ this.msg = msg; this.pos = pos; }
+
+  function normalize(s){
+    return String(s).replace(/[−–—]/g, '-').replace(/[×·∙]/g, '*')
+      .replace(/÷/g, '/').replace(/\*\*/g, '^').replace(/(\d),(\d)/g, '$1.$2');
+  }
+  function tokenize(s){
+    var t = [], i = 0, m;
+    while (i < s.length){
+      var c = s.charAt(i), rest = s.slice(i);
+      if (/\s/.test(c)){ i++; continue; }
+      if ((m = rest.match(/^(\d+(\.\d+)?|\.\d+)/))){ t.push({k:'num', v:parseFloat(m[0]), p:i}); i += m[0].length; continue; }
+      if (/^sqrt/i.test(rest)){ t.push({k:'sqrt', p:i}); i += 4; continue; }
+      if (c === '√'){ t.push({k:'sqrt', p:i}); i++; continue; }
+      if (c === '²' || c === '³'){ t.push({k:'sup', v:(c === '²' ? 2 : 3), p:i}); i++; continue; }
+      if (/[a-zA-Z]/.test(c)){ t.push({k:'var', n:c.toLowerCase(), p:i}); i++; continue; }
+      if ('+-*/^'.indexOf(c) >= 0){ t.push({k:'op', v:c, p:i}); i++; continue; }
+      if (c === '(' || c === '['){ t.push({k:'(', p:i}); i++; continue; }
+      if (c === ')' || c === ']'){ t.push({k:')', p:i}); i++; continue; }
+      if (c === '='){ throw new LErr('le signe = n’a rien à faire ici : utilise l’onglet « Une valeur est-elle solution ? » pour une équation', i); }
+      throw new LErr('le symbole « ' + c + ' » n’est pas reconnu', i);
+    }
+    for (var j = 1; j < t.length; j++){
+      if (t[j].k === 'num' && (t[j-1].k === 'var' || t[j-1].k === ')' || t[j-1].k === 'sup' || t[j-1].k === 'num')){
+        throw new LErr(t[j-1].k === 'num' ? 'deux nombres se suivent sans opération entre eux'
+          : 'un nombre ne peut pas suivre directement une lettre ou une parenthèse : écris 2x plutôt que x2, et x^2 ou x² pour un carré', t[j].p);
+      }
+    }
+    return t;
+  }
+  function parse(str){
+    var s = normalize(str), toks = tokenize(s), k = 0;
+    if (!toks.length) throw new LErr('la case est vide', 0);
+    function at(kind, v){ var x = toks[k]; return !!x && x.k === kind && (v === undefined || x.v === v); }
+    function startsAtom(){ var x = toks[k]; return !!x && (x.k === 'num' || x.k === 'var' || x.k === '(' || x.k === 'sqrt'); }
+    function pExpr(){
+      var a = pTerm();
+      while (at('op', '+') || at('op', '-')){ var o = toks[k++].v; a = {t:o, a:a, b:pTerm()}; }
+      return a;
+    }
+    function pTerm(){
+      var a = pUnary();
+      for (;;){
+        if (at('op', '*') || at('op', '/')){ var o = toks[k++].v; a = {t:o, a:a, b:pUnary()}; }
+        else if (startsAtom()){ a = {t:'*', a:a, b:pPow()}; }
+        else break;
+      }
+      return a;
+    }
+    function pUnary(){
+      if (at('op', '-')){ k++; return {t:'neg', a:pUnary()}; }
+      if (at('op', '+')){ k++; return pUnary(); }
+      return pPow();
+    }
+    function pPow(){
+      var a = pPost();
+      if (at('op', '^')){ k++; a = {t:'^', a:a, b:pUnary()}; }
+      return a;
+    }
+    function pPost(){
+      var a = pAtom();
+      while (at('sup')){ a = {t:'^', a:a, b:{t:'num', v:toks[k++].v}}; }
+      return a;
+    }
+    function pAtom(){
+      var x = toks[k];
+      if (!x) throw new LErr('l’expression s’arrête trop tôt : il manque quelque chose à la fin', s.length);
+      if (x.k === 'num'){ k++; return {t:'num', v:x.v}; }
+      if (x.k === 'var'){ k++; return {t:'var', n:x.n}; }
+      if (x.k === '('){
+        k++; var e = pExpr();
+        if (!at(')')) throw new LErr('une parenthèse ouverte n’est pas refermée', toks[k] ? toks[k].p : s.length);
+        k++; return e;
+      }
+      if (x.k === 'sqrt'){ k++; return {t:'sqrt', a:(at('(') ? pAtom() : pPost())}; }
+      if (x.k === ')') throw new LErr('il y a une parenthèse fermante de trop, ou rien entre deux parenthèses', x.p);
+      if (x.k === 'sup') throw new LErr('un exposant doit suivre un nombre, une lettre ou une parenthèse', x.p);
+      throw new LErr('il manque un nombre ou une lettre avant « ' + (x.v || '') + ' »', x.p);
+    }
+    var root = pExpr();
+    if (k < toks.length){
+      var x = toks[k];
+      throw new LErr(x.k === ')' ? 'il y a une parenthèse fermante de trop' : 'il y a un symbole en trop', x.p);
+    }
+    root._src = s;
+    return root;
+  }
+  function ev(n, env){
+    switch (n.t){
+      case 'num': return n.v;
+      case 'var': return env[n.n];
+      case 'neg': return -ev(n.a, env);
+      case '+': return ev(n.a, env) + ev(n.b, env);
+      case '-': return ev(n.a, env) - ev(n.b, env);
+      case '*': return ev(n.a, env) * ev(n.b, env);
+      case '/': var d = ev(n.b, env); if (!isFinite(d) || Math.abs(d) < 1e-12) return NaN; return ev(n.a, env) / d;
+      case '^': return Math.pow(ev(n.a, env), ev(n.b, env));
+      case 'sqrt': var v = ev(n.a, env); return (v < 0) ? NaN : Math.sqrt(v);
+    }
+    return NaN;
+  }
+  function vars(n, acc){
+    if (n.t === 'var'){ if (acc.indexOf(n.n) < 0) acc.push(n.n); }
+    else if (n.t !== 'num'){ vars(n.a, acc); if (n.b) vars(n.b, acc); }
+    return acc;
+  }
+  function fmtNum(v){
+    if (Math.abs(v - Math.round(v)) < 1e-9 * Math.max(1, Math.abs(v))) v = Math.round(v);
+    var str = Number.isInteger(v) ? String(v) : String(parseFloat(v.toPrecision(10)));
+    if (/e/.test(str)) str = v.toPrecision(6);
+    return str.replace('-', '−').replace('.', ',');
+  }
+  function sup(e){
+    if (e.t === 'num' && e.v === 2) return '²';
+    if (e.t === 'num' && e.v === 3) return '³';
+    return '^' + ((e.t === 'num' || e.t === 'var') ? pr(e, 9) : '(' + pr(e, 0) + ')');
+  }
+  function pr(n, p){
+    var r, q;
+    switch (n.t){
+      case 'num': return fmtNum(n.v);
+      case 'var': return n.n;
+      case 'sqrt': return '√(' + pr(n.a, 0) + ')';
+      case '+': q = 1; r = pr(n.a, 1) + ' + ' + pr(n.b, 1.1); break;
+      case '-': q = 1; r = pr(n.a, 1) + ' − ' + pr(n.b, 1.1); break;
+      case '*': q = 2; r = pr(n.a, 2) + ' × ' + pr(n.b, 2.1); break;
+      case '/': q = 2; r = pr(n.a, 2) + (((n.a.t === 'num' || n.a.t === 'var') && (n.b.t === 'num' || n.b.t === 'var')) ? '/' : ' / ') + pr(n.b, 2.1); break;
+      case 'neg': q = 2; r = '−' + pr(n.a, 3); break;
+      case '^': q = 4; r = pr(n.a, 4.1) + sup(n.b); break;
+    }
+    return q < p ? '(' + r + ')' : r;
+  }
+  function close(a, b){ return Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+  function envStr(env, vs){ return vs.map(function(v){ return v + ' = ' + fmtNum(env[v]); }).join(', '); }
+  function errHtml(where, e, raw){
+    if (!(e instanceof LErr)) throw e;
+    var s = normalize(raw), near = s.slice(Math.max(0, e.pos - 6), e.pos + 6).trim();
+    return '<p class="err">' + esc(where) + ' : ' + esc(e.msg) + (near ? ' (près de « ' + esc(near) + ' »)' : '') + '.</p>';
+  }
+
+  var NICE = [2, 3, -1, 5, -2, 1, 0, 4, -3, 10, 0.5, -0.5, 1.5, 7, -4, 2.5, -7, 6, -6, -10];
+  function points(vs){
+    var pts = [], i, j, env;
+    if (!vs.length) return [{}];
+    for (i = 0; i < NICE.length; i++){
+      env = {};
+      for (j = 0; j < vs.length; j++) env[vs[j]] = NICE[(i + 7 * j) % NICE.length];
+      pts.push(env);
+    }
+    for (i = 0; i < 14; i++){
+      env = {};
+      for (j = 0; j < vs.length; j++) env[vs[j]] = Math.round((Math.random() * 20 - 10) * 1000) / 1000 + 0.0137;
+      pts.push(env);
+    }
+    return pts;
+  }
+
+  function runCmp(){
+    var out = $('out-cmp'), rawA = $('lab-a').value, rawB = $('lab-b').value, A, B;
+    try { A = parse(rawA); } catch (e){ out.innerHTML = errHtml('Expression de départ', e, rawA); return; }
+    try { B = parse(rawB); } catch (e){ out.innerHTML = errHtml('Ton résultat', e, rawB); return; }
+    var vs = vars(B, vars(A, [])).sort();
+    if (vs.length > 4){ out.innerHTML = '<p class="err">Trop de lettres différentes : quatre au maximum.</p>'; return; }
+    if (!vs.length){
+      var na = ev(A, {}), nb = ev(B, {});
+      if (!isFinite(na) || !isFinite(nb)){ out.innerHTML = '<div class="verdict mid"><p>L’un des deux calculs n’a pas de sens (division par 0, ou racine d’un nombre négatif).</p></div>'; return; }
+      out.innerHTML = (close(na, nb)
+        ? '<div class="verdict ok"><p><b>Les deux calculs donnent le même nombre : ' + fmtNum(na) + '.</b></p></div>'
+        : '<div class="verdict ko"><p><b>Les deux calculs diffèrent</b> : le premier vaut ' + fmtNum(na) + ', le second ' + fmtNum(nb) + '.</p></div>');
+      return;
+    }
+    var pts = points(vs), tested = 0, bad = null, undef = [];
+    for (var i = 0; i < pts.length; i++){
+      var a = ev(A, pts[i]), b = ev(B, pts[i]), fa = isFinite(a), fb = isFinite(b);
+      if (!fa && !fb) continue;
+      if (fa !== fb){ if (undef.length < 3) undef.push({env:pts[i], which:(fa ? 'B' : 'A'), val:(fa ? a : b)}); continue; }
+      tested++;
+      if (!close(a, b)){ bad = {env:pts[i], a:a, b:b}; break; }
+    }
+    var read = '<p class="read">Je lis : départ = <span class="mw">' + esc(pr(A, 0)) + '</span> ; résultat = <span class="mw">' + esc(pr(B, 0)) + '</span>.</p>';
+    var h;
+    if (bad){
+      h = '<div class="verdict ko"><p><b>Ces deux expressions ne sont pas égales.</b></p>' +
+          '<p>Pour <span class="mw">' + esc(envStr(bad.env, vs)) + '</span> : l’expression de départ vaut <b>' + fmtNum(bad.a) + '</b>, ton résultat vaut <b>' + fmtNum(bad.b) + '</b>.</p>' +
+          '<p>Refais les deux calculs à la main avec cette valeur : tu verras à quelle étape ils se séparent.</p></div>';
+    } else if (!tested){
+      h = '<div class="verdict mid"><p>Je n’ai trouvé aucune valeur pour laquelle les deux expressions existent toutes les deux.</p></div>';
+    } else if (undef.length){
+      var u = undef[0], who = (u.which === 'A') ? 'l’expression de départ n’est pas définie' : 'ton résultat n’est pas défini', other = (u.which === 'A') ? 'ton résultat' : 'l’expression de départ';
+      h = '<div class="verdict mid"><p><b>Égales partout où les deux existent.</b></p>' +
+          '<p>Mais pour <span class="mw">' + esc(envStr(u.env, vs)) + '</span>, ' + who + ' (division par 0, ou racine d’un nombre négatif), alors que ' + other + ' vaut ' + fmtNum(u.val) + '.</p>' +
+          '<p>Les deux expressions sont égales, sauf pour cette valeur interdite (partie 6.6).</p></div>';
+    } else {
+      h = '<div class="verdict ok"><p><b>Égales pour les ' + tested + ' valeurs testées.</b></p><p>Ton calcul est très probablement juste.</p></div>';
+    }
+    out.innerHTML = h + read;
+  }
+
+  function runSol(){
+    var out = $('out-sol'), raw = $('lab-eq').value, parts = normalize(raw).split('='), L, R;
+    if (parts.length !== 2){ out.innerHTML = '<p class="err">Une équation contient exactement un signe =.</p>'; return; }
+    try { L = parse(parts[0]); } catch (e){ out.innerHTML = errHtml('Côté gauche', e, parts[0]); return; }
+    try { R = parse(parts[1]); } catch (e){ out.innerHTML = errHtml('Côté droit', e, parts[1]); return; }
+    var vs = vars(R, vars(L, []));
+    for (var i = 0; i < vs.length; i++){
+      if (vs[i] !== 'x'){ out.innerHTML = '<p class="err">L’inconnue doit s’appeler x : la lettre « ' + esc(vs[i]) + ' » n’est pas permise ici.</p>'; return; }
+    }
+    var vals = $('lab-vals').value.split(';').map(function(v){ return v.trim(); }).filter(function(v){ return v.length; });
+    if (!vals.length){ out.innerHTML = '<p class="err">Écris au moins une valeur de x à tester.</p>'; return; }
+    var h = '';
+    for (i = 0; i < vals.length; i++){
+      var V, v;
+      try { V = parse(vals[i]); } catch (e){ h += errHtml('Valeur « ' + vals[i] + ' »', e, vals[i]); continue; }
+      if (vars(V, []).length){ h += '<p class="err">La valeur « ' + esc(vals[i]) + ' » contient une lettre : écris un nombre.</p>'; continue; }
+      v = ev(V, {});
+      if (!isFinite(v)){ h += '<p class="err">La valeur « ' + esc(vals[i]) + ' » n’est pas un nombre réel.</p>'; continue; }
+      var shown = 'x = ' + esc(pr(V, 0)) + (V.t === 'num' ? '' : ' (soit ' + fmtNum(v) + ')');
+      var l = ev(L, {x:v}), r = ev(R, {x:v});
+      if (!isFinite(l) || !isFinite(r)){
+        h += '<div class="verdict mid"><p><span class="mr">' + shown + '</span> : l’équation n’a pas de sens pour cette valeur (division par 0, ou racine d’un nombre négatif). C’est une valeur interdite : elle ne peut pas être solution.</p></div>';
+      } else if (close(l, r)){
+        h += '<div class="verdict ok"><p><span class="mr">' + shown + '</span> : à gauche ' + fmtNum(l) + ', à droite ' + fmtNum(r) + '. <b>C’est une solution.</b></p></div>';
+      } else {
+        h += '<div class="verdict ko"><p><span class="mr">' + shown + '</span> : à gauche ' + fmtNum(l) + ', à droite ' + fmtNum(r) + '. <b>Ce n’est pas une solution.</b></p></div>';
+      }
+    }
+    h += '<p class="read">Je lis : <span class="mw">' + esc(pr(L, 0)) + ' = ' + esc(pr(R, 0)) + '</span>. Ce test vérifie les valeurs que tu proposes ; il ne dit pas si tu les as toutes trouvées.</p>';
+    out.innerHTML = h;
+  }
+
+  function showTab(which){
+    var cmp = (which === 'cmp');
+    $('tab-cmp').setAttribute('aria-pressed', cmp ? 'true' : 'false');
+    $('tab-sol').setAttribute('aria-pressed', cmp ? 'false' : 'true');
+    $('pane-cmp').hidden = !cmp; $('pane-sol').hidden = cmp;
+  }
+  if ($('lab')){
+    $('tab-cmp').addEventListener('click', function(){ showTab('cmp'); });
+    $('tab-sol').addEventListener('click', function(){ showTab('sol'); });
+    $('go-cmp').addEventListener('click', runCmp);
+    $('go-sol').addEventListener('click', runSol);
+    ['lab-a', 'lab-b'].forEach(function(id){ $(id).addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); runCmp(); } }); });
+    ['lab-eq', 'lab-vals'].forEach(function(id){ $(id).addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); runSol(); } }); });
+    Array.prototype.forEach.call(document.querySelectorAll('#pre-cmp button'), function(b){
+      b.addEventListener('click', function(){ $('lab-a').value = b.getAttribute('data-a'); $('lab-b').value = b.getAttribute('data-b'); runCmp(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#pre-sol button'), function(b){
+      b.addEventListener('click', function(){ $('lab-eq').value = b.getAttribute('data-e'); $('lab-vals').value = b.getAttribute('data-v'); runSol(); });
+    });
+    runCmp(); runSol();
+  }
+
+  /* Pour les tests automatiques */
+  window.__labo = {parse: parse, ev: ev, pr: pr, vars: vars, runCmp: runCmp, runSol: runSol};
+})();
+</script>
+</body>
+</html>

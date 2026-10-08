@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>Majorants et bornes, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+.hero{position:relative}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.m{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-style:italic;font-size:1.1em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+.vec{position:relative;display:inline-block;padding-top:.45em;line-height:1.1}
+.vec::before{content:"→";position:absolute;top:-.12em;left:0;right:0;text-align:center;font-size:.75em;line-height:1;font-style:normal}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.toc{columns:2 220px;margin:10px 0;padding-left:1.4em}
+.toc li{break-inside:avoid}
+details.check{margin:28px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+details.check[open]>summary{margin-bottom:4px}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:'STIX Two Text','Cambria Math',serif;font-style:italic;font-size:16px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.thick{stroke-width:4}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}
+/* widget */
+.widget .ctrl{max-width:440px;margin:12px auto 0}
+.widget label{font-weight:700;display:block;margin-bottom:4px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.presets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;background:var(--paper);border-radius:8px;padding:10px 14px}
+.readout b{font-weight:600}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+/* ---- ajouts propres au cours de logique ---- */
+td.v,span.v{color:var(--green);font-weight:700}
+td.f,span.f{color:var(--red);font-weight:700}
+table.c tr.hl td{background:var(--soft-r)}
+table.c tr.ok td{background:var(--soft-g)}
+table.c th{white-space:nowrap}
+table.tight{width:auto;margin:0 auto}
+.sym{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.sym b{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.25rem;text-align:center;min-width:1.6em;color:var(--blue)}
+.rule{border-left:5px solid var(--blue);background:var(--card);border-radius:10px;padding:10px 14px;margin:14px 0;border:1px solid var(--line);border-left-width:5px}
+.steps{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.15em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.redac .note{font-size:.9rem;color:var(--muted)}
+/* machine à promesses */
+.toggles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 12px}
+.tog{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:8px 14px;cursor:pointer;min-height:44px;text-align:left}
+.tog b{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
+.tog[aria-pressed="true"]{border-color:var(--green)}
+.tog[aria-pressed="false"]{border-color:var(--red)}
+.tog .val{font-weight:700}
+.tog[aria-pressed="true"] .val{color:var(--green)}
+.tog[aria-pressed="false"] .val{color:var(--red)}
+.verdict{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:1rem}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+/* cartes de Wason */
+.cards{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.card{width:72px;height:100px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-family:'STIX Two Text',serif;font-size:2rem;cursor:pointer;display:grid;place-items:center;position:relative}
+.card[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);box-shadow:0 0 0 3px var(--soft-b)}
+.card[aria-pressed="true"]::after{content:"à retourner";position:absolute;bottom:4px;left:0;right:0;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.62rem;color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.center{text-align:center}
+.fb p{margin:6px 0}
+.fb .good{color:var(--green);font-weight:700}
+.fb .bad{color:var(--red);font-weight:700}
+/* labo */
+.labin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.labin input{flex:1 1 220px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.keys button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;min-width:44px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.keys button:hover{border-color:var(--blue)}
+.keys button.w{font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem}
+.presets2{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.presets2 button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+#lab-out .err{color:var(--red);font-weight:700}
+#lab-out .tm{color:var(--muted)}
+#lab-out .verdict{margin-top:10px}
+.phr{font-style:italic}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+
+/* ---- Feuille 1 : ateliers (même identité que « La logique, depuis le tout début ») ---- */
+.enonce{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0}
+.kit{display:grid;gap:2px;font-size:1.12rem;margin:6px 0 10px}
+.kit p{margin:0}
+.recipe li,.four li{margin:8px 0}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.95rem}
+.note{font-size:.92rem;color:var(--muted)}
+.fbk{border-radius:10px;padding:10px 14px;margin:8px 0}
+.fbk>:first-child{margin-top:0}.fbk>:last-child{margin-bottom:0}
+.fbk.good{background:var(--soft-g)}.fbk.bad{background:var(--soft-r)}.fbk.info{background:var(--soft-b)}.fbk.meh{background:var(--soft-a)}
+
+/* table à remplir */
+.tt-wrap{margin:14px 0}
+table.tt{width:auto;margin:0 auto;border-collapse:collapse}
+table.tt th,table.tt td{padding:0;text-align:center;vertical-align:middle}
+table.tt th{padding:6px 10px;white-space:nowrap;background:var(--card);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.02rem;font-weight:600}
+table.tt .rn{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.78rem;color:var(--muted);font-weight:400;padding:0 8px}
+table.tt td.lock{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;padding:0 12px;height:40px}
+table.tt th.fin{background:var(--soft-b);color:var(--blue)}
+table.tt td.fin{background:var(--soft-b)}
+table.tt .sep{border-left:3px double var(--muted)}
+.cell{display:block;width:100%;min-width:46px;height:40px;border:0;margin:0;padding:0;background:transparent;color:var(--ink);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;font-weight:600;cursor:pointer;border-radius:0}
+.cell:hover{background:var(--soft-b)}
+.cell.e{outline:1px dashed var(--muted);outline-offset:-7px}
+.cell.v{color:var(--green)}.cell.f{color:var(--red)}
+.cell.ok{background:var(--soft-g)}
+.cell.ko{background:var(--soft-r);box-shadow:inset 0 0 0 2px var(--red)}
+.cell.shown{box-shadow:inset 0 0 0 2px var(--amber)}
+.cell.target{box-shadow:inset 0 0 0 3px var(--blue)}
+.cell:focus-visible{outline:3px solid var(--green);outline-offset:-3px;border-radius:0}
+.tt-ctrl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.tt-q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0}
+
+/* questions guidées */
+.mq{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+.mq-ok>:first-child{margin-top:0}.mq-ok>:last-child{margin-bottom:0}
+.seq-end{background:var(--card);border:2px solid var(--green);border-radius:10px;padding:10px 16px;margin:12px 0}
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.drill .mq{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0 6px;margin:0;background:transparent}
+
+/* calcul pas à pas */
+.calc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:18px 0}
+.calc-head{display:flex;flex-wrap:wrap;gap:4px 20px;font-size:.95rem;color:var(--muted)}
+.calc-head b{color:var(--ink);font-weight:600}
+.calc .steps{background:var(--paper);border:0;margin:10px 0}
+.calc-ask{font-weight:700;margin:12px 0 8px}
+.calc-opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer}
+.opt:hover{border-color:var(--blue)}
+.opt.bad{border-color:var(--red);background:var(--soft-r)}
+.opt.meh{border-color:var(--amber);background:var(--soft-a)}
+.opt.hintopt{border-color:var(--blue);box-shadow:0 0 0 3px var(--soft-b)}
+.linkbtn{font:inherit;font-size:.92rem;background:none;border:0;color:var(--blue);text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:6px}
+
+/* simulateur de scénarios */
+.sim-line{background:var(--paper);border-radius:8px;padding:8px 12px;margin:8px 0 12px}
+.sim-list{display:grid;gap:6px}
+.sim-row{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.chip{display:block;text-align:center;border-radius:8px;padding:2px 0;font-family:'STIX Two Text','Cambria Math',serif;font-weight:700}
+.chip.v{background:var(--soft-g);color:var(--green)}.chip.f{background:var(--soft-r);color:var(--red)}
+.sim-row .fm{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem}
+.sim-row .kt{font-size:.93rem;color:var(--muted)}
+.tag{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.75rem;font-weight:700;color:var(--blue);background:var(--soft-b);border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+.sim-cmp{margin-top:14px}
+.cmp-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.pill{font-size:.85rem;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}
+
+/* testeur de seuils (exercice 8) */
+.seuils{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px;margin:10px 0}
+.seuil{border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--paper);font-size:.95rem;line-height:1.35}
+.seuil .res{display:block;font-size:.82rem;font-weight:700}
+.seuil.v{border-color:var(--green);background:var(--soft-g)}.seuil.v .res{color:var(--green)}
+.seuil.f{border-color:var(--red);background:var(--soft-r)}.seuil.f .res{color:var(--red)}
+#t8r .fbk{margin:6px 0}
+
+/* ---- laboratoire des bornes ---- */
+.lab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:18px 0}
+.lab-sets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.lab-sets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:5px 12px;min-height:38px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.lab-sets button:hover{border-color:var(--blue)}
+.lab-sets button[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);color:var(--blue);font-weight:600}
+.lab-fig svg{display:block;width:100%;height:auto;max-width:640px;margin:4px auto}
+.lab-ctrl{margin:8px 0}
+.lab-ctrl label{display:block;font-weight:700;margin-bottom:2px}
+.lab-ctrl input[type=range]{width:100%;accent-color:var(--blue);height:32px;margin:0}
+.lab-tog{margin:6px 0;font-size:.95rem}
+.lab-tog input{accent-color:var(--blue);width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+.lab-read{display:grid;gap:6px;margin-top:8px}
+.lab-row{background:var(--paper);border-radius:8px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.lab-why{flex-basis:100%;font-size:.95rem;color:var(--muted)}
+.lab-sum{display:flex;flex-wrap:wrap;gap:4px 20px;background:var(--soft-b);border-radius:8px;padding:8px 12px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.04rem}
+.lab-eps{background:var(--paper);border-radius:8px;padding:8px 12px;font-size:.97rem}
+.lab-eps p{margin:2px 0}
+svg .labA{stroke:var(--blue);stroke-width:6;stroke-linecap:butt;fill:none}
+svg .ptopen{fill:var(--card);stroke:var(--blue);stroke-width:2.5}
+svg .ring{fill:none;stroke:var(--amber);stroke-width:2.5}
+svg .ringb{fill:none;stroke:var(--blue);stroke-width:2.5}
+svg .epsband{fill:var(--soft-b);stroke:var(--blue);stroke-width:1;stroke-dasharray:4 3}
+svg .zline{stroke-width:2;fill:none}
+svg text.ta{fill:var(--amber)}
+svg text.bold{font-weight:700}
+.fsa{fill:var(--soft-a)}
+.sa{stroke:var(--amber);stroke-width:2;fill:none}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/mathematiques">← Vizion.Blog / Mathématiques</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »). Dans cette version publique, j'ai retiré une remarque sur le polycopié de mon enseignant.</p>
+</div>
+<div id="haut"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<marker id="ah-i" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fi"/></marker>
+</defs></svg>
+
+<header class="hero">
+<p class="kicker">Suites numériques, chapitre 1 : rappels sur ℝ</p>
+<h1>Majorants et bornes, depuis le tout début<small>Majorant, minorant, maximum, minimum, borne supérieure, borne inférieure : six mots pour décrire les bords d'un ensemble de nombres.</small></h1>
+<p class="lede">Ton cours a introduit six mots d'un coup. Ils répondent tous à la même question : jusqu'où s'étend un ensemble de nombres sur la droite, et qu'est-ce qui l'arrête à gauche et à droite ? On les reprend un par un, avec des dessins, deux laboratoires où tu déplaces toi-même les nombres, et les preuves de ton cours réécrites ligne par ligne.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Lis dans l'ordre.</b> Chaque section utilise la précédente, et la section 4 (borne supérieure) les utilise toutes.</li>
+<li><b>Joue avec les laboratoires</b> des sections 2 et 4 : choisis un ensemble, déplace le nombre c, et lis ce que la page te répond.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b> Une erreur ici ne coûte rien.</li>
+<li><b>Rythme conseillé :</b> sections 1 à 3 à une première séance, sections 4 à 8 à une deuxième.</li>
+<li>Ce chapitre utilise beaucoup ∀, ∃ et leurs négations. Si besoin, relis la partie 8 de ton cours <a href="/cours/la-logique.html">La logique, depuis le tout début</a>.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Pourquoi ce chapitre compte</p>
+<p>Dans le cours de suites, tu rencontreras ce théorème : <b>toute suite croissante et majorée converge, et sa limite est la borne supérieure de ses termes.</b> Et la définition de la limite d'une suite utilise le même « ε » que la caractérisation de la borne supérieure (section 4.6). Ce chapitre est la porte d'entrée des suites.</p>
+</div>
+<h3>Les mots, et où ils sont expliqués</h3>
+<ul class="blk">
+<li><a href="#p2"><b>•</b>Majorant, minorant</a></li>
+<li><a href="#p2-bornee"><b>•</b>Majorée, minorée, bornée</a></li>
+<li><a href="#p3"><b>•</b>Maximum, minimum</a></li>
+<li><a href="#p4"><b>•</b>Borne supérieure, borne inférieure</a></li>
+<li><a href="#p4-eps"><b>•</b>La caractérisation avec ε</a></li>
+<li><a href="#p5"><b>•</b>L'axiome de la borne supérieure</a></li>
+<li><a href="#p7"><b>•</b>Relecture de tes notes</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Ce qu'il faut savoir avant</h2>
+
+<h3>1.1 L'ordre sur ℝ</h3>
+<p>Deux réels se comparent toujours : on a x ≤ y ou y ≤ x. Ton polycopié le dit en une phrase : ℝ est <b>totalement ordonné</b>. Sur la droite graduée, « plus petit » veut dire « plus à gauche ».</p>
+<p>Une règle sert dans presque toutes les preuves de ce chapitre.</p>
+<div class="box key">
+<p class="lbl">Antisymétrie (<i>antisymmetry</i>)</p>
+<p>Si a ≤ b et b ≤ a, alors a = b.</p>
+<p>Pour montrer que deux nombres sont égaux, on montre souvent les deux inégalités. C'est la même idée que pour démontrer une équivalence A ⇔ B : on démontre A ⇒ B, puis B ⇒ A.</p>
+</div>
+
+<h3>1.2 « Soit A une partie de ℝ »</h3>
+<p>Cette phrase ouvre ton cours. Une <b>partie</b> de ℝ, c'est un sous-ensemble de ℝ : un ensemble dont tous les éléments sont des réels. On écrit A ⊂ ℝ. Ça peut être un intervalle comme [1 ; 2], un ensemble de points isolés, ℕ, ℤ…</p>
+
+<h3>1.3 Deux façons de décrire un ensemble</h3>
+<p>Ton cours utilise deux notations très différentes. Il faut savoir les lire.</p>
+<div class="tw"><table>
+<tr><th>Notation</th><th>Ce qu'elle fait</th><th>En Python</th></tr>
+<tr><td class="mr">{x ∈ ℝ | 1 ≤ x ≤ 2}</td><td>On part de ℝ et on <b>garde</b> les x qui passent un test. C'est l'intervalle [1 ; 2].</td><td><code>[x for x in R if 1 &lt;= x &lt;= 2]</code></td></tr>
+<tr><td class="mr">{1/n ; n ∈ ℕ*}</td><td>On <b>fabrique</b> un élément 1/n pour chaque n de ℕ* : 1, 1/2, 1/3, 1/4…</td><td><code>[1/n for n in N_etoile]</code></td></tr>
+</table></div>
+<p>Dans la seconde notation, n n'est pas un élément de l'ensemble : c'est le compteur qui sert à fabriquer les éléments. Les éléments, ce sont les nombres 1/n. Et ℕ* désigne ℕ privé de 0, parce qu'on ne divise pas par 0.</p>
+<figure><svg viewBox="0 0 440 108" role="img" aria-label="Les points 1, 1/2, 1/3, 1/4 et les suivants sur une droite graduée, de plus en plus serrés près de 0, qui n'est pas atteint">
+<line x1="16" y1="60" x2="430" y2="60" class="sm" marker-end="url(#ah-i)"/>
+<circle cx="376.8" cy="60" r="3.4" class="fb"/>
+<circle cx="213.5" cy="60" r="3.4" class="fb"/>
+<circle cx="159.0" cy="60" r="3.4" class="fb"/>
+<circle cx="131.8" cy="60" r="3.4" class="fb"/>
+<circle cx="115.5" cy="60" r="3.4" class="fb"/>
+<circle cx="104.6" cy="60" r="3.4" class="fb"/>
+<circle cx="96.8" cy="60" r="3.4" class="fb"/>
+<circle cx="91.0" cy="60" r="3.4" class="fb"/>
+<circle cx="86.4" cy="60" r="3.4" class="fb"/>
+<circle cx="82.8" cy="60" r="3.4" class="fb"/>
+<circle cx="79.8" cy="60" r="3.4" class="fb"/>
+<circle cx="77.4" cy="60" r="3.4" class="fb"/>
+<circle cx="75.3" cy="60" r="3.4" class="fb"/>
+<circle cx="73.5" cy="60" r="3.4" class="fb"/>
+<circle cx="71.9" cy="60" r="3.4" class="fb"/>
+<circle cx="70.5" cy="60" r="3.4" class="fb"/>
+<circle cx="69.3" cy="60" r="3.4" class="fb"/>
+<circle cx="68.3" cy="60" r="3.4" class="fb"/>
+<circle cx="67.3" cy="60" r="3.4" class="fb"/>
+<circle cx="66.5" cy="60" r="3.4" class="fb"/>
+<circle cx="65.7" cy="60" r="3.4" class="fb"/>
+<circle cx="65.0" cy="60" r="3.4" class="fb"/>
+<circle cx="64.3" cy="60" r="3.4" class="fb"/>
+<circle cx="63.7" cy="60" r="3.4" class="fb"/>
+<circle cx="63.2" cy="60" r="3.4" class="fb"/>
+<circle cx="62.7" cy="60" r="3.4" class="fb"/>
+<circle cx="62.2" cy="60" r="3.4" class="fb"/>
+<circle cx="61.8" cy="60" r="3.4" class="fb"/>
+<circle cx="61.4" cy="60" r="3.4" class="fb"/>
+<circle cx="61.0" cy="60" r="3.4" class="fb"/>
+<circle cx="60.7" cy="60" r="3.4" class="fb"/>
+<circle cx="60.3" cy="60" r="3.4" class="fb"/>
+<circle cx="60.0" cy="60" r="3.4" class="fb"/>
+<circle cx="59.7" cy="60" r="3.4" class="fb"/>
+<circle cx="59.5" cy="60" r="3.4" class="fb"/>
+<circle cx="59.2" cy="60" r="3.4" class="fb"/>
+<circle cx="59.0" cy="60" r="3.4" class="fb"/>
+<circle cx="58.7" cy="60" r="3.4" class="fb"/>
+<circle cx="58.5" cy="60" r="3.4" class="fb"/>
+<circle cx="58.3" cy="60" r="3.4" class="fb"/>
+<circle cx="58.1" cy="60" r="3.4" class="fb"/>
+<circle cx="57.9" cy="60" r="3.4" class="fb"/>
+<circle cx="57.7" cy="60" r="3.4" class="fb"/>
+<circle cx="57.6" cy="60" r="3.4" class="fb"/>
+<circle cx="57.4" cy="60" r="3.4" class="fb"/>
+<circle cx="57.2" cy="60" r="3.4" class="fb"/>
+<circle cx="57.1" cy="60" r="3.4" class="fb"/>
+<circle cx="56.9" cy="60" r="3.4" class="fb"/>
+<circle cx="56.8" cy="60" r="3.4" class="fb"/>
+<circle cx="56.7" cy="60" r="3.4" class="fb"/>
+<circle cx="56.5" cy="60" r="3.4" class="fb"/>
+<circle cx="56.4" cy="60" r="3.4" class="fb"/>
+<circle cx="56.3" cy="60" r="3.4" class="fb"/>
+<circle cx="56.2" cy="60" r="3.4" class="fb"/>
+<circle cx="56.1" cy="60" r="3.4" class="fb"/>
+<circle cx="56.0" cy="60" r="3.4" class="fb"/>
+<circle cx="55.9" cy="60" r="3.4" class="fb"/>
+<circle cx="55.8" cy="60" r="3.4" class="fb"/>
+<circle cx="55.7" cy="60" r="3.4" class="fb"/>
+<circle cx="55.6" cy="60" r="3.4" class="fb"/>
+<circle cx="50.1" cy="60" r="5" class="ptopen"/>
+<text x="376.8" y="46" text-anchor="middle" class="mt tb" style="font-size:15px">1</text>
+<text x="213.5" y="46" text-anchor="middle" class="mt tb" style="font-size:15px">1/2</text>
+<text x="159.0" y="46" text-anchor="middle" class="mt tb" style="font-size:15px">1/3</text>
+<text x="131.8" y="46" text-anchor="middle" class="mt tb" style="font-size:15px">1/4</text>
+<text x="50.1" y="84" text-anchor="middle" class="mt">0</text>
+<text x="44.1" y="100" class="s tm" style="font-size:13.5px">0 n'appartient pas à l'ensemble</text>
+</svg><figcaption>Les points 1, 1/2, 1/3, 1/4… se serrent de plus en plus près de 0, sans jamais l'atteindre. Le rond vide marque 0, qui n'est pas un élément de l'ensemble.</figcaption></figure>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 1)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">Le nombre 1/3 appartient-il à {1/n ; n ∈ ℕ*} ?</p>
+<div class="mq-c"><button type="button">Oui</button><button type="button" data-fb="Cherche un n qui donne 1/n = 1/3.">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Oui, il est fabriqué par n = 3.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Le nombre 0 appartient-il à {1/n ; n ∈ ℕ*} ?</p>
+<div class="mq-c"><button type="button" data-fb="Il faudrait un n tel que 1/n = 0. Il n'en existe aucun.">Oui</button><button type="button">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Aucun n ne donne 1/n = 0. Les points se rapprochent de 0 sans jamais l'atteindre.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Et le nombre 2/3 ?</p>
+<div class="mq-c"><button type="button" data-fb="1/n = 2/3 donnerait n = 3/2, qui n'est pas un entier.">Oui</button><button type="button">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Non : 1/n = 2/3 donnerait n = 3/2, qui n'est pas un entier.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Majorant et minorant</h2>
+
+<h3>2.1 Les définitions</h3>
+<div class="box key">
+<p class="lbl">Définitions</p>
+<p>Soit A une partie de ℝ.</p>
+<p><b>M est un majorant</b> (<i>upper bound</i>) de A si tous les éléments de A sont inférieurs ou égaux à M :</p>
+<p class="eq">∀x ∈ A, x ≤ M</p>
+<p><b>m est un minorant</b> (<i>lower bound</i>) de A si tous les éléments de A sont supérieurs ou égaux à m :</p>
+<p class="eq">∀x ∈ A, x ≥ m</p>
+</div>
+<p>Une image : les éléments de A sont des personnes de tailles différentes, qui doivent passer sous une porte. <b>Un majorant, c'est une hauteur de porte qui laisse passer tout le monde sans se baisser.</b> Si personne ne dépasse 1,90 m, une porte de 2 m convient, une porte de 2,50 m aussi, une porte de 10 m aussi. Un minorant, c'est l'inverse : une hauteur que tout le monde atteint ou dépasse.</p>
+<p>Trois remarques découlent directement de la définition.</p>
+<ul>
+<li><b>Un majorant n'a pas besoin d'appartenir à A</b>, c'est la remarque de ton cours. 3 est un majorant de [1 ; 2], alors que 3 ∉ [1 ; 2]. Un majorant est un réel quelconque, qui doit seulement être au-dessus de tout le monde.</li>
+<li><b>Si M est un majorant, tout nombre plus grand en est un aussi.</b> Si x ≤ M et M ≤ M′, alors x ≤ M′. Un ensemble qui a un majorant en a donc une infinité, comme le dit ton polycopié.</li>
+<li><b>Les majorants forment une demi-droite</b> qui part vers la droite, et les minorants une demi-droite qui part vers la gauche. Toute la question des sections 3 et 4 sera : où commence cette demi-droite ?</li>
+</ul>
+
+<h3>2.2 Le laboratoire des majorants</h3>
+<p>Choisis un ensemble A, puis déplace le nombre c. La page te dit si c est un majorant ou un minorant de A. Quand ce n'est pas le cas, elle te montre un élément de A qui le prouve : c'est le <b>témoin</b>, le contre-exemple qui fait tomber le « pour tout ».</p>
+<div class="lab" id="lab1" data-mode="basic" data-set="ferme"></div>
+<p><b>À essayer :</b> avec ]0 ; 1[, mets c = 1, puis c = 0,99. Avec {1/n ; n ∈ ℕ*}, cherche le plus petit majorant, puis le plus grand minorant. Avec ℕ, essaie de trouver un majorant.</p>
+
+<h3>2.3 Les exemples de ton cours, expliqués</h3>
+<div class="tw"><table>
+<tr><th>A</th><th>Ses majorants</th><th>Ses minorants</th><th>Bornée ?</th></tr>
+<tr><td class="mr">[1 ; 2]</td><td class="mr">[2 ; +∞[</td><td class="mr">]−∞ ; 1]</td><td>oui</td></tr>
+<tr><td class="mr">]0 ; 1[</td><td class="mr">[1 ; +∞[</td><td class="mr">]−∞ ; 0]</td><td>oui</td></tr>
+<tr><td class="mr">{1/n ; n ∈ ℕ*}</td><td class="mr">[1 ; +∞[</td><td class="mr">]−∞ ; 0]</td><td>oui</td></tr>
+<tr><td class="mr">ℕ</td><td>aucun : l'ensemble des majorants est ∅</td><td class="mr">]−∞ ; 0]</td><td>non</td></tr>
+<tr><td class="mr">ℤ</td><td>aucun</td><td>aucun</td><td>non</td></tr>
+</table></div>
+<ul>
+<li><b>]0 ; 1[</b> : 1 est un majorant, même s'il n'est pas dans A, car tous les éléments sont &lt; 1, donc ≤ 1. Mais 0,99 n'en est pas un : 0,995 est dans A et dépasse 0,99. Aucun nombre plus petit que 1 n'est un majorant : entre lui et 1, il reste toujours des éléments de A.</li>
+<li><b>{1/n ; n ∈ ℕ*}</b> : 0 est un minorant, car 1/n &gt; 0 pour tout n. Mais 0,01 n'en est pas un : 1/101 est dans A et 1/101 &lt; 0,01. Aucun nombre strictement positif n'est un minorant, puisque les points se rapprochent de 0 autant qu'on veut.</li>
+<li><b>ℕ</b> : il n'a aucun majorant. Quel que soit le réel M positif, l'entier E(M) + 1 est dans ℕ et dépasse M (E(M) est la partie entière de M, définie dans ton polycopié). Si M est négatif, 0 le dépasse déjà.</li>
+</ul>
+
+<h3>2.4 Comment le prouver</h3>
+<p>La définition commence par « pour tout ». Les deux méthodes du cours de logique s'appliquent donc directement.</p>
+<div class="tw"><table>
+<tr><th>Pour montrer que…</th><th>on écrit…</th></tr>
+<tr><td>M <b>est</b> un majorant de A</td><td>« Soit x ∈ A », puis on démontre x ≤ M pour cet x quelconque.</td></tr>
+<tr><td>M <b>n'est pas</b> un majorant de A</td><td>On exhibe <b>un</b> élément x de A avec x &gt; M. C'est la négation de la définition : ∃x ∈ A, x &gt; M.</td></tr>
+</table></div>
+<div class="redac">
+<p><b>Montrons que 1 est un majorant de ]0 ; 1[.</b> Soit x ∈ ]0 ; 1[. Alors x &lt; 1, donc x ≤ 1. Ceci vaut pour tout x de ]0 ; 1[ : 1 est un majorant.</p>
+<p><b>Montrons que 0,9 n'est pas un majorant de ]0 ; 1[.</b> Le nombre 0,95 appartient à ]0 ; 1[, et 0,95 &gt; 0,9.</p>
+</div>
+
+<h3 id="p2-bornee">2.5 Majorée, minorée, bornée</h3>
+<p>Dans la marge de tes notes, à côté de la colonne « Bornée ? », tu as écrit « what is that supposed to mean? ». Voici la réponse : il y a trois définitions.</p>
+<div class="box key">
+<p class="lbl">Définitions</p>
+<p>A est <b>majorée</b> (<i>bounded above</i>) si elle a au moins un majorant : <span class="mr">∃M ∈ ℝ, ∀x ∈ A, x ≤ M</span>.</p>
+<p>A est <b>minorée</b> (<i>bounded below</i>) si elle a au moins un minorant : <span class="mr">∃m ∈ ℝ, ∀x ∈ A, x ≥ m</span>.</p>
+<p>A est <b>bornée</b> (<i>bounded</i>) si elle est à la fois majorée et minorée : coincée entre deux nombres.</p>
+</div>
+<p>Une borne, c'est une limite qu'on ne dépasse pas, comme les bornes au bord des routes. Un ensemble borné tient entre deux bornes. Le mot ressemble à « borne supérieure », et les deux idées sont liées (section 4), mais « bornée » veut seulement dire « majorée et minorée ».</p>
+<p>Regarde l'ordre des quantificateurs : ∃M vient avant ∀x. On cherche <b>un seul</b> M, choisi une fois pour toutes, qui convient pour tous les x. C'est la clé passe-partout de la partie 8.5 du cours de logique.</p>
+<p>On peut aussi écrire « bornée » avec une valeur absolue. Rappel : |x| ≤ M veut dire −M ≤ x ≤ M.</p>
+<p class="eq">A est bornée ⇔ ∃M ∈ ℝ, ∀x ∈ A, |x| ≤ M</p>
+<p>En effet, si |x| ≤ M pour tout x de A, alors −M est un minorant et M un majorant. Inversement, si m ≤ x ≤ M′ pour tout x de A, le nombre M = max(|m| ; |M′|) vérifie −M ≤ m ≤ x ≤ M′ ≤ M, donc |x| ≤ M. C'est cette forme qu'utilise l'exercice 9 de ta feuille, « f est bornée ».</p>
+<div class="box warn">
+<p class="lbl">Nier « majorée »</p>
+<p>A n'est pas majorée ⇔ <span class="mr">∀M ∈ ℝ, ∃x ∈ A, x &gt; M</span>. Aussi grand que soit M, un élément de A le dépasse. C'est le cas de ℕ.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">5 est-il un majorant de [1 ; 2] ?</p>
+<div class="mq-c"><button type="button">Oui</button><button type="button" data-fb="Un majorant n'a pas besoin d'être dans A : il suffit que tous les éléments de A soient ≤ 5.">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Oui : tous les éléments de [1 ; 2] sont ≤ 5. Peu importe que 5 ne soit pas dans A.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">1,9 est-il un majorant de [1 ; 2[ ?</p>
+<div class="mq-c"><button type="button" data-fb="Cherche un élément de [1 ; 2[ plus grand que 1,9.">Oui</button><button type="button">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Non : 1,95 est dans [1 ; 2[ et dépasse 1,9.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">−3 est-il un minorant de ℕ ?</p>
+<div class="mq-c"><button type="button">Oui</button><button type="button" data-fb="Un minorant n'a pas besoin d'être dans l'ensemble.">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Oui : tout entier naturel est ≥ 0, donc ≥ −3.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Pour montrer que 2 n'est pas un majorant de A, il suffit de…</p>
+<div class="mq-c"><button type="button" data-fb="C'est beaucoup trop : un seul élément suffit à faire tomber un « pour tout ».">montrer que tous les x de A sont &gt; 2</button><button type="button" data-fb="Un élément plus petit que 2 ne gêne pas 2 : il passe sous la porte.">trouver un x ∈ A avec x &lt; 2</button><button type="button">trouver un x ∈ A avec x &gt; 2</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Un seul témoin suffit : c'est la négation ∃x ∈ A, x &gt; 2.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">{1/n ; n ∈ ℕ*} est-il borné ?</p>
+<div class="mq-c"><button type="button">Oui</button><button type="button" data-fb="Cherche un minorant et un majorant.">Non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Oui : 0 ≤ 1/n ≤ 1 pour tout n de ℕ*. Il est minoré par 0 et majoré par 1.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Maximum et minimum</h2>
+
+<h3>3.1 Les définitions</h3>
+<div class="box key">
+<p class="lbl">Définitions</p>
+<p><b>M est le maximum</b> de A (ou plus grand élément, <i>maximum</i>) si M est un majorant de A <b>et</b> M ∈ A. On le note max A.</p>
+<p><b>m est le minimum</b> de A (ou plus petit élément, <i>minimum</i>) si m est un minorant de A <b>et</b> m ∈ A. On le note min A.</p>
+</div>
+<p>Avec l'image de la porte : le maximum, c'est la personne la plus grande du groupe, et elle doit faire partie du groupe. Un majorant peut être n'importe quelle hauteur de porte ; le maximum, lui, est un élément qu'on peut montrer du doigt.</p>
+
+<h3>3.2 Exemples</h3>
+<ul>
+<li><b>[1 ; 2]</b> : max = 2 et min = 1. Les deux bouts sont dans l'ensemble.</li>
+<li><b>]0 ; 1[</b> : ni maximum, ni minimum. 1 est un majorant, mais 1 ∉ A. Et aucun élément de A n'est un majorant (section 3.4).</li>
+<li><b>{1/n ; n ∈ ℕ*}</b> : max = 1, car 1 = 1/1 est dans A et 1/n ≤ 1 pour tout n. Pas de minimum : 0 est un minorant, mais 0 ∉ A, comme tu l'as noté. Et pour tout élément 1/n, l'élément 1/(n + 1) est plus petit.</li>
+<li><b>ℕ</b> : min = 0, pas de maximum.</li>
+</ul>
+<div class="box warn">
+<p class="lbl">Une erreur de notation dans tes notes</p>
+<p>Tu as écrit « min = ∅ » pour {1/n ; n ∈ ℕ*}. Le minimum, quand il existe, est un <b>nombre</b> ; ∅ est un <b>ensemble</b>. On écrit simplement « A n'a pas de minimum ». Dans le tableau de la section 2.3, en revanche, ∅ était juste : là, c'est l'<b>ensemble</b> des majorants de ℕ qui est vide.</p>
+</div>
+
+<h3>3.3 Il y a au plus un maximum</h3>
+<p>C'est pour ça qu'on dit « <b>le</b> maximum ». Voici la preuve de ton cours, rédigée complètement.</p>
+<div class="redac">
+<p>Soient M₁ et M₂ deux maxima de A.</p>
+<p>M₁ appartient à A, et M₂ majore A, donc M₁ ≤ M₂.</p>
+<p>De même, M₂ appartient à A, et M₁ majore A, donc M₂ ≤ M₁.</p>
+<p>Par antisymétrie (section 1.1), M₁ = M₂.</p>
+<p class="note">Chaque inégalité utilise les deux moitiés de la définition : « appartient à A » pour l'un, « majore A » pour l'autre.</p>
+</div>
+<div class="box nts">
+<p class="lbl">Dans tes notes</p>
+<p>La flèche « ⇒ M₁ = M₂ » est écrite juste après M₁ ≤ M₂. Une seule inégalité ne suffit pas : 3 ≤ 5, et pourtant 3 ≠ 5. Il faut les deux inégalités, puis l'antisymétrie.</p>
+</div>
+
+<h3>3.4 Montrer qu'un ensemble n'a pas de maximum</h3>
+<p>« A a un maximum » s'écrit ∃M ∈ A, ∀x ∈ A, x ≤ M. Sa négation :</p>
+<p class="eq">A n'a pas de maximum ⇔ ∀M ∈ A, ∃x ∈ A, x &gt; M</p>
+<p>Autrement dit, pour chaque élément de A, on en trouve un autre, plus grand, dans A. Le plus simple est souvent de raisonner par l'absurde.</p>
+<div class="redac">
+<p><b>Montrons que ]0 ; 1[ n'a pas de maximum.</b> Supposons par l'absurde que M soit le maximum de ]0 ; 1[. Alors 0 &lt; M &lt; 1.</p>
+<p>Posons x = (M + 1)/2, le milieu entre M et 1. Comme M &lt; 1, on a M &lt; x &lt; 1, et x &gt; 0. Donc x ∈ ]0 ; 1[ et x &gt; M.</p>
+<p>C'est une contradiction, puisque M devait majorer ]0 ; 1[. Donc ]0 ; 1[ n'a pas de maximum.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Quel est le maximum de [0 ; 5[ ?</p>
+<div class="mq-c"><button type="button" data-fb="5 n'appartient pas à [0 ; 5[.">5</button><button type="button" data-fb="4,9995 est dans [0 ; 5[ et plus grand. Pour tout candidat, on en trouve un plus grand.">4,999</button><button type="button">il n'y en a pas</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">5 est un majorant, mais 5 ∉ [0 ; 5[. Et aucun élément de l'ensemble n'est un majorant.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Quel est le minimum de ]−1 ; 3] ?</p>
+<div class="mq-c"><button type="button" data-fb="−1 n'appartient pas à ]−1 ; 3] : le crochet est tourné vers l'extérieur.">−1</button><button type="button">il n'y en a pas</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">−1 est un minorant mais n'appartient pas à l'ensemble. Le maximum, lui, existe : c'est 3.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Quel est le minimum de {1 − 1/n ; n ∈ ℕ*} = {0 ; 1/2 ; 2/3 ; 3/4 ; …} ?</p>
+<div class="mq-c"><button type="button" data-fb="1 est un majorant, pas un minorant.">1</button><button type="button" data-fb="Regarde le premier élément, obtenu pour n = 1.">il n'y en a pas</button><button type="button">0</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0, obtenu pour n = 1. Il est dans l'ensemble, et tous les autres éléments sont plus grands.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Borne supérieure et borne inférieure</h2>
+
+<h3>4.1 Le problème</h3>
+<p>]0 ; 1[ n'a pas de maximum. Pourtant, 1 joue clairement un rôle spécial : c'est le bord droit de l'ensemble. La borne supérieure donne un nom à ce bord, même quand il n'appartient pas à l'ensemble.</p>
+
+<h3>4.2 Les définitions</h3>
+<div class="box key">
+<p class="lbl">Définitions</p>
+<p>La <b>borne supérieure</b> de A (<i>supremum</i>, ou <i>least upper bound</i>), notée sup A, est <b>le plus petit des majorants</b> de A, s'il existe.</p>
+<p>La <b>borne inférieure</b> de A (<i>infimum</i>, ou <i>greatest lower bound</i>), notée inf A, est <b>le plus grand des minorants</b> de A, s'il existe.</p>
+<p>Autrement dit, s = sup A si et seulement si : (1) s est un majorant de A, et (2) s ≤ M pour tout majorant M de A.</p>
+</div>
+<p>Avec l'image de la porte : <b>la borne supérieure, c'est la porte la plus basse qui laisse encore passer tout le monde.</b> Si le plus grand du groupe mesure 1,90 m, c'est 1,90 m, et la borne supérieure est alors le maximum. Mais imagine un groupe de 1,80 m, 1,85 m, 1,875 m, 1,8875 m…, qui s'approche de 1,90 m sans l'atteindre. Il n'y a pas de plus grand, et pourtant la porte idéale mesure toujours 1,90 m.</p>
+<figure><svg viewBox="0 0 440 150" role="img" aria-label="L'intervalle ]0 ; 1[ en bleu. À droite de 1, la zone des majorants ; à gauche de 0, la zone des minorants. 1 est la borne supérieure, 0 la borne inférieure">
+<rect x="301.7" y="56" width="128.3" height="24" class="fsg"/>
+<line x1="301.7" y1="56" x2="301.7" y2="80" class="sg zline"/>
+<text x="307.7" y="50" class="s tg" style="font-size:13.5px">majorants</text>
+<rect x="16" y="56" width="122.3" height="24" class="fsa"/>
+<line x1="138.3" y1="56" x2="138.3" y2="80" class="sa zline"/>
+<text x="132.3" y="50" text-anchor="end" class="s ta" style="font-size:13.5px">minorants</text>
+<line x1="16" y1="84" x2="430" y2="84" class="sm" marker-end="url(#ah-i)"/>
+<line x1="138.3" y1="84" x2="301.7" y2="84" class="labA"/>
+<circle cx="138.3" cy="84" r="6" class="ptopen"/><circle cx="301.7" cy="84" r="6" class="ptopen"/>
+<text x="220.0" y="70" text-anchor="middle" class="mt tb">A = ]0 ; 1[</text>
+<text x="138.3" y="106" text-anchor="middle" class="mt">0</text><text x="301.7" y="106" text-anchor="middle" class="mt">1</text>
+<text x="138.3" y="128" text-anchor="middle" class="s tm" style="font-size:13.5px">inf A = 0</text>
+<text x="138.3" y="143" text-anchor="middle" class="s tm" style="font-size:13.5px">plus grand minorant</text>
+<text x="301.7" y="128" text-anchor="middle" class="s tb" style="font-size:13.5px">sup A = 1</text>
+<text x="301.7" y="143" text-anchor="middle" class="s tb" style="font-size:13.5px">plus petit majorant</text>
+</svg><figcaption>Les majorants de ]0 ; 1[ forment la demi-droite [1 ; +∞[. Le plus petit d'entre eux, 1, est la borne supérieure. Il n'appartient pas à A : A n'a pas de maximum. Même chose à gauche avec 0.</figcaption></figure>
+
+<h3>4.3 Le laboratoire des bornes</h3>
+<p>Même principe qu'en 2.2, avec en plus sup, inf, max et min, et un test de la caractérisation avec ε (section 4.6) : bouge ε et regarde la page trouver un élément de A juste sous la borne supérieure.</p>
+<div class="lab" id="lab2" data-mode="full" data-set="ouvert"></div>
+
+<h3>4.4 Les propriétés de ton cours, démontrées</h3>
+<h4>Unicité</h4>
+<p>Si sup A existe, il est unique. La preuve est la même que pour le maximum : si s₁ et s₂ sont deux plus petits majorants, alors s₁ ≤ s₂ (car s₁ est le plus petit et s₂ est un majorant) et s₂ ≤ s₁ (pour la même raison), donc s₁ = s₂.</p>
+
+<h4>Le lien avec le maximum</h4>
+<div class="box key">
+<p class="lbl">Propriété</p>
+<p>Si A a un maximum, alors sup A existe et sup A = max A.</p>
+<p>Plus précisément : max A existe ⇔ sup A existe et sup A ∈ A.</p>
+</div>
+<div class="redac">
+<p><b>Preuve du sens ⇒</b> (celle de ton cours). Soit M = max A. Par définition du maximum, M est un majorant de A.</p>
+<p>Soit M′ un majorant quelconque de A. Comme M ∈ A, on a M ≤ M′.</p>
+<p>Donc M est un majorant plus petit que tous les autres : M = sup A. Et sup A = M ∈ A.</p>
+<p><b>Preuve du sens ⇐.</b> Si sup A existe et appartient à A, alors sup A est un majorant de A qui appartient à A : c'est exactement la définition du maximum.</p>
+</div>
+<p>En pratique : <b>pour savoir si A a un maximum, cherche sup A, puis regarde s'il appartient à A.</b> Pour ]0 ; 1[, sup A = 1 ∉ A : pas de maximum. Pour [1 ; 2], sup A = 2 ∈ A : max A = 2.</p>
+
+<h4>La monotonie</h4>
+<div class="box key">
+<p class="lbl">Propriété</p>
+<p>Si A ⊂ B, avec A non vide et B majorée, alors sup A ≤ sup B.</p>
+</div>
+<div class="redac">
+<p>B est majorée, et non vide puisqu'elle contient A. Donc sup B existe (section 5).</p>
+<p>sup B majore B. Tout élément de A est aussi un élément de B, donc sup B majore aussi A.</p>
+<p>A est non vide et majorée, donc sup A existe. C'est le plus petit majorant de A, et sup B est un majorant de A : donc sup A ≤ sup B.</p>
+</div>
+<p>L'intuition : si on ajoute des personnes au groupe, la porte idéale ne peut que monter, ou rester à la même hauteur. Pour les bornes inférieures, c'est l'inverse : si A ⊂ B, avec A non vide et B minorée, alors inf A ≥ inf B.</p>
+
+<h3>4.5 Le tableau de ton cours, complété</h3>
+<div class="tw"><table class="c">
+<tr><th>A</th><th>sup A</th><th>inf A</th><th>max A</th><th>min A</th></tr>
+<tr><td>[1 ; 2]</td><td>2</td><td>1</td><td>2</td><td>1</td></tr>
+<tr><td>[1 ; 2[</td><td>2</td><td>1</td><td>n'existe pas</td><td>1</td></tr>
+<tr><td>]0 ; 1[</td><td>1</td><td>0</td><td>n'existe pas</td><td>n'existe pas</td></tr>
+<tr><td>{1/n ; n ∈ ℕ*}</td><td>1</td><td>0</td><td>1</td><td>n'existe pas</td></tr>
+<tr><td>ℕ</td><td>n'existe pas</td><td>0</td><td>n'existe pas</td><td>0</td></tr>
+</table></div>
+<p>Règle de lecture : <b>le maximum existe exactement quand sup A appartient à A</b>, et le minimum exactement quand inf A appartient à A. Vérifie-le ligne par ligne.</p>
+<div class="box nts">
+<p class="lbl">Dans tes notes</p>
+<p>Ta dernière colonne s'appelle « inf A », comme la deuxième. Ce doit être « min A » : les valeurs que tu as écrites (1, 1, ×, ×) sont bien celles du minimum.</p>
+</div>
+
+<h3 id="p4-eps">4.6 La caractérisation avec ε</h3>
+<p>C'est le résultat le plus important du chapitre pour la suite, et il est dans ton polycopié (page 5). La lettre grecque ε (epsilon) désigne un nombre strictement positif, qu'on imagine tout petit.</p>
+<div class="box key">
+<p class="lbl">Caractérisation de la borne supérieure</p>
+<p>Soit s un majorant de A. Alors :</p>
+<p class="eq">s = sup A ⇔ ∀ε &gt; 0, ∃x ∈ A, x &gt; s − ε</p>
+<p>En français : aussi petit que soit ε, si on descend de ε sous s, on retrouve des éléments de A. Autrement dit, aucun nombre plus petit que s n'est un majorant.</p>
+</div>
+<p>D'où vient cette formule ? De la négation. D'après la section 2.4, « s − ε n'est pas un majorant de A » s'écrit ∃x ∈ A, x &gt; s − ε. La caractérisation dit donc simplement que tout nombre plus petit que s, de la forme s − ε, n'est pas un majorant.</p>
+<div class="redac">
+<p><b>Preuve du sens ⇒.</b> Soit s = sup A, et soit ε &gt; 0. Comme s − ε &lt; s, et que s est le plus petit des majorants, s − ε n'est pas un majorant. Donc il existe x ∈ A tel que x &gt; s − ε.</p>
+<p><b>Preuve du sens ⇐.</b> Supposons que s majore A et vérifie la propriété avec ε. Soit M un majorant de A. Supposons par l'absurde que M &lt; s, et posons ε = s − M, qui est &gt; 0. Il existe alors x ∈ A tel que x &gt; s − ε = M. C'est impossible, puisque M majore A. Donc s ≤ M : s est bien le plus petit des majorants, s = sup A.</p>
+</div>
+<p><b>Exemple : sup ]0 ; 1[ = 1.</b> 1 est un majorant (section 2.4). Soit ε &gt; 0. Le nombre x = max(1 − ε/2 ; 1/2) est dans ]0 ; 1[ et vérifie x &gt; 1 − ε. Donc 1 = sup ]0 ; 1[. Le laboratoire de la section 4.3 calcule ce x pour toi quand tu bouges ε.</p>
+<div class="box key">
+<p class="lbl">La même chose pour la borne inférieure</p>
+<p>Soit m un minorant de A. Alors <span class="mr">m = inf A ⇔ ∀ε &gt; 0, ∃x ∈ A, x &lt; m + ε</span>.</p>
+</div>
+<p><b>Exemple : inf {1/n ; n ∈ ℕ*} = 0.</b> 0 est un minorant. Soit ε &gt; 0. D'après la propriété d'Archimède de ton polycopié, il existe un entier n &gt; 1/ε, et alors 1/n &lt; ε = 0 + ε. Donc 0 = inf. Comme 0 ∉ A, l'ensemble n'a pas de minimum. Tu retrouveras exactement cet argument dans l'exercice 8 de ta feuille.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut sup [1 ; 2[ ?</p>
+<div class="mq-c"><button type="button" data-fb="1,9995 est dans [1 ; 2[ et dépasse 1,999 : ce n'est même pas un majorant.">1,999</button><button type="button" data-fb="[1 ; 2[ est non vide et majoré : sa borne supérieure existe (section 5). C'est le maximum qui n'existe pas.">elle n'existe pas</button><button type="button">2</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2 est le plus petit majorant. Comme 2 ∉ A, il n'y a pas de maximum.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Si sup A ∈ A, alors…</p>
+<div class="mq-c"><button type="button">sup A = max A</button><button type="button" data-fb="Si sup A appartient à A, A contient au moins un élément.">A est vide</button><button type="button" data-fb="C'est l'inverse : un majorant qui appartient à A, c'est la définition du maximum.">A n'a pas de maximum</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">sup A est un majorant qui appartient à A : c'est le maximum.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Pour montrer que s = sup A avec la caractérisation, il faut montrer…</p>
+<div class="mq-c"><button type="button" data-fb="La borne supérieure peut ne pas appartenir à A, comme pour ]0 ; 1[.">que s ∈ A</button><button type="button">que s majore A, et que ∀ε &gt; 0, ∃x ∈ A, x &gt; s − ε</button><button type="button" data-fb="Il manque la première moitié : s doit être un majorant. Pour A = [1 ; 2], s = 1 vérifie la propriété avec ε (x = 1 convient toujours), mais 1 n'est pas la borne supérieure.">seulement que ∀ε &gt; 0, ∃x ∈ A, x &gt; s − ε</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les deux moitiés : s est un majorant, et rien en dessous de s n'en est un.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut inf {1/n ; n ∈ ℕ*} ?</p>
+<div class="mq-c"><button type="button" data-fb="1 est le maximum, donc la borne supérieure.">1</button><button type="button" data-fb="L'ensemble est non vide et minoré par 0 : sa borne inférieure existe. C'est le minimum qui n'existe pas.">elle n'existe pas</button><button type="button">0</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0 est le plus grand minorant. Il n'appartient pas à l'ensemble, donc pas de minimum.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>L'axiome de la borne supérieure</h2>
+<div class="box key">
+<p class="lbl">Propriété de la borne supérieure (<i>least-upper-bound property</i>)</p>
+<p>Toute partie <b>non vide</b> et <b>majorée</b> de ℝ admet une borne supérieure.</p>
+<p>De même, toute partie non vide et minorée de ℝ admet une borne inférieure.</p>
+</div>
+<p>Ton cours ne démontre pas cette propriété : c'est une propriété fondamentale de ℝ, qu'on admet. Ton polycopié la dit « essentielle pour comprendre la construction de ℝ ». Regardons pourquoi chaque mot compte.</p>
+<ul>
+<li><b>« majorée »</b> : ℕ n'a aucun majorant, donc pas de plus petit majorant. Pas de borne supérieure.</li>
+<li><b>« non vide »</b> : tout réel M est un majorant de l'ensemble vide. En effet, « pour tout x ∈ ∅, x ≤ M » est vrai par vacuité, puisqu'il n'y a aucun x pour le contredire (partie 8.3 du cours de logique). Les majorants de ∅ sont donc tous les réels, et il n'y a pas de plus petit réel. Pas de borne supérieure.</li>
+</ul>
+
+<h3>5.1 Pourquoi c'est une propriété de ℝ, et pas de ℚ</h3>
+<p>Dans ℚ, la propriété est fausse. Prends A = [1 ; √2[ ∩ ℚ, l'ensemble des fractions comprises entre 1 et √2. A est non vide (il contient 1) et majorée (par 2, par exemple).</p>
+<p>Si on cherche ses majorants <b>parmi les fractions</b>, on trouve toutes les fractions plus grandes que √2. Or il n'y a pas de plus petite fraction plus grande que √2 : entre √2 et n'importe quelle fraction q &gt; √2, il y a toujours une autre fraction, plus proche de √2. Ton polycopié le dit ainsi : ℚ est dense dans ℝ. Donc A n'a pas de borne supérieure dans ℚ.</p>
+<p>Dans ℝ, en revanche, sup A = √2. La borne supérieure tombe exactement sur le « trou » de ℚ à l'endroit de √2, celui dont on avait parlé à propos de la droite graduée. <b>La propriété de la borne supérieure est la façon précise de dire que la droite réelle n'a pas de trou.</b></p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Pourquoi c'est la porte d'entrée des suites</h2>
+<p>Prends la suite u<sub>n</sub> = 1 − 1/n, pour n ≥ 1 : 0 ; 1/2 ; 2/3 ; 3/4 ; 4/5… Ses termes forment l'ensemble {1 − 1/n ; n ∈ ℕ*}, que tu peux étudier dans les laboratoires. La suite monte, ne dépasse jamais 1, et s'en approche autant qu'on veut : sa borne supérieure vaut 1.</p>
+<p>Tu verras dans le cours de suites deux résultats construits exactement sur ce chapitre.</p>
+<ul>
+<li><b>Le théorème de la limite monotone</b> (<i>monotone convergence theorem</i>) : toute suite croissante et majorée converge, et sa limite est la borne supérieure de ses termes. Ici, u<sub>n</sub> tend vers 1.</li>
+<li><b>La définition de la limite</b> : u<sub>n</sub> tend vers ℓ si <span class="mr">∀ε &gt; 0, ∃N ∈ ℕ, ∀n ≥ N, |u<sub>n</sub> − ℓ| &lt; ε</span>. Elle commence comme la caractérisation de la section 4.6 : « pour tout ε &gt; 0, il existe… ».</li>
+</ul>
+<p>Si la section 4.6 est claire pour toi, tu as déjà fait une bonne partie du chemin vers la notion de limite.</p>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Relecture de tes notes</h2>
+<h3>Ce qui est juste</h3>
+<ul>
+<li>Les définitions de majorant et de minorant, et la remarque « un majorant n'a pas besoin d'appartenir à A ».</li>
+<li>Tout ton tableau des majorants et des minorants, y compris le ∅ pour les majorants de ℕ.</li>
+<li>Les définitions de borne supérieure et de borne inférieure, l'unicité, le lien avec le maximum et sa preuve.</li>
+<li>Toutes les valeurs de ton dernier tableau (sup, inf, max, min).</li>
+</ul>
+<h3>Ce qu'il faut corriger</h3>
+<ol>
+<li><b>La définition du maximum.</b> Tu as écrit « M est un maximum de A si A est un majorant et M ∈ A ». C'est M qui est un majorant de A, pas A : « M est un majorant de A et M ∈ A ».</li>
+<li><b>« min = ∅ »</b> pour {1/n ; n ∈ ℕ*} : le minimum est un nombre, pas un ensemble. On écrit « A n'a pas de minimum » (section 3.2).</li>
+<li><b>L'unicité du maximum.</b> « M₁ ≤ M₂ ⇒ M₁ = M₂ » : une seule inégalité ne suffit pas. Il faut M₁ ≤ M₂ <b>et</b> M₂ ≤ M₁ (section 3.3).</li>
+<li><b>Le titre de ta dernière colonne</b> : « min A » au lieu de « inf A » (section 4.5).</li>
+<li><b>La preuve de la monotonie</b> (« En effet : sup B majore B ⇒ majore A et sup A… ») est incomplète. Sa version complète est en section 4.4.</li>
+<li><b>La colonne « Bornée ? »</b>, à côté de laquelle tu as noté « borne sup » : « bornée » veut dire « majorée et minorée » (section 2.5). Ce n'est pas la même chose qu'avoir une borne supérieure, qui ne demande que d'être majorée (et non vide).</li>
+</ol>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Bilan</h2>
+<div class="box key">
+<p class="lbl">Avant le prochain cours, tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>écrire les définitions de majorant, minorant, maximum, minimum, borne supérieure et borne inférieure, avec les quantificateurs ;</li>
+<li>remplir le tableau de la section 4.5 pour [1 ; 2], [1 ; 2[, ]0 ; 1[, {1/n ; n ∈ ℕ*} et ℕ, en justifiant chaque case ;</li>
+<li>démontrer qu'il y a au plus un maximum, et que sup A = max A quand le maximum existe ;</li>
+<li>démontrer qu'un ensemble comme ]0 ; 1[ n'a pas de maximum ;</li>
+<li>énoncer la caractérisation avec ε, et l'expliquer en français ;</li>
+<li>énoncer la propriété de la borne supérieure, et dire pourquoi « non vide » et « majorée » sont nécessaires.</li>
+</ul>
+</div>
+<p>Sur ta feuille de TD, l'exercice 9 (« f est bornée ») utilise la section 2.5, et l'exercice 8 le même argument que la fin de la section 4.6.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes notes du cours de Suites numériques et du chapitre 1 de ton polycopié, Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function fmt(v){
+  var r = Math.round(v * 1000) / 1000;
+  if (r === 0) r = 0;
+  return String(r).replace('-', '−').replace('.', ',');
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ---------- Questions « Vérifie-toi » ---------- */
+function advance(mq){
+  var sq = mq.parentElement;
+  if (!sq || !sq.classList.contains('seq')) return;
+  var nx = mq.nextElementSibling;
+  while (nx && !(nx.classList.contains('mq') || nx.classList.contains('seq-end'))) nx = nx.nextElementSibling;
+  if (nx && nx.hidden) nx.hidden = false;
+}
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; advance(mq); }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la définition juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+each(document.querySelectorAll('.seq'), function(sq){
+  var items = [];
+  each(sq.children, function(ch){ if (ch.classList.contains('mq') || ch.classList.contains('seq-end')) items.push(ch); });
+  for (var i = 1; i < items.length; i++) items[i].hidden = true;
+});
+
+/* ---------- Les ensembles du laboratoire ----------
+   above(c) : un élément de A strictement plus grand que c, ou null si c est un majorant
+   below(c) : un élément de A strictement plus petit que c, ou null si c est un minorant
+   nearSup(e) / nearInf(e) : un élément de A dans ]sup − e ; sup] / [inf ; inf + e[ */
+function range(a, b){ var r = []; for (var i = a; i <= b; i++) r.push(i); return r; }
+var SETS = {
+  ferme: {label:'[1 ; 2]', vmin:-0.25, vmax:2.75, c0:2.3, ticks:[0,0.5,1,1.5,2,2.5], seg:[1,2,true,true],
+    sup:2, inf:1, supIn:true, infIn:true, maj:'[2 ; +∞[', mino:']−∞ ; 1]',
+    above:function(c){ return c < 2 ? {v:2, t:'2'} : null; },
+    below:function(c){ return c > 1 ? {v:1, t:'1'} : null; },
+    nearSup:function(){ return {v:2, t:'2'}; },
+    nearInf:function(){ return {v:1, t:'1'}; }},
+  semi: {label:'[1 ; 2[', vmin:-0.25, vmax:2.75, c0:1.9, ticks:[0,0.5,1,1.5,2,2.5], seg:[1,2,true,false],
+    sup:2, inf:1, supIn:false, infIn:true, maj:'[2 ; +∞[', mino:']−∞ ; 1]',
+    above:function(c){ if (c >= 2) return null; var x = c < 1 ? 1 : (c + 2) / 2; return {v:x, t:fmt(x)}; },
+    below:function(c){ return c > 1 ? {v:1, t:'1'} : null; },
+    nearSup:function(e){ var x = Math.max(1, 2 - e / 2); return {v:x, t:fmt(x)}; },
+    nearInf:function(){ return {v:1, t:'1'}; }},
+  ouvert: {label:']0 ; 1[', vmin:-0.5, vmax:1.5, c0:0.9, ticks:[-0.5,0,0.5,1,1.5], seg:[0,1,false,false],
+    sup:1, inf:0, supIn:false, infIn:false, maj:'[1 ; +∞[', mino:']−∞ ; 0]',
+    above:function(c){ if (c >= 1) return null; var x = (Math.max(c, 0) + 1) / 2; return {v:x, t:fmt(x)}; },
+    below:function(c){ if (c <= 0) return null; var x = Math.min(c, 1) / 2; return {v:x, t:fmt(x)}; },
+    nearSup:function(e){ var x = Math.max(1 - e / 2, 0.5); return {v:x, t:fmt(x)}; },
+    nearInf:function(e){ var x = Math.min(e / 2, 0.5); return {v:x, t:fmt(x)}; }},
+  inv: {label:'{1/n ; n ∈ ℕ*}', vmin:-0.15, vmax:1.25, c0:0.3, ticks:[0,0.5,1], pts:range(1,80).map(function(n){ return 1/n; }),
+    sup:1, inf:0, supIn:true, infIn:false, maj:'[1 ; +∞[', mino:']−∞ ; 0]',
+    above:function(c){ return c < 1 ? {v:1, t:'1 (n = 1)'} : null; },
+    below:function(c){ if (c <= 0) return null; var n = Math.floor(1 / c) + 1; while (1 / n >= c) n++; return {v:1/n, t:'1/' + n + ' ≈ ' + fmt(1/n) + ' (n = ' + n + ')'}; },
+    nearSup:function(){ return {v:1, t:'1'}; },
+    nearInf:function(e){ var n = Math.floor(1 / e) + 1; while (1 / n >= e) n++; return {v:1/n, t:'1/' + n + ' ≈ ' + fmt(1/n)}; }},
+  croiss: {label:'{1 − 1/n ; n ∈ ℕ*}', vmin:-0.25, vmax:1.25, c0:0.8, ticks:[0,0.5,1], pts:range(1,80).map(function(n){ return 1 - 1/n; }),
+    sup:1, inf:0, supIn:false, infIn:true, maj:'[1 ; +∞[', mino:']−∞ ; 0]',
+    above:function(c){ if (c >= 1) return null; if (c < 0) return {v:0, t:'0 (n = 1)'}; var n = Math.floor(1 / (1 - c)) + 1; while (1 - 1 / n <= c) n++; return {v:1 - 1/n, t:'1 − 1/' + n + ' ≈ ' + fmt(1 - 1/n) + ' (n = ' + n + ')'}; },
+    below:function(c){ return c > 0 ? {v:0, t:'0 (n = 1)'} : null; },
+    nearSup:function(e){ var n = Math.floor(1 / e) + 1; while (1 - 1 / n <= 1 - e) n++; return {v:1 - 1/n, t:'1 − 1/' + n + ' ≈ ' + fmt(1 - 1/n)}; },
+    nearInf:function(){ return {v:0, t:'0'}; }},
+  nat: {label:'ℕ', vmin:-1.5, vmax:11.5, cmax:10.5, c0:6.5, ticks:[0,2,4,6,8,10], pts:range(0,11), more:true,
+    sup:null, inf:0, supIn:false, infIn:true, maj:'aucun', mino:']−∞ ; 0]',
+    above:function(c){ var x = c < 0 ? 0 : Math.floor(c) + 1; return {v:x, t:String(x)}; },
+    below:function(c){ return c > 0 ? {v:0, t:'0'} : null; },
+    nearSup:null,
+    nearInf:function(){ return {v:0, t:'0'}; }}
+};
+var ORDER = ['ferme', 'semi', 'ouvert', 'inv', 'croiss', 'nat'];
+
+function pill(yes){ return '<span class="pill ' + (yes ? 'v' : 'f') + '">' + (yes ? 'oui' : 'non') + '</span>'; }
+
+function initLab(root){
+  var id = root.id, full = root.getAttribute('data-mode') === 'full';
+  var key = root.getAttribute('data-set') || 'ferme', S = SETS[key], c = S.c0, eps = 0.1, zones = full;
+  var h = '<div class="lab-sets" role="group" aria-label="Choisir l\'ensemble A">'
+    + ORDER.map(function(k){ return '<button type="button" data-k="' + k + '" aria-pressed="' + (k === key) + '">' + SETS[k].label + '</button>'; }).join('')
+    + '</div><div class="lab-fig"></div>'
+    + '<div class="lab-ctrl"><label for="' + id + '-c">Ton nombre c = <span class="mr" id="' + id + '-cv"></span></label><input type="range" id="' + id + '-c" step="0.005"></div>';
+  if (full) h += '<div class="lab-ctrl"><label for="' + id + '-e">ε = <span class="mr" id="' + id + '-ev"></span></label><input type="range" id="' + id + '-e" min="0.01" max="1" step="0.01" value="0.1"></div>';
+  else h += '<p class="lab-tog"><label><input type="checkbox" id="' + id + '-z">Montrer tous les majorants et tous les minorants</label></p>';
+  h += '<div class="lab-read" aria-live="polite"></div>';
+  root.innerHTML = h;
+  var fig = root.querySelector('.lab-fig'), read = root.querySelector('.lab-read');
+  var cIn = document.getElementById(id + '-c'), cV = document.getElementById(id + '-cv');
+  var eIn = document.getElementById(id + '-e'), eV = document.getElementById(id + '-ev'), zIn = document.getElementById(id + '-z');
+
+  function setSet(k){
+    key = k; S = SETS[k];
+    each(root.querySelectorAll('.lab-sets button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-k') === k ? 'true' : 'false'); });
+    cIn.min = (S.cmin !== undefined ? S.cmin : S.vmin); cIn.max = (S.cmax !== undefined ? S.cmax : S.vmax);
+    cIn.value = S.c0; c = S.c0;
+    render();
+  }
+
+  function draw(ab, be){
+    var W = Math.round(Math.max(330, Math.min(640, fig.clientWidth || 640))), H = full ? 184 : 156, y0 = full ? 112 : 96, L = 30, R = W - 30;
+    var X = function(v){ return L + (v - S.vmin) / (S.vmax - S.vmin) * (R - L); };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Droite graduée : l\'ensemble ' + esc(S.label) + ' en bleu, le nombre c = ' + fmt(c) + ' en rouge">';
+    if (zones){
+      if (S.sup !== null){
+        s += '<rect x="' + X(S.sup) + '" y="' + (y0 - 30) + '" width="' + (R + 14 - X(S.sup)) + '" height="26" class="fsg"/>';
+        s += '<line x1="' + X(S.sup) + '" y1="' + (y0 - 30) + '" x2="' + X(S.sup) + '" y2="' + (y0 - 4) + '" class="sg zline"/>';
+        s += (X(S.sup) + 72 > W) ? '<text x="' + (W - 4) + '" y="' + (y0 - 36) + '" text-anchor="end" class="s tg">majorants</text>' : '<text x="' + (X(S.sup) + 6) + '" y="' + (y0 - 36) + '" class="s tg">majorants</text>';
+      }
+      if (S.inf !== null){
+        s += '<rect x="' + (L - 10) + '" y="' + (y0 - 30) + '" width="' + (X(S.inf) - L + 10) + '" height="26" class="fsa"/>';
+        s += '<line x1="' + X(S.inf) + '" y1="' + (y0 - 30) + '" x2="' + X(S.inf) + '" y2="' + (y0 - 4) + '" class="sa zline"/>';
+        s += (X(S.inf) < 74) ? '<text x="4" y="' + (y0 - 36) + '" class="s ta">minorants</text>' : '<text x="' + (X(S.inf) - 6) + '" y="' + (y0 - 36) + '" text-anchor="end" class="s ta">minorants</text>';
+      }
+    }
+    var ns = null, ni = null;
+    if (full){
+      if (S.sup !== null){
+        ns = S.nearSup(eps);
+        var a1 = Math.max(X(S.sup - eps), L - 10);
+        s += '<rect x="' + a1 + '" y="' + (y0 - 13) + '" width="' + (X(S.sup) - a1) + '" height="26" class="epsband"/>';
+        s += '<text x="' + X(S.sup) + '" y="20" text-anchor="middle" class="mt tb bold">sup A</text>';
+        s += '<line x1="' + X(S.sup) + '" y1="26" x2="' + X(S.sup) + '" y2="' + (y0 - 42) + '" class="sb dash" style="stroke-width:1.2"/>';
+      }
+      if (S.inf !== null){
+        ni = S.nearInf(eps);
+        var b1 = Math.min(X(S.inf + eps), R + 14);
+        s += '<rect x="' + X(S.inf) + '" y="' + (y0 - 13) + '" width="' + (b1 - X(S.inf)) + '" height="26" class="epsband"/>';
+        s += '<text x="' + X(S.inf) + '" y="20" text-anchor="middle" class="mt tb bold">inf A</text>';
+        s += '<line x1="' + X(S.inf) + '" y1="26" x2="' + X(S.inf) + '" y2="' + (y0 - 42) + '" class="sb dash" style="stroke-width:1.2"/>';
+      }
+    }
+    s += '<line x1="' + (L - 10) + '" y1="' + y0 + '" x2="' + (R + 14) + '" y2="' + y0 + '" class="sm" marker-end="url(#ah-i)"/>';
+    S.ticks.forEach(function(t){
+      var x = X(t);
+      s += '<line x1="' + x + '" y1="' + (y0 - 4) + '" x2="' + x + '" y2="' + (y0 + 4) + '" class="sm"/>';
+      s += '<text x="' + x + '" y="' + (y0 + 21) + '" text-anchor="middle" class="s tm">' + fmt(t) + '</text>';
+    });
+    if (S.seg){
+      var a = X(S.seg[0]), b = X(S.seg[1]);
+      s += '<line x1="' + a + '" y1="' + y0 + '" x2="' + b + '" y2="' + y0 + '" class="labA"/>';
+      s += '<circle cx="' + a + '" cy="' + y0 + '" r="6" class="' + (S.seg[2] ? 'fb' : 'ptopen') + '"/>';
+      s += '<circle cx="' + b + '" cy="' + y0 + '" r="6" class="' + (S.seg[3] ? 'fb' : 'ptopen') + '"/>';
+    }
+    if (S.pts) S.pts.forEach(function(p){ s += '<circle cx="' + X(p).toFixed(1) + '" cy="' + y0 + '" r="3.6" class="fb"/>'; });
+    if (S.more) s += '<text x="' + (R + 4) + '" y="' + (y0 - 10) + '" text-anchor="end" class="tb">…</text>';
+    [ab, be].forEach(function(w){
+      if (!w) return;
+      s += '<circle cx="' + X(w.v) + '" cy="' + y0 + '" r="10" class="ring"/>';
+      s += '<text x="' + X(w.v) + '" y="' + (y0 + 40) + '" text-anchor="middle" class="s ta">témoin</text>';
+    });
+    if (ns) s += '<circle cx="' + X(ns.v) + '" cy="' + y0 + '" r="8" class="ringb"/>';
+    if (ni) s += '<circle cx="' + X(ni.v) + '" cy="' + y0 + '" r="8" class="ringb"/>';
+    var xc = X(c);
+    s += '<line x1="' + xc + '" y1="' + (y0 - 48) + '" x2="' + xc + '" y2="' + (y0 + 8) + '" class="sr"/>';
+    s += '<circle cx="' + xc + '" cy="' + y0 + '" r="4" class="fr"/>';
+    s += '<text x="' + xc + '" y="' + (y0 - 53) + '" text-anchor="middle" class="mt tr">c</text>';
+    s += '</svg>';
+    fig.innerHTML = s;
+    return {ns:ns, ni:ni};
+  }
+
+  function render(){
+    cV.textContent = fmt(c);
+    if (eV) eV.textContent = fmt(eps);
+    var ab = S.above(c), be = S.below(c);
+    var near = draw(ab, be);
+    var r = '<div class="lab-row"><span>c est-il un <b>majorant</b> de A ?</span>' + pill(!ab) + '<span class="lab-why">'
+      + (ab ? 'Non : x = ' + ab.t + ' appartient à A et x &gt; c. Ce seul témoin fait tomber « pour tout x ∈ A, x ≤ c ».'
+            : 'Oui : tous les éléments de A sont inférieurs ou égaux à c.') + '</span></div>';
+    r += '<div class="lab-row"><span>c est-il un <b>minorant</b> de A ?</span>' + pill(!be) + '<span class="lab-why">'
+      + (be ? 'Non : x = ' + be.t + ' appartient à A et x &lt; c. Ce seul témoin fait tomber « pour tout x ∈ A, x ≥ c ».'
+            : 'Oui : tous les éléments de A sont supérieurs ou égaux à c.') + '</span></div>';
+    if (zones) r += '<div class="lab-sum"><span>Majorants : ' + S.maj + '</span><span>Minorants : ' + S.mino + '</span></div>';
+    if (full){
+      var supT = S.sup === null ? 'n\'existe pas' : fmt(S.sup), infT = S.inf === null ? 'n\'existe pas' : fmt(S.inf);
+      var maxT = (S.sup !== null && S.supIn) ? fmt(S.sup) : (S.sup !== null ? 'n\'existe pas (sup A ∉ A)' : 'n\'existe pas');
+      var minT = (S.inf !== null && S.infIn) ? fmt(S.inf) : (S.inf !== null ? 'n\'existe pas (inf A ∉ A)' : 'n\'existe pas');
+      r += '<div class="lab-sum"><span>sup A = ' + supT + '</span><span>inf A = ' + infT + '</span><span>max A : ' + maxT + '</span><span>min A : ' + minT + '</span></div>';
+      var e1 = S.sup === null
+        ? '<p><b>Côté sup :</b> A n\'est pas majorée, donc pas de borne supérieure. Rien à tester de ce côté.</p>'
+        : '<p><b>Côté sup :</b> x = ' + near.ns.t + ' appartient à A et x &gt; sup A − ε = ' + fmt(S.sup - eps) + '.</p>';
+      var e2 = '<p><b>Côté inf :</b> x = ' + near.ni.t + ' appartient à A et x &lt; inf A + ε = ' + fmt(S.inf + eps) + '.</p>';
+      r += '<div class="lab-eps"><p>Caractérisation avec ε = ' + fmt(eps) + ' : la page cherche un élément de A dans chaque bande bleue.</p>' + e1 + e2 + '</div>';
+    }
+    read.innerHTML = r;
+  }
+
+  each(root.querySelectorAll('.lab-sets button'), function(b){ b.addEventListener('click', function(){ setSet(b.getAttribute('data-k')); }); });
+  cIn.addEventListener('input', function(){ c = parseFloat(cIn.value); render(); });
+  if (eIn) eIn.addEventListener('input', function(){ eps = parseFloat(eIn.value); render(); });
+  if (zIn) zIn.addEventListener('change', function(){ zones = zIn.checked; render(); });
+  var lastW = 0;
+  window.addEventListener('resize', function(){ var w = fig.clientWidth; if (Math.abs(w - lastW) > 8){ lastW = w; render(); } });
+  setSet(key);
+  lastW = fig.clientWidth;
+}
+each(document.querySelectorAll('div.lab[id]'), initLab);
+window.__labSets = SETS;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Géométrie et trigonométrie, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+.hero{position:relative}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.m{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-style:italic;font-size:1.1em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+.vec{position:relative;display:inline-block;padding-top:.45em;line-height:1.1}
+.vec::before{content:"→";position:absolute;top:-.12em;left:0;right:0;text-align:center;font-size:.75em;line-height:1;font-style:normal}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.toc{columns:2 220px;margin:10px 0;padding-left:1.4em}
+.toc li{break-inside:avoid}
+details.check{margin:28px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+details.check[open]>summary{margin-bottom:4px}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:'STIX Two Text','Cambria Math',serif;font-style:italic;font-size:16px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.thick{stroke-width:4}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}
+/* widget */
+.widget .ctrl{max-width:440px;margin:12px auto 0}
+.widget label{font-weight:700;display:block;margin-bottom:4px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.presets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;background:var(--paper);border-radius:8px;padding:10px 14px}
+.readout b{font-weight:600}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body id="haut">
+<div class="vz-bar">
+<a class="vz-back" href="/mathematiques">← Vizion.Blog / Mathématiques</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »).</p>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<marker id="ah-i" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fi"/></marker>
+<marker id="ah-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fr"/></marker>
+<marker id="ah-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fg"/></marker>
+</defs></svg>
+
+<header class="hero">
+<p class="kicker">Fonctions élémentaires, semestre 1 — remise à niveau</p>
+<h1>Géométrie et trigonométrie, depuis le tout début<small>Pour comprendre tes notes du premier cours, pas pour les réciter.</small></h1>
+<p class="lede">On part du point et de l'angle, on arrive au cercle trigonométrique et aux valeurs remarquables. Rien n'est considéré comme évident : si une notion de collège manque, elle est expliquée ici.</p>
+</header>
+
+<main>
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<p>Ce cours est long, et c'est voulu : tu rattrapes en une semaine des notions étalées sur plusieurs années de collège et de lycée. Il est construit comme un escalier. Chaque partie s'appuie sur les précédentes, donc si tu sautes une marche, tu trébucheras plus haut.</p>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Crayon et feuille obligatoires.</b> Redessine chaque figure à la main. C'est en traçant que ton cerveau enregistre ; lire passivement donne l'illusion de comprendre.</li>
+<li><b>Les questions « Vérifie-toi » en fin de partie :</b> réponds par écrit <em>avant</em> d'ouvrir la réponse. Chercher, même sans trouver, c'est là que tu apprends.</li>
+<li><b>Rythme conseillé :</b> jour 1, parties 1 à 3 ; jour 2, parties 4 et 5 ; jour 3, parties 6 et 7 ; jour 4, parties 8 et 9 ; jour 5, partie 10, relecture de tes notes et premiers exercices.</li>
+<li><b>Code couleur</b> dans tout le cours : <span class="c-b">cosinus en bleu</span>, <span class="c-r">sinus en rouge</span>, <span class="c-g">angles et tangente en vert</span>.</li>
+</ul>
+</div>
+
+<h3>Tes 16 blocages, et où trouver la réponse</h3>
+<ul class="blk">
+<li><a href="#p3-rayon"><b>1</b>Le rayon</a></li>
+<li><a href="#p4-sens"><b>2</b>Cercle orienté, sens direct</a></li>
+<li><a href="#p4-ortho"><b>3</b>« L'ordre est 1 »</a></li>
+<li><a href="#p4-ortho"><b>4</b>Repère orthonormé (direct)</a></li>
+<li><a href="#p6-radian"><b>5</b>Radian, cosinus, sinus</a></li>
+<li><a href="#p6-theta"><b>6</b>Thêta, θ</a></li>
+<li><a href="#p3-pi"><b>7</b>Ce que π représente</a></li>
+<li><a href="#p4-proj"><b>8</b>Projeté orthogonal</a></li>
+<li><a href="#p5"><b>9</b>Pythagore et Thalès</a></li>
+<li><a href="#p2-rect"><b>10</b>Triangle rectangle</a></li>
+<li><a href="#p2-quad"><b>11</b>Quadrilatère</a></li>
+<li><a href="#p9"><b>12</b>Périodicité</a></li>
+<li><a href="#p8"><b>13</b>Valeurs remarquables</a></li>
+<li><a href="#p2-iso"><b>14</b>Triangle isocèle</a></li>
+<li><a href="#p2-iso"><b>15</b>Triangle équilatéral</a></li>
+<li><a href="#p2-med"><b>16</b>Médiatrice</a></li>
+</ul>
+
+<h3>Sommaire</h3>
+<ol class="toc">
+<li><a href="#p1">Les briques de base</a></li>
+<li><a href="#p2">Triangles et quadrilatères</a></li>
+<li><a href="#p3">Le cercle et π</a></li>
+<li><a href="#p4">Le repère</a></li>
+<li><a href="#p5">Pythagore et Thalès</a></li>
+<li><a href="#p6">Cercle trigonométrique et radian</a></li>
+<li><a href="#p7">Cosinus, sinus, tangente</a></li>
+<li><a href="#p8">Les valeurs remarquables</a></li>
+<li><a href="#p9">Fonctions et périodicité</a></li>
+<li><a href="#p10">Au-delà de π/2</a></li>
+<li><a href="#p11">Relecture de tes notes</a></li>
+<li><a href="#p12">Ta feuille d'exercices</a></li>
+</ol>
+</section>
+
+<!-- ============ PARTIE 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Les briques de base</h2>
+<p>Avant de construire une maison, on apprend ce qu'est une brique. Ici, les briques s'appellent point, segment, droite et angle.</p>
+
+<h3>1.1 Point, segment, droite, longueur</h3>
+<p>Un <b>point</b> est une position, sans épaisseur : imagine la pointe d'un crayon infiniment fine. On le nomme avec une lettre majuscule : A, O, M…</p>
+<p>Avec deux points A et B, on peut fabriquer trois objets différents, chacun avec sa notation. C'est important, parce que ta prof va passer de l'un à l'autre sans prévenir :</p>
+<div class="tw"><table>
+<tr><th>Notation</th><th>Se lit</th><th>Ce que c'est</th></tr>
+<tr><td class="mr">[AB]</td><td>« le segment AB »</td><td>Le morceau de ligne droite qui va de A à B. Un début, une fin.</td></tr>
+<tr><td class="mr">(AB)</td><td>« la droite AB »</td><td>La ligne infinie qui passe par A et B, prolongée sans fin des deux côtés.</td></tr>
+<tr><td class="mr">AB</td><td>« la longueur AB »</td><td>Un <b>nombre</b> : la distance entre A et B.</td></tr>
+</table></div>
+<p>Tes notes contiennent les trois : « projeté orthogonal de M sur (OI) » parle d'une droite, « OH = x » parle d'une longueur. Relis-les avec cette grille, elles deviennent déjà plus claires.</p>
+
+<h3>1.2 L'angle</h3>
+<p>Un <b>angle</b>, c'est l'ouverture entre deux demi-droites qui partent d'un même point, appelé le <b>sommet</b>. Pense à une paire de ciseaux ou à une porte qui s'ouvre : l'angle mesure <em>de combien</em> c'est ouvert, peu importe la longueur des lames.</p>
+<p>On le mesure d'abord en <b>degrés</b> (°). Par convention, un tour complet vaut 360°. Pourquoi 360 ? Pas pour une raison mathématique profonde : c'est un héritage des astronomes babyloniens. 360 est proche du nombre de jours dans une année, et il se divise par énormément de nombres (2, 3, 4, 5, 6, 8, 9, 10, 12…). <b>C'est un choix humain.</b> Garde cette idée : elle expliquera pourquoi les mathématiciens ont inventé une autre unité, le radian.</p>
+<figure>
+<svg viewBox="0 0 360 160" role="img" aria-label="Un angle aigu, un angle droit et un angle plat">
+<line class="st" x1="20" y1="120" x2="105" y2="120"/><line class="st" x1="20" y1="120" x2="85" y2="65"/>
+<path class="sg" d="M45,120 A25,25 0 0 0 39.2,103.9"/><circle class="fi" cx="20" cy="120" r="3"/>
+<text x="60" y="150" text-anchor="middle">aigu (&lt; 90°)</text>
+<line class="st" x1="145" y1="120" x2="225" y2="120"/><line class="st" x1="145" y1="120" x2="145" y2="45"/>
+<path class="sg" d="M145,106 L159,106 L159,120"/><circle class="fi" cx="145" cy="120" r="3"/>
+<text x="185" y="150" text-anchor="middle">droit (= 90°)</text>
+<line class="st" x1="235" y1="120" x2="345" y2="120"/><circle class="fi" cx="290" cy="120" r="3"/>
+<path class="sg" d="M312,120 A22,22 0 0 0 268,120"/>
+<text x="290" y="150" text-anchor="middle">plat (= 180°)</text>
+</svg>
+<figcaption>Le petit carré signale un angle droit. C'est un symbole universel : tu le verras dans toutes les figures.</figcaption>
+</figure>
+<p>Les repères à connaître : l'<b>angle droit</b> vaut 90°, un quart de tour (le coin d'une feuille) ; l'<b>angle plat</b> vaut 180°, un demi-tour (il forme une ligne droite) ; le tour complet vaut 360°. Un angle plus petit que 90° est dit <b>aigu</b> ; entre 90° et 180°, il est <b>obtus</b>.</p>
+
+<h3>1.3 Perpendiculaire</h3>
+<p>Deux droites sont <b>perpendiculaires</b> quand elles se coupent en formant un angle droit. On écrit <span class="mr">(d) ⊥ (d′)</span>. Tu en as sous les yeux en ce moment : sur ta feuille de cours, la marge rouge verticale est perpendiculaire aux lignes horizontales.</p>
+
+<h3>1.4 Nommer un angle : la règle de la lettre du milieu</h3>
+<p>Dans tes notes, tu écris des choses comme <span class="m">OĤM</span> = 90° ou <span class="m">HÔM</span> = 45°. Le chapeau se place sur la lettre du <b>sommet</b>, qui est toujours <b>celle du milieu</b>.</p>
+<ul>
+<li><span class="m">OĤM</span> : l'angle <b>en H</b>, entre les segments [HO] et [HM].</li>
+<li><span class="m">HÔM</span> : l'angle <b>en O</b>, entre [OH] et [OM].</li>
+</ul>
+<p>Réflexe : lis <span class="m">OĤM</span> comme « l'angle en H ». Et quand on dit qu'un triangle est « rectangle en H », cela veut dire que son angle droit est en H.</p>
+
+<h3>1.5 La somme des angles d'un triangle vaut 180°</h3>
+<div class="box key"><p class="lbl">À retenir</p><p>Dans n'importe quel triangle, les trois angles additionnés font toujours 180°.</p></div>
+<div class="box img"><p class="lbl">À faire pour de vrai</p><p>Découpe un triangle dans une feuille, peu importe sa forme. Déchire ses trois coins et pose-les côte à côte, pointes réunies. Ils forment une ligne droite : un angle plat, 180°. Deux minutes, et tu ne l'oublieras jamais.</p></div>
+<p>Ce résultat sert deux fois dans tes notes (démonstrations de π/4 et de π/3) : si tu connais deux angles d'un triangle, tu trouves le troisième par soustraction.</p>
+
+<details class="check"><summary>Vérifie-toi (partie 1)</summary><ol>
+<li>Dans la notation <span class="m">HÔM</span>, quel est le sommet de l'angle ?<details><summary>Réponse</summary><div>O : c'est la lettre du milieu, celle qui porte le chapeau.</div></details></li>
+<li>Un triangle a un angle de 90° et un angle de 45°. Combien vaut le troisième ?<details><summary>Réponse</summary><div>180 − 90 − 45 = 45°.</div></details></li>
+<li>Quelle différence entre [OI], (OI) et OI ?<details><summary>Réponse</summary><div>[OI] est un segment, (OI) une droite infinie, OI une longueur (un nombre).</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Les triangles et les quadrilatères</h2>
+<p>Trigonométrie veut dire, en grec, « mesure des triangles » (<i>tri</i> = trois, <i>gônia</i> = angle, <i>metron</i> = mesure). Il faut donc connaître les triangles comme ta poche. Trois familles jouent un rôle dans tes notes.</p>
+
+<h3 id="p2-rect">2.1 Le triangle rectangle</h3>
+<p>Un <b>triangle rectangle</b> est un triangle qui possède un angle droit. « Rectangle en A » : l'angle droit est au sommet A.</p>
+<figure>
+<svg viewBox="0 0 340 200" role="img" aria-label="Triangle rectangle en A avec son hypoténuse">
+<line class="st" x1="40" y1="170" x2="260" y2="170"/><line class="st" x1="40" y1="170" x2="40" y2="40"/>
+<line class="sr thick" x1="40" y1="40" x2="260" y2="170"/>
+<path class="sg" d="M40,156 L54,156 L54,170"/>
+<text x="32" y="186" text-anchor="end" class="mt">A</text><text x="266" y="186" class="mt">B</text><text x="32" y="42" text-anchor="end" class="mt">C</text>
+<text x="158" y="100" text-anchor="middle" transform="rotate(30.6 158 100)" class="tr">hypoténuse</text>
+<text x="150" y="190" text-anchor="middle" class="s tm">côté de l'angle droit</text>
+<text x="26" y="108" text-anchor="middle" transform="rotate(-90 26 108)" class="s tm">côté de l'angle droit</text>
+</svg>
+<figcaption>L'hypoténuse est toujours en face de l'angle droit, et c'est toujours le plus long côté.</figcaption>
+</figure>
+<p>Le côté situé <b>en face</b> de l'angle droit s'appelle l'<b>hypoténuse</b>. C'est toujours le plus long des trois. Les deux autres sont simplement « les côtés de l'angle droit ».</p>
+<div class="box img"><p class="lbl">Image mentale</p><p>Une échelle posée contre un mur. Le mur est vertical, le sol horizontal : ils forment un angle droit. L'échelle, c'est l'hypoténuse, et elle est forcément plus longue que la hauteur qu'elle atteint sur le mur.</p></div>
+<p>Pourquoi ce triangle compte autant ? Parce que <b>toute la trigonométrie est construite sur lui</b> : le théorème de Pythagore ne marche que dans un triangle rectangle, et c'est là que cosinus et sinus sont nés.</p>
+
+<h3 id="p2-iso">2.2 Isocèle et équilatéral</h3>
+<p>Un triangle <b>isocèle</b> a <b>deux côtés de même longueur</b>. Le mot vient du grec <i>iso</i> (même) et <i>skelos</i> (jambe) : « deux jambes identiques ». Le sommet où se rejoignent les deux côtés égaux est le <b>sommet principal</b> : « isocèle en A » veut dire que c'est A.</p>
+<p>Un triangle <b>équilatéral</b> a ses <b>trois côtés égaux</b> (<i>équi</i> = égal, <i>latéral</i> = côté). Ses trois angles sont donc égaux aussi, et comme ils font 180° au total, chacun vaut 180 ÷ 3 = <b>60°</b>.</p>
+<figure>
+<svg viewBox="0 0 360 200" role="img" aria-label="Triangle isocèle et triangle équilatéral avec leurs codages">
+<polygon class="st" points="90,25 30,165 150,165"/>
+<line class="sr" x1="54.5" y1="92.6" x2="65.5" y2="97.4"/><line class="sr" x1="114.5" y1="97.4" x2="125.5" y2="92.6"/>
+<path class="sg" d="M48,165 A18,18 0 0 0 37.1,148.5"/><path class="sg" d="M142.9,148.5 A18,18 0 0 0 132,165"/>
+<text x="90" y="18" text-anchor="middle" class="mt">A</text><text x="24" y="172" text-anchor="end" class="mt">B</text><text x="156" y="172" class="mt">C</text>
+<text x="90" y="192" text-anchor="middle">isocèle en A</text>
+<polygon class="st" points="270,61.1 210,165 330,165"/>
+<line class="sr" x1="234.8" y1="110" x2="245.2" y2="116"/><line class="sr" x1="294.8" y1="116" x2="305.2" y2="110"/><line class="sr" x1="270" y1="159" x2="270" y2="171"/>
+<text x="232" y="158" class="s tg">60°</text><text x="292" y="158" class="s tg">60°</text><text x="270" y="92" text-anchor="middle" class="s tg">60°</text>
+<text x="270" y="192" text-anchor="middle">équilatéral</text>
+</svg>
+<figcaption>Les petits traits (qu'on appelle des « codages ») signalent des longueurs égales. Un équilatéral est un cas particulier d'isocèle.</figcaption>
+</figure>
+<div class="box key"><p class="lbl">La propriété qui va te servir</p><p>Dans un triangle isocèle, les deux angles « à la base » sont égaux (les arcs verts de la figure). Et la réciproque est vraie aussi : <b>si un triangle a deux angles égaux, alors il est isocèle</b>, donc il a deux côtés égaux.</p></div>
+<p>C'est exactement l'argument de ta démonstration de π/4 : le triangle a deux angles de 45°, donc il est isocèle, donc deux de ses côtés sont égaux.</p>
+
+<h3 id="p2-quad">2.3 Le quadrilatère</h3>
+<p>Un <b>quadrilatère</b> est une figure fermée à <b>quatre côtés</b> (<i>quadri</i> = quatre, <i>latère</i> = côté). Carré, rectangle, losange, trapèze sont des quadrilatères particuliers ; un cerf-volant tordu en est un aussi.</p>
+<figure>
+<svg viewBox="0 0 360 160" role="img" aria-label="Un quadrilatère quelconque, un rectangle et un carré">
+<polygon class="st" points="15,120 55,40 120,55 105,125"/>
+<text x="65" y="150" text-anchor="middle">quelconque</text>
+<rect class="st" x="140" y="45" width="90" height="75"/>
+<path class="sg" d="M149,45 L149,54 L140,54 M221,45 L221,54 L230,54 M140,111 L149,111 L149,120 M230,111 L221,111 L221,120"/>
+<text x="185" y="150" text-anchor="middle">rectangle</text>
+<rect class="st" x="262" y="45" width="75" height="75"/>
+<path class="sr" d="M299.5,39 L299.5,51 M299.5,114 L299.5,126 M256,82.5 L268,82.5 M331,82.5 L343,82.5"/>
+<text x="299.5" y="150" text-anchor="middle">carré</text>
+</svg>
+<figcaption>Trois quadrilatères. Le rectangle a quatre angles droits ; le carré a en plus quatre côtés égaux.</figcaption>
+</figure>
+<p>Un <b>rectangle</b> est un quadrilatère avec quatre angles droits. Ses côtés opposés sont égaux deux à deux.</p>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>Ta prof écrit : « le quadrilatère OHMK a 3 angles droits, c'est donc un rectangle ». Pourquoi trois suffisent ? Les angles d'un quadrilatère font toujours 360° au total (coupe-le par une diagonale : tu obtiens deux triangles, et 2 × 180° = 360°). Si trois angles valent 90°, le quatrième vaut 360 − 270 = 90° : il est droit lui aussi. Et comme les côtés opposés d'un rectangle sont égaux, on obtient OH = KM et HM = OK.</p></div>
+
+<h3 id="p2-med">2.4 Médiatrice, hauteur et « pied »</h3>
+<p>La <b>médiatrice</b> d'un segment [AB] est la droite qui coupe [AB] <b>en son milieu</b> et <b>perpendiculairement</b>. Deux conditions à la fois : au milieu, et à angle droit.</p>
+<figure>
+<svg viewBox="0 0 340 200" role="img" aria-label="Médiatrice d'un segment AB">
+<line class="sr" x1="170" y1="12" x2="170" y2="192"/>
+<line class="st" x1="60" y1="130" x2="280" y2="130"/>
+<path class="sg" d="M170,116 L184,116 L184,130"/>
+<line class="sr" x1="115" y1="124" x2="115" y2="136"/><line class="sr" x1="225" y1="124" x2="225" y2="136"/>
+<line class="sg dash" x1="170" y1="45" x2="60" y2="130"/><line class="sg dash" x1="170" y1="45" x2="280" y2="130"/>
+<circle class="fi" cx="60" cy="130" r="3.5"/><circle class="fi" cx="280" cy="130" r="3.5"/><circle class="fi" cx="170" cy="130" r="3.5"/><circle class="fg" cx="170" cy="45" r="4.5"/>
+<text x="52" y="148" text-anchor="end" class="mt">A</text><text x="288" y="148" class="mt">B</text><text x="162" y="150" text-anchor="end" class="mt">I</text><text x="180" y="42" class="mt">P</text>
+<text x="180" y="22" class="tr">médiatrice de [AB]</text>
+<text x="236" y="80" class="tg s">PA = PB</text>
+</svg>
+<figcaption>La médiatrice passe par le milieu I de [AB], à angle droit. Tout point P de la médiatrice est à égale distance de A et de B.</figcaption>
+</figure>
+<div class="box img"><p class="lbl">Image mentale</p><p>Deux amis habitent en A et en B. Ils cherchent un point de rendez-vous où chacun marchera exactement la même distance. Tous les points possibles forment une ligne : la médiatrice de [AB].</p></div>
+<p>Deux mots voisins apparaissent dans tes notes. La <b>hauteur</b> d'un triangle issue d'un sommet est le segment qui part de ce sommet et tombe perpendiculairement sur le côté opposé. Le point où elle « atterrit » s'appelle son <b>pied</b>. Dans un triangle équilatéral, la hauteur tombe pile au milieu du côté opposé : <b>hauteur et médiatrice sont confondues</b>. C'est la clé de la démonstration de π/3.</p>
+
+<details class="check"><summary>Vérifie-toi (partie 2)</summary><ol>
+<li>Où se trouve l'hypoténuse d'un triangle rectangle ?<details><summary>Réponse</summary><div>En face de l'angle droit. C'est le plus long côté.</div></details></li>
+<li>Un triangle a deux angles de 45°. Que vaut le troisième, et que peux-tu dire de ses côtés ?<details><summary>Réponse</summary><div>Le troisième vaut 180 − 45 − 45 = 90° : le triangle est rectangle. Deux angles égaux, donc il est aussi isocèle : les deux côtés de l'angle droit sont égaux. C'est un « triangle rectangle isocèle », la moitié d'un carré.</div></details></li>
+<li>Pourquoi un quadrilatère qui a trois angles droits est-il forcément un rectangle ?<details><summary>Réponse</summary><div>Ses angles font 360° au total ; 360 − 3 × 90 = 90°, donc le quatrième est droit aussi.</div></details></li>
+<li>Quelles sont les deux conditions qui définissent la médiatrice de [AB] ?<details><summary>Réponse</summary><div>Elle passe par le milieu de [AB], et elle est perpendiculaire à [AB].</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Le cercle et le nombre π</h2>
+
+<h3 id="p3-rayon">3.1 Cercle, centre, rayon, diamètre</h3>
+<p>Le <b>cercle</b> de centre O et de rayon r est l'ensemble de <b>tous les points situés exactement à la distance r du point O</b>. Pas un peu plus, pas un peu moins : exactement r.</p>
+<div class="box img"><p class="lbl">Image mentale</p><p>Une chèvre est attachée à un piquet par une corde de longueur r. Elle tourne autour en gardant la corde bien tendue : le chemin qu'elle trace est un cercle. Le piquet, c'est le <b>centre</b>. La corde, c'est le <b>rayon</b>. C'est aussi exactement ce que fait ton compas : la pointe est le centre, l'écartement est le rayon.</p></div>
+<figure>
+<svg viewBox="0 0 340 230" role="img" aria-label="Cercle de centre O avec rayon et diamètre">
+<circle class="st" cx="170" cy="115" r="90"/>
+<line class="sm dash" x1="170" y1="115" x2="125" y2="37.1"/><line class="sm dash" x1="170" y1="115" x2="139.2" y2="199.6"/><line class="sm dash" x1="170" y1="115" x2="238.9" y2="172.9"/>
+<line class="sb" x1="80" y1="115" x2="260" y2="115"/>
+<line class="sr thick" x1="170" y1="115" x2="243.7" y2="63.4"/>
+<circle class="fi" cx="170" cy="115" r="4"/><circle class="fr" cx="243.7" cy="63.4" r="4"/>
+<text x="160" y="106" text-anchor="end" class="mt">O</text>
+<text x="199" y="80" text-anchor="end" class="tr">rayon r</text>
+<text x="222" y="133" text-anchor="middle" class="tb s">diamètre = 2r</text>
+</svg>
+<figcaption>Tous les rayons (en pointillés) ont la même longueur r : c'est la définition même du cercle.</figcaption>
+</figure>
+<p>Le mot <b>rayon</b> désigne deux choses : le <em>segment</em> qui relie le centre à un point du cercle, et sa <em>longueur</em> r. Le <b>diamètre</b> est un segment qui traverse le cercle en passant par le centre : sa longueur vaut deux rayons, d = 2r.</p>
+<p>Petite nuance : le cercle, c'est seulement la <b>ligne</b> (le chemin de la chèvre). La surface à l'intérieur s'appelle le <b>disque</b>. En trigonométrie, on travaille sur le cercle.</p>
+
+<h3 id="p3-pi">3.2 Ce que π représente vraiment</h3>
+<p>Tu sais que π ≈ 3,14. Mais π n'est pas un nombre tombé du ciel : c'est un <b>rapport</b>.</p>
+<div class="box key"><p class="lbl">À retenir</p><p>Pour <b>n'importe quel cercle</b>, si tu divises la longueur de son tour (son périmètre) par son diamètre, tu obtiens toujours le même nombre : π ≈ 3,14159…</p></div>
+<p>Une pièce de monnaie, une roue de vélo, l'équateur de la Terre : petit ou gigantesque, le tour mesure toujours « un peu plus de 3 diamètres ». Ce « un peu plus de 3 », fixe et universel, on l'a baptisé π, la lettre grecque « p » (comme <i>périphérie</i>).</p>
+<figure>
+<svg viewBox="0 0 360 175" role="img" aria-label="Le tour d'une roue déroulé mesure pi fois son diamètre">
+<line class="sm" x1="10" y1="140" x2="350" y2="140"/>
+<circle class="st" cx="50" cy="110" r="30"/>
+<line class="sb" x1="50" y1="80" x2="50" y2="140"/>
+<text x="57" y="114" class="tb mt">d</text>
+<line class="sr thick" x1="50" y1="140" x2="238.5" y2="140"/>
+<path class="sb" d="M110,133 L110,147 M170,133 L170,147 M230,133 L230,147"/>
+<text x="110" y="164" text-anchor="middle" class="tb s">1 d</text><text x="170" y="164" text-anchor="middle" class="tb s">2 d</text><text x="226" y="164" text-anchor="middle" class="tb s">3 d</text>
+<line class="sr" x1="238.5" y1="140" x2="238.5" y2="118"/>
+<text x="244" y="116" class="tr">π × d ≈ 3,14 d</text>
+<text x="180" y="40" text-anchor="middle" class="tm s">le tour de la roue, déroulé sur le sol</text>
+<path class="sm dash" d="M78,100 C120,60 170,70 205,125" marker-end="url(#ah-i)"/>
+</svg>
+<figcaption>Déroule le tour d'une roue sur le sol : il mesure un peu plus de 3 fois son diamètre. Exactement π fois.</figcaption>
+</figure>
+<div class="box img"><p class="lbl">Expérience à faire ce soir</p><p>Entoure un verre ou une canette avec une ficelle, marque le tour, mesure-le. Mesure ensuite le diamètre. Divise. Tu tomberas sur environ 3,1. Tu viens de mesurer π de tes mains.</p></div>
+<p>Conséquence directe : périmètre = π × diamètre = π × 2r, qu'on écrit <b class="mr">P = 2πr</b>. C'est le « P = 2πR » de ta page 1.</p>
+<p>Pour un cercle de <b>rayon 1</b>, retiens ces trois longueurs. Elles sont la fondation de tout ce qui suit :</p>
+<div class="tw"><table>
+<tr><th>Portion du cercle de rayon 1</th><th>Longueur exacte</th><th>Environ</th></tr>
+<tr><td>Le tour complet</td><td class="mr">2π</td><td>6,28</td></tr>
+<tr><td>Un demi-tour</td><td class="mr">π</td><td>3,14</td></tr>
+<tr><td>Un quart de tour</td><td class="mr">π/2</td><td>1,57</td></tr>
+</table></div>
+<div class="box warn"><p class="lbl">Attention</p><p>π a une infinité de décimales, sans motif qui se répète. 3,14 n'est qu'une approximation. Quand ta feuille d'exercices demande une « valeur exacte », on garde le symbole π (et les racines comme √2) sans jamais les remplacer par des nombres à virgule.</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 3)</summary><ol>
+<li>Un cercle a un rayon de 5 cm. Quel est son périmètre (valeur exacte, puis approchée) ?<details><summary>Réponse</summary><div>P = 2π × 5 = 10π ≈ 31,4 cm.</div></details></li>
+<li>Quelle est la longueur d'un demi-cercle de rayon 1 ?<details><summary>Réponse</summary><div>La moitié de 2π, soit π.</div></details></li>
+<li>Pourquoi écrire « π = 3,14 » est-il faux au sens strict ?<details><summary>Réponse</summary><div>Parce que 3,14 n'est qu'une approximation : π a une infinité de décimales. On écrit π ≈ 3,14.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Le repère</h2>
+
+<h3>4.1 Donner une adresse à chaque point</h3>
+<p>Un <b>repère</b> est un système qui donne à chaque point du plan une « adresse » faite de deux nombres. Tu connais déjà le principe : à la bataille navale, « B4 » désigne une case ; au cinéma, « rang 12, siège 7 » désigne un fauteuil.</p>
+<p>Le repère a un point de départ, l'<b>origine</b> O, et deux axes gradués :</p>
+<ul>
+<li>l'axe horizontal, l'<b>axe des abscisses</b>, qui donne le premier nombre, noté x ;</li>
+<li>l'axe vertical, l'<b>axe des ordonnées</b>, qui donne le second nombre, noté y.</li>
+</ul>
+<p>Le point M(3 ; 2) s'atteint en partant de O : 3 pas vers la droite, puis 2 pas vers le haut. Ces deux nombres sont les <b>coordonnées</b> de M. Un nombre négatif veut dire « vers la gauche » (pour x) ou « vers le bas » (pour y).</p>
+<figure>
+<svg viewBox="0 0 340 250" role="img" aria-label="Repère orthonormé avec le point M de coordonnées 3 et 2">
+<line class="st" x1="20" y1="190" x2="328" y2="190" marker-end="url(#ah-i)"/>
+<line class="st" x1="90" y1="245" x2="90" y2="14" marker-end="url(#ah-i)"/>
+<path class="st" d="M150,185 L150,195 M210,185 L210,195 M270,185 L270,195 M85,130 L95,130 M85,70 L95,70"/>
+<text x="210" y="210" text-anchor="middle" class="s">2</text><text x="270" y="210" text-anchor="middle" class="s">3</text>
+<text x="80" y="74" text-anchor="end" class="s">2</text>
+<line class="sr thick" x1="90" y1="190" x2="146" y2="190" marker-end="url(#ah-r)"/>
+<line class="sr thick" x1="90" y1="190" x2="90" y2="134" marker-end="url(#ah-r)"/>
+<path class="sg" d="M90,176 L104,176 L104,190"/>
+<line class="sm dash" x1="270" y1="70" x2="270" y2="190"/><line class="sm dash" x1="270" y1="70" x2="90" y2="70"/>
+<circle class="fi" cx="270" cy="70" r="4.5"/>
+<text x="276" y="62" class="mt">M(3 ; 2)</text>
+<text x="82" y="206" text-anchor="end" class="mt">O</text>
+<text x="150" y="210" text-anchor="middle" class="tr mt">I</text>
+<text x="80" y="134" text-anchor="end" class="tr mt">J</text>
+<text x="326" y="180" text-anchor="end" class="tm s">abscisses (x)</text>
+<text x="98" y="22" class="tm s">ordonnées (y)</text>
+</svg>
+<figcaption>I(1 ; 0) et J(0 ; 1) marquent l'unité de longueur sur chaque axe. Les flèches rouges sont les « pas standard » du repère.</figcaption>
+</figure>
+
+<h3 id="p4-ortho">4.2 Orthonormé, et le mystère de « l'ordre est 1 »</h3>
+<p>Décompose le mot : <b>ortho</b> + <b>normé</b>.</p>
+<ul>
+<li><b>Ortho</b> veut dire « droit » (comme dans orthographe, l'écriture « droite », ou orthodontiste, qui redresse les dents). Ici : les deux axes sont <b>perpendiculaires</b>.</li>
+<li><b>Normé</b> vient de <b>norme</b>, qui en maths désigne une <b>longueur</b>. Ici : l'unité est <b>la même sur les deux axes</b>, OI = OJ = 1.</li>
+</ul>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>Tu as écrit : « deux axes perpendiculaires et dont l'ordre est 1 ». Je pense fortement que ta prof a dit « dont <b>la norme</b> est 1 ». Les deux mots se ressemblent à l'oral, et c'est exactement le sens de « normé » : les flèches OI et OJ mesurent 1. Vérifie auprès d'elle ou d'un camarade, mais mathématiquement, c'est bien ça.</p></div>
+<p>Pourquoi l'exiger ? Imagine une carte où 1 cm vaut 1 km vers l'est mais 3 km vers le nord : les distances seraient faussées, et Pythagore donnerait des résultats absurdes. Un repère orthonormé est une carte « honnête » : axes bien d'équerre, même échelle dans toutes les directions.</p>
+<p><b>Et la flèche au-dessus de OI ?</b> <span class="vec mr">OI</span> est un <b>vecteur</b> : pas une longueur, mais un <em>déplacement</em>, « aller de O jusqu'à I », avec une direction, un sens et une longueur. Écrire le repère (O, <span class="vec">OI</span>, <span class="vec">OJ</span>) revient à dire : « point de départ O ; un pas standard vers la droite ; un pas standard vers le haut ».</p>
+<p>Enfin, « (<span class="vec">OI</span>, <span class="vec">OJ</span>) = π/2 » se lit : pour passer de la flèche <span class="vec">OI</span> à la flèche <span class="vec">OJ</span>, on tourne d'un quart de tour (π/2 radian, on verra pourquoi à la partie 6) <b>dans le sens direct</b>. Ce qui nous amène au point suivant.</p>
+
+<h3 id="p4-sens">4.3 Le sens direct</h3>
+<p>Pour tourner autour d'un point, il y a deux sens possibles. Les mathématiciens ont choisi, une fois pour toutes, lequel compte comme positif :</p>
+<div class="box key"><p class="lbl">À retenir</p><p>Sens direct = sens positif = sens trigonométrique = <b>sens inverse des aiguilles d'une montre</b> (anti-horaire). Le sens des aiguilles d'une montre (horaire) est le sens indirect, ou négatif.</p></div>
+<figure>
+<svg viewBox="0 0 340 200" role="img" aria-label="Sens direct anti-horaire et sens indirect horaire">
+<circle class="sm" cx="85" cy="90" r="55"/>
+<path class="sg thick" d="M140,90 A55,55 0 0 0 57.5,42.4" marker-end="url(#ah-g)"/>
+<circle class="fi" cx="140" cy="90" r="4"/>
+<text x="85" y="102" text-anchor="middle" class="tg" style="font-size:34px">+</text>
+<text x="85" y="170" text-anchor="middle" class="tg">sens direct (+)</text>
+<text x="85" y="188" text-anchor="middle" class="s tm">anti-horaire</text>
+<circle class="sm" cx="255" cy="90" r="55"/>
+<path class="sr thick" d="M227.5,42.4 A55,55 0 0 1 310,90" marker-end="url(#ah-r)"/>
+<text x="255" y="102" text-anchor="middle" class="tr" style="font-size:34px">−</text>
+<text x="255" y="170" text-anchor="middle" class="tr">sens indirect (−)</text>
+<text x="255" y="188" text-anchor="middle" class="s tm">horaire</text>
+</svg>
+<figcaption>À gauche, on part de la droite et on monte : c'est le sens positif des mathématiciens.</figcaption>
+</figure>
+<p>Un « cercle <b>orienté</b> dans le sens direct » est donc un cercle sur lequel on a décidé que tourner vers le haut en partant de la droite compte positivement. Et un « repère orthonormé <b>direct</b> » est un repère où passer de <span class="vec">OI</span> à <span class="vec">OJ</span> se fait en tournant dans ce sens : x vers la droite, y vers le haut. C'est le repère habituel.</p>
+<div class="box img"><p class="lbl">Image mentale</p><p>C'est comme rouler à droite : ce n'est ni plus logique ni plus naturel que rouler à gauche (les Britanniques font l'inverse), mais tout le monde doit adopter la même règle pour que ça marche. En maths, la règle est : anti-horaire = positif.</p></div>
+
+<h3 id="p4-proj">4.4 Le projeté orthogonal</h3>
+<p>Le <b>projeté orthogonal</b> d'un point M sur une droite d est le point H de d tel que la droite (MH) soit perpendiculaire à d. (« Orthogonal » est un synonyme savant de « perpendiculaire ».)</p>
+<figure>
+<svg viewBox="0 0 340 190" role="img" aria-label="Projeté orthogonal H du point M sur la droite d">
+<g aria-hidden="true"><circle cx="200" cy="14" r="5" class="fm"/><path class="sm" d="M200 3v3M200 22v3M189 14h3M208 14h3M192.2 6.2l2.1 2.1M205.7 19.7l2.1 2.1M192.2 21.8l2.1-2.1M205.7 8.3l2.1-2.1"/></g>
+<line class="sm dash" x1="200" y1="26" x2="200" y2="34"/>
+<line class="st" x1="15" y1="150" x2="325" y2="150"/>
+<text x="318" y="142" text-anchor="end" class="mt">d</text>
+<line class="sb dash" x1="200" y1="40" x2="200" y2="150"/>
+<line class="sm dash" x1="200" y1="40" x2="90" y2="150"/>
+<path class="sg" d="M186,150 L186,136 L200,136"/>
+<circle class="fi" cx="200" cy="40" r="5"/><circle class="fb" cx="200" cy="150" r="5"/><circle class="fm" cx="90" cy="150" r="4"/>
+<text x="210" y="44" class="mt">M</text><text x="200" y="172" text-anchor="middle" class="tb mt">H</text><text x="90" y="172" text-anchor="middle" class="tm mt">N</text>
+<text x="96" y="100" text-anchor="end" class="tm s">MN &gt; MH</text>
+</svg>
+<figcaption>H est « l'ombre » de M sur d quand la lumière tombe à la verticale. C'est aussi le point de d le plus proche de M.</figcaption>
+</figure>
+<div class="box img"><p class="lbl">Image mentale</p><p>Le soleil est exactement au-dessus de ta tête, à midi pile. Un ballon flotte en M. Son ombre sur le sol, c'est H : le projeté orthogonal de M sur le sol. Autre façon de le voir : pour rejoindre une route par le chemin le plus court, on y va à angle droit. H est ce point d'arrivée.</p></div>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>H est le projeté de M sur l'axe (OI), et K son projeté sur l'axe (OJ). Si M a pour coordonnées (x ; y), alors H(x ; 0) et K(0 ; y) : projeter sur les axes, c'est <b>lire les coordonnées</b>. D'où OH = x et OK = y, du moins quand M est dans le quart en haut à droite, où x et y sont positifs. (Une longueur est toujours positive, une coordonnée peut être négative : on y reviendra.)</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 4)</summary><ol>
+<li>Où se trouve le point M(−2 ; 3) par rapport à O ?<details><summary>Réponse</summary><div>2 unités vers la gauche, 3 vers le haut.</div></details></li>
+<li>Quel est le projeté orthogonal de M(4 ; 5) sur l'axe des abscisses ? Sur l'axe des ordonnées ?<details><summary>Réponse</summary><div>(4 ; 0) sur l'axe des abscisses, (0 ; 5) sur l'axe des ordonnées.</div></details></li>
+<li>Dans le repère habituel, passer de <span class="vec">OI</span> à <span class="vec">OJ</span>, c'est tourner dans quel sens ?<details><summary>Réponse</summary><div>Anti-horaire : le sens direct.</div></details></li>
+<li>Que signifient « ortho » et « normé » ?<details><summary>Réponse</summary><div>Ortho : axes perpendiculaires. Normé : même unité de longueur (norme 1) sur les deux axes.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Pythagore et Thalès</h2>
+<p>Les deux théorèmes les plus célèbres du collège. Un <b>théorème</b>, c'est une affirmation qui a été <em>démontrée</em> : une fois prouvée, on peut l'utiliser partout sans la redémontrer.</p>
+
+<h3>5.1 Rappel : carré et racine carrée</h3>
+<p>Le <b>carré</b> d'un nombre, c'est ce nombre multiplié par lui-même : x² = x × x. Par exemple 3² = 9 et (1/2)² = 1/4.</p>
+<p>La <b>racine carrée</b> fait le chemin inverse : √a est le nombre <b>positif</b> dont le carré vaut a. Donc √9 = 3 et √(1/4) = 1/2. Règle utile : la racine d'une fraction, c'est la racine du haut sur la racine du bas. Ainsi √(3/4) = √3 / √4 = √3/2.</p>
+<div class="box nts"><p class="lbl">« Rationaliser » : ce que fait ta prof avec 1/√2</p><p>Par tradition, on évite de laisser une racine au dénominateur. On multiplie en haut et en bas par √2, ce qui revient à multiplier par 1 et ne change donc rien : 1/√2 = (1 × √2)/(√2 × √2) = √2/2, puisque √2 × √2 = 2. C'est le même nombre (≈ 0,707), juste écrit autrement, comme 0,5 et 1/2.</p></div>
+
+<h3>5.2 Le théorème de Pythagore</h3>
+<div class="box key"><p class="lbl">À retenir</p><p>Dans un triangle <b>rectangle</b>, le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés. Pour ABC rectangle en A : <span class="mr">BC² = AB² + AC²</span>.</p></div>
+<figure>
+<svg viewBox="0 0 300 300" role="img" aria-label="Pythagore : carrés construits sur les côtés d'un triangle 3, 4, 5">
+<rect class="fsb" x="38" y="118" width="72" height="72"/>
+<rect class="fsg" x="110" y="190" width="96" height="96"/>
+<polygon class="fsr" points="110,118 206,190 278,94 182,22"/>
+<path class="sm" style="stroke-width:.8" d="M62,118 V190 M86,118 V190 M38,142 H110 M38,166 H110 M134,190 V286 M158,190 V286 M182,190 V286 M110,214 H206 M110,238 H206 M110,262 H206"/>
+<g transform="matrix(0.8 0.6 0.6 -0.8 110 118)"><path class="sm" style="stroke-width:.8" d="M24,0 V120 M48,0 V120 M72,0 V120 M96,0 V120 M0,24 H120 M0,48 H120 M0,72 H120 M0,96 H120"/></g>
+<rect class="sb" x="38" y="118" width="72" height="72"/>
+<rect class="sg" x="110" y="190" width="96" height="96"/>
+<polygon class="sr" points="110,118 206,190 278,94 182,22"/>
+<polygon class="st" points="110,190 206,190 110,118" style="stroke-width:3"/>
+<path class="st" d="M110,178 L122,178 L122,190"/>
+<text x="74" y="159" text-anchor="middle" class="tb halo">3² = 9</text>
+<text x="158" y="243" text-anchor="middle" class="tg halo">4² = 16</text>
+<text x="194" y="110" text-anchor="middle" class="tr halo">5² = 25</text>
+</svg>
+<figcaption>Un triangle rectangle de côtés 3, 4 et 5. Compte les petits carrés : 9 + 16 = 25.</figcaption>
+</figure>
+<p>La figure montre ce que l'égalité veut dire <em>physiquement</em> : construis un carré sur chaque côté. L'aire du grand carré (celui de l'hypoténuse) est exactement la somme des aires des deux autres. Compte les cases : 9 + 16 = 25.</p>
+<p>À quoi ça sert ? À calculer un côté inconnu quand on connaît les deux autres. Avec des côtés de l'angle droit de 3 et 4 : hypoténuse² = 9 + 16 = 25, donc hypoténuse = √25 = 5.</p>
+<div class="box warn"><p class="lbl">Attention</p><p>Pythagore ne marche <b>que</b> dans un triangle rectangle. Avant de l'utiliser, vérifie toujours qu'il y a un angle droit, et repère bien l'hypoténuse : c'est elle qui est seule de son côté du signe « = ».</p></div>
+<div class="box img"><p class="lbl">Une histoire</p><p>On raconte que les bâtisseurs égyptiens utilisaient une corde à 12 nœuds régulièrement espacés. En la tendant pour former un triangle de côtés 3, 4 et 5 nœuds, ils obtenaient un angle droit parfait pour leurs fondations. C'est Pythagore utilisé à l'envers : si les longueurs vérifient l'égalité, alors le triangle est rectangle.</p></div>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>Triangle OHM rectangle en H : l'hypoténuse est [OM], puisqu'elle est en face de l'angle droit. Pythagore donne OM² = OH² + HM².</p></div>
+
+<h3>5.3 Le théorème de Thalès</h3>
+<p>Thalès parle de triangles qui ont <b>la même forme mais pas la même taille</b> : l'un est un agrandissement de l'autre. On dit qu'ils sont <b>semblables</b>. Dans un agrandissement, toutes les longueurs sont multipliées par le même nombre : les côtés sont <b>proportionnels</b>.</p>
+<figure>
+<svg viewBox="0 0 340 222" role="img" aria-label="Configuration de Thalès : petit triangle OHM dans grand triangle OIT">
+<line class="sm" x1="20" y1="190" x2="330" y2="190"/>
+<path class="sm dash" d="M290,190 A250,250 0 0 0 207.3,4.2"/>
+<polygon class="fsb" points="40,190 244.8,190 244.8,46.6"/>
+<polygon class="sr" points="40,190 290,190 290,15"/>
+<line class="st" x1="40" y1="190" x2="244.8" y2="46.6"/>
+<line class="sb thick" x1="244.8" y1="190" x2="244.8" y2="46.6"/>
+<path class="sg" d="M230.8,190 L230.8,176 L244.8,176 M276,190 L276,176 L290,176"/>
+<path class="sg" d="M80,190 A40,40 0 0 0 72.8,167.1"/>
+<text x="86" y="182" class="tg mt">θ</text>
+<circle class="fi" cx="244.8" cy="46.6" r="4"/><circle class="fr" cx="290" cy="15" r="4"/>
+<text x="32" y="206" text-anchor="end" class="mt">O</text>
+<text x="244.8" y="208" text-anchor="middle" class="mt">H</text>
+<text x="296" y="208" class="mt">I</text>
+<text x="234" y="40" text-anchor="end" class="mt">M</text>
+<text x="298" y="20" class="tr mt">T</text>
+</svg>
+<figcaption>Le petit triangle OHM (bleuté) et le grand triangle OIT (rouge) ont les mêmes angles : l'un est un agrandissement de l'autre.</figcaption>
+</figure>
+<div class="box key"><p class="lbl">À retenir</p><p>Si O, H, I sont alignés, si O, M, T sont alignés, et si (HM) est parallèle à (IT), alors : <span class="mr">OH/OI = OM/OT = HM/IT</span>.</p></div>
+<div class="box img"><p class="lbl">Image mentale</p><p>Tu agrandis une photo pour qu'elle soit deux fois plus large : elle devient aussi deux fois plus haute, sinon les visages seraient déformés. Autre exemple : au même moment de la journée, un bâton d'1 m fait une ombre de 2 m ; un arbre dont l'ombre mesure 10 m est donc haut de 5 m. Mêmes rapports partout.</p></div>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>Ta prof s'en sert pour montrer que IT = tan θ. On détaillera ce calcul à la partie 7, une fois que cos et sin seront définis.</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 5)</summary><ol>
+<li>Un triangle rectangle a deux côtés de l'angle droit de longueur 1. Que vaut l'hypoténuse ?<details><summary>Réponse</summary><div>hypoténuse² = 1² + 1² = 2, donc hypoténuse = √2 ≈ 1,41.</div></details></li>
+<li>Pourquoi 1/√2 = √2/2 ?<details><summary>Réponse</summary><div>On multiplie en haut et en bas par √2 : on obtient √2/(√2 × √2) = √2/2. On a multiplié par √2/√2 = 1, donc la valeur ne change pas.</div></details></li>
+<li>Un triangle rectangle a une hypoténuse de 1 et un côté de 1/2. Que vaut le troisième côté ?<details><summary>Réponse</summary><div>côté² = 1 − (1/2)² = 1 − 1/4 = 3/4, donc côté = √(3/4) = √3/2. Retiens ce calcul : il revient à la partie 8.</div></details></li>
+<li>Un bâton d'1 m fait une ombre de 2 m. L'ombre d'un arbre mesure 10 m au même moment. Quelle est sa hauteur ?<details><summary>Réponse</summary><div>Les rapports sont égaux : hauteur/10 = 1/2, donc hauteur = 5 m.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Le cercle trigonométrique et le radian</h2>
+
+<h3 id="p6-theta">6.1 θ, la lettre thêta</h3>
+<p>θ (« thêta ») est la 8ᵉ lettre de l'alphabet grec. Par tradition, les mathématiciens nomment les angles avec des lettres grecques : α (alpha), β (bêta), θ (thêta), φ (phi). <b>θ n'a rien de magique</b> : c'est un nom pour « un angle quelconque », exactement comme x est un nom pour « un nombre quelconque ». Pour l'écrire à la main : un ovale barré horizontalement. (Et π, que tu connais déjà, est aussi une lettre grecque : le « p ».)</p>
+
+<h3>6.2 La définition</h3>
+<div class="box key"><p class="lbl">À retenir</p><p>Le <b>cercle trigonométrique</b> est le cercle de centre O (l'origine du repère) et de <b>rayon 1</b>, orienté dans le sens direct, dans un repère orthonormé direct.</p></div>
+<p>Pourquoi un rayon de 1 ? Parce que multiplier ou diviser par 1 ne change rien : toutes les formules deviennent les plus simples possibles. C'est le cercle « étalon », la taille de référence.</p>
+
+<h3>6.3 Pourquoi son équation est x² + y² = 1 (tes notes, pas à pas)</h3>
+<p>Prends un point M(x ; y) quelconque sur le cercle, placé en haut à droite pour commencer. Voici le raisonnement de ta page 2, décomposé :</p>
+<ol>
+<li>On projette M : H sur l'axe horizontal, K sur l'axe vertical (partie 4.4).</li>
+<li>Le quadrilatère OHMK a trois angles droits : c'est un rectangle (partie 2.3). Donc OH = KM = x et HM = OK = y.</li>
+<li>Le triangle OHM est rectangle en H. Son hypoténuse est [OM], et OM = 1 puisque c'est un rayon.</li>
+<li>Pythagore : OH² + HM² = OM², c'est-à-dire <b class="mr">x² + y² = 1</b>.</li>
+</ol>
+<p>Cette égalité est vraie pour <em>tous</em> les points du cercle, et <em>seulement</em> pour eux. Elle fonctionne comme un <b>test d'appartenance</b>, un peu comme ton password checker teste si un mot de passe passe ou non : un point est sur le cercle si et seulement si x² + y² = 1. Essai avec (0,6 ; 0,8) : 0,36 + 0,64 = 1, il passe. Avec (1 ; 1) : 1 + 1 = 2, il échoue.</p>
+<p>Ta prof écrit aussi √(x² + y²) = 1. C'est la même chose (on a pris la racine des deux côtés) : √(x² + y²) est la <em>distance</em> de O à M, et elle vaut le rayon, 1.</p>
+
+<h3>6.4 Lire la notation ensembliste</h3>
+<div class="eq">C = { (x, y) ∈ ℝ² | x² + y² = 1 }</div>
+<div class="tw"><table>
+<tr><th>Symbole</th><th>Se lit, ou signifie</th></tr>
+<tr><td class="mr">{ … }</td><td>« l'ensemble des … »</td></tr>
+<tr><td class="mr">(x, y)</td><td>un couple de nombres : les coordonnées d'un point</td></tr>
+<tr><td class="mr">∈</td><td>« appartient à »</td></tr>
+<tr><td class="mr">ℝ</td><td>l'ensemble de tous les nombres réels : −3, 0, 1/2, √2, π… tous les nombres de la droite graduée</td></tr>
+<tr><td class="mr">ℝ²</td><td>tous les couples de réels, donc tous les points du plan</td></tr>
+<tr><td class="mr">|</td><td>« tel que »</td></tr>
+</table></div>
+<p>Lecture complète : « C est l'ensemble des couples de réels (x, y) <b>tels que</b> x² + y² = 1 ».</p>
+<div class="box img"><p class="lbl">Tu connais déjà cette écriture</p><p>En Python, c'est une compréhension d'ensemble : <code>C = {(x, y) for (x, y) in plan if x**2 + y**2 == 1}</code>. Python a emprunté cette syntaxe aux mathématiques : « l'ensemble des (x, y) du plan, tels que la condition est vraie ».</p></div>
+
+<h3 id="p6-radian">6.5 Le radian</h3>
+<p>Rappelle-toi : 360° est un choix arbitraire des Babyloniens. Les mathématiciens voulaient une unité d'angle qui vienne du cercle lui-même. Leur idée :</p>
+<div class="box key"><p class="lbl">À retenir</p><p>On mesure un angle par la <b>longueur de l'arc</b> qu'il découpe sur le cercle de rayon 1. Un angle de <b>1 radian</b> découpe un arc de longueur 1, égale au rayon.</p></div>
+<figure>
+<svg viewBox="0 0 340 240" role="img" aria-label="Un radian : l'arc a la même longueur que le rayon">
+<circle class="sm" cx="150" cy="125" r="95"/>
+<line class="sm" x1="40" y1="125" x2="300" y2="125"/>
+<line class="sb" x1="150" y1="125" x2="245" y2="125"/>
+<line class="sb" x1="150" y1="125" x2="201.3" y2="45.1"/>
+<path class="sr thick" d="M245,125 A95,95 0 0 0 201.3,45.1"/>
+<path class="sg" d="M174,125 A24,24 0 0 0 163,104.8"/>
+<circle class="fi" cx="150" cy="125" r="3.5"/><circle class="fi" cx="245" cy="125" r="3.5"/><circle class="fi" cx="201.3" cy="45.1" r="3.5"/>
+<text x="197" y="142" text-anchor="middle" class="tb">1</text>
+<text x="166" y="84" text-anchor="end" class="tb">1</text>
+<text x="238" y="72" class="tr">arc = 1</text>
+<text x="180" y="116" class="tg s">1 rad</text>
+<text x="140" y="142" text-anchor="end" class="mt">O</text><text x="250" y="142" class="mt">I</text>
+<text x="150" y="232" text-anchor="middle" class="tm s">1 rad ≈ 57,3°</text>
+</svg>
+<figcaption>Un radian : l'angle pour lequel l'arc (rouge) mesure exactement un rayon (bleu).</figcaption>
+</figure>
+<div class="box img"><p class="lbl">La parabole du fil</p><p>Prends la droite graduée comme un fil souple. Pose son 0 sur le point I du cercle trigonométrique, et enroule le fil autour du cercle dans le sens direct. Chaque nombre du fil vient se poser sur un point du cercle : le nombre θ se pose sur le point M tel que l'arc de I à M mesure θ. L'angle en radians, <em>c'est</em> la longueur de fil enroulée.</p></div>
+<p>Conséquence immédiate, grâce à la partie 3 : le tour complet mesure 2π, donc <b>un tour = 2π radians</b>. Un demi-tour vaut π rad, un quart de tour π/2 rad. D'où la correspondance fondamentale :</p>
+<div class="eq">180° ⟷ π rad</div>
+<div class="tw"><table class="c">
+<tr><th>Degrés</th><td>30°</td><td>45°</td><td>60°</td><td>90°</td><td>180°</td><td>270°</td><td>360°</td></tr>
+<tr><th>Radians</th><td>π/6</td><td>π/4</td><td>π/3</td><td>π/2</td><td>π</td><td>3π/2</td><td>2π</td></tr>
+</table></div>
+<div class="box img"><p class="lbl">L'astuce de conversion</p><p>Pour passer des radians aux degrés, remplace π par 180 et calcule : π/6 devient 180/6 = 30°, et 3π/4 devient 3 × 180/4 = 135°. Dans l'autre sens, multiplie les degrés par π/180 : 120° devient 120π/180 = 2π/3.</p></div>
+<p>Pourquoi s'embêter avec les radians ? Parce qu'en radians, l'angle <em>est</em> une longueur. Et plus tard, en analyse, les formules de dérivée de sin et cos ne sont simples qu'en radians. À l'université, on travaille donc toujours en radians.</p>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>En bas de ta page 1, la formule générale : sur un cercle de rayon R, angle (en rad) = longueur de l'arc ÷ R. Sur le cercle trigonométrique, R = 1, donc angle = longueur de l'arc. C'est le « θ = longueur arc » encadré en rouge.</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 6)</summary><ol>
+<li>Convertis 120° en radians.<details><summary>Réponse</summary><div>120 × π/180 = 2π/3.</div></details></li>
+<li>Convertis 3π/4 en degrés.<details><summary>Réponse</summary><div>3 × 180/4 = 135°.</div></details></li>
+<li>Le point (0,6 ; −0,8) est-il sur le cercle trigonométrique ?<details><summary>Réponse</summary><div>Oui : 0,6² + (−0,8)² = 0,36 + 0,64 = 1. Il est en bas à droite.</div></details></li>
+<li>Traduis en français : { (x, y) ∈ ℝ² | y = 2x }.<details><summary>Réponse</summary><div>L'ensemble des couples de réels (x, y) tels que y = 2x : tous les points dont l'ordonnée est le double de l'abscisse. C'est une droite.</div></details></li>
+<li>Combien de radians dans un tour complet, et pourquoi ?<details><summary>Réponse</summary><div>2π, parce que le tour du cercle de rayon 1 mesure 2π × 1 = 2π, et qu'en radians l'angle est la longueur d'arc.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Cosinus, sinus et tangente</h2>
+
+<h3>7.1 La définition, le cœur de tout</h3>
+<p>Place le point M sur le cercle trigonométrique à l'angle θ = (<span class="vec">OI</span>, <span class="vec">OM</span>), c'est-à-dire en enroulant une longueur θ de fil à partir de I. Alors :</p>
+<div class="box key"><p class="lbl">À retenir</p><p><span class="c-b">cos θ est l'abscisse de M</span> (sa coordonnée x), et <span class="c-r">sin θ est l'ordonnée de M</span> (sa coordonnée y). Autrement dit : <span class="mr">M(cos θ ; sin θ)</span>.</p></div>
+<p>C'est tout. Le cosinus dit de combien M est à droite (ou à gauche) du centre ; le sinus dit de combien il est en haut (ou en bas).</p>
+<div class="box img"><p class="lbl">Image mentale</p><p>Tu montes dans une grande roue de fête foraine qui tourne dans le sens direct. Quand la roue a tourné d'un angle θ, ta hauteur par rapport à l'axe central, c'est sin θ ; ta position gauche-droite, c'est cos θ. La roue tourne, et ces deux nombres montent et descendent en permanence entre −1 et 1.</p></div>
+<p><b>Manipule la figure</b> : fais glisser le curseur et observe les segments bleu et rouge.</p>
+
+<figure class="widget" id="uc">
+<svg viewBox="0 0 340 320" role="img" aria-label="Cercle trigonométrique interactif">
+<line class="sm" x1="20" y1="160" x2="325" y2="160"/>
+<line class="sm" x1="170" y1="314" x2="170" y2="6"/>
+<circle class="st" cx="170" cy="160" r="115"/>
+<line class="sm dash" x1="285" y1="4" x2="285" y2="316"/>
+<text x="162" y="177" text-anchor="end" class="tm mt">O</text>
+<text x="291" y="177" class="tm mt">I</text>
+<text x="177" y="40" class="tm mt">J</text>
+<path id="uc-arc" class="sg"/>
+<line id="uc-mt" class="sg dash"/>
+<line id="uc-it" class="sg thick"/>
+<line id="uc-mk" class="sm dash"/>
+<line id="uc-om" class="st"/>
+<line id="uc-cos" class="sb thick"/>
+<line id="uc-sin" class="sr thick"/>
+<circle id="uc-t" r="4" class="fg"/>
+<circle id="uc-m" r="6" class="fi"/>
+<text id="uc-ml" text-anchor="middle" class="mt">M</text>
+<text id="uc-hl" text-anchor="middle" class="tb mt">H</text>
+<text id="uc-kl" class="tr mt">K</text>
+<text id="uc-tl" class="tg mt">T</text>
+</svg>
+<div class="ctrl">
+<label for="uc-range">Fais tourner M (angle θ)</label>
+<input id="uc-range" type="range" min="0" max="360" step="1" value="40">
+<div class="presets">
+<button type="button" data-d="0">0</button><button type="button" data-d="30">π/6</button><button type="button" data-d="45">π/4</button><button type="button" data-d="60">π/3</button><button type="button" data-d="90">π/2</button><button type="button" data-d="180">π</button><button type="button" data-d="270">3π/2</button><button type="button" data-d="360">2π</button>
+</div>
+<div class="readout" aria-live="polite">
+<span>θ</span><b id="r-ang">40°</b>
+<span class="c-b">cos θ</span><b id="r-cos">≈ 0,766</b>
+<span class="c-r">sin θ</span><b id="r-sin">≈ 0,643</b>
+<span class="c-g">tan θ</span><b id="r-tan">≈ 0,839</b>
+</div>
+</div>
+<figcaption>Bleu : cos θ, l'abscisse de M. Rouge : sin θ, son ordonnée. Vert : tan θ, lue sur la tangente en I (la verticale en pointillés).</figcaption>
+</figure>
+<p>Expériences à faire avec la figure : que valent cos et sin pour 0 ? Pour π/2 ? Pour π ? Quand le cosinus devient-il négatif ? Et le sinus ? Arrive-t-on à dépasser 1 ? Plus tard, tu pourras aussi t'en servir pour <b>vérifier</b> tes réponses à l'exercice 1, après les avoir cherchées sur papier.</p>
+
+<h3>7.2 Le lien avec le triangle (ce que tu as peut-être vu au collège)</h3>
+<p>Au collège, on définit cos et sin dans un triangle rectangle, par rapport à l'un de ses angles aigus :</p>
+<ul>
+<li>le <b>côté adjacent</b> : le côté de l'angle droit « collé » à l'angle ;</li>
+<li>le <b>côté opposé</b> : le côté situé en face de l'angle ;</li>
+<li>l'<b>hypoténuse</b>.</li>
+</ul>
+<div class="eq">cos = <span class="q"><span>adjacent</span><span>hypoténuse</span></span> &nbsp; sin = <span class="q"><span>opposé</span><span>hypoténuse</span></span> &nbsp; tan = <span class="q"><span>opposé</span><span>adjacent</span></span></div>
+<p>Moyen mnémotechnique : <b>CAH SOH TOA</b> (prononce « casse-toi »). Cos = Adjacent sur Hypoténuse, Sin = Opposé sur Hypoténuse, Tan = Opposé sur Adjacent.</p>
+<div class="box nts"><p class="lbl">Dans tes notes</p><p>C'est le calcul de ta page 3. Dans le triangle OHM rectangle en H, pour l'angle θ en O : l'adjacent est OH, l'opposé est HM, l'hypoténuse est OM = 1. Donc cos θ = OH/OM = x/1 = x et sin θ = HM/OM = y/1 = y. Les deux définitions, triangle et cercle, donnent le même résultat, grâce au rayon 1.</p></div>
+<p>Pourquoi l'université préfère la version « cercle » ? Parce qu'un triangle rectangle ne peut pas avoir un angle de 150° ou de −30°. Le cercle, lui, accepte <b>tous les angles</b> : on continue simplement d'enrouler le fil.</p>
+
+<h3>7.3 La tangente</h3>
+<p>On définit <b class="mr">tan θ = sin θ / cos θ</b>. On ne peut pas diviser par 0, donc la tangente n'existe que si cos θ ≠ 0. Elle est <b>indéfinie</b> en π/2 (et en 3π/2), là où M est tout en haut ou tout en bas. C'est le « X » de ton tableau.</p>
+<p><b>Sa signification géométrique</b> (le dessin de ta page 1) : trace la droite verticale qui passe par I. Elle ne touche le cercle qu'en un seul point, I : on dit qu'elle est <b>tangente</b> au cercle, du latin <i>tangere</i>, toucher. Prolonge la droite (OM) jusqu'à ce qu'elle coupe cette verticale en un point T. Alors <b>IT = tan θ</b>. C'est le segment vert de la figure interactive.</p>
+<div class="box nts"><p class="lbl">La démonstration avec Thalès, décortiquée</p><p>Les triangles OHM et OIT sont emboîtés (figure de la partie 5.3) : O, H, I alignés ; O, M, T alignés ; (HM) et (IT) verticales, donc parallèles. Thalès donne OH/OI = HM/IT. On remplace : OH = cos θ, OI = 1, HM = sin θ. Donc cos θ / 1 = sin θ / IT, ce qui donne IT = sin θ / cos θ = tan θ.</p></div>
+<div class="box img"><p class="lbl">Image mentale</p><p>tan θ, c'est aussi la <b>pente</b> de la droite (OM) : de combien on monte quand on avance de 1 vers la droite, comme sur un panneau routier « pente 10 % ». À π/2, la droite est verticale : une pente infinie, un mur. La tangente n'existe plus.</p></div>
+
+<h3>7.4 La relation fondamentale</h3>
+<p>Le point M(cos θ ; sin θ) est sur le cercle, donc ses coordonnées passent le test x² + y² = 1 :</p>
+<div class="box key"><p class="lbl">À retenir</p><p class="eq" style="margin:4px 0">cos²θ + sin²θ = 1 &nbsp;pour tout angle θ</p></div>
+<p><b>Notation piège :</b> cos²θ veut dire (cos θ)², le cosinus <em>mis au carré</em>. Pas cos(θ²). On l'écrit ainsi pour éviter les parenthèses.</p>
+<p>À quoi ça sert ? Si tu connais l'un, tu retrouves l'autre, au signe près. Exemple : cos θ = 3/5 donne sin²θ = 1 − 9/25 = 16/25, donc sin θ = 4/5 ou −4/5, selon que M est en haut ou en bas.</p>
+<p>Et un garde-fou : cos et sin sont toujours <b>entre −1 et 1</b>, puisque ce sont les coordonnées d'un point d'un cercle de rayon 1. Si tu trouves sin θ = 1,3, tu t'es trompé quelque part.</p>
+
+<details class="check"><summary>Vérifie-toi (partie 7)</summary><ol>
+<li>Pour θ = π/2, où est M ? Que valent cos θ et sin θ ?<details><summary>Réponse</summary><div>M est en J(0 ; 1), tout en haut. cos(π/2) = 0 et sin(π/2) = 1.</div></details></li>
+<li>Même question pour θ = π.<details><summary>Réponse</summary><div>Un demi-tour : M est en (−1 ; 0). cos π = −1 et sin π = 0.</div></details></li>
+<li>Donne deux raisons pour lesquelles tan(π/2) n'existe pas.<details><summary>Réponse</summary><div>Par le calcul : cos(π/2) = 0 et on ne divise pas par 0. Par le dessin : la droite (OM) est verticale, parallèle à la tangente en I, donc elle ne la coupe jamais et le point T n'existe pas.</div></details></li>
+<li>On sait que cos θ = 0,6 et que M est en haut. Que vaut sin θ ?<details><summary>Réponse</summary><div>sin²θ = 1 − 0,36 = 0,64, et M est en haut donc sin θ &gt; 0 : sin θ = 0,8.</div></details></li>
+<li>Que signifie l'écriture cos²θ ?<details><summary>Réponse</summary><div>(cos θ)², le cosinus de θ élevé au carré.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Les valeurs remarquables</h2>
+<p>Pour la plupart des angles, cos et sin sont des nombres à virgule sans écriture simple : il faut une calculatrice. Mais pour quelques angles « remarquables », on connaît les valeurs exactes. Elles viennent toutes de deux triangles « parfaits » : <b>le demi-carré</b> (le triangle rectangle isocèle, pour 45°) et <b>le demi-triangle équilatéral</b> (pour 30° et 60°).</p>
+<div class="tw"><table class="c">
+<tr><th>x</th><th>0</th><th>π/6</th><th>π/4</th><th>π/3</th><th>π/2</th></tr>
+<tr><th class="c-b">cos x</th><td>1</td><td>√3/2</td><td>√2/2</td><td>1/2</td><td>0</td></tr>
+<tr><th class="c-r">sin x</th><td>0</td><td>1/2</td><td>√2/2</td><td>√3/2</td><td>1</td></tr>
+<tr><th class="c-g">tan x</th><td>0</td><td>√3/3</td><td>1</td><td>√3</td><td>indéfinie</td></tr>
+</table></div>
+<figure>
+<svg viewBox="0 0 340 282" role="img" aria-label="Quart de cercle avec les valeurs remarquables lues sur les axes">
+<line class="sm" x1="40" y1="250" x2="300" y2="250"/><line class="sm" x1="50" y1="262" x2="50" y2="14"/>
+<path class="st" d="M270,250 A220,220 0 0 0 50,30"/>
+<path class="sm" d="M50,250 L240.5,140 M50,250 L205.6,94.4 M50,250 L160,59.5"/>
+<path class="sb dash" d="M240.5,140 V250 M205.6,94.4 V250 M160,59.5 V250"/>
+<path class="sr dash" d="M240.5,140 H50 M205.6,94.4 H50 M160,59.5 H50"/>
+<circle class="fi" cx="240.5" cy="140" r="4"/><circle class="fi" cx="205.6" cy="94.4" r="4"/><circle class="fi" cx="160" cy="59.5" r="4"/><circle class="fi" cx="50" cy="30" r="4"/><circle class="fi" cx="270" cy="250" r="4"/>
+<text x="248" y="134" class="tg">π/6</text><text x="213" y="88" class="tg">π/4</text><text x="167" y="52" class="tg">π/3</text><text x="58" y="26" class="tg">π/2</text><text x="276" y="244" class="tg">0</text>
+<text x="160" y="268" text-anchor="middle" class="tb s">1/2</text><text x="205.6" y="268" text-anchor="middle" class="tb s">√2/2</text><text x="240.5" y="268" text-anchor="middle" class="tb s">√3/2</text><text x="272" y="268" text-anchor="middle" class="tb s">1</text>
+<text x="44" y="144" text-anchor="end" class="tr s">1/2</text><text x="44" y="98" text-anchor="end" class="tr s">√2/2</text><text x="44" y="63" text-anchor="end" class="tr s">√3/2</text><text x="44" y="34" text-anchor="end" class="tr s">1</text>
+<text x="44" y="262" text-anchor="end" class="mt s">O</text>
+</svg>
+<figcaption>Le quart de cercle en haut à droite : les cosinus se lisent sur l'axe horizontal (bleu), les sinus sur l'axe vertical (rouge).</figcaption>
+</figure>
+<p>Ta prof a écrit « à apprendre par cœur ». Oui, mais tu vas maintenant pouvoir les <b>reconstruire</b> si ta mémoire flanche. La mémoire est rapide ; la compréhension est ta roue de secours.</p>
+
+<h3>8.1 π/4 : le demi-carré</h3>
+<figure>
+<svg viewBox="0 0 300 256" role="img" aria-label="Démonstration de pi sur 4 avec un triangle rectangle isocèle">
+<line class="sm" x1="30" y1="220" x2="270" y2="220"/><line class="sm" x1="40" y1="232" x2="40" y2="10"/>
+<path class="sm dash" d="M240,220 A200,200 0 0 0 40,20"/>
+<polygon class="fsg" points="40,220 181.4,220 181.4,78.6"/>
+<line class="st" x1="40" y1="220" x2="181.4" y2="78.6"/>
+<line class="sb thick" x1="40" y1="220" x2="181.4" y2="220"/>
+<line class="sr thick" x1="181.4" y1="220" x2="181.4" y2="78.6"/>
+<path class="sg" d="M167.4,220 L167.4,206 L181.4,206"/>
+<path class="sg" d="M75,220 A35,35 0 0 0 64.7,195.3"/><path class="sg" d="M161.6,98.4 A28,28 0 0 0 181.4,106.6"/>
+<line class="st" x1="110.7" y1="213" x2="110.7" y2="227"/><line class="st" x1="174.4" y1="149.3" x2="188.4" y2="149.3"/>
+<text x="80" y="208" class="tg s">45°</text><text x="150" y="124" class="tg s">45°</text>
+<text x="104" y="144" text-anchor="end" class="halo">1</text>
+<text x="110.7" y="244" text-anchor="middle" class="tb mt">a</text><text x="194" y="154" class="tr mt">a</text>
+<text x="30" y="236" text-anchor="end" class="mt">O</text><text x="181.4" y="238" text-anchor="middle" class="mt">H</text><text x="246" y="238" class="mt">I</text><text x="190" y="74" class="mt">M</text>
+</svg>
+<figcaption>Le triangle OHM pour θ = π/4 : deux angles de 45°, donc deux côtés égaux (codés par un trait).</figcaption>
+</figure>
+<ol>
+<li>M est le point du cercle à l'angle π/4 = 45°. H est son projeté sur l'axe horizontal : le triangle OHM est rectangle en H.</li>
+<li>Les angles : 90° en H, 45° en O. Le troisième, en M, vaut 180 − 90 − 45 = 45° (partie 1.5).</li>
+<li>Deux angles égaux, donc le triangle est isocèle : OH = HM. Appelons a cette longueur commune.</li>
+<li>Pythagore, avec OM = 1 : a² + a² = 1, donc 2a² = 1, donc a² = 1/2.</li>
+<li>a est une longueur, donc positive : a = √(1/2) = 1/√2 = √2/2 (rationalisation, partie 5.1).</li>
+</ol>
+<div class="box key"><p class="lbl">Résultat</p><p>cos(π/4) = sin(π/4) = √2/2 ≈ 0,707, et tan(π/4) = 1.</p></div>
+<p>Pourquoi « a est positive » compte : l'équation a² = 1/2 a deux solutions, √2/2 et −√2/2. On garde la positive parce qu'une longueur ne peut pas être négative. Ce genre de justification, c'est exactement ce qu'on attend de toi à l'université.</p>
+
+<h3>8.2 π/3 : le triangle équilatéral</h3>
+<figure>
+<svg viewBox="0 0 320 256" role="img" aria-label="Démonstration de pi sur 3 avec un triangle équilatéral">
+<line class="sm" x1="30" y1="220" x2="300" y2="220"/><line class="sm" x1="40" y1="232" x2="40" y2="4"/>
+<path class="sm dash" d="M260,220 A220,220 0 0 0 78.2,3.3"/>
+<polygon class="st fsg" points="40,220 260,220 150,29.5"/>
+<line class="sb thick" x1="40" y1="220" x2="150" y2="220"/>
+<line class="sr thick" x1="150" y1="220" x2="150" y2="29.5"/>
+<path class="sg" d="M136,220 L136,206 L150,206"/>
+<path class="sg" d="M72,220 A32,32 0 0 0 56,192.3"/>
+<line class="st" x1="89.8" y1="121.75" x2="100.2" y2="127.75"/><line class="st" x1="199.8" y1="127.75" x2="210.2" y2="121.75"/>
+<path class="st" d="M92,214 V226 M98,214 V226 M202,214 V226 M208,214 V226"/>
+<text x="76" y="208" class="tg s">60°</text>
+<text x="84" y="118" text-anchor="end">1</text>
+<text x="156" y="130" class="tr s">√3/2</text>
+<text x="95" y="244" text-anchor="middle" class="tb s">1/2</text><text x="205" y="244" text-anchor="middle" class="s">1/2</text>
+<text x="30" y="236" text-anchor="end" class="mt">O</text><text x="150" y="240" text-anchor="middle" class="mt">H</text><text x="266" y="236" class="mt">I</text><text x="160" y="24" class="mt">M</text>
+</svg>
+<figcaption>Le triangle OIM est équilatéral ; la hauteur [MH] tombe au milieu de [OI].</figcaption>
+</figure>
+<ol>
+<li>M est le point du cercle à l'angle π/3 = 60°. On regarde le triangle OIM.</li>
+<li>OI = OM = 1 (ce sont deux rayons), donc OIM est isocèle en O.</li>
+<li>L'angle en O vaut 60°. Les deux autres sont égaux (triangle isocèle) et font ensemble 180 − 60 = 120°, donc 60° chacun.</li>
+<li>Trois angles de 60° : OIM est équilatéral, donc MI = 1 aussi.</li>
+<li>H, projeté de M sur (OI), est le pied de la hauteur issue de M. Dans un équilatéral, cette hauteur est aussi la médiatrice de [OI] (partie 2.4) : H est le milieu de [OI], donc OH = 1/2.</li>
+<li>Donc cos(π/3) = OH = 1/2.</li>
+<li>Pythagore dans OHM : HM² = OM² − OH² = 1 − 1/4 = 3/4, donc HM = √3/2. Donc sin(π/3) = √3/2.</li>
+</ol>
+<div class="box key"><p class="lbl">Résultat</p><p>cos(π/3) = 1/2, sin(π/3) = √3/2 ≈ 0,866, et tan(π/3) = (√3/2) ÷ (1/2) = √3.</p></div>
+
+<h3>8.3 π/6 : ce qui manque à tes notes</h3>
+<p>Tes notes s'arrêtent sur une indication : « pour π/6, on calcule l'angle <span class="m">OM̂H</span> ». Terminons.</p>
+<p><b>La méthode de ta prof.</b> Dans le triangle OHM de la figure précédente, l'angle en M vaut 180 − 90 − 60 = 30°, soit π/6. Regarde maintenant le triangle <em>depuis cet angle de 30°</em> : le côté adjacent est HM = √3/2, le côté opposé est OH = 1/2, l'hypoténuse est OM = 1. Avec CAH SOH TOA : cos(π/6) = √3/2 et sin(π/6) = 1/2. Le même triangle sert deux fois !</p>
+<p><b>La méthode du miroir</b>, plus visuelle :</p>
+<figure>
+<svg viewBox="0 0 300 268" role="img" aria-label="Symétrie entre pi sur 6 et pi sur 3 par rapport à la droite y égale x">
+<line class="sm" x1="30" y1="240" x2="270" y2="240"/><line class="sm" x1="40" y1="252" x2="40" y2="14"/>
+<path class="st" d="M250,240 A210,210 0 0 0 40,30"/>
+<line class="sr dash" x1="40" y1="240" x2="230" y2="50"/>
+<path class="sm" d="M40,240 L221.9,135 M40,240 L145,58.1"/>
+<path class="sg dash" d="M221.9,135 V240 M221.9,135 H40"/>
+<path class="sb dash" d="M145,58.1 V240 M145,58.1 H40"/>
+<circle class="fg" cx="221.9" cy="135" r="5"/><circle class="fb" cx="145" cy="58.1" r="5"/>
+<text x="229" y="130" class="tg">π/6</text><text x="152" y="52" class="tb">π/3</text>
+<text x="221.9" y="258" text-anchor="middle" class="tg s">√3/2</text><text x="145" y="258" text-anchor="middle" class="tb s">1/2</text>
+<text x="34" y="139" text-anchor="end" class="tg s">1/2</text><text x="34" y="62" text-anchor="end" class="tb s">√3/2</text>
+<text x="190" y="110" class="tr s">miroir y = x</text>
+</svg>
+<figcaption>Le point de π/6 (vert) est le reflet du point de π/3 (bleu) dans le miroir y = x : ses coordonnées sont échangées.</figcaption>
+</figure>
+<div class="box key"><p class="lbl">Résultat</p><p>cos(π/6) = √3/2, sin(π/6) = 1/2, et tan(π/6) = (1/2) ÷ (√3/2) = 1/√3 = √3/3.</p></div>
+
+<h3>8.4 Les retenir sans les réciter</h3>
+<div class="box img"><p class="lbl">L'astuce des racines</p><p>Écris la ligne du sinus pour 0, π/6, π/4, π/3, π/2 sous cette forme : √0/2, √1/2, √2/2, √3/2, √4/2. Ça se simplifie en 0, 1/2, √2/2, √3/2, 1. Le cosinus, c'est la même ligne lue à l'envers.</p></div>
+<p>Et deux vérifications de bon sens. Quand l'angle grandit de 0 à π/2, M monte (le sinus augmente de 0 à 1) et se rapproche de l'axe vertical (le cosinus diminue de 1 à 0). Et √2/2 ≈ 0,71 est bien entre 1/2 = 0,5 et √3/2 ≈ 0,87, ce qui est logique puisque π/4 est entre π/6 et π/3.</p>
+
+<details class="check"><summary>Vérifie-toi (partie 8)</summary><ol>
+<li>Sans regarder : cos et sin de π/6, π/4 et π/3.<details><summary>Réponse</summary><div>π/6 : √3/2 et 1/2. π/4 : √2/2 et √2/2. π/3 : 1/2 et √3/2.</div></details></li>
+<li>Pourquoi cos(π/3) = sin(π/6) ?<details><summary>Réponse</summary><div>C'est le même côté OH du même triangle, vu depuis ses deux angles aigus : adjacent pour l'angle de 60°, opposé pour l'angle de 30°. Autre façon : les deux points sont symétriques par rapport à la droite y = x.</div></details></li>
+<li>tan(π/4) sans calcul ?<details><summary>Réponse</summary><div>1, parce que cos(π/4) = sin(π/4) : un nombre divisé par lui-même.</div></details></li>
+<li>Dans la démonstration de π/4, pourquoi rejette-t-on −√2/2 ?<details><summary>Réponse</summary><div>a est une longueur, donc positive.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Les fonctions trigonométriques et la périodicité</h2>
+
+<h3>9.1 Lire « cos : [0 ; 2π[ → ℝ »</h3>
+<div class="eq">cos : [0 ; 2π[ → ℝ<br>x ↦ cos x</div>
+<div class="tw"><table>
+<tr><th>Morceau</th><th>Signification</th></tr>
+<tr><td class="mr">cos</td><td>le nom de la fonction</td></tr>
+<tr><td class="mr">[0 ; 2π[</td><td>l'<b>ensemble de départ</b> : les nombres autorisés en entrée, ici de 0 à 2π</td></tr>
+<tr><td class="mr">→ ℝ</td><td>l'<b>ensemble d'arrivée</b> : les résultats sont des nombres réels</td></tr>
+<tr><td class="mr">x ↦ cos x</td><td>la règle : « à x, on associe cos x ». La flèche ↦ (avec une petite barre au départ) relie un nombre à son résultat ; la flèche → relie deux ensembles.</td></tr>
+</table></div>
+<p><b>Le sens des crochets.</b> Dans [0 ; 2π[, le crochet de gauche est tourné vers l'intérieur : 0 est <b>inclus</b>. Le crochet de droite est tourné vers l'extérieur : 2π est <b>exclu</b>. Pourquoi exclure 2π ? Parce qu'après un tour complet, on retombe sur le point I, le même que pour 0. On ne veut pas compter ce point deux fois.</p>
+<div class="box img"><p class="lbl">Côté Python</p><p>C'est l'équivalent d'une fonction annotée, <code>def cos(x: float) -&gt; float</code>, avec une contrainte en plus sur les x acceptés. Et c'est bien une fonction au sens qu'on a vu ensemble : une entrée, une seule sortie. À chaque angle correspond un seul point M, donc un seul cosinus.</p></div>
+<p>Pour la tangente, tes notes donnent tan : [0 ; π/2[ → ℝ. Le nombre π/2 est exclu parce que la tangente n'y est pas définie.</p>
+
+<h3>9.2 La périodicité</h3>
+<p><b>Périodique</b> veut dire : qui se répète à l'identique à intervalles réguliers. La durée d'un cycle s'appelle la <b>période</b>. Tu vis entouré de phénomènes périodiques : les jours de la semaine (période 7 jours), les saisons (1 an), les aiguilles d'une horloge (12 heures), les battements de ton cœur.</p>
+<p>Pour cos et sin : ajouter 2π à un angle, c'est faire un tour complet de plus. On retombe <b>exactement sur le même point M</b>, donc sur les mêmes coordonnées.</p>
+<div class="box key"><p class="lbl">À retenir</p><p>Pour tout réel x : cos(x + 2π) = cos x et sin(x + 2π) = sin x. On dit que cos et sin sont <b>2π-périodiques</b>. Plus généralement, cos(x + 2kπ) = cos x pour tout entier k : k tours de plus ou de moins ne changent rien.</p></div>
+<p><b>« Prolonger par périodicité »</b>, ça veut dire quoi ? La définition de départ ne donnait cos que sur [0 ; 2π[, un seul tour. Pour le définir sur tout ℝ, on continue d'enrouler le fil : au-delà de 2π, on refait des tours ; pour les nombres négatifs, on enroule dans le sens horaire. Comme sur une horloge : 14 h, c'est la même position des aiguilles que 2 h.</p>
+<p>Exemple : 9π/4 = 2π + π/4. On a fait un tour complet, puis encore π/4. Donc cos(9π/4) = cos(π/4) = √2/2.</p>
+<figure>
+<svg viewBox="0 0 360 200" role="img" aria-label="Courbes de sinus et cosinus sur deux périodes">
+<path class="sm dash" style="stroke-width:.8" d="M30,40 H335 M30,160 H335 M105,32 V170 M180,32 V170 M255,32 V170 M330,32 V170"/>
+<line class="sm" x1="22" y1="100" x2="340" y2="100"/><line class="sm" x1="30" y1="30" x2="30" y2="172"/>
+<path class="sb" d="M30.0,40.0 L31.9,40.2 L33.8,40.7 L35.6,41.7 L37.5,42.9 L39.4,44.6 L41.2,46.5 L43.1,48.8 L45.0,51.5 L46.9,54.4 L48.8,57.6 L50.6,61.0 L52.5,64.7 L54.4,68.7 L56.2,72.8 L58.1,77.0 L60.0,81.5 L61.9,86.0 L63.8,90.6 L65.6,95.3 L67.5,100.0 L69.4,104.7 L71.2,109.4 L73.1,114.0 L75.0,118.5 L76.9,123.0 L78.8,127.2 L80.6,131.3 L82.5,135.3 L84.4,139.0 L86.2,142.4 L88.1,145.6 L90.0,148.5 L91.9,151.2 L93.8,153.5 L95.6,155.4 L97.5,157.1 L99.4,158.3 L101.2,159.3 L103.1,159.8 L105.0,160.0 L106.9,159.8 L108.8,159.3 L110.6,158.3 L112.5,157.1 L114.4,155.4 L116.2,153.5 L118.1,151.2 L120.0,148.5 L121.9,145.6 L123.8,142.4 L125.6,139.0 L127.5,135.3 L129.4,131.3 L131.2,127.2 L133.1,123.0 L135.0,118.5 L136.9,114.0 L138.8,109.4 L140.6,104.7 L142.5,100.0 L144.4,95.3 L146.2,90.6 L148.1,86.0 L150.0,81.5 L151.9,77.0 L153.8,72.8 L155.6,68.7 L157.5,64.7 L159.4,61.0 L161.2,57.6 L163.1,54.4 L165.0,51.5 L166.9,48.8 L168.8,46.5 L170.6,44.6 L172.5,42.9 L174.4,41.7 L176.2,40.7 L178.1,40.2 L180.0,40.0 L181.9,40.2 L183.8,40.7 L185.6,41.7 L187.5,42.9 L189.4,44.6 L191.2,46.5 L193.1,48.8 L195.0,51.5 L196.9,54.4 L198.8,57.6 L200.6,61.0 L202.5,64.7 L204.4,68.7 L206.2,72.8 L208.1,77.0 L210.0,81.5 L211.9,86.0 L213.7,90.6 L215.6,95.3 L217.5,100.0 L219.4,104.7 L221.2,109.4 L223.1,114.0 L225.0,118.5 L226.9,123.0 L228.8,127.2 L230.6,131.3 L232.5,135.3 L234.4,139.0 L236.3,142.4 L238.1,145.6 L240.0,148.5 L241.9,151.2 L243.7,153.5 L245.6,155.4 L247.5,157.1 L249.4,158.3 L251.2,159.3 L253.1,159.8 L255.0,160.0 L256.9,159.8 L258.8,159.3 L260.6,158.3 L262.5,157.1 L264.4,155.4 L266.2,153.5 L268.1,151.2 L270.0,148.5 L271.9,145.6 L273.8,142.4 L275.6,139.0 L277.5,135.3 L279.4,131.3 L281.2,127.2 L283.1,123.0 L285.0,118.5 L286.9,114.0 L288.8,109.4 L290.6,104.7 L292.5,100.0 L294.4,95.3 L296.2,90.6 L298.1,86.0 L300.0,81.5 L301.9,77.0 L303.8,72.8 L305.6,68.7 L307.5,64.7 L309.4,61.0 L311.2,57.6 L313.1,54.4 L315.0,51.5 L316.9,48.8 L318.8,46.5 L320.6,44.6 L322.5,42.9 L324.4,41.7 L326.2,40.7 L328.1,40.2 L330.0,40.0"/>
+<path class="sr" d="M30.0,100.0 L31.9,95.3 L33.8,90.6 L35.6,86.0 L37.5,81.5 L39.4,77.0 L41.2,72.8 L43.1,68.7 L45.0,64.7 L46.9,61.0 L48.8,57.6 L50.6,54.4 L52.5,51.5 L54.4,48.8 L56.2,46.5 L58.1,44.6 L60.0,42.9 L61.9,41.7 L63.8,40.7 L65.6,40.2 L67.5,40.0 L69.4,40.2 L71.2,40.7 L73.1,41.7 L75.0,42.9 L76.9,44.6 L78.8,46.5 L80.6,48.8 L82.5,51.5 L84.4,54.4 L86.2,57.6 L88.1,61.0 L90.0,64.7 L91.9,68.7 L93.8,72.8 L95.6,77.0 L97.5,81.5 L99.4,86.0 L101.2,90.6 L103.1,95.3 L105.0,100.0 L106.9,104.7 L108.8,109.4 L110.6,114.0 L112.5,118.5 L114.4,123.0 L116.2,127.2 L118.1,131.3 L120.0,135.3 L121.9,139.0 L123.8,142.4 L125.6,145.6 L127.5,148.5 L129.4,151.2 L131.2,153.5 L133.1,155.4 L135.0,157.1 L136.9,158.3 L138.8,159.3 L140.6,159.8 L142.5,160.0 L144.4,159.8 L146.2,159.3 L148.1,158.3 L150.0,157.1 L151.9,155.4 L153.8,153.5 L155.6,151.2 L157.5,148.5 L159.4,145.6 L161.2,142.4 L163.1,139.0 L165.0,135.3 L166.9,131.3 L168.8,127.2 L170.6,123.0 L172.5,118.5 L174.4,114.0 L176.2,109.4 L178.1,104.7 L180.0,100.0 L181.9,95.3 L183.8,90.6 L185.6,86.0 L187.5,81.5 L189.4,77.0 L191.2,72.8 L193.1,68.7 L195.0,64.7 L196.9,61.0 L198.8,57.6 L200.6,54.4 L202.5,51.5 L204.4,48.8 L206.2,46.5 L208.1,44.6 L210.0,42.9 L211.9,41.7 L213.7,40.7 L215.6,40.2 L217.5,40.0 L219.4,40.2 L221.2,40.7 L223.1,41.7 L225.0,42.9 L226.9,44.6 L228.8,46.5 L230.6,48.8 L232.5,51.5 L234.4,54.4 L236.3,57.6 L238.1,61.0 L240.0,64.7 L241.9,68.7 L243.7,72.8 L245.6,77.0 L247.5,81.5 L249.4,86.0 L251.2,90.6 L253.1,95.3 L255.0,100.0 L256.9,104.7 L258.8,109.4 L260.6,114.0 L262.5,118.5 L264.4,123.0 L266.2,127.2 L268.1,131.3 L270.0,135.3 L271.9,139.0 L273.8,142.4 L275.6,145.6 L277.5,148.5 L279.4,151.2 L281.2,153.5 L283.1,155.4 L285.0,157.1 L286.9,158.3 L288.8,159.3 L290.6,159.8 L292.5,160.0 L294.4,159.8 L296.2,159.3 L298.1,158.3 L300.0,157.1 L301.9,155.4 L303.8,153.5 L305.6,151.2 L307.5,148.5 L309.4,145.6 L311.2,142.4 L313.1,139.0 L315.0,135.3 L316.9,131.3 L318.8,127.2 L320.6,123.0 L322.5,118.5 L324.4,114.0 L326.2,109.4 L328.1,104.7 L330.0,100.0"/>
+<path class="st" style="stroke-width:1.5" d="M30,28 L30,20 L180,20 L180,28"/>
+<text x="105" y="14" text-anchor="middle" class="s">une période = 2π</text>
+<text x="24" y="44" text-anchor="end" class="s">1</text><text x="24" y="164" text-anchor="end" class="s">−1</text>
+<text x="105" y="188" text-anchor="middle" class="s">π</text><text x="180" y="188" text-anchor="middle" class="s">2π</text><text x="255" y="188" text-anchor="middle" class="s">3π</text><text x="330" y="188" text-anchor="middle" class="s">4π</text>
+<text x="252" y="14" class="tr s">— sin</text><text x="300" y="14" class="tb s">— cos</text>
+</svg>
+<figcaption>En traçant cos (bleu) et sin (rouge), on obtient des vagues qui se répètent tous les 2π. C'est la grande roue, vue de profil au fil du temps.</figcaption>
+</figure>
+<div class="box img"><p class="lbl">Pourquoi ça compte</p><p>Ces vagues sont partout. Le courant de ta prise électrique est une sinusoïde qui se répète 50 fois par seconde ; le son, les ondes radio et le Wi-Fi en sont d'autres. Et jusque dans les LLM : le modèle Transformer original repère la position de chaque mot d'une phrase à l'aide de sinus et de cosinus.</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 9)</summary><ol>
+<li>Simplifie sin(x + 4π).<details><summary>Réponse</summary><div>4π, c'est deux tours complets : sin(x + 4π) = sin x.</div></details></li>
+<li>Sur quel point du cercle se place 9π/4 ?<details><summary>Réponse</summary><div>Sur le même point que π/4, car 9π/4 = 2π + π/4.</div></details></li>
+<li>Dans [0 ; 2π[, le nombre 2π est-il inclus ?<details><summary>Réponse</summary><div>Non : le crochet est tourné vers l'extérieur.</div></details></li>
+<li>Donne un phénomène périodique de ta vie et sa période.<details><summary>Réponse</summary><div>Par exemple les jours de la semaine (7 jours), ou un métro qui passe toutes les 4 minutes (4 minutes).</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Au-delà de π/2 : les angles associés</h2>
+<p>Ta feuille d'exercices demande des valeurs comme cos(2π/3) ou sin(13π/6). Ces angles ne sont pas dans le tableau, mais on peut toujours se ramener à un angle du premier quart grâce aux symétries du cercle. Rien à apprendre par cœur : <b>le dessin donne la réponse.</b></p>
+<figure>
+<svg viewBox="0 0 320 280" role="img" aria-label="Les points theta, pi moins theta, pi plus theta et moins theta sur le cercle">
+<line class="sm" x1="36" y1="150" x2="284" y2="150"/><line class="sm" x1="160" y1="28" x2="160" y2="272"/>
+<circle class="st" cx="160" cy="150" r="105"/>
+<rect class="sm dash" x="74" y="89.8" width="172" height="120.4"/>
+<path class="sm" d="M160,150 L246,89.8 M160,150 L74,89.8 M160,150 L74,210.2 M160,150 L246,210.2"/>
+<path class="sg" d="M185,150 A25,25 0 0 0 180.5,135.7"/>
+<circle class="fi" cx="246" cy="89.8" r="5"/><circle class="fi" cx="74" cy="89.8" r="5"/><circle class="fi" cx="74" cy="210.2" r="5"/><circle class="fi" cx="246" cy="210.2" r="5"/>
+<text x="254" y="86" class="mt">θ</text><text x="66" y="86" text-anchor="end" class="mt">π − θ</text><text x="66" y="226" text-anchor="end" class="mt">π + θ</text><text x="254" y="226" class="mt">−θ</text>
+<text x="235" y="40" text-anchor="middle" class="s tm">cos + , sin +</text><text x="85" y="40" text-anchor="middle" class="s tm">cos − , sin +</text>
+<text x="85" y="268" text-anchor="middle" class="s tm">cos − , sin −</text><text x="235" y="268" text-anchor="middle" class="s tm">cos + , sin −</text>
+</svg>
+<figcaption>Les quatre points θ, π − θ, π + θ et −θ forment un rectangle : mêmes valeurs de cos et de sin, au signe près. Les signes dépendent du quart où l'on se trouve.</figcaption>
+</figure>
+
+<h3>10.1 Les trois symétries</h3>
+<div class="tw"><table class="c">
+<tr><th>Angle</th><th>Symétrie par rapport à…</th><th>cos</th><th>sin</th></tr>
+<tr><td>−θ</td><td>l'axe horizontal</td><td>cos θ</td><td>−sin θ</td></tr>
+<tr><td>π − θ</td><td>l'axe vertical</td><td>−cos θ</td><td>sin θ</td></tr>
+<tr><td>π + θ</td><td>le centre O</td><td>−cos θ</td><td>−sin θ</td></tr>
+</table></div>
+
+<h3>10.2 La méthode en quatre étapes</h3>
+<ol>
+<li><b>Réduire.</b> Si l'angle dépasse 2π ou est négatif, ajoute ou retire des tours complets (2π) pour le ramener entre 0 et 2π.</li>
+<li><b>Placer le point.</b> Exprime l'angle par rapport à π, le demi-tour. Par exemple 3π/4 = π − π/4 : un demi-tour moins un huitième de tour, en haut à gauche.</li>
+<li><b>Trouver le jumeau.</b> Repère l'angle de référence du premier quart (π/6, π/4 ou π/3) qui lui est symétrique.</li>
+<li><b>Mettre les signes.</b> cos est positif à droite, négatif à gauche ; sin est positif en haut, négatif en bas.</li>
+</ol>
+<div class="box nts"><p class="lbl">Exemples résolus</p>
+<p>sin(3π/4) : 3π/4 = π − π/4, en haut à gauche, à la même hauteur que π/4. Donc sin(3π/4) = sin(π/4) = √2/2 (positif, on est en haut).</p>
+<p>cos(3π/4) : même point, mais à gauche. Donc cos(3π/4) = −cos(π/4) = −√2/2.</p>
+<p>cos(−π/3) : reflet de π/3 par rapport à l'axe horizontal, même abscisse. Donc cos(−π/3) = cos(π/3) = 1/2.</p></div>
+<p>C'est l'esprit de la phrase en haut de ta page 1 : « formule algébrique → représentation graphique ». Devant chaque calcul, dessine le cercle.</p>
+
+<h3>10.3 Résoudre sin x = a ou cos x = a</h3>
+<p>Résoudre « sin x = a », c'est chercher tous les points du cercle dont l'<b>ordonnée</b> vaut a : trace la droite horizontale y = a, et regarde où elle coupe le cercle. Pour « cos x = a », trace la droite verticale x = a.</p>
+<p>Exemple : sin x = √2/2. La droite horizontale y = √2/2 coupe le cercle en deux points : π/4 et π − π/4 = 3π/4. Dans [0 ; 2π], les solutions sont donc π/4 et 3π/4. Dans ℝ, on ajoute tous les tours possibles : x = π/4 + 2kπ ou x = 3π/4 + 2kπ, avec k ∈ ℤ (ℤ est l'ensemble des entiers relatifs : …, −2, −1, 0, 1, 2, …).</p>
+<div class="box img"><p class="lbl">Un écho de la parabole</p><p>Tu te souviens de la parabole qui coupe l'axe en 2, 1 ou 0 points ? Même phénomène ici. Une droite horizontale coupe le cercle en <b>deux points</b> si −1 &lt; a &lt; 1, en <b>un seul</b> si a = 1 ou a = −1 (elle le touche tout en haut ou tout en bas), et en <b>aucun</b> si a &gt; 1 ou a &lt; −1. L'équation sin x = 2 n'a pas de solution. La géométrie explique le nombre de solutions.</p></div>
+
+<details class="check"><summary>Vérifie-toi (partie 10)</summary><ol>
+<li>Que vaut sin(−π/6) ?<details><summary>Réponse</summary><div>Reflet de π/6 par rapport à l'axe horizontal : sin(−π/6) = −sin(π/6) = −1/2.</div></details></li>
+<li>Que vaut cos(7π/6) ?<details><summary>Réponse</summary><div>7π/6 = π + π/6 : symétrique de π/6 par rapport au centre, en bas à gauche. cos(7π/6) = −cos(π/6) = −√3/2.</div></details></li>
+<li>Que vaut cos(3π/2) ?<details><summary>Réponse</summary><div>M est tout en bas, en (0 ; −1) : cos(3π/2) = 0.</div></details></li>
+<li>Combien de solutions a cos x = 1/2 dans [0 ; 2π[ ? Lesquelles ?<details><summary>Réponse</summary><div>La verticale x = 1/2 coupe le cercle en deux points : π/3 en haut, et son reflet −π/3 en bas, qui s'écrit 2π − π/3 = 5π/3 dans [0 ; 2π[. Deux solutions : π/3 et 5π/3.</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ PARTIE 11 ============ -->
+<section id="p11">
+<h2><span class="num">11</span>Relecture de tes notes : corrections et compléments</h2>
+<p>Tu as pris des notes à toute vitesse ; c'est normal qu'il y ait des trous. Voici ce que j'ai repéré en les lisant. C'est de l'écriture manuscrite : si je lis mal un passage, fie-toi à ta copie.</p>
+<ol>
+<li><b>« dont l'ordre est 1 »</b> : très probablement « dont la norme est 1 ». Les vecteurs <span class="vec">OI</span> et <span class="vec">OJ</span> mesurent 1 (partie 4.2).</li>
+<li><b>Ta boîte « en résumé » de la page 3</b> : il me semble lire cos²θ + sin θ = 1. Le sinus aussi est au carré : cos²θ + sin²θ = 1 (partie 7.4). Ta boîte rouge juste au-dessus est correcte.</li>
+<li><b>Le bas de ta page 1</b> : les formules sur l'arc sont difficiles à relire. Retiens la version propre : angle en radians = longueur d'arc ÷ rayon ; sur le cercle trigonométrique, angle = longueur d'arc ; et x degrés × π/180 = l'angle en radians.</li>
+<li><b>La démonstration de π/6</b> s'arrête à « l'indication » : elle est complétée en partie 8.3.</li>
+<li><b>Dans la démonstration de π/4</b>, l'angle noté « ÂMO » est l'angle en M du triangle OHM, qu'on écrirait plutôt <span class="m">OM̂H</span>. Le raisonnement, lui, est juste.</li>
+<li><b>« x = OH et y = OK »</b> n'est vrai que si M est dans le quart en haut à droite. En général, une longueur est positive alors qu'une coordonnée peut être négative. C'est justement pour ça que la définition par le cercle (cos = abscisse) est plus puissante que celle par le triangle.</li>
+</ol>
+</section>
+
+<!-- ============ PARTIE 12 ============ -->
+<section id="p12">
+<h2><span class="num">12</span>Et maintenant : ta feuille d'exercices</h2>
+<p>Franchement : tu n'as pas encore tous les outils pour toute la feuille, et c'est normal. Plusieurs exercices demandent des formules qui ne sont pas encore dans tes notes : les formules d'addition, comme cos(a + b), et de duplication, comme cos(2x). Le titre de ta partie I annonce « formules », elles arriveront sans doute au prochain cours.</p>
+<div class="tw"><table>
+<tr><th>Où tu en es</th><th>Exercices</th></tr>
+<tr><td>Faisables avec ce cours</td><td>Ex. 1, Ex. 2, Ex. 7 (questions 1 à 3), Ex. 9 (1, 4, 5, 6), Ex. 10 (1, 2, 5), et Ex. 11 en défi (compare les aires du triangle OIM, de la « part de disque » IOM et du triangle OIT).</td></tr>
+<tr><td>Avec une petite astuce en plus</td><td>Ex. 8 (1, 2, 3, 6 à 9) : pose X = 2x, X = x/4, etc., et résous en X d'abord. Ex. 8.5 : c'est un polynôme du second degré en cos x (ta parabole revient). Ex. 8.10 et 8.12 : utilise tan = sin/cos, et sin²x = 1 − cos²x. Ex. 9 (2, 3) et Ex. 10 (3, 6).</td></tr>
+<tr><td>Attendent les formules du prochain cours</td><td>Ex. 3, 4, 5, 6, 7.4, 8.4, 8.11 et 10.4.</td></tr>
+</table></div>
+<p>Commence par l'exercice 1, en redessinant le cercle à chaque question. Si tu bloques, reviens à la partie 10.</p>
+
+<h3>Avant le prochain cours, tu dois pouvoir…</h3>
+<ul>
+<li>expliquer avec tes mots ce que sont un rayon, un repère orthonormé direct et un projeté orthogonal ;</li>
+<li>énoncer Pythagore et Thalès, et dire quand on a le droit de les utiliser ;</li>
+<li>convertir des degrés en radians, et inversement ;</li>
+<li>dire ce que valent cos θ et sin θ sur le cercle, sans formule ;</li>
+<li>redémontrer x² + y² = 1 et cos²θ + sin²θ = 1 ;</li>
+<li>retrouver les valeurs remarquables à partir des deux triangles « parfaits » ;</li>
+<li>expliquer pourquoi cos(x + 2π) = cos x ;</li>
+<li>placer un angle comme 5π/6 ou −π/4 sur le cercle et trouver son cos et son sin.</li>
+</ul>
+<p>Si tu coches tout ça, tu n'arriveras pas au prochain cours en recopiant sans comprendre : tu sauras d'où vient chaque ligne du tableau. Et c'est exactement le passage « calcul → raisonnement » dont on parlait avant la rentrée.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes notes du premier cours de Fonctions élémentaires (Paris 8, 2026-2027).</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+  var cx=170, cy=160, R=115, r=30;
+  function $(id){return document.getElementById(id);}
+  var rng=$('uc-range'); if(!rng) return;
+  var radEx={0:'0',30:'π/6',45:'π/4',60:'π/3',90:'π/2',120:'2π/3',135:'3π/4',150:'5π/6',180:'π',210:'7π/6',225:'5π/4',240:'4π/3',270:'3π/2',300:'5π/3',315:'7π/4',330:'11π/6',360:'2π'};
+  var mag={0:'1',30:'√3/2',45:'√2/2',60:'1/2',90:'0'};
+  var tmag={0:'0',30:'√3/3',45:'1',60:'√3'};
+  function fmt(v){ if(Math.abs(v)<5e-4) v=0; return v.toFixed(3).replace('.',',').replace('-','−'); }
+  function set(el,a){ for(var k in a) el.setAttribute(k,a[k]); }
+  function show(el,on){ el.style.display = on ? '' : 'none'; }
+  function refA(d){ var a=d%180; return a<=90 ? a : 180-a; }
+  function withApprox(ex,v){ return (ex.indexOf('√')>-1 || ex.indexOf('/')>-1) ? ex+' ≈ '+fmt(v) : ex; }
+  function upd(d){
+    var t=d*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+    var mx=cx+R*c, my=cy-R*s;
+    set($('uc-om'),{x1:cx,y1:cy,x2:mx,y2:my});
+    set($('uc-cos'),{x1:cx,y1:cy,x2:mx,y2:cy});
+    set($('uc-sin'),{x1:mx,y1:cy,x2:mx,y2:my});
+    set($('uc-mk'),{x1:mx,y1:my,x2:cx,y2:my});
+    set($('uc-m'),{cx:mx,cy:my});
+    set($('uc-ml'),{x:cx+(R+18)*c, y:cy-(R+18)*s+5});
+    var hl=$('uc-hl'); set(hl,{x:mx, y: s>=0 ? cy+18 : cy-8}); show(hl, Math.abs(c)>0.12);
+    var kl=$('uc-kl'); set(kl,{x: c>=0 ? cx-8 : cx+8, y:my+5, 'text-anchor': c>=0 ? 'end':'start'}); show(kl, Math.abs(s)>0.12);
+    var arc=$('uc-arc');
+    if(d<0.5){ arc.setAttribute('d',''); }
+    else if(d>359.5){ arc.setAttribute('d','M'+(cx+r)+','+cy+' A'+r+','+r+' 0 1 0 '+(cx-r)+','+cy+' A'+r+','+r+' 0 1 0 '+(cx+r)+','+cy); }
+    else { arc.setAttribute('d','M'+(cx+r)+','+cy+' A'+r+','+r+' 0 '+(d>180?1:0)+' 0 '+(cx+r*c)+','+(cy-r*s)); }
+    var ok=Math.abs(c)>1e-6 && Math.abs(s/c)<=1.35;
+    ['uc-it','uc-mt','uc-t','uc-tl'].forEach(function(id){ show($(id), ok); });
+    if(ok){
+      var ty=cy-R*(s/c);
+      set($('uc-it'),{x1:cx+R,y1:cy,x2:cx+R,y2:ty});
+      set($('uc-mt'),{x1:mx,y1:my,x2:cx+R,y2:ty});
+      set($('uc-t'),{cx:cx+R,cy:ty});
+      set($('uc-tl'),{x:cx+R+9,y:ty+5});
+    }
+    var rem = Object.prototype.hasOwnProperty.call(radEx,d);
+    $('r-ang').textContent = rem ? (d+'° = '+radEx[d]+' rad') : (d+'° ≈ '+fmt(t)+' rad');
+    if(rem){
+      var ra=refA(d), cm=mag[ra], sm=mag[90-ra];
+      var cs=(c<-1e-9 && cm!=='0')?'−':'', ss=(s<-1e-9 && sm!=='0')?'−':'';
+      $('r-cos').textContent = withApprox(cs+cm,c);
+      $('r-sin').textContent = withApprox(ss+sm,s);
+      if(Math.abs(c)<1e-9){ $('r-tan').textContent='indéfinie (cos θ = 0)'; }
+      else { var tm=tmag[ra], ts=(s*c<-1e-9 && tm!=='0')?'−':''; $('r-tan').textContent = withApprox(ts+tm,s/c); }
+    } else {
+      $('r-cos').textContent='≈ '+fmt(c);
+      $('r-sin').textContent='≈ '+fmt(s);
+      $('r-tan').textContent = Math.abs(c)<1e-9 ? 'indéfinie' : '≈ '+fmt(s/c);
+    }
+  }
+  rng.addEventListener('input',function(e){ upd(+e.target.value); });
+  var bs=document.querySelectorAll('#uc .presets button');
+  for(var i=0;i<bs.length;i++){ bs[i].addEventListener('click',function(){ rng.value=this.getAttribute('data-d'); upd(+rng.value); }); }
+  upd(+rng.value);
+})();
+</script>
+</body>
+</html>

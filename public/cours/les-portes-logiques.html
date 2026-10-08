@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>Les portes logiques, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Cahier à grands carreaux : même identité que les cours de maths (papier ligné, marge rouge, Atkinson + STIX),
+   avec une police à chasse fixe pour les bits, et les couleurs de fils de Logisim (vert vif = 1, vert sombre = 0). */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  --w1:#1fbf4a; --w0:#0f5a2c; --wz:#2f6fe0; --wx:#d33a2c; --w-off:#c9d2e3;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:780px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:780px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.mr{font-family:var(--serif);font-size:1.1em}
+.eq{font-family:var(--serif);font-size:1.25rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+code,.bits{font-family:var(--mono);font-size:.86em}
+code{background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.bits{white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+sub{font-size:.7em}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}.c-m{color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;white-space:nowrap}
+table.c td.bits{font-size:.95rem}
+table.tight{width:auto;margin:0 auto}
+table.c tr.hl td{background:var(--soft-a)}
+table.c td.v,td.one{color:var(--green);font-weight:700}
+td.zero{color:var(--muted)}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:var(--serif)}
+.blk a:hover{border-color:var(--blue)}
+details.check{margin:22px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem;overflow-x:auto}
+.steps{font-family:var(--serif);font-size:1.08rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:var(--sans);font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.05em;font-family:var(--sans);font-weight:700}
+.steps .bits{font-size:.92em}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.9rem}
+.note{font-size:.92rem;color:var(--muted)}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:780px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+/* questions guidées */
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.mq{border-top:1px solid var(--line);padding:10px 0 6px}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+
+/* boutons et champs communs aux laboratoires */
+.lab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:18px 0}
+.lab>.lbl{color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0}
+.row>*{min-width:0}
+.fld{display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:var(--muted);font-weight:700}
+.fld input,.fld select{font-family:var(--mono);font-size:1.05rem;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px;min-width:0;width:100%}
+.fld select{font-family:var(--sans)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.92rem;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:38px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--soft-b);color:var(--blue);font-weight:700}
+.out{margin-top:10px}
+.msg{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:.98rem}
+.msg>:first-child{margin-top:0}.msg>:last-child{margin-bottom:0}
+.msg.ok{background:var(--soft-g)}.msg.ko{background:var(--soft-r)}.msg.info{background:var(--soft-b)}.msg.meh{background:var(--soft-a)}
+.pill{display:inline-block;font-size:.82rem;font-weight:700;border-radius:999px;padding:1px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}.pill.n{background:var(--soft-b);color:var(--blue)}
+/* ---- circuits ---- */
+.circ,.lab-c{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:16px 0}
+.circ-fig{overflow-x:auto;padding:4px 0}
+.circ-fig svg{display:block;margin:0 auto}
+.circ-fig svg .gate,.gal svg .gate{fill:var(--card);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.circ-fig svg .gate-l,.gal svg .gate-l{fill:none;stroke:var(--ink);stroke-width:2}
+svg .w{fill:none;stroke-width:3;stroke-linejoin:round}
+svg .w1{stroke:var(--w1)}
+svg .w0{stroke:var(--w0)}
+svg .jn.on{fill:var(--w1)} svg .jn.off{fill:var(--w0)}
+svg .ipin{cursor:pointer}
+svg .ipin:focus{outline:none}
+svg .ipin:focus-visible .ibox{stroke:var(--blue);stroke-width:3}
+svg .ibox{stroke-width:2}
+svg .ibox.on{fill:var(--soft-g);stroke:var(--w1)}
+svg .ibox.off{fill:var(--card);stroke:var(--w0)}
+svg .ipin:hover .ibox{stroke:var(--blue)}
+svg .opin{stroke-width:2.5}
+svg .opin.on{fill:var(--soft-g);stroke:var(--w1)}
+svg .opin.off{fill:var(--card);stroke:var(--w0)}
+svg .pv{font-family:var(--mono);font-size:14px;font-weight:700;fill:var(--ink)}
+svg .pn{font-family:var(--sans);font-size:14px;font-weight:700;fill:var(--blue)}
+svg .iec{font-family:var(--sans);font-size:13px;font-weight:700;fill:var(--ink)}
+svg .wl{font-family:var(--serif);font-size:13px;fill:var(--amber);paint-order:stroke;stroke:var(--card);stroke-width:4px}
+svg .cst{font-family:var(--mono);font-size:13px;font-weight:700;fill:var(--ink)}
+.ov{border-top:1.5px solid currentColor;padding-top:1px}
+.ov:has(.ov){padding-top:4px}
+.ov:has(.ov .ov){padding-top:7px}
+table.tt th.sub{font-weight:400;color:var(--muted)}
+table.tt th.outc,table.tt td.outc{background:var(--soft-b)}
+table.tt th{font-family:var(--serif);font-size:1.02rem}
+table.tt td{font-family:var(--mono);padding:4px 12px}
+table.tt tr.hl td{background:var(--soft-a)}
+
+/* ---- portes : galerie et banc d'essai ---- */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
+.gcard svg{display:block;margin:0 auto}
+.gname{font-weight:700;margin:4px 0 0}
+.gname .en{color:var(--muted);font-weight:400}
+.gexpr{font-family:var(--serif);font-size:1.1rem;margin:2px 0}
+.symtog{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.pg-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:center;margin-top:10px}
+@media (max-width:620px){.pg-grid{grid-template-columns:minmax(0,1fr)}}
+.pg-info p{margin:4px 0;font-size:.96rem}
+.pg-info .gname{font-size:1.15rem}
+#pg .seg button{min-width:3.4em}
+
+/* ---- lampe ---- */
+.lamp-fig svg{display:block;width:100%;max-width:420px;height:auto;margin:6px auto}
+.lamp-fig .cw{fill:none;stroke:var(--muted);stroke-width:3;stroke-linejoin:round}
+.lamp-fig .cw.on{stroke:var(--amber)}
+.lamp-fig .sw{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round}
+.lamp-fig .sw.on{stroke:var(--green)}
+.lamp-fig .term{fill:var(--ink)}
+.lamp-fig .bat{stroke:var(--ink);stroke-width:3}
+.lamp-fig .bulb{fill:var(--card);stroke:var(--ink);stroke-width:2.5}
+.lamp-fig .bulb.on{fill:var(--amber);stroke:var(--amber)}
+.lamp-fig .fil{stroke:var(--ink);stroke-width:1.5}
+.lamp-fig .swl{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+
+/* ---- laboratoire ---- */
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.presets button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+.presets button:hover{background:var(--soft-b)}
+.chk{font-size:.93rem;display:flex;gap:8px;align-items:center;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--blue)}
+.syntax{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:.95rem}
+.syntax code{white-space:nowrap}
+
+/* ---- Logisim ---- */
+.lg svg{display:block;width:100%;max-width:700px;height:auto;margin:0 auto}
+.lg .frame{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+.lg .bar{fill:var(--soft-b)}
+.lg .pane{fill:var(--paper);stroke:var(--line)}
+.lg .grid{fill:url(#dots)}
+.lg text{font-family:var(--sans);font-size:11px;fill:var(--ink)}
+.lg text.m{fill:var(--muted)}
+.lg .ico{fill:none;stroke:var(--ink);stroke-width:1.5}
+.lg .num circle{fill:var(--margin)}
+.lg .num text{fill:#fff;font-weight:700;font-size:11px}
+.lg .gate{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+ol.lg-leg li{margin:6px 0}
+.lg-leg b.n{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--margin);color:#fff;font-size:.8rem;margin-right:6px}
+.swatch{display:inline-block;width:28px;height:5px;border-radius:3px;vertical-align:middle}
+
+/* ---- exercices ---- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px 14px;margin:18px 0}
+.ex h3{margin-top:14px}
+.ex .circ{border:0;padding:0;margin:8px 0}
+.hints p{display:none;background:var(--soft-b);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:.96rem}
+.hints p.shown{display:block}
+.hints .btn{margin-top:6px}
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+/* Bandeau du blog Vizion : retour à la section et mention de l'auteur */
+.vz-bar{max-width:780px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/informatique">← Vizion.Blog / Informatique</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ta prof »).</p>
+</div>
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Architecture des ordinateurs, séance du 5 octobre</p>
+<h1>Les portes logiques, depuis le tout début<small>Six portes, leurs tables de vérité, les expressions booléennes, et comment passer d'une expression à un circuit dans Logisim.</small></h1>
+<p class="lede">Les additions de ta page sur le binaire, le processeur les fait avec des circuits construits à partir de six briques : les portes logiques. Tu en connais déjà trois sous un autre nom : le non, le et et le ou de ton cours de logique. Cette page prépare la séance du 5 octobre et le TP Logisim. Tous les circuits sont vivants : clique sur les carrés d'entrée pour changer leur valeur.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Clique sur les carrés à gauche des circuits</b> pour basculer les entrées entre 0 et 1. Comme dans Logisim, un fil <span class="swatch" style="background:var(--w1)"></span> vert vif vaut 1, un fil <span class="swatch" style="background:var(--w0)"></span> vert sombre vaut 0.</li>
+<li><b>Remplis chaque table de vérité à la main</b> avant de regarder celle de la page.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b></li>
+<li><b>Rythme conseillé :</b> sections 1 à 4 avant la séance, 5 à 7 juste après, la section 8 avant le TP, puis les exercices de la section 9.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Tu connais déjà ces portes</p>
+<p>Les portes NON, ET, OU sont les connecteurs ¬, ∧, ∨ de ta page <a href="/cours/la-logique.html">La logique, depuis le tout début</a>, avec 1 à la place de V et 0 à la place de F. Seules les notations changent :</p>
+<div class="tw"><table class="c">
+<tr><th></th><th>cours de logique</th><th>architecture</th><th>Python</th><th>Racket</th></tr>
+<tr><td>non</td><td class="mr">¬a</td><td class="mr"><span class="ov">a</span></td><td><code>not a</code></td><td><code>(not a)</code></td></tr>
+<tr><td>et</td><td class="mr">a ∧ b</td><td class="mr">a·b ou ab</td><td><code>a and b</code></td><td><code>(and a b)</code></td></tr>
+<tr><td>ou</td><td class="mr">a ∨ b</td><td class="mr">a + b</td><td><code>a or b</code></td><td><code>(or a b)</code></td></tr>
+</table></div>
+</div>
+<h3>Les mots, et où ils sont expliqués</h3>
+<ul class="blk">
+<li><a href="#p1"><b>•</b>Transistor et interrupteur</a></li>
+<li><a href="#p2"><b>•</b>Les six portes</a></li>
+<li><a href="#p2-pg"><b>•</b>Le banc d'essai</a></li>
+<li><a href="#p3"><b>•</b>Tables de vérité</a></li>
+<li><a href="#p4"><b>•</b>Expressions booléennes</a></li>
+<li><a href="#p5"><b>•</b>Expression et circuit</a></li>
+<li><a href="#p5-lab"><b>•</b>Le laboratoire des circuits</a></li>
+<li><a href="#p5-eq"><b>•</b>Circuits équivalents</a></li>
+<li><a href="#p6"><b>•</b>NAND, la porte universelle</a></li>
+<li><a href="#p7"><b>•</b>Le demi-additionneur</a></li>
+<li><a href="#p8"><b>•</b>Prise en main de Logisim</a></li>
+<li><a href="#p9"><b>•</b>Exercices</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Du transistor à la porte</h2>
+<h3>1.1 Un interrupteur commandé par une tension</h3>
+<p>Un interrupteur ordinaire est commandé par ton doigt. Un <b>transistor</b> (<i>transistor</i>) est un interrupteur commandé par une tension : selon la tension appliquée sur sa commande, il laisse passer le courant ou le bloque. Un processeur en contient des milliards, et chacun peut basculer des milliards de fois par seconde.</p>
+
+<h3>1.2 En série, en parallèle</h3>
+<p>Branche deux interrupteurs avant une lampe. En série, le courant doit traverser les deux : la lampe s'allume si a <b>et</b> b sont fermés. En parallèle, il a deux chemins : il suffit que a <b>ou</b> b soit fermé. Tu as peut-être câblé ce montage en CIEL.</p>
+<div class="lab" id="lamp"></div>
+
+<h3>1.3 On oublie l'électricité</h3>
+<p>Une <b>porte logique</b> (<i>logic gate</i>) est un petit groupe de transistors câblés pour que la tension de sortie dépende des tensions d'entrée selon une règle fixe. À partir de maintenant, on oublie l'électricité : chaque fil vaut 0 ou 1, et chaque porte calcule une fonction de ses entrées. C'est la même idée qu'en programmation : quand tu écris <code>a and b</code> en Python, tu ne penses pas aux transistors. On appelle ça une <b>abstraction</b>.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Les six portes</h2>
+<p>Une porte reçoit une ou plusieurs <b>entrées</b> (<i>inputs</i>) à gauche, et produit une <b>sortie</b> (<i>output</i>) à droite. Chaque porte a un symbole, une notation et une table de vérité.</p>
+<div class="symtog"></div>
+<div class="gal" id="gal"></div>
+<div class="box img">
+<p class="lbl">Reconnaître les symboles</p>
+<ul>
+<li><b>ET</b> a le dos plat et l'avant arrondi, comme un D. Pense à <i>AND</i>, qui finit par un D.</li>
+<li><b>OU</b> a le dos creusé et l'avant pointu, comme une pointe de flèche.</li>
+<li><b>XOR</b> est un OU avec une deuxième ligne courbe derrière le dos.</li>
+<li>Le <b>petit rond</b> (la bulle) sur la sortie veut dire « on inverse ». NON est un triangle avec une bulle, NAND est un ET avec une bulle, NOR est un OU avec une bulle.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Deux familles de symboles</p>
+<p>Logisim dessine par défaut les symboles américains, ceux de cette page. Les manuels français utilisent souvent la norme européenne (CEI 60617) : un rectangle avec « & » pour ET, « ≥1 » pour OU, « =1 » pour XOR, « 1 » pour NON, et une bulle pour l'inversion. Le bouton au-dessus de la galerie change tous les dessins de la page. Il faut savoir lire les deux.</p>
+</div>
+
+<h3>2.1 Les six tables, côte à côte</h3>
+<p>Toutes les règles tiennent dans ce tableau. Les lignes sont rangées en comptant en binaire : 00, 01, 10, 11.</p>
+<div class="tw"><table class="c tight tt">
+<tr><th>a</th><th>b</th><th>NON a</th><th>ET</th><th>OU</th><th>XOR</th><th>NAND</th><th>NOR</th></tr>
+<tr><td>0</td><td>0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+<tr><td>0</td><td>1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+<tr><td>1</td><td>0</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+<tr><td>1</td><td>1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+</table></div>
+<ul>
+<li><b>ET</b> ne vaut 1 que sur la dernière ligne, <b>NAND</b> est sa colonne inversée.</li>
+<li><b>OU</b> ne vaut 0 que sur la première ligne, <b>NOR</b> est sa colonne inversée.</li>
+<li><b>XOR</b> vaut 1 quand les entrées sont <b>différentes</b>. C'est le « ou » du restaurant, « fromage ou dessert » : l'un ou l'autre, pas les deux. Le OU des maths et des circuits, lui, accepte les deux.</li>
+<li>Dans ton cours de logique, les tables commençaient par V V. Ici on compte en binaire à partir de 0 0. C'est la même table, dans un autre ordre.</li>
+</ul>
+
+<h3 id="p2-pg">2.2 Le banc d'essai</h3>
+<p>Choisis une porte, puis clique sur les entrées a et b. La ligne correspondante de la table s'allume.</p>
+<div class="lab" id="pg"></div>
+<p class="note">Logisim propose aussi <b>XNOR</b> (NON-OU exclusif), qui vaut 1 quand les deux entrées sont égales : c'est un détecteur d'égalité.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="3">
+<p class="mq-q">Quelle porte donne 1 seulement quand ses deux entrées valent 0 ?</p>
+<div class="mq-c"><button type="button" data-fb="NAND vaut 1 sur trois lignes sur quatre.">NAND</button><button type="button" data-fb="ET donne 1 quand les deux entrées valent 1.">ET</button><button type="button" data-fb="XOR donne 0 quand les deux entrées sont égales.">XOR</button><button type="button">NOR</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">NOR = NON (a OU b) : il faut qu'aucune entrée ne soit à 1.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Quelle porte détecte que deux bits sont différents ?</p>
+<div class="mq-c"><button type="button" data-fb="OU donne aussi 1 quand les deux bits valent 1, alors qu'ils sont égaux.">OU</button><button type="button" data-fb="NAND donne 1 pour 0 et 0, qui sont égaux.">NAND</button><button type="button">XOR</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">XOR vaut 1 exactement sur les lignes 01 et 10.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Que vaut NAND(1, 1) ?</p>
+<div class="mq-c"><button type="button">0</button><button type="button" data-fb="ET(1, 1) vaut 1, et NAND inverse le résultat de ET.">1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">ET(1, 1) = 1, inversé : 0. C'est la seule ligne où NAND vaut 0.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Les tables de vérité</h2>
+<p>La <b>table de vérité</b> (<i>truth table</i>) d'un circuit donne sa sortie pour toutes les combinaisons possibles des entrées. Elle décrit complètement ce que fait le circuit.</p>
+<div class="box key">
+<p class="lbl">Combien de lignes ?</p>
+<p>Avec n entrées, il y a <b>2<sup>n</sup> lignes</b> : 4 lignes pour 2 entrées, 8 pour 3, 16 pour 4. C'est le « 2<sup>n</sup> valeurs avec n bits » de ta page sur le binaire.</p>
+<p>On range les lignes en comptant en binaire : 000, 001, 010, …, 111. La colonne de droite alterne 0, 1, 0, 1 ; celle du milieu change tous les 2 ; celle de gauche tous les 4. Avec cette méthode, tu n'oublies jamais une ligne.</p>
+</div>
+<h3>3.1 Combien de fonctions différentes ?</h3>
+<p>Une table à 2 entrées a 4 lignes, et chaque ligne peut valoir 0 ou 1 : il y a donc 2⁴ = 16 tables possibles, c'est-à-dire 16 fonctions différentes de 2 entrées. Nos six portes en sont six. Parmi les dix autres, certaines sont sans intérêt (toujours 0, toujours 1, recopier a), d'autres se construisent avec nos portes. Avec 3 entrées, il y a 2⁸ = 256 fonctions.</p>
+<h3>3.2 Portes à plus de deux entrées</h3>
+<ul>
+<li><b>ET</b> à n entrées vaut 1 si <b>toutes</b> ses entrées valent 1.</li>
+<li><b>OU</b> à n entrées vaut 1 si <b>au moins une</b> entrée vaut 1.</li>
+<li><b>NAND</b> et <b>NOR</b> inversent ces deux résultats.</li>
+<li><b>XOR</b> à n entrées est en général défini comme la <b>parité</b> : il vaut 1 si un <b>nombre impair</b> d'entrées vaut 1.</li>
+</ul>
+<div class="box warn">
+<p class="lbl">XOR à trois entrées dans Logisim</p>
+<p>Dans Logisim, une porte XOR à plus de deux entrées a un réglage nommé <i>Multiple-Input Behavior</i>. Dans la version 2.7, la valeur par défaut est « exactement une entrée à 1 », pas « un nombre impair ». Avec trois entrées à 1, les deux réglages ne donnent pas le même résultat : vérifie cet attribut.</p>
+</div>
+<h4>Pourquoi XOR calcule la parité</h4>
+<p>La <b>parité</b> d'une suite de bits, c'est la réponse à la question : « combien de 1 y a-t-il, un nombre pair ou impair ? ». On ne compte pas les 1 exactement, on regarde seulement s'il en reste un quand on les range par paires.</p>
+<p><b>Avec deux entrées</b>, c'est déjà la définition de XOR. a ⊕ b vaut 1 quand a et b sont différents, c'est-à-dire quand il y a exactement un 1 parmi les deux : un nombre impair. Quand il y a zéro ou deux 1, deux nombres pairs, XOR vaut 0.</p>
+<div class="tw"><table class="c tight tt">
+<tr><th>a</th><th>b</th><th>nombre de 1</th><th>pair ou impair ?</th><th class="outc">a ⊕ b</th></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>pair</td><td class="outc zero">0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td><td>impair</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>0</td><td>1</td><td>impair</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>1</td><td>2</td><td>pair</td><td class="outc zero">0</td></tr>
+</table></div>
+<p><b>Avec plus d'entrées</b>, on enchaîne les XOR. Regarde ce que fait un XOR avec un bit : x ⊕ 0 = x (rien ne change) et x ⊕ 1 = <span class="ov">x</span> (ça s'inverse). Un XOR se comporte donc comme un interrupteur qu'on bascule : chaque 1 rencontré le fait changer d'état, chaque 0 le laisse tranquille. On part de 0, on lit les bits un par un, et à la fin l'état vaut 1 si on a basculé un nombre impair de fois. Pour <span class="bits">1011</span> :</p>
+<div class="steps">
+<span class="op">départ</span><span>0</span>
+<span class="op">⊕ 1</span><span>1 <span class="note">(on bascule)</span></span>
+<span class="op">⊕ 0</span><span>1 <span class="note">(rien ne change)</span></span>
+<span class="op">⊕ 1</span><span>0 <span class="note">(on bascule)</span></span>
+<span class="op">⊕ 1</span><span>1 <span class="note">(on bascule) : trois 1, impair</span></span>
+</div>
+<p>C'est la lampe de l'escalier de la section 2, avec autant d'interrupteurs que de bits. En Python, c'est une accumulation que tu connais :</p>
+<pre class="code"><code>etat = 0
+for bit in [1, 0, 1, 1]:
+    etat = etat ^ bit      # bascule si bit vaut 1
+print(etat)                # 1, comme sum([1, 0, 1, 1]) % 2</code></pre>
+<p>Un lien de plus avec la page sur le binaire : a ⊕ b, c'est la colonne S du demi-additionneur (section 7), le chiffre des unités de a + b. La parité d'une suite de bits, c'est donc le dernier bit de leur somme : 1 + 0 + 1 + 1 = 3 = (11)₂, qui finit par 1.</p>
+<div class="box img">
+<p class="lbl">À quoi sert la parité : détecter une erreur</p>
+<p>Un ordinateur veut envoyer les 7 bits <span class="bits">101 1001</span> par un câble où le bruit électrique peut abîmer un bit. Ils contiennent quatre 1, un nombre pair. On ajoute un huitième bit, le <b>bit de parité</b>, choisi pour que le nombre total de 1 soit pair : ici 0. On envoie <span class="bits">1011 0010</span>.</p>
+<p>Le récepteur fait le XOR des 8 bits reçus. S'il trouve 0, le nombre de 1 est pair : tout va bien. Si un bit a été inversé en route, il y a un 1 de plus ou de moins, le nombre de 1 devient impair, et le XOR donne 1 : l'erreur est détectée.</p>
+<p>Limites : si deux bits sont abîmés, le nombre de 1 redevient pair et l'erreur passe inaperçue. Et même quand l'erreur est détectée, on ne sait pas quel bit est faux.</p>
+</div>
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de lignes a la table d'un circuit à 4 entrées ?</p>
+<div class="mq-c"><button type="button" data-fb="Chaque entrée double le nombre de lignes.">8</button><button type="button">16</button><button type="button" data-fb="Ça, ce serait pour 5 entrées.">32</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2⁴ = 16 lignes, de 0000 à 1111.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Une porte XOR (parité) à 3 entrées reçoit 1, 1 et 1. Sa sortie ?</p>
+<div class="mq-c"><button type="button">1</button><button type="button" data-fb="Trois 1, c'est un nombre impair de 1.">0</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 ⊕ 1 = 0, puis 0 ⊕ 1 = 1. Mais attention au réglage de Logisim.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Les expressions booléennes</h2>
+<p>Une <b>expression booléenne</b> (<i>Boolean expression</i>) décrit un circuit avec des lettres et des symboles, comme une formule de maths. Elle porte le nom de George Boole, qui a inventé ce calcul au XIX<sup>e</sup> siècle, bien avant les ordinateurs.</p>
+<h3>4.1 Les notations</h3>
+<div class="tw"><table class="c">
+<tr><th>porte</th><th>notation</th><th>se lit</th></tr>
+<tr><td>NON</td><td class="mr"><span class="ov">a</span></td><td>« a barre », ou « non a »</td></tr>
+<tr><td>ET</td><td class="mr">a·b, ou simplement ab</td><td>« a et b »</td></tr>
+<tr><td>OU</td><td class="mr">a + b</td><td>« a ou b »</td></tr>
+<tr><td>XOR</td><td class="mr">a ⊕ b</td><td>« a ou exclusif b »</td></tr>
+<tr><td>NAND</td><td class="mr"><span class="ov">a·b</span></td><td>« non (a et b) »</td></tr>
+<tr><td>NOR</td><td class="mr"><span class="ov">a + b</span></td><td>« non (a ou b) »</td></tr>
+</table></div>
+
+<h3>4.2 Les priorités</h3>
+<p>Comme en calcul, où × passe avant +, il y a un ordre : <b>d'abord NON, puis ET, puis OU</b>. Ainsi a + b·c se lit a + (b·c), comme 2 + 3 × 4 se lit 2 + (3 × 4).</p>
+<p>Une barre posée sur un groupe joue le rôle de parenthèses : <span class="mr"><span class="ov">a·b</span></span> veut dire « non (a·b) ». Ce n'est pas la même chose que <span class="mr"><span class="ov">a</span>·<span class="ov">b</span></span>, où chaque lettre est inversée séparément. Pour XOR, mets toujours des parenthèses, les conventions varient.</p>
+
+<div class="box warn">
+<p class="lbl">Le « + » n'est pas une addition</p>
+<p>En algèbre de Boole, <b>1 + 1 = 1</b> : « vrai ou vrai » est vrai. Dans ta page sur le binaire, <b>1 + 1 = 10</b> : c'est l'addition de deux nombres. Même symbole, deux sens. Le contexte décide : expression booléenne ou calcul binaire.</p>
+</div>
+
+<h3>4.3 Évaluer une expression, colonne par colonne</h3>
+<p>On procède comme dans ton cours de logique : une colonne par morceau de l'expression, du plus petit au plus grand. Exemple, S = a·b + <span class="ov">a</span>·c :</p>
+<div class="tw"><table class="c tight tt">
+<tr><th>a</th><th>b</th><th>c</th><th class="sub"><span class="ov">a</span></th><th class="sub">a·b</th><th class="sub"><span class="ov">a</span>·c</th><th class="outc">S</th></tr>
+<tr><td>0</td><td>0</td><td>0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>0</td><td>0</td><td>1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="outc one">1</td></tr>
+<tr><td>0</td><td>1</td><td>0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>1</td><td>1</td><td>0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>1</td><td>1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="outc one">1</td></tr>
+</table></div>
+<p>Regarde la colonne S : quand a = 1, S recopie b ; quand a = 0, S recopie c. Ce circuit est un <b>aiguillage</b> : a choisit laquelle des deux entrées passe. On l'appelle un <b>multiplexeur</b> (<i>multiplexer</i>), et tu le retrouveras le 19 octobre.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Que vaut a + b·c pour a = 0, b = 1, c = 1 ?</p>
+<div class="mq-c"><button type="button" data-fb="b·c passe en premier : 1·1 = 1, puis 0 + 1.">0</button><button type="button">1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">b·c = 1, puis 0 + 1 = 1.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Pour a = 1 et b = 0, que valent <span class="bits" style="font-family:var(--serif);font-size:1.05em"><span class="ov">a·b</span></span> (une seule barre longue : non(a·b)) et <span class="bits" style="font-family:var(--serif);font-size:1.05em"><span class="ov">a</span>·<span class="ov">b</span></span> (deux barres courtes : (non a)·(non b)) ? Pas besoin de table : on calcule une seule ligne.</p>
+<div class="mq-c"><button type="button">1 et 0</button><button type="button" data-fb="Calcule d'abord a·b = 0, puis inverse. Pour l'autre, ā = 0.">0 et 1</button><button type="button" data-fb="Les deux expressions ne sont pas équivalentes.">1 et 1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok"><span class="ov">a·b</span> = <span class="ov">0</span> = 1, alors que <span class="ov">a</span>·<span class="ov">b</span> = 0·1 = 0. Une barre longue n'est pas deux barres courtes.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">En algèbre de Boole, 1 + 1 = ?</p>
+<div class="mq-c"><button type="button" data-fb="Ça, c'est l'addition binaire (page sur le binaire).">10</button><button type="button" data-fb="Le + booléen est un OU.">2</button><button type="button">1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Vrai ou vrai, c'est vrai : 1.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>D'une expression à un circuit, et retour</h2>
+<p>Ta prof veut que tu saches passer de l'un à l'autre dans les deux sens. Une expression et un circuit sont deux écritures de la même chose.</p>
+
+<h3>5.1 De l'expression au circuit</h3>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li>Repère l'opération <b>calculée en dernier</b> (en tenant compte des priorités) : c'est la porte qui touche la sortie.</li>
+<li>Chacun de ses opérandes devient un fil d'entrée de cette porte.</li>
+<li>Recommence sur chaque opérande, jusqu'à tomber sur les entrées a, b, c.</li>
+</ol>
+</div>
+<p>Pour S = a·b + <span class="ov">a</span>·c, la dernière opération est le + : une porte OU en sortie. Ses deux entrées sont a·b (une porte ET) et <span class="ov">a</span>·c (une autre porte ET, dont la première entrée passe par une porte NON).</p>
+<div class="box img">
+<p class="lbl">Le lien avec Racket</p>
+<p>En Racket, la même expression s'écrit <code>(or (and a b) (and (not a) c))</code>. Chaque paire de parenthèses est une porte, et l'emboîtement des parenthèses est le câblage. L'arbre de l'expression (<i>expression tree</i>) que tu manipules en programmation fonctionnelle, c'est le circuit.</p>
+</div>
+<div class="circ" data-expr="S = a.b + !a.c" data-init="101"></div>
+
+<h3>5.2 Du circuit à l'expression</h3>
+<p>On part des entrées, et on écrit sur chaque fil l'expression qu'il transporte, porte après porte, jusqu'à la sortie. Dans le laboratoire ci-dessous, coche « écrire l'expression transportée par chaque fil » pour voir la méthode appliquée.</p>
+
+<h3 id="p5-lab">5.3 Le laboratoire des circuits</h3>
+<p>Tape une expression : la page dessine le circuit et calcule sa table de vérité. Tu peux décrire plusieurs sorties, séparées par un point-virgule.</p>
+<div class="box">
+<p class="lbl">Comment écrire</p>
+<div class="syntax">
+<span>entrées</span><span><code>a</code> <code>b</code> <code>c</code> <code>d</code>, et les constantes <code>0</code> <code>1</code></span>
+<span>NON</span><span><code>!a</code> ou <code>a'</code> (l'apostrophe se met après)</span>
+<span>ET</span><span><code>a.b</code>, <code>a*b</code>, ou simplement <code>ab</code></span>
+<span>OU</span><span><code>a + b</code></span>
+<span>XOR</span><span><code>a ^ b</code></span>
+<span>NAND, NOR</span><span><code>nand(a, b)</code>, <code>nor(a, b)</code></span>
+<span>sorties</span><span><code>S = a ^ b ; R = a.b</code></span>
+<span>comparer</span><span><code>S1 = !(a.b) ; S2 = !a + !b</code> : avec les noms S1 et S2, la page dit si les deux sorties sont équivalentes</span>
+</div>
+</div>
+<div class="symtog"></div>
+<div class="lab" id="lab"></div>
+<p class="note">Le dessin automatique reproduit l'arbre de l'expression. Si une même sous-expression apparaît deux fois, il dessine deux portes, alors qu'un vrai circuit brancherait une seule porte sur deux fils.</p>
+
+<h3 id="p5-eq">5.4 Deux circuits, une seule fonction</h3>
+<p>Deux circuits sont <b>équivalents</b> s'ils ont la même table de vérité : pour chaque combinaison d'entrées, ils donnent la même sortie. Ils peuvent avoir des portes très différentes.</p>
+<p>Les lois de De Morgan de ton cours de logique, ¬(P ∧ Q) ⇔ ¬P ∨ ¬Q et ¬(P ∨ Q) ⇔ ¬P ∧ ¬Q, deviennent ici :</p>
+<p class="eq"><span class="ov">a·b</span> = <span class="ov">a</span> + <span class="ov">b</span> &nbsp;&nbsp;et&nbsp;&nbsp; <span class="ov">a + b</span> = <span class="ov">a</span>·<span class="ov">b</span></p>
+<p>Voici la première, avec les deux circuits branchés sur les mêmes entrées. Change a et b : les deux sorties restent toujours égales.</p>
+<div class="circ" data-expr="S1 = !(a.b) ; S2 = !a + !b" data-init="10" data-verdict></div>
+<p>Dans le laboratoire, le bouton « erreur classique » montre ce qui se passe quand on oublie de transformer le ET en OU. Pourquoi chercher des circuits équivalents ? Parce qu'un circuit plus petit utilise moins de transistors : il coûte moins cher, chauffe moins et va plus vite. Le 12 octobre, tu apprendras les lois de l'algèbre de Boole et les tableaux de Karnaugh, qui servent justement à simplifier un circuit.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 5)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Dans S = (a + b)·<span class="ov">c</span>, quelle porte touche la sortie ?</p>
+<div class="mq-c"><button type="button" data-fb="Les parenthèses font calculer a + b d'abord : le OU est à l'intérieur.">un OU</button><button type="button">un ET</button><button type="button" data-fb="Le NON ne porte que sur c.">un NON</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">La dernière opération est le ·, entre (a + b) et <span class="ov">c</span>.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Deux circuits ont des portes différentes mais la même table de vérité. Ils sont…</p>
+<div class="mq-c"><button type="button">équivalents</button><button type="button" data-fb="La table de vérité décrit entièrement ce que fait un circuit.">différents, puisque leurs portes diffèrent</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Seule la table compte pour dire ce que calcule un circuit.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>NAND, la porte universelle</h2>
+<p>Un résultat surprenant : <b>avec des portes NAND seulement, on peut construire toutes les autres</b>, donc n'importe quel circuit. On dit que NAND est <b>universelle</b>. NOR l'est aussi.</p>
+<h4>NON avec une NAND</h4>
+<p>On branche a sur les deux entrées : NAND(a, a) = <span class="ov">a·a</span> = <span class="ov">a</span>.</p>
+<div class="circ" data-expr="S = nand(a, a)" data-init="1" data-nosub></div>
+<h4>ET avec deux NAND</h4>
+<p>Une NAND, c'est un ET suivi d'un NON. On ajoute un deuxième NON, fait avec une NAND, pour annuler le premier.</p>
+<div class="circ" data-expr="S = nand(nand(a, b), nand(a, b))" data-init="11" data-nosub></div>
+<p class="note">Le dessin montre trois portes, parce que nand(a, b) apparaît deux fois dans l'expression. Dans un vrai circuit, la sortie de la première NAND part sur les deux entrées de la seconde : deux portes suffisent.</p>
+<h4>OU avec trois NAND</h4>
+<p>C'est De Morgan : NAND(<span class="ov">a</span>, <span class="ov">b</span>) = non(<span class="ov">a</span>·<span class="ov">b</span>) = <span class="ov"><span class="ov">a</span></span> + <span class="ov"><span class="ov">b</span></span> = a + b. On fabrique <span class="ov">a</span> et <span class="ov">b</span> avec deux NAND, puis on les envoie dans une troisième.</p>
+<div class="circ" data-expr="S = nand(nand(a, a), nand(b, b))" data-init="01" data-nosub></div>
+<div class="box nts">
+<p class="lbl">Pourquoi c'est important</p>
+<p>En technologie CMOS, celle des processeurs actuels, une porte NAND à deux entrées demande 4 transistors, tout comme une NOR. Une porte ET ou OU en demande 6, parce qu'elle est fabriquée comme une NAND ou une NOR suivie d'un NON. Beaucoup de circuits sont donc construits avec des NAND, souvent préférées aux NOR parce qu'elles sont plus rapides.</p>
+</div>
+<div class="ex">
+<h3>Défi : XOR avec des NAND seulement</h3>
+<p>Écris a ⊕ b en n'utilisant que la fonction <code>nand(…, …)</code>. Les sous-expressions identiques sont comptées une seule fois : le minimum est 4 portes.</p>
+<div class="xck" data-id="dnand" data-target="a ^ b" data-only="nand" data-best="4"></div>
+<div class="hints">
+<p>Commence par m = nand(a, b). Que vaut m sur chacune des quatre lignes ?</p>
+<p>Calcule nand(a, m) : il vaut <span class="ov">a</span> + <span class="ov">m</span> par De Morgan. Fais pareil avec nand(b, m).</p>
+<p>Il reste à combiner les deux résultats précédents avec une dernière NAND. Écris tout dans une seule expression, en recopiant nand(a, b) partout où tu utilises m.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Un premier vrai circuit : le demi-additionneur</h2>
+<p>Retour à ta page sur le binaire. Pour additionner deux bits a et b, il y a quatre cas, et le résultat tient sur deux bits : une retenue R et un chiffre S.</p>
+<div class="tw"><table class="c tight tt">
+<tr><th>a</th><th>b</th><th>a + b</th><th class="outc">R</th><th class="outc">S</th></tr>
+<tr><td>0</td><td>0</td><td>0</td><td class="outc zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td><td class="outc zero">0</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>0</td><td>1</td><td class="outc zero">0</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>1</td><td>2 = (10)₂</td><td class="outc one">1</td><td class="outc zero">0</td></tr>
+</table></div>
+<p>Compare les colonnes avec le tableau de la section 2.1 : <b>S est la colonne XOR, et R la colonne ET</b>. Deux portes suffisent pour additionner deux bits. Ce circuit s'appelle le <b>demi-additionneur</b> (<i>half adder</i>).</p>
+<div class="circ" data-expr="S = a ^ b ; R = a.b" data-init="11"></div>
+<p>Il est « demi » parce qu'il ne sait pas ajouter la retenue qui vient de la colonne de droite. L'<b>additionneur complet</b> (<i>full adder</i>) additionne trois bits : a, b et la retenue entrante, notée c ici.</p>
+<div class="circ" data-expr="S = a ^ b ^ c ; R = a.b + c.(a ^ b)" data-init="111"></div>
+<div class="box nts">
+<p class="lbl">La suite, le 19 octobre</p>
+<p>En chaînant huit additionneurs complets, la retenue sortante de chaque étage devenant la retenue entrante du suivant, on obtient l'additionneur 8 bits qui calcule les additions de la page sur le binaire. Avec une porte XOR sur chaque bit de B, qui inverse les bits à la demande, et une retenue entrante à 1, ce même circuit calcule A + (B inversé) + 1 = A − B. C'est le « inverser puis + 1 » du complément à deux, fait par des portes.</p>
+</div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Prise en main de Logisim</h2>
+<h3>8.1 Quel Logisim ?</h3>
+<p>Logisim est un simulateur de circuits logiques gratuit. Il en existe deux versions :</p>
+<ul>
+<li><b>Logisim</b>, la version d'origine écrite par Carl Burch. Elle n'est plus développée ; sa dernière version est la 2.7.1.</li>
+<li><b>Logisim-evolution</b>, la version maintenue, développée à partir de la première. Sa version la plus récente est la 4.1.0 (février 2026).</li>
+</ul>
+<p>Les menus et les outils sont très proches. Demande en séance laquelle utilise ta prof, et installe la même chez toi pour que tes fichiers s'ouvrent sans surprise.</p>
+
+<h3>8.2 L'installer sur ta Debian 13</h3>
+<p>Trois possibilités pour Logisim-evolution. La plus simple passe par Flatpak :</p>
+<pre class="code"><code>sudo apt install flatpak
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub com.github.reds.LogisimEvolution
+flatpak run com.github.reds.LogisimEvolution</code></pre>
+<p class="note">Après avoir installé Flatpak, ferme ta session et reconnecte-toi pour que Logisim apparaisse dans le menu de KDE.</p>
+<p>Autre possibilité, le paquet <code>.deb</code> publié sur la page <i>Releases</i> du dépôt GitHub du projet (logisim-evolution/logisim-evolution) :</p>
+<pre class="code"><code>sudo apt install ./logisim-evolution_4.1.0_amd64.deb   # mets le nom exact du fichier téléchargé</code></pre>
+<p>Enfin, le fichier <code>logisim-evolution-4.1.0-all.jar</code> fonctionne partout, mais demande Java 21 ou plus :</p>
+<pre class="code"><code>sudo apt install default-jre
+java -version          # doit afficher 21 ou plus
+java -jar logisim-evolution-4.1.0-all.jar</code></pre>
+
+<h3>8.3 L'interface</h3>
+<figure class="lg">
+<svg viewBox="0 0 700 400" role="img" aria-label="Schéma simplifié de la fenêtre de Logisim : barre de menus, barre d'outils, explorateur de composants, table des attributs et zone de dessin">
+<defs><pattern id="dots" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" style="fill:var(--line)"/></pattern></defs>
+<rect class="frame" x="1" y="1" width="698" height="398" rx="8"/>
+<rect class="bar" x="1" y="1" width="698" height="24" rx="8"/>
+<text x="14" y="17">File</text><text x="50" y="17">Edit</text><text x="88" y="17">Project</text><text x="146" y="17">Simulate</text><text x="210" y="17">Window</text><text x="268" y="17">Help</text>
+<line x1="1" y1="56" x2="699" y2="56" style="stroke:var(--line)"/>
+<path class="ico" d="M20,47 V36 a2,2 0 0 1 4,0 V42 V33 a2,2 0 0 1 4,0 V42 V35 a2,2 0 0 1 4,0 V43 a8,8 0 0 1 -12,4 z"/>
+<path class="ico" d="M48,32 L48,48 L52,44 L56,51 L59,50 L55,43 L60,43 Z"/>
+<text x="74" y="47" style="font-size:16px;font-weight:700">A</text>
+<line x1="96" y1="30" x2="96" y2="52" style="stroke:var(--line)"/>
+<rect class="ico" x="108" y="34" width="14" height="14"/>
+<circle class="ico" cx="144" cy="41" r="7"/>
+<path class="ico" d="M164,33 L178,41 L164,49 Z M178,41 m3,0 a2.5,2.5 0 1 0 0.1,0"/>
+<path class="ico" d="M196,33 H204 A8,8 0 0 1 204,49 H196 Z"/>
+<path class="ico" d="M224,33 Q229,41 224,49 Q236,49 242,41 Q236,33 224,33 Z"/>
+<rect class="pane" x="1" y="56" width="190" height="200"/>
+<text x="10" y="74" style="font-weight:700">▾ mon-projet</text>
+<text x="24" y="90">main</text>
+<text x="10" y="108" class="m">▸ Wiring</text>
+<text x="10" y="124" style="font-weight:700">▾ Gates</text>
+<text x="24" y="140">NOT Gate</text><text x="24" y="155">AND Gate</text><text x="24" y="170">OR Gate</text><text x="24" y="185">XOR Gate</text><text x="24" y="200" class="m">…</text>
+<text x="10" y="218" class="m">▸ Plexers</text><text x="10" y="234" class="m">▸ Arithmetic</text><text x="10" y="250" class="m">▸ Memory</text>
+<rect class="pane" x="1" y="256" width="190" height="143"/>
+<text x="10" y="274" style="font-weight:700">AND Gate</text>
+<text x="10" y="294" class="m">Facing</text><text x="130" y="294">East</text>
+<text x="10" y="312" class="m">Data Bits</text><text x="130" y="312">1</text>
+<text x="10" y="330" class="m">Number Of Inputs</text><text x="130" y="330">2</text>
+<text x="10" y="348" class="m">Label</text><text x="130" y="348">R</text>
+<rect class="grid" x="192" y="57" width="506" height="341"/>
+<path d="M298,135 H368 M298,165 H368 M330,135 V225 H372 M345,165 V245 H372 M420,235 H500" style="fill:none;stroke:var(--w1);stroke-width:3"/>
+<path d="M436,150 H500" style="fill:none;stroke:var(--w0);stroke-width:3"/>
+<circle cx="330" cy="135" r="3.5" style="fill:var(--w1)"/><circle cx="345" cy="165" r="3.5" style="fill:var(--w1)"/>
+<rect x="276" y="124" width="22" height="22" style="fill:var(--soft-g);stroke:var(--w1);stroke-width:2"/><text x="283" y="140" style="font-family:var(--mono);font-weight:700">1</text><text x="258" y="140" style="font-weight:700;fill:var(--blue)">a</text>
+<rect x="276" y="154" width="22" height="22" style="fill:var(--soft-g);stroke:var(--w1);stroke-width:2"/><text x="283" y="170" style="font-family:var(--mono);font-weight:700">1</text><text x="258" y="170" style="font-weight:700;fill:var(--blue)">b</text>
+<path d="M366,120 Q374,150 366,180" style="fill:none;stroke:var(--ink);stroke-width:1.5"/>
+<path class="gate" d="M372,120 Q380,150 372,180 Q404,180 436,150 Q404,120 372,120 Z"/>
+<path class="gate" d="M372,215 H400 A20,20 0 0 1 400,255 H372 Z"/>
+<circle cx="512" cy="150" r="11" style="fill:var(--card);stroke:var(--w0);stroke-width:2"/><text x="508" y="155" style="font-family:var(--mono);font-weight:700">0</text><text x="530" y="155" style="font-weight:700;fill:var(--blue)">S</text>
+<circle cx="512" cy="235" r="11" style="fill:var(--soft-g);stroke:var(--w1);stroke-width:2"/><text x="508" y="240" style="font-family:var(--mono);font-weight:700">1</text><text x="530" y="240" style="font-weight:700;fill:var(--blue)">R</text>
+<text x="300" y="300" class="m">a = 1, b = 1 : S = 0, R = 1 (1 + 1 = 10)</text>
+<g class="num"><circle cx="318" cy="13" r="9"/><text x="314.5" y="17">1</text></g>
+<g class="num"><circle cx="262" cy="41" r="9"/><text x="258.5" y="45">2</text></g>
+<g class="num"><circle cx="176" cy="70" r="9"/><text x="172.5" y="74">3</text></g>
+<g class="num"><circle cx="176" cy="270" r="9"/><text x="172.5" y="274">4</text></g>
+<g class="num"><circle cx="680" cy="76" r="9"/><text x="676.5" y="80">5</text></g>
+</svg>
+<figcaption>Schéma simplifié de la fenêtre, avec un demi-additionneur. L'apparence exacte dépend de ta version.</figcaption>
+</figure>
+<ol class="lg-leg">
+<li><b>Barre de menus.</b> <i>File</i> (fichier), <i>Edit</i>, <i>Project</i> (dont <i>Analyze Circuit</i>), <i>Simulate</i>, <i>Window</i>, <i>Help</i>.</li>
+<li><b>Barre d'outils.</b> La <b>main</b> (<i>Poke Tool</i>) clique sur le circuit pour changer les entrées ; la <b>flèche</b> (<i>Edit Tool</i>) place, déplace et relie les composants ; le A écrit du texte. Viennent ensuite des raccourcis : entrée (carré), sortie (rond), NON, ET, OU.</li>
+<li><b>Explorateur.</b> Ton projet et ses circuits (<i>main</i> au départ), puis les bibliothèques de composants : <i>Wiring</i> (fils, broches), <i>Gates</i> (portes), <i>Plexers</i> (multiplexeurs), <i>Arithmetic</i>, <i>Memory</i>…</li>
+<li><b>Table des attributs.</b> Les réglages du composant sélectionné : orientation (<i>Facing</i>), nombre d'entrées (<i>Number Of Inputs</i>), nom affiché (<i>Label</i>)…</li>
+<li><b>Le canevas.</b> La zone quadrillée où tu dessines le circuit.</li>
+</ol>
+<p class="note">Je te donne les noms anglais. Si ton Logisim s'affiche en français, les intitulés changent un peu, mais leur place reste la même.</p>
+
+<h3>8.4 Ton premier circuit, pas à pas : le demi-additionneur</h3>
+<ol>
+<li><b>Crée un projet</b> : <i>File › New</i>. Il contient un circuit vide nommé <i>main</i>.</li>
+<li><b>Place deux entrées</b> : choisis l'outil « entrée » (le carré de la barre d'outils, ou <i>Wiring › Pin</i>), puis clique deux fois sur le canevas. Dans la table des attributs, donne-leur les noms a et b (<i>Label</i>).</li>
+<li><b>Place une porte XOR et une porte ET</b> depuis le dossier <i>Gates</i>. Vérifie le nombre d'entrées : dans certaines versions, une porte en a 5 par défaut. Mets 2.</li>
+<li><b>Place deux sorties</b> (le rond), nommées S et R.</li>
+<li><b>Relie les composants</b> avec la flèche : appuie sur un point de connexion (un petit point au bout d'une broche), glisse jusqu'à un autre point, relâche. Pour qu'une entrée alimente deux portes, pars du milieu d'un fil existant : Logisim crée une jonction, marquée d'un gros point.</li>
+<li><b>Teste</b> : prends la main, et clique sur les entrées pour les faire passer de 0 à 1. Remplis la table de vérité sur ta feuille, et compare avec celle de la section 7.</li>
+<li><b>Fais vérifier la table par Logisim</b> : <i>Project › Analyze Circuit</i> (ou <i>Window › Combinational Analysis</i>). La fenêtre affiche la table de vérité et les expressions de chaque sortie. Elle sait aussi faire l'inverse : à partir d'une expression ou d'une table, elle construit le circuit.</li>
+<li><b>Enregistre</b> : <i>File › Save</i>. Le fichier <code>.circ</code> est du XML : tu peux l'ouvrir dans VS Code et le versionner avec Git, comme ton code.</li>
+</ol>
+
+<h3>8.5 Lire les couleurs des fils</h3>
+<p>D'après la documentation de Logisim, la couleur d'un fil indique ce qu'il transporte.</p>
+<div class="tw"><table>
+<tr><th>couleur</th><th>signification</th></tr>
+<tr><td>vert vif</td><td>le fil transporte un 1</td></tr>
+<tr><td>vert sombre</td><td>le fil transporte un 0</td></tr>
+<tr><td>bleu</td><td>valeur flottante : rien n'impose de valeur sur ce fil (souvent une entrée de porte qui n'est reliée à rien)</td></tr>
+<tr><td>rouge</td><td>erreur : par exemple une porte qui ne peut pas calculer sa sortie, faute d'entrée, ou deux sorties reliées qui imposent des valeurs différentes</td></tr>
+<tr><td>gris</td><td>fil relié à aucun composant : sa largeur est inconnue</td></tr>
+<tr><td>orange</td><td>les composants reliés n'ont pas le même nombre de bits : le fil est « cassé »</td></tr>
+<tr><td>noir</td><td>fil de plusieurs bits (un bus)</td></tr>
+</table></div>
+
+<h3>8.6 Les pièges classiques</h3>
+<ul>
+<li><b>Tu cliques sur une entrée et rien ne change</b> : tu as la flèche, pas la main. Change d'outil.</li>
+<li><b>Un fil reste bleu</b> : une extrémité n'est pas vraiment branchée. Rapproche-la du point de connexion jusqu'à ce qu'elle s'accroche.</li>
+<li><b>Un fil devient rouge</b> : tu as relié deux sorties qui imposent des valeurs différentes, ou une porte n'a aucune entrée branchée.</li>
+<li><b>Un fil passe par-dessus un autre</b> : deux fils qui se croisent ne sont pas reliés, sauf s'il y a un gros point de jonction.</li>
+<li><b>Rien ne bouge du tout</b> : regarde dans le menu <i>Simulate</i> que la simulation est activée.</li>
+</ul>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Exercices</h2>
+<p>Ces exercices ne viennent pas de ta feuille : la page te dit si ta réponse est juste. Toute expression qui a la bonne table de vérité est acceptée, même si elle ne ressemble pas à la mienne.</p>
+
+<div class="ex">
+<h3>Exercice 1 : du circuit à l'expression</h3>
+<p>Écris l'expression de ce circuit. Tu peux changer les entrées pour l'étudier.</p>
+<div class="circ" data-expr="S = (a + b).c'" data-hide data-notable data-init="100"></div>
+<div class="xck" data-id="x1" data-target="(a + b).!c" data-show></div>
+</div>
+
+<div class="ex">
+<h3>Exercice 2 : du circuit à l'expression</h3>
+<div class="circ" data-expr="S = nor(a, b.c)" data-hide data-notable data-init="011"></div>
+<div class="xck" data-id="x2" data-target="nor(a, b.c)" data-show></div>
+</div>
+
+<div class="ex">
+<h3>Exercice 3 : le vote à la majorité</h3>
+<p>Trois juges votent avec a, b et c (1 = oui). La sortie S vaut 1 si <b>au moins deux</b> juges votent oui. Fais la table de vérité, puis trouve une expression.</p>
+<div class="xck" data-id="x3" data-target="a.b + a.c + b.c" data-show></div>
+<div class="hints">
+<p>Commence par la table : sur les 8 lignes, lesquelles ont au moins deux 1 ?</p>
+<p>« Au moins deux oui », c'est « a et b votent oui, ou a et c, ou b et c ».</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Exercice 4 : le comparateur d'égalité</h3>
+<p>S vaut 1 si les deux bits a et b sont égaux. Écris S avec les portes de ton choix.</p>
+<div class="xck" data-id="x4" data-target="!(a ^ b)" data-show></div>
+<div class="hints">
+<p>Quelle porte détecte que deux bits sont différents ? Il suffit d'inverser sa sortie.</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Exercice 5 : l'alarme</h3>
+<p>Une alarme sonne (S = 1) si la porte est ouverte (a = 1) et que l'alarme est activée (b = 1), sauf si le bon code vient d'être tapé (c = 1).</p>
+<div class="xck" data-id="x5" data-target="a.b.!c" data-show></div>
+<div class="hints">
+<p>« Sauf si c » veut dire « et c vaut 0 », c'est-à-dire « et non c ».</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Exercice 6 : De Morgan</h3>
+<p>Écris <span class="mr"><span class="ov">a + b + c</span></span> sans barre au-dessus d'un groupe : chaque barre ne doit porter que sur une seule lettre.</p>
+<div class="xck" data-id="x6" data-target="nor(a, b, c)" data-show></div>
+<div class="hints">
+<p>De Morgan : la barre se répartit sur chaque lettre, et les + deviennent des ·.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Bilan</h2>
+<div class="box key">
+<p class="lbl">Avant le TP, tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>dessiner les symboles des six portes et écrire leur table de vérité ;</li>
+<li>dire combien de lignes a la table d'un circuit à n entrées, et les ranger en comptant en binaire ;</li>
+<li>évaluer une expression comme a·b + <span class="ov">a</span>·c en respectant les priorités ;</li>
+<li>dessiner le circuit d'une expression, et écrire l'expression d'un circuit ;</li>
+<li>montrer que deux circuits sont équivalents en comparant leurs tables ;</li>
+<li>construire NON, ET et OU avec des NAND ;</li>
+<li>expliquer pourquoi le demi-additionneur est fait d'un XOR et d'un ET ;</li>
+<li>placer, relier et tester des composants dans Logisim, et lire la couleur d'un fil.</li>
+</ul>
+</div>
+<p>La suite logique : le 12 octobre, l'algèbre de Boole et les tableaux de Karnaugh, pour simplifier les circuits. Les calculs binaires que ces circuits réalisent sont dans ta page <a href="/cours/le-binaire.html">Le binaire, depuis le tout début</a>.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir du plan de séances d'Architecture des ordinateurs de ta prof et de la documentation de Logisim, Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+var SETTINGS = {iec:false};
+var REDRAW = [];
+
+/* ---------- questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la section juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+
+/* ======================================================================
+   Expressions booléennes : analyse
+   ====================================================================== */
+function PErr(msg, pos){ this.msg = msg; this.pos = pos; }
+var WORDS = [['xnor','FN'],['nand','FN'],['nor','FN'],['xor','XOR'],['and','AND'],['not','NOT'],['non','NOT'],['or','OR'],['et','AND'],['ou','OR']];
+function tokenize(s){
+  var t = [], i = 0, m;
+  while (i < s.length){
+    var c = s.charAt(i);
+    if (/\s/.test(c)){ i++; continue; }
+    var low = s.slice(i).toLowerCase(), hit = null;
+    for (var w = 0; w < WORDS.length; w++){
+      var word = WORDS[w][0];
+      if (low.indexOf(word) === 0 && !/[a-zà-ÿ]/i.test(low.charAt(word.length))){ hit = WORDS[w]; break; }
+    }
+    if (hit){ t.push({t:hit[1], v:hit[0], p:i}); i += hit[0].length; continue; }
+    if ('!~¬'.indexOf(c) >= 0){ t.push({t:'NOT', p:i}); i++; continue; }
+    if ("'’′".indexOf(c) >= 0){ t.push({t:'POST', p:i}); i++; continue; }
+    if ('.·*&∧×⋅'.indexOf(c) >= 0){ t.push({t:'AND', p:i}); i++; continue; }
+    if ('+|∨'.indexOf(c) >= 0){ t.push({t:'OR', p:i}); i++; continue; }
+    if ('^⊕'.indexOf(c) >= 0){ t.push({t:'XOR', p:i}); i++; continue; }
+    if (c === '(' || c === ')' || c === ','){ t.push({t:c, p:i}); i++; continue; }
+    if (c === '0' || c === '1'){ t.push({t:'CONST', v:+c, p:i}); i++; continue; }
+    if (/[a-dA-D]/.test(c)){ t.push({t:'VAR', v:c.toLowerCase(), p:i}); i++; continue; }
+    if (/[a-zA-Z]/.test(c)) throw new PErr('« ' + c + ' » n\'est pas une entrée connue : utilise a, b, c ou d', i);
+    throw new PErr('symbole inconnu « ' + c + ' »', i);
+  }
+  return t;
+}
+function parseExpr(s){
+  var T = tokenize(s), k = 0;
+  if (!T.length) throw new PErr('l\'expression est vide', 0);
+  var at = function(x){ return k < T.length && T[k].t === x; };
+  var here = function(){ return k < T.length ? T[k].p : s.length; };
+  var startsUnary = function(){ return k < T.length && (T[k].t === 'VAR' || T[k].t === 'CONST' || T[k].t === '(' || T[k].t === 'NOT' || T[k].t === 'FN'); };
+  function chain(op, sub, test){
+    var first = sub(), args = [first];
+    while (test()){ if (at(op)) k++; args.push(sub()); }
+    return args.length === 1 ? first : {t:op.toLowerCase(), args:args};
+  }
+  function pOr(){ return chain('OR', pXor, function(){ return at('OR'); }); }
+  function pXor(){ return chain('XOR', pAnd, function(){ return at('XOR'); }); }
+  function pAnd(){ return chain('AND', pUnary, function(){ return at('AND') || startsUnary(); }); }
+  function pUnary(){ if (at('NOT')){ k++; return {t:'not', args:[pUnary()]}; } return pPost(); }
+  function pPost(){ var a = pAtom(); while (at('POST')){ k++; a = {t:'not', args:[a]}; } return a; }
+  function pAtom(){
+    var tk = T[k];
+    if (!tk) throw new PErr('l\'expression s\'arrête trop tôt', s.length);
+    if (tk.t === 'VAR'){ k++; return {t:'var', n:tk.v}; }
+    if (tk.t === 'CONST'){ k++; return {t:'const', v:tk.v}; }
+    if (tk.t === '('){ k++; var e = pOr(); if (!at(')')) throw new PErr('une parenthèse n\'est pas refermée', here()); k++; return e; }
+    if (tk.t === 'FN'){
+      k++;
+      if (!at('(')) throw new PErr(tk.v + ' s\'écrit comme une fonction : ' + tk.v + '(a, b)', here());
+      k++; var args = [pOr()];
+      while (at(',')){ k++; args.push(pOr()); }
+      if (!at(')')) throw new PErr('il manque « ) » après les arguments de ' + tk.v, here());
+      k++;
+      if (args.length < 2 && tk.v !== 'nand' && tk.v !== 'nor') throw new PErr(tk.v + ' demande au moins deux arguments', tk.p);
+      return {t:tk.v, args:args};
+    }
+    throw new PErr('j\'attendais une entrée (a, b, c, d), 0, 1 ou « ( »', tk.p);
+  }
+  var root = pOr();
+  if (k < T.length) throw new PErr('symbole en trop', T[k].p);
+  return root;
+}
+function parseProgram(src){
+  var parts = src.split(/[;\n]/).map(function(x){ return x.trim(); }).filter(function(x){ return x; });
+  if (!parts.length) throw new PErr('écris une expression', 0);
+  return parts.map(function(p, i){
+    var m = p.match(/^([A-Za-z][A-Za-z0-9]*)\s*=\s*(.*)$/);
+    var name = m ? m[1] : (parts.length > 1 ? 'S' + (i + 1) : 'S');
+    var e;
+    try { e = parseExpr(m ? m[2] : p); }
+    catch (err){ if (err instanceof PErr) err.msg = (parts.length > 1 ? 'sortie ' + name + ' : ' : '') + err.msg; throw err; }
+    return {name:name, ast:e};
+  });
+}
+function isLeaf(n){ return n.t === 'var' || n.t === 'const'; }
+function evalN(n, env){
+  switch (n.t){
+    case 'var': return env[n.n] ? 1 : 0;
+    case 'const': return n.v;
+    case 'not': return evalN(n.args[0], env) ? 0 : 1;
+  }
+  var v = n.args.map(function(x){ return evalN(x, env); });
+  var all = v.every(function(x){ return x; }), any = v.some(function(x){ return x; });
+  var odd = v.reduce(function(s, x){ return s ^ x; }, 0);
+  switch (n.t){
+    case 'and': return all ? 1 : 0;
+    case 'or': return any ? 1 : 0;
+    case 'xor': return odd;
+    case 'nand': return all ? 0 : 1;
+    case 'nor': return any ? 0 : 1;
+    case 'xnor': return odd ? 0 : 1;
+  }
+}
+function varsOf(list){
+  var acc = [];
+  (function walk(n){ if (n.t === 'var'){ if (acc.indexOf(n.n) < 0) acc.push(n.n); } else if (n.args) n.args.forEach(walk); })({args:list.map(function(o){ return o.ast; })});
+  return acc.sort();
+}
+var PREC = {or:1, xor:2, and:3};
+function disp(n, parent){
+  if (n.t === 'var') return n.n;
+  if (n.t === 'const') return String(n.v);
+  if (n.t === 'not') return '<span class="ov">' + disp(n.args[0], null) + '</span>';
+  if (n.t === 'nand' || n.t === 'nor' || n.t === 'xnor'){
+    var sym = n.t === 'nand' ? '·' : (n.t === 'nor' ? ' + ' : ' ⊕ ');
+    return '<span class="ov">' + n.args.map(function(x){ return disp(x, n.t === 'nand' ? 'and' : (n.t === 'nor' ? 'or' : 'xor')); }).join(sym) + '</span>';
+  }
+  var s = n.args.map(function(x){ return disp(x, n.t); }).join(n.t === 'and' ? '·' : (n.t === 'or' ? ' + ' : ' ⊕ '));
+  return (parent && PREC[parent] && PREC[n.t] < PREC[parent]) || (parent && parent !== n.t && PREC[parent] === PREC[n.t]) ? '(' + s + ')' : s;
+}
+function key(n){ return n.t === 'var' ? n.n : n.t === 'const' ? String(n.v) : n.t + '(' + n.args.map(key).join(',') + ')'; }
+function gatesOf(n, acc, seen){
+  if (isLeaf(n)) return acc;
+  n.args.forEach(function(x){ gatesOf(x, acc, seen); });
+  var k = key(n);
+  if (!seen[k]){ seen[k] = 1; acc.push(n); }
+  return acc;
+}
+
+/* ======================================================================
+   Dessin des circuits
+   ====================================================================== */
+var ROW = 30, PIN = 20, COLW = 104, GW = 46, BUB = 8;
+var INVERT = {not:1, nand:1, nor:1, xnor:1};
+var IECL = {not:'1', and:'&', or:'≥1', xor:'=1', nand:'&', nor:'≥1', xnor:'=1'};
+function f1(x){ return Math.round(x * 10) / 10; }
+function bodyH(n){ var k = n.args.length; return n.t === 'not' ? 26 : Math.max(36, (k - 1) * PIN + 20); }
+function backX(n, gx, py, top, h){
+  if (SETTINGS.iec || n.t === 'not' || n.t === 'and' || n.t === 'nand') return gx;
+  var t = (py - top) / h, Wo = GW - (INVERT[n.t] ? BUB : 0) - ((n.t === 'xor' || n.t === 'xnor') ? 7 : 0);
+  return gx + 0.5 * Wo * t * (1 - t);
+}
+function shape(n, gx, top, h, val){
+  var b = INVERT[n.t] ? BUB : 0, W = GW, s = '', y2 = top + h, cy = top + h / 2;
+  if (SETTINGS.iec){
+    var w = 38;
+    s += '<rect class="gate" x="' + gx + '" y="' + top + '" width="' + w + '" height="' + h + '" rx="2"/>';
+    s += '<text class="iec" x="' + (gx + w / 2) + '" y="' + (top + 15) + '" text-anchor="middle">' + IECL[n.t] + '</text>';
+    if (b) s += '<circle class="gate" cx="' + (gx + w + 4) + '" cy="' + cy + '" r="4"/>';
+    return {s:s, out:gx + w + (b ? 8 : 0)};
+  }
+  if (n.t === 'not'){
+    s += '<path class="gate" d="M' + gx + ',' + top + ' L' + (gx + 30) + ',' + cy + ' L' + gx + ',' + y2 + ' Z"/>';
+    s += '<circle class="gate" cx="' + (gx + 34) + '" cy="' + cy + '" r="4"/>';
+    return {s:s, out:gx + 38};
+  }
+  var Wb = W - b;
+  if (n.t === 'and' || n.t === 'nand'){
+    var r = Math.min(h / 2, Wb * 0.55), flat = Wb - r;
+    s += '<path class="gate" d="M' + gx + ',' + top + ' H' + f1(gx + flat) + ' A' + f1(r) + ',' + f1(h / 2) + ' 0 0 1 ' + f1(gx + flat) + ',' + y2 + ' H' + gx + ' Z"/>';
+  } else {
+    var off = (n.t === 'xor' || n.t === 'xnor') ? 7 : 0, x0 = gx + off, Wo = Wb - off;
+    s += '<path class="gate" d="M' + x0 + ',' + top + ' Q' + f1(x0 + 0.25 * Wo) + ',' + cy + ' ' + x0 + ',' + y2 + ' Q' + f1(x0 + 0.62 * Wo) + ',' + y2 + ' ' + f1(x0 + Wo) + ',' + cy + ' Q' + f1(x0 + 0.62 * Wo) + ',' + top + ' ' + x0 + ',' + top + ' Z"/>';
+    if (off) s += '<path class="gate-l" d="M' + gx + ',' + top + ' Q' + f1(gx + 0.25 * Wo) + ',' + cy + ' ' + gx + ',' + y2 + '"/>';
+  }
+  if (b) s += '<circle class="gate" cx="' + (gx + Wb + 4) + '" cy="' + cy + '" r="4"/>';
+  return {s:s, out:gx + W};
+}
+function wireCls(v){ return v ? 'w w1' : 'w w0'; }
+
+function draw(outputs, env, opt){
+  opt = opt || {};
+  var vars = varsOf(outputs), nv = vars.length;
+  var railX = {}, i;
+  vars.forEach(function(v, j){ railX[v] = 24 + j * 32; });
+  var x0 = 24 + nv * 32 + 8;
+  function height(n){ return isLeaf(n) ? 0 : 1 + Math.max.apply(null, n.args.map(height)); }
+  var H = 0; outputs.forEach(function(o){ H = Math.max(H, height(o.ast)); });
+  var gateX = function(col){ return x0 + (col - 1) * COLW + 46; };
+  var xOut = x0 + H * COLW + 46;
+  var slot = 0, nodes = [];
+  function place(n){
+    if (isLeaf(n)){ n._y = slot * ROW; slot++; return; }
+    n.args.forEach(place);
+    var ys = n.args.map(function(c){ return c._y; });
+    n._y = ys.reduce(function(a, b){ return a + b; }, 0) / ys.length;
+    n._h = height(n);
+    nodes.push(n);
+  }
+  outputs.forEach(function(o, oi){ if (oi) slot += 0.6; place(o.ast); });
+  var maxY = (slot - 1) * ROW;
+  var svgW = xOut + 70, top = -64, svgH = maxY + 30 - top;
+  var parts = [], junctions = [], railBottom = {};
+  vars.forEach(function(v){ railBottom[v] = -26; });
+  var labels = [];
+  function wire(src, val, pins){ // src {x,y}, pins: [{x,y,bend}]
+    pins.forEach(function(p){
+      var d;
+      if (Math.abs(src.y - p.y) < 0.5) d = 'M' + f1(src.x) + ',' + f1(src.y) + ' H' + f1(p.x);
+      else d = 'M' + f1(src.x) + ',' + f1(src.y) + ' H' + f1(p.bend) + ' V' + f1(p.y) + ' H' + f1(p.x);
+      parts.push('<path class="' + wireCls(val) + '" d="' + d + '"/>');
+    });
+  }
+  function srcOf(c){
+    if (c.t === 'var'){ junctions.push({x:railX[c.n], y:c._y, v:env[c.n] ? 1 : 0}); railBottom[c.n] = Math.max(railBottom[c.n], c._y); return {x:railX[c.n], y:c._y}; }
+    if (c.t === 'const'){ parts.push('<text class="cst" x="' + (x0 - 6) + '" y="' + (c._y + 4) + '" text-anchor="end">' + c.v + '</text>'); return {x:x0 - 2, y:c._y}; }
+    return {x:c._out, y:c._y};
+  }
+  // gates, by increasing height so that child outputs are known
+  nodes.sort(function(a, b){ return a._h - b._h; });
+  var gateSvg = [];
+  nodes.forEach(function(n){
+    var gx = gateX(n._h), h = bodyH(n), topY = n._y - h / 2, k = n.args.length;
+    var sh = shape(n, gx, topY, h, 0);
+    n._out = sh.out;
+    gateSvg.push(sh.s);
+    n.args.forEach(function(c, j){
+      var py = k === 1 ? n._y : n._y + (j - (k - 1) / 2) * PIN;
+      var src = srcOf(c), cv = evalN(c, env);
+      var down = src.y < py;
+      var bend = gx - 12 - 8 * (down ? (k - 1 - j) : j);
+      wire(src, cv, [{x:backX(n, gx, py, topY, h), y:py, bend:bend}]);
+    });
+    if (opt.labels) labels.push('<text class="wl" x="' + f1(n._out + 4) + '" y="' + f1(n._y - 6) + '">' + svgDisp(n) + '</text>');
+  });
+  // outputs
+  outputs.forEach(function(o){
+    var n = o.ast, src = srcOf(n), v = evalN(n, env);
+    parts.push('<path class="' + wireCls(v) + '" d="M' + f1(src.x) + ',' + f1(src.y) + ' H' + (xOut + 10) + '"/>');
+    parts.push('<circle class="opin ' + (v ? 'on' : 'off') + '" cx="' + (xOut + 22) + '" cy="' + f1(n._y) + '" r="12"/><text class="pv" x="' + (xOut + 22) + '" y="' + f1(n._y + 5) + '" text-anchor="middle">' + v + '</text>');
+    parts.push('<text class="pn" x="' + (xOut + 40) + '" y="' + f1(n._y + 5) + '">' + esc(o.name) + '</text>');
+  });
+  // rails and input pins
+  var rails = [];
+  vars.forEach(function(v){
+    var x = railX[v], val = env[v] ? 1 : 0;
+    rails.push('<path class="' + wireCls(val) + '" d="M' + x + ',-26 V' + f1(railBottom[v]) + '"/>');
+    rails.push('<g class="ipin" data-v="' + v + '" tabindex="0" role="button" aria-label="entrée ' + v + ', vaut ' + val + '"><rect class="ibox ' + (val ? 'on' : 'off') + '" x="' + (x - 12) + '" y="-50" width="24" height="24" rx="3"/><text class="pv" x="' + x + '" y="-33" text-anchor="middle">' + val + '</text></g>');
+    rails.push('<text class="pn" x="' + x + '" y="-56" text-anchor="middle">' + v + '</text>');
+  });
+  var jn = junctions.map(function(j){ return '<circle class="jn ' + (j.v ? 'on' : 'off') + '" cx="' + j.x + '" cy="' + f1(j.y) + '" r="3.6"/>'; });
+  var svg = '<svg viewBox="0 ' + top + ' ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH + '" style="max-width:100%;height:auto;min-width:' + Math.min(svgW, 300) + 'px" role="img" aria-label="Circuit logique">'
+    + rails.join('') + parts.join('') + jn.join('') + gateSvg.join('') + labels.join('') + '</svg>';
+  return svg;
+}
+function svgDisp(n){
+  // plain-text label for SVG: overline rendered with a tspan
+  var h = disp(n, null);
+  return h.replace(/<span class="ov">/g, '<tspan style="text-decoration:overline">').replace(/<\/span>/g, '</tspan>');
+}
+
+/* ---------- table de vérité ---------- */
+function tableHTML(outputs, env, opt){
+  opt = opt || {};
+  var vars = varsOf(outputs), cols = [], seen = {};
+  if (!opt.noSub) outputs.forEach(function(o){ gatesOf(o.ast, cols, seen); });
+  var outKeys = outputs.map(function(o){ return key(o.ast); });
+  cols = cols.filter(function(c){ return outKeys.indexOf(key(c)) < 0; });
+  var h = '<div class="tw"><table class="c tight tt"><tr>';
+  vars.forEach(function(v){ h += '<th>' + v + '</th>'; });
+  cols.forEach(function(c){ h += '<th class="sub">' + disp(c, null) + '</th>'; });
+  outputs.forEach(function(o){ h += '<th class="outc">' + esc(o.name) + (isLeaf(o.ast) || opt.hideExpr ? '' : ' = ' + disp(o.ast, null)) + '</th>'; });
+  h += '</tr>';
+  var n = Math.pow(2, vars.length);
+  for (var r = 0; r < n; r++){
+    var e = {}, cur = true;
+    vars.forEach(function(v, j){ e[v] = (r >> (vars.length - 1 - j)) & 1; if (env && (env[v] ? 1 : 0) !== e[v]) cur = false; });
+    h += '<tr' + (env && cur ? ' class="hl"' : '') + '>';
+    vars.forEach(function(v){ h += '<td>' + e[v] + '</td>'; });
+    cols.forEach(function(c){ var x = evalN(c, e); h += '<td class="' + (x ? 'one' : 'zero') + '">' + x + '</td>'; });
+    outputs.forEach(function(o){ var x = evalN(o.ast, e); h += '<td class="outc ' + (x ? 'one' : 'zero') + '">' + x + '</td>'; });
+    h += '</tr>';
+  }
+  return h + '</table></div>';
+}
+function sameTable(o1, o2){
+  var vars = varsOf([o1, o2]), n = Math.pow(2, vars.length);
+  for (var r = 0; r < n; r++){
+    var e = {};
+    vars.forEach(function(v, j){ e[v] = (r >> (vars.length - 1 - j)) & 1; });
+    if (evalN(o1.ast, e) !== evalN(o2.ast, e)) return e;
+  }
+  return null;
+}
+function countGates(list){ var seen = {}, acc = []; list.forEach(function(o){ gatesOf(o.ast, acc, seen); }); return acc.length; }
+function tooBig(outputs){
+  var g = 0, d = 0;
+  function walk(n, dep){ if (isLeaf(n)) return; g++; d = Math.max(d, dep); n.args.forEach(function(x){ walk(x, dep + 1); }); }
+  outputs.forEach(function(o){ walk(o.ast, 1); });
+  return g > 16 || d > 7;
+}
+
+/* ---------- un circuit vivant ---------- */
+function Circuit(root, outputs, opt){
+  opt = opt || {};
+  var env = {}, vars = varsOf(outputs);
+  (opt.init || '').split('').forEach(function(ch, i){ if (vars[i]) env[vars[i]] = ch === '1' ? 1 : 0; });
+  vars.forEach(function(v){ if (env[v] === undefined) env[v] = 0; });
+  function render(){
+    var h = '';
+    if (tooBig(outputs)) h += '<div class="msg meh">Circuit trop grand pour le dessin : la table de vérité est quand même calculée.</div>';
+    else h += '<div class="circ-fig">' + draw(outputs, env, {labels:opt.labels && opt.labels()}) + '</div>';
+    if (opt.verdict){
+      var diff = sameTable(outputs[0], outputs[1]);
+      h += diff ? '<div class="msg ko"><b>Pas équivalentes :</b> pour ' + Object.keys(diff).map(function(v){ return v + ' = ' + diff[v]; }).join(', ') + ', ' + esc(outputs[0].name) + ' et ' + esc(outputs[1].name) + ' diffèrent.</div>'
+                : '<div class="msg ok"><b>Équivalentes :</b> les deux sorties ont la même colonne dans la table. Les deux circuits calculent la même fonction.</div>';
+    }
+    if (!opt.noTable) h += tableHTML(outputs, env, {hideExpr:opt.hideExpr, noSub:opt.noSub});
+    root.innerHTML = h;
+    each(root.querySelectorAll('.ipin'), function(g){
+      var tog = function(){ var v = g.getAttribute('data-v'); env[v] = env[v] ? 0 : 1; render(); var again = root.querySelector('.ipin[data-v="' + v + '"]'); if (again && opt.keepFocus !== false) again.focus({preventScroll:true}); };
+      g.addEventListener('click', tog);
+      g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tog(); } });
+    });
+  }
+  render();
+  REDRAW.push(render);
+  return {render:render, env:env};
+}
+each(document.querySelectorAll('.circ[data-expr]'), function(el){
+  var outs;
+  try { outs = parseProgram(el.getAttribute('data-expr')); } catch (e){ el.textContent = 'Erreur : ' + (e.msg || e); return; }
+  Circuit(el, outs, {init:el.getAttribute('data-init') || '', noTable:el.hasAttribute('data-notable'), hideExpr:el.hasAttribute('data-hide'), noSub:el.hasAttribute('data-nosub') || el.hasAttribute('data-hide'), verdict:el.hasAttribute('data-verdict')});
+});
+
+/* ---------- les six portes ---------- */
+var GATES = [
+  {k:'not', fr:'NON', en:'NOT', e:'a\'', rule:'La sortie est l\'inverse de l\'entrée.', ana:'La lampe du frigo : allumée quand la porte n\'est <i>pas</i> fermée.', py:'not a'},
+  {k:'and', fr:'ET', en:'AND', e:'a.b', rule:'1 seulement si toutes les entrées valent 1.', ana:'Un coffre à deux serrures : il faut la clé du directeur <i>et</i> celle du caissier.', py:'a and b'},
+  {k:'or', fr:'OU', en:'OR', e:'a+b', rule:'1 dès qu\'au moins une entrée vaut 1.', ana:'Le plafonnier d\'une voiture : il s\'allume si la portière avant <i>ou</i> la portière arrière est ouverte.', py:'a or b'},
+  {k:'xor', fr:'OU exclusif', en:'XOR', e:'a^b', rule:'1 si les deux entrées sont différentes.', ana:'La lampe d\'un escalier, avec un interrupteur en bas et un en haut : basculer l\'un ou l\'autre change son état.', py:'a != b   (sur des bits : a ^ b)'},
+  {k:'nand', fr:'NON-ET', en:'NAND', e:'nand(a,b)', rule:'0 seulement si toutes les entrées valent 1.', ana:'Le voyant « passage autorisé » d\'un sas : allumé, sauf si les deux portes sont ouvertes en même temps.', py:'not (a and b)'},
+  {k:'nor', fr:'NON-OU', en:'NOR', e:'nor(a,b)', rule:'1 seulement si toutes les entrées valent 0.', ana:'Le voyant « tout est fermé » d\'une voiture : allumé seulement si aucune portière n\'est ouverte.', py:'not (a or b)'}
+];
+(function(){
+  var gal = $('gal'); if (!gal) return;
+  function render(){
+    gal.innerHTML = GATES.map(function(g){
+      var outs = parseProgram('S = ' + g.e), n = outs[0].ast;
+      var h = n.t === 'not' ? 26 : 36, sh = shape(n, 30, 12, h, 0), cy = 12 + h / 2;
+      var pins = n.t === 'not' ? [cy] : [cy - 10, cy + 10];
+      var w = pins.map(function(py){ return '<path class="w w0" d="M6,' + py + ' H' + backX(n, 30, py, 12, h) + '"/>'; }).join('') + '<path class="w w0" d="M' + sh.out + ',' + cy + ' H' + (sh.out + 22) + '"/>';
+      return '<div class="gcard"><svg viewBox="0 0 110 60" width="110" height="60" role="img" aria-label="symbole ' + g.en + '">' + w + sh.s + '</svg>'
+        + '<p class="gname">' + g.fr + ' <span class="en">(' + g.en + ')</span></p><p class="gexpr">S = ' + disp(n, null) + '</p></div>';
+    }).join('');
+  }
+  render(); REDRAW.push(render);
+})();
+
+/* ---------- le banc d'essai ---------- */
+(function(){
+  var root = $('pg'); if (!root) return;
+  var cur = 1, env = {a:1, b:0};
+  root.innerHTML = '<p class="lbl">Le banc d\'essai des portes</p><div class="seg" role="group" aria-label="Choisir la porte">'
+    + GATES.map(function(g, i){ return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === cur) + '">' + g.fr + '</button>'; }).join('') + '</div>'
+    + '<div class="pg-body"></div>';
+  var body = root.querySelector('.pg-body');
+  function render(){
+    var g = GATES[cur], outs = parseProgram('S = ' + g.e), n = outs[0].ast;
+    var h = '<div class="pg-grid"><div class="circ-fig">' + draw(outs, env, {}) + '</div><div class="pg-info"><p class="gname">' + g.fr + ' <span class="en">(' + g.en + ')</span></p>'
+      + '<p><b>Notation :</b> S = ' + disp(n, null) + '</p><p><b>Règle :</b> ' + g.rule + '</p><p><b>Image :</b> ' + g.ana + '</p><p><b>Python :</b> <code>' + esc(g.py) + '</code></p></div></div>';
+    h += tableHTML(outs, env, {noSub:true});
+    body.innerHTML = h;
+    each(body.querySelectorAll('.ipin'), function(p){
+      var tog = function(){ var v = p.getAttribute('data-v'); env[v] = env[v] ? 0 : 1; render(); var a = body.querySelector('.ipin[data-v="' + v + '"]'); if (a) a.focus({preventScroll:true}); };
+      p.addEventListener('click', tog);
+      p.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tog(); } });
+    });
+  }
+  each(root.querySelectorAll('.seg button'), function(b){
+    b.addEventListener('click', function(){ cur = +b.getAttribute('data-i'); each(root.querySelectorAll('.seg button'), function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); render(); });
+  });
+  render(); REDRAW.push(render);
+})();
+
+/* ---------- choix des symboles ---------- */
+each(document.querySelectorAll('.symtog'), function(box){
+  box.innerHTML = '<span class="note" style="margin:0">Symboles :</span><span class="seg" role="group" aria-label="Famille de symboles"><button type="button" data-s="us" aria-pressed="true">américains (Logisim)</button><button type="button" data-s="iec" aria-pressed="false">européens (CEI)</button></span>';
+});
+each(document.querySelectorAll('.symtog button'), function(b){
+  b.addEventListener('click', function(){
+    SETTINGS.iec = b.getAttribute('data-s') === 'iec';
+    each(document.querySelectorAll('.symtog button'), function(x){ x.setAttribute('aria-pressed', (x.getAttribute('data-s') === 'iec') === SETTINGS.iec ? 'true' : 'false'); });
+    REDRAW.forEach(function(f){ f(); });
+  });
+});
+
+/* ---------- la lampe : série et parallèle ---------- */
+(function(){
+  var root = $('lamp'); if (!root) return;
+  var mode = 'serie', a = 1, b = 0;
+  root.innerHTML = '<p class="lbl">Deux interrupteurs, une lampe</p><div class="row"><span class="seg" role="group" aria-label="Montage"><button type="button" data-m="serie" aria-pressed="true">en série</button><button type="button" data-m="para" aria-pressed="false">en parallèle</button></span></div><div class="lamp-fig"></div><div class="row" style="justify-content:center"><button type="button" class="btn ghost" data-s="a"></button><button type="button" class="btn ghost" data-s="b"></button></div><div class="out" aria-live="polite"></div>';
+  var fig = root.querySelector('.lamp-fig'), out = root.querySelector('.out');
+  function sw(x, y, closed, name){
+    var end = closed ? (x + 34) + ',' + y : (x + 28) + ',' + (y - 18);
+    return '<circle class="term" cx="' + x + '" cy="' + y + '" r="3.5"/><circle class="term" cx="' + (x + 36) + '" cy="' + y + '" r="3.5"/><path class="sw' + (closed ? ' on' : '') + '" d="M' + x + ',' + y + ' L' + end + '"/><text class="swl" x="' + (x + 18) + '" y="' + (y + 22) + '" text-anchor="middle">' + name + ' = ' + (closed ? 1 : 0) + '</text>';
+  }
+  function render(){
+    var on = mode === 'serie' ? (a && b) : (a || b), s = '<svg viewBox="0 0 360 170" role="img" aria-label="Pile, deux interrupteurs ' + (mode === 'serie' ? 'en série' : 'en parallèle') + ' et une lampe ' + (on ? 'allumée' : 'éteinte') + '">';
+    var c = on ? 'cw on' : 'cw';
+    // pile à gauche, lampe à droite
+    s += '<path class="' + c + '" d="M30,70 V30 H' + (mode === 'serie' ? '90' : '120') + '"/>';
+    if (mode === 'serie'){
+      s += '<path class="' + c + '" d="M126,30 H170 M206,30 H330 V70"/>';
+      s += sw(90, 30, a, 'a') + sw(170, 30, b, 'b');
+    } else {
+      s += '<path class="' + c + '" d="M120,30 V12 H150 M120,30 V62 H150 M186,12 H220 V62 H186 M220,30 H330 V70"/>';
+      s += sw(150, 12, a, 'a') + sw(150, 62, b, 'b');
+    }
+    s += '<path class="' + c + '" d="M330,110 V150 H30 V100"/>';
+    s += '<path class="bat" d="M18,78 H42 M24,90 H36"/><text class="swl" x="50" y="90">pile</text>';
+    s += '<circle class="bulb' + (on ? ' on' : '') + '" cx="330" cy="90" r="20"/><path class="fil" d="M318,82 L342,98 M342,82 L318,98"/><text class="swl" x="300" y="128" text-anchor="end">lampe = ' + (on ? 1 : 0) + '</text>';
+    s += '</svg>';
+    fig.innerHTML = s;
+    root.querySelector('[data-s="a"]').textContent = (a ? 'Ouvrir' : 'Fermer') + ' a';
+    root.querySelector('[data-s="b"]').textContent = (b ? 'Ouvrir' : 'Fermer') + ' b';
+    out.innerHTML = '<div class="msg ' + (on ? 'ok' : 'info') + '">' + (mode === 'serie' ? 'En série, le courant doit traverser a <b>puis</b> b : la lampe vaut a <b>ET</b> b = ' + (on ? 1 : 0) + '.' : 'En parallèle, le courant passe par a <b>ou</b> par b : la lampe vaut a <b>OU</b> b = ' + (on ? 1 : 0) + '.') + '</div>';
+  }
+  each(root.querySelectorAll('[data-m]'), function(btn){ btn.addEventListener('click', function(){ mode = btn.getAttribute('data-m'); each(root.querySelectorAll('[data-m]'), function(x){ x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); }); render(); }); });
+  root.querySelector('[data-s="a"]').addEventListener('click', function(){ a = a ? 0 : 1; render(); });
+  root.querySelector('[data-s="b"]').addEventListener('click', function(){ b = b ? 0 : 1; render(); });
+  render();
+})();
+
+/* ---------- le laboratoire ---------- */
+(function(){
+  var root = $('lab'); if (!root) return;
+  var PRE = [
+    ['a.b + !a.c', 'S = a·b + ā·c'],
+    ['(a + b).c\'', 'S = (a + b)·c̄'],
+    ['S1 = !(a.b) ; S2 = !a + !b', 'De Morgan 1'],
+    ['S1 = !(a + b) ; S2 = !a . !b', 'De Morgan 2'],
+    ['S1 = a ^ b ; S2 = a.!b + !a.b', 'XOR de deux façons'],
+    ['S1 = a.(b + c) ; S2 = a.b + a.c', 'distributivité'],
+    ['S1 = !(a.b) ; S2 = !a . !b', 'erreur classique'],
+    ['S = a ^ b ; R = a.b', 'demi-additionneur']
+  ];
+  root.innerHTML = '<p class="lbl">Le laboratoire des circuits</p>'
+    + '<div class="row"><label class="fld" style="flex:1 1 260px">expression (ou plusieurs, séparées par « ; »)<input id="lab-in" type="text" value="a.b + !a.c" autocomplete="off" spellcheck="false"></label><button type="button" class="btn" id="lab-go">Dessiner</button></div>'
+    + '<div class="presets">' + PRE.map(function(p){ return '<button type="button" data-x="' + esc(p[0]) + '">' + p[1] + '</button>'; }).join('') + '</div>'
+    + '<div class="row"><label class="chk"><input type="checkbox" id="lab-lbl"> écrire l\'expression transportée par chaque fil</label></div>'
+    + '<div id="lab-out" aria-live="polite"></div>';
+  var inp = $('lab-in'), out = $('lab-out'), lbl = $('lab-lbl'), C = null;
+  function run(){
+    var outs;
+    try { outs = parseProgram(inp.value); }
+    catch (e){ if (!(e instanceof PErr)) throw e; out.innerHTML = '<div class="msg ko">Je n\'ai pas compris : ' + esc(e.msg) + '.</div>'; return; }
+    var vars = varsOf(outs);
+    if (vars.length > 4){ out.innerHTML = '<div class="msg ko">4 entrées au maximum (a, b, c, d).</div>'; return; }
+    if (outs.length > 3){ out.innerHTML = '<div class="msg ko">3 sorties au maximum.</div>'; return; }
+    var div = document.createElement('div');
+    out.innerHTML = ''; out.appendChild(div);
+    REDRAW = REDRAW.filter(function(f){ return !f._lab; });
+    C = Circuit(div, outs, {verdict:outs.length === 2 && /^S\d+$/.test(outs[0].name) && /^S\d+$/.test(outs[1].name), labels:function(){ return lbl.checked; }});
+    REDRAW[REDRAW.length - 1]._lab = true;
+    var g = countGates(outs);
+    out.insertAdjacentHTML('beforeend', '<p class="note">' + g + ' porte' + (g > 1 ? 's' : '') + ' (sous-expressions identiques comptées une fois). Clique sur les carrés pour changer les entrées.</p>');
+  }
+  $('lab-go').addEventListener('click', run);
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); run(); } });
+  lbl.addEventListener('change', function(){ if (C) C.render(); });
+  each(root.querySelectorAll('.presets button'), function(b){ b.addEventListener('click', function(){ inp.value = b.getAttribute('data-x'); run(); }); });
+  run();
+})();
+
+/* ---------- exercices auto-corrigés ---------- */
+each(document.querySelectorAll('.xck'), function(box){
+  var target = parseProgram('S = ' + box.getAttribute('data-target'))[0];
+  var only = box.getAttribute('data-only');
+  var id = box.getAttribute('data-id');
+  box.insertAdjacentHTML('beforeend', '<div class="row"><label class="fld" style="flex:1 1 240px">ton expression<input id="' + id + '" type="text" autocomplete="off" spellcheck="false"></label><button type="button" class="btn ghost">Vérifier</button></div><div class="xr" aria-live="polite"></div>');
+  var inp = $(id), r = box.querySelector('.xr');
+  function check(){
+    var mine;
+    try { mine = parseExpr(inp.value); }
+    catch (e){ if (!(e instanceof PErr)) throw e; r.innerHTML = '<div class="msg ko">Je n\'ai pas compris : ' + esc(e.msg) + '.</div>'; return; }
+    if (only){
+      var bad = [];
+      (function walk(n){ if (!isLeaf(n)){ if (n.t !== only && bad.indexOf(n.t) < 0) bad.push(n.t); n.args.forEach(walk); } })(mine);
+      if (bad.length){ r.innerHTML = '<div class="msg ko">Seules les portes ' + only.toUpperCase() + ' sont permises ici (tu utilises : ' + bad.join(', ') + ').</div>'; return; }
+    }
+    var mo = {name:'toi', ast:mine};
+    var diff = sameTable(target, mo);
+    if (diff){
+      var vs = Object.keys(diff);
+      r.innerHTML = '<div class="msg ko"><b>Pas encore.</b> Pour ' + vs.map(function(v){ return v + ' = ' + diff[v]; }).join(', ') + ', ton expression donne ' + evalN(mine, diff) + ' alors qu\'il faut ' + evalN(target.ast, diff) + '.</div>';
+      return;
+    }
+    var g = countGates([mo]), best = box.getAttribute('data-best');
+    var extra = best ? (g <= +best ? ' Avec ' + g + ' portes, c\'est le minimum possible.' : ' Tu utilises ' + g + ' portes : on peut descendre à ' + best + '.') : '';
+    r.innerHTML = '<div class="msg ok"><b>Juste :</b> ton expression a exactement la même table de vérité. ' + (box.hasAttribute('data-show') ? 'Une réponse possible : S = ' + disp(target.ast, null) + '.' : '') + extra + '</div>';
+  }
+  box.querySelector('button').addEventListener('click', check);
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); check(); } });
+});
+each(document.querySelectorAll('.hints'), function(hs){
+  var ps = hs.querySelectorAll('p'), n = 0;
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn ghost';
+  function lab(){ b.textContent = n < ps.length ? 'Indice ' + (n + 1) + ' sur ' + ps.length : 'Tous les indices sont affichés'; b.disabled = n >= ps.length; }
+  b.addEventListener('click', function(){ if (n < ps.length){ ps[n].classList.add('shown'); n++; lab(); } });
+  lab();
+  hs.appendChild(b);
+});
+})();
+</script>
+</body>
+</html>

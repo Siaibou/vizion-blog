@@ -30,7 +30,7 @@ id                  # informations détaillées sur l'identité (UID, GID, group
 id bandit7          # idem pour un autre utilisateur
 ```
 
-**Pourquoi ce niveau a deux identités différentes (user bandit7, group bandit6).** C'est une construction volontaire de Bandit : tu es connecté en `bandit6` (donc tu peux **lire** les fichiers du groupe `bandit6`), mais le fichier **appartient** à l'utilisateur `bandit7`. C'est exactement le mécanisme classique d'élévation de privilèges en Unix : le fichier "passe le relais" du niveau 6 au niveau 7 via le système de groupe.
+**Pourquoi ce niveau a deux identités différentes (user bandit7, group bandit6).** C'est une construction volontaire de Bandit : tu es connecté en `bandit6`, membre du groupe `bandit6`, mais le fichier **appartient** à l'utilisateur `bandit7`. Ses permissions accordent la lecture au groupe : tu peux donc le **lire** sans en être le propriétaire. Ce n'est pas une faille, c'est le fonctionnement normal des permissions de groupe sous Unix, et c'est ce qui permet au fichier de "passer le relais" du niveau 6 au niveau 7.
 
 **Chercher dans toute l'arborescence du système.** Au lieu de chercher depuis le répertoire courant (`.`), on cherche depuis la racine (`/`) :
 
@@ -38,7 +38,7 @@ id bandit7          # idem pour un autre utilisateur
 find / -type f -user bandit7 -group bandit6 -size 33c
 ```
 
-Mais comme la majorité des dossiers du système sont protégés en lecture pour ton utilisateur, `find` va afficher **des centaines de lignes d'erreur** `Permission denied`. Pour les masquer, on redirige la sortie d'erreur vers le néant :
+Mais comme beaucoup de dossiers du système sont interdits en lecture à ton utilisateur, `find` va afficher **des centaines de lignes d'erreur** `Permission denied`. Pour les masquer, on redirige la sortie d'erreur vers le néant :
 
 ```bash
 find / -type f -user bandit7 -group bandit6 -size 33c 2>/dev/null
@@ -66,9 +66,9 @@ Cherche depuis le répertoire courant (`.`). Une longue liste s'affiche, et... j
 
 Au passage, j'ai exploré l'arborescence et ça m'a soulevé deux questions intéressantes :
 
-**Question 1 : pourquoi `cat .` ne fait rien mais `cat ..` non plus ?** Réponse : `.` est le **dossier courant**, `..` est le **dossier parent**. Ce ne sont pas des fichiers — `cat` sur un dossier n'affiche rien d'utile (et selon les systèmes, peut afficher une erreur explicite). Tu as raison de penser que `.` signifie le dossier actuel.
+**Question 1 : pourquoi `cd ..` me déplaçait bien, alors que `cd .` ne faisait rien, sans même afficher d'erreur ?** Parce que `.` désigne le **dossier courant** et `..` le **dossier parent**. `cd ..` remonte d'un cran ; `cd .` me "déplace" dans le dossier où je suis déjà : la commande réussit, mais rien ne change, d'où l'absence de message. Ce sont deux entrées spéciales présentes dans chaque dossier (`ls -a` les affiche en tête de liste). Mon intuition était donc bonne : `.` signifie bien le dossier actuel.
 
-**Question 2 : pourquoi `cat .bashrc`, `.profile`, `.bash_logout` ont marché ?** Parce que ce sont des **fichiers**, pas des dossiers. Le point en début de nom indique juste qu'ils sont "cachés" par convention (voir niveau 3→4). Ce sont des scripts de configuration du shell, lus automatiquement à chaque connexion.
+**Question 2 : pourquoi je ne pouvais pas "entrer" dans `.bashrc`, `.profile` et `.bash_logout` ?** Parce que ce sont des **fichiers**, pas des dossiers : `cd` ne fonctionne que sur un dossier (bash répond `Not a directory`), alors qu'un `cat` les affiche sans problème. Le point en début de nom indique juste qu'ils sont "cachés" par convention (voir [niveau 3 → 4](/cybersecurite/bandit-3)). Ce sont des fichiers de configuration du shell, lus automatiquement à l'ouverture d'une session (et `.bash_logout` à la déconnexion).
 
 Revenons au problème. **La méthode propre** pour ce niveau, c'est d'utiliser **tous** les critères de l'énoncé en une seule commande `find` :
 
