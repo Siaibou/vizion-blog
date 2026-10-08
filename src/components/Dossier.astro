@@ -1,0 +1,160 @@
+---
+// Un menu déroulant : un cours de la licence, ou un thème de la partie Autodidacte.
+// Fermé par défaut ; une adresse comme /licence/#suites-numeriques l'ouvre directement.
+interface Contenu { titre: string; href: string; meta?: string }
+interface Groupe { titre?: string; contenus: Contenu[] }
+interface Props {
+  id: string;
+  nom: string;
+  description?: string;
+  etiquette?: string;
+  groupes: Groupe[];
+}
+
+const { id, nom, description, etiquette = 'Présentation', groupes } = Astro.props;
+const total = groupes.reduce((n, g) => n + g.contenus.length, 0);
+const compte = total === 0 ? 'à venir' : `${total} contenu${total > 1 ? 's' : ''}`;
+---
+
+<details class="dossier" id={id}>
+  <summary>
+    <span class="nom">{nom}</span>
+    <span class:list={['compte', { vide: total === 0 }]}>{compte}</span>
+  </summary>
+  <div class="corps">
+    {description && (
+      <div class="presentation">
+        <p class="label">{etiquette}</p>
+        <p class="description">{description}</p>
+      </div>
+    )}
+    {groupes.length === 0 && <p class="rien">Rien de publié pour l'instant.</p>}
+    {groupes.map((g) => (
+      <div class="groupe">
+        {g.titre && <p class="label">{g.titre}</p>}
+        {g.contenus.length === 0 ? (
+          <p class="rien">Rien de publié pour l'instant.</p>
+        ) : (
+          <ul class="liste">
+            {g.contenus.map((c) => (
+              <li>
+                <a href={c.href}>{c.titre}</a>
+                {c.meta && <span class="meta">{c.meta}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ))}
+  </div>
+</details>
+
+<script>
+  // Ouvre le menu visé par l'ancre de l'adresse (#architecture-des-ordinateurs, par exemple).
+  function ouvrirDepuisAncre() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    const cible = document.getElementById(id);
+    if (cible instanceof HTMLDetailsElement) {
+      cible.open = true;
+      cible.scrollIntoView({ block: 'start' });
+    }
+  }
+  ouvrirDepuisAncre();
+  window.addEventListener('hashchange', ouvrirDepuisAncre);
+</script>
+
+<style>
+  .dossier {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.7rem;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+    scroll-margin-top: 5.5rem;
+  }
+  .dossier[open] { border-color: var(--border-strong); }
+
+  summary {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.95rem 3rem 0.95rem 1.2rem;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    transition: background 0.15s ease;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { background: var(--bg-card-hover); }
+  summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  summary::after {
+    content: '+';
+    position: absolute;
+    right: 1.2rem;
+    top: 0.95rem;
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .dossier[open] summary::after { content: '−'; }
+
+  .nom {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .compte {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .compte.vide { color: var(--text-muted); }
+
+  .corps {
+    padding: 0.2rem 1.2rem 1.1rem;
+    border-top: 1px solid var(--border);
+  }
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 1.1rem 0 0.3rem;
+  }
+  .description {
+    color: var(--text-secondary);
+    font-size: 0.96rem;
+    line-height: 1.65;
+    margin: 0;
+    max-width: 68ch;
+  }
+  .rien {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.95rem;
+    margin: 0.8rem 0 0;
+  }
+  .liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .liste li {
+    margin: 0;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--border);
+  }
+  .liste li:first-child { border-top: none; }
+  .meta {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Dossier from '../../components/Dossier.astro';
+import { themes } from '../../data/autodidacte.js';
+---
+
+<Layout>
+    <p class="section-kicker">Hors cursus</p>
+    <h1>Autodidacte</h1>
+    <p class="section-intro">
+        Ce que j'apprends en dehors de la licence : la cybersécurité, mes outils,
+        mes projets personnels, et bientôt l'intelligence artificielle.
+    </p>
+
+    <div class="themes">
+        {themes.map((t) => (
+            <Dossier id={t.id} nom={t.nom} description={t.description} etiquette="En bref" groupes={t.groupes} />
+        ))}
+    </div>
+</Layout>
+
+<style>
+    .section-kicker {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 1.5rem 0 0.3rem;
+    }
+    h1 { margin-top: 0.3rem; }
+    .section-intro {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin: 0.5rem 0 2rem;
+        max-width: 620px;
+    }
+</style>

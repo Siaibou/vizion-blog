@@ -1,14 +1,21 @@
 ---
+// Deux entrées : la licence, et tout ce que j'apprends seul.
+// Les articles gardent leurs adresses d'origine (/cybersecurite/..., /informatique/...),
+// d'où la liste des préfixes qui allument « Autodidacte ».
+const chemin = Astro.url.pathname;
+const actif = chemin.startsWith('/licence')
+    ? 'licence'
+    : ['/autodidacte', '/cybersecurite/', '/informatique/'].some((p) => chemin.startsWith(p))
+        ? 'autodidacte'
+        : '';
 ---
 <nav class="navbar">
     <div class="nav-content">
         <a href="/" class="site-title">Vizion<span class="dot">.</span>Blog</a>
 
         <div class="menu-links">
-            <a href="/informatique">Informatique</a>
-            <a href="/cybersecurite">Cybersécurité</a>
-            <a href="/mathematiques">Mathématiques</a>
-            <a href="/ia">Intelligence Artificielle</a>
+            <a href="/licence/" aria-current={actif === 'licence' ? 'page' : undefined}>Licence</a>
+            <a href="/autodidacte/" aria-current={actif === 'autodidacte' ? 'page' : undefined}>Autodidacte</a>
         </div>
     </div>
 </nav>
@@ -50,20 +57,26 @@
 
     .menu-links {
         display: flex;
-        gap: 1.5rem;
+        gap: 1.75rem;
         flex-wrap: wrap;
     }
 
     .menu-links a {
         text-decoration: none;
         color: var(--text-secondary);
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 500;
-        transition: color 0.2s ease;
-        border-bottom: 1px solid transparent;
+        padding: 0.15rem 0;
+        border-bottom: 2px solid transparent;
+        transition: color 0.2s ease, border-color 0.2s ease;
     }
 
     .menu-links a:hover {
         color: var(--accent);
+    }
+
+    .menu-links a[aria-current='page'] {
+        color: var(--text-primary);
+        border-bottom-color: var(--accent);
     }
 </style>

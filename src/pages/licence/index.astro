@@ -1,0 +1,76 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Dossier from '../../components/Dossier.astro';
+import { semestres } from '../../data/licence.js';
+---
+
+<Layout>
+    <p class="section-kicker">Cursus</p>
+    <h1>Licence</h1>
+    <p class="section-intro">
+        Ma licence d'informatique, cours par cours. Ouvre un cours pour lire sa présentation
+        officielle et retrouver les cours et notes que j'ai publiés pour le réviser.
+    </p>
+
+    {semestres.map((s) => (
+        <section class="semestre">
+            <h2>{s.titre} <span class="annee">{s.annee}</span></h2>
+            {s.groupes.map((g) => (
+                <div class="groupe-cours">
+                    <p class="groupe-titre">
+                        {g.titre}{g.note && <span class="note"> · {g.note}</span>}
+                    </p>
+                    {g.cours.map((c) => (
+                        <Dossier
+                            id={c.id}
+                            nom={c.nom}
+                            description={c.description}
+                            etiquette="Présentation du cours"
+                            groupes={c.contenus.length ? [{ titre: 'Cours et notes', contenus: c.contenus }] : []}
+                        />
+                    ))}
+                </div>
+            ))}
+        </section>
+    ))}
+</Layout>
+
+<style>
+    .section-kicker {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 1.5rem 0 0.3rem;
+    }
+    h1 { margin-top: 0.3rem; }
+    .section-intro {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin: 0.5rem 0 1.5rem;
+        max-width: 620px;
+    }
+    .semestre h2 {
+        font-size: 1.25rem;
+        margin: 2rem 0 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+    .annee {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: var(--text-muted);
+        margin-left: 0.4rem;
+    }
+    .groupe-cours { margin-top: 1.4rem; }
+    .groupe-titre {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-secondary);
+        margin: 0 0 0.6rem;
+    }
+    .note { color: var(--text-muted); text-transform: none; letter-spacing: 0.02em; }
+</style>

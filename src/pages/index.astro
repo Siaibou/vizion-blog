@@ -1,5 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { bilanLicence } from '../data/licence.js';
+import { bilanAutodidacte } from '../data/autodidacte.js';
+
+const licence = bilanLicence();
+const auto = bilanAutodidacte();
 ---
 
 <Layout>
@@ -7,35 +12,28 @@ import Layout from '../layouts/Layout.astro';
         <p class="kicker">Journal de progression</p>
         <h1 class="hero-title">Vers l'<span>AI Security Engineering</span>.</h1>
         <p class="hero-sub">
-            Je documente ici mon apprentissage, de Python aux LLMs en passant par la cybersécurité classique.
+            Je documente ici mon apprentissage, en deux parties : ma licence d'informatique, cours par cours,
+            et ce que j'apprends en autodidacte, de la cybersécurité à l'IA.
             Les articles sont des notes que je publie pour mieux les structurer — et pour qu'on me corrige si je me trompe.
         </p>
     </div>
 
     <hr />
 
-    <h2 class="sections-title">Les sections</h2>
+    <h2 class="sections-title">Les deux parties</h2>
 
     <div class="sections-grid">
-        <a class="section-card" href="/informatique">
-            <span class="section-tag">01</span>
-            <strong>Informatique</strong>
-            <span class="section-desc">Architecture des ordinateurs, Python, Linux, Git — les fondations techniques.</span>
+        <a class="section-card" href="/licence/">
+            <span class="section-tag">Cursus</span>
+            <strong>Licence</strong>
+            <span class="section-desc">Mes cours de licence d'informatique : la présentation de chaque cours, puis mes cours et notes de révision.</span>
+            <span class="section-stat">{licence.cours} cours · {licence.contenus} contenus publiés</span>
         </a>
-        <a class="section-card" href="/cybersecurite">
-            <span class="section-tag">02</span>
-            <strong>Cybersécurité</strong>
-            <span class="section-desc">Réseaux, attaque/défense, TryHackMe, OverTheWire.</span>
-        </a>
-        <a class="section-card" href="/mathematiques">
-            <span class="section-tag">03</span>
-            <strong>Mathématiques</strong>
-            <span class="section-desc">Logique, analyse, géométrie — puis algèbre linéaire et probas pour comprendre l'IA.</span>
-        </a>
-        <a class="section-card" href="/ia">
-            <span class="section-tag">04</span>
-            <strong>Intelligence Artificielle</strong>
-            <span class="section-desc">Machine learning, LLMs, AI Security.</span>
+        <a class="section-card" href="/autodidacte/">
+            <span class="section-tag">Hors cursus</span>
+            <strong>Autodidacte</strong>
+            <span class="section-desc">Cybersécurité, outils, projets personnels, et bientôt l'intelligence artificielle.</span>
+            <span class="section-stat">{auto.themes} thèmes · {auto.contenus} contenus publiés</span>
         </a>
     </div>
 </Layout>
@@ -112,6 +110,7 @@ import Layout from '../layouts/Layout.astro';
         font-size: 0.75rem;
         color: var(--accent);
         letter-spacing: 0.1em;
+        text-transform: uppercase;
     }
     .section-card strong {
         font-size: 1.2rem;
@@ -122,5 +121,11 @@ import Layout from '../layouts/Layout.astro';
         font-size: 0.95rem;
         color: var(--text-secondary);
         line-height: 1.5;
+    }
+    .section-card .section-stat {
+        margin-top: 0.4rem;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-muted);
     }
 </style>

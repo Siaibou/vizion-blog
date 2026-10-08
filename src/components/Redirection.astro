@@ -1,0 +1,31 @@
+---
+// Page de redirection : les anciennes sections (Informatique, Mathématiques,
+// Cybersécurité, IA) renvoient vers les nouvelles pages Licence et Autodidacte.
+interface Props { vers: string }
+const { vers } = Astro.props;
+---
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="robots" content="noindex" />
+        <meta http-equiv="refresh" content={`0; url=${vers}`} />
+        <link rel="canonical" href={vers} />
+        <title>Vizion Blog</title>
+    </head>
+    <body>
+        <p>Cette section a déménagé : <a href={vers}>continuer vers la nouvelle page</a>.</p>
+    </body>
+</html>
+
+<style>
+    body {
+        margin: 0;
+        padding: 2rem 1.5rem;
+        background: #0d1421;
+        color: #e5e9f0;
+        font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    }
+    a { color: #88c0d0; }
+</style>

@@ -1,5 +1,14 @@
 ---
 import Navigation from '../components/Navigation.astro';
+
+// Fil d'Ariane des articles : leur place dans la partie Autodidacte.
+// Les articles gardent leurs adresses d'origine, d'où ces préfixes.
+const FILS = [
+    ['/cybersecurite/', 'Cybersécurité', '/autodidacte/#cybersecurite'],
+    ['/informatique/git-', 'Outils du développeur', '/autodidacte/#outils'],
+    ['/informatique/python-', 'Projets personnels', '/autodidacte/#projets-personnels'],
+];
+const fil = FILS.find(([prefixe]) => Astro.url.pathname.startsWith(prefixe));
 ---
 
 <!doctype html>
@@ -23,6 +32,13 @@ import Navigation from '../components/Navigation.astro';
         <Navigation />
 
         <main class="page-main">
+            {fil && (
+                <p class="fil">
+                    <a href="/autodidacte/">Autodidacte</a>
+                    <span aria-hidden="true">/</span>
+                    <a href={fil[2]}>{fil[1]}</a>
+                </p>
+            )}
             <slot />
         </main>
     </body>
@@ -81,6 +97,17 @@ import Navigation from '../components/Navigation.astro';
     @media (max-width: 700px) {
         .page-main { padding-left: 1rem; padding-right: 1rem; }
         table { display: block; overflow-x: auto; }
+    }
+
+    /* ---- Fil d'Ariane des articles ---- */
+    .fil {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin: 0.5rem 0 -0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     /* ---- Titres ---- */
