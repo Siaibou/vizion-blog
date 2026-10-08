@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pratique des machines, jour 2 (préambule) : hiérarchie de fichiers et archives</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+[hidden]{display:none!important}
+/* Cahier à lignes, marge rouge : la même famille que les cours « depuis le tout début ».
+   Ici le code Racket tient la place des formules : blocs façon DrRacket, résultats « ; → » repérables. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00; --str:#8a4a12;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.10);
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+
+/* ---- en-tête ---- */
+.hero{padding:28px 16px 8px 30px;max-width:760px;margin:0 auto;position:relative}
+.series{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 30px;font-size:.9rem}
+.series .hub{font-weight:700;color:var(--blue);text-decoration:none}
+.series .hub:hover{text-decoration:underline}
+.series ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.series li{margin:0}
+.series ul a,.series ul span{display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none}
+.series ul a:hover{border-color:var(--blue)}
+.series ul span[aria-current]{border-color:var(--margin);color:var(--margin);font-weight:700}
+.series ul span.todo{color:var(--muted)}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.42em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:10px;line-height:1.4}
+.meta{margin:0;color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.predict-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:20px 0 0;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.predict-box p{margin:0;font-size:.92rem;color:var(--muted);flex:1 1 260px;min-width:0}
+.predict-btn{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;cursor:pointer;min-height:40px}
+.predict-btn[aria-pressed="true"]{background:var(--blue);color:var(--paper)}
+
+/* ---- corps ---- */
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3,h4{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+li>p{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+strong{font-weight:700}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.katex math{font-size:1.1em}
+.m{font-family:var(--serif);font-style:italic}
+.xref{font-style:italic}
+blockquote{margin:16px 0;padding:4px 16px;border-left:4px solid var(--line);color:var(--muted)}
+
+/* ---- tableaux ---- */
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.wide{min-width:34rem}
+
+/* ---- encadrés ---- */
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.box.idea{border-left:5px solid var(--margin)}.box.idea .lbl{color:var(--margin)}
+.box.nts{border-left:5px solid var(--blue)}.box.nts .lbl{color:var(--blue)}
+.box.warn{border-left:5px solid var(--amber)}.box.warn .lbl{color:var(--amber)}
+.box.tip{border-left:5px solid var(--green)}.box.tip .lbl{color:var(--green)}
+.box.ask{border:1.5px dashed var(--muted)}
+.box.ask .lbl{font-size:1.05rem}
+.box.danger{border-left:5px solid var(--red)}.box.danger .lbl{color:var(--red)}
+mark{background:var(--soft-a);color:inherit;padding:0 .15em;border-radius:3px}
+
+/* ---- blocs repliés : indices, solutions, réponses ---- */
+details.fold{margin:12px 0;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:10px;padding:0 14px}
+details.fold>summary{cursor:pointer;font-weight:700;padding:9px 0;color:var(--fc)}
+details.fold[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+.fold-body{padding-bottom:10px}
+.fold-body>:first-child{margin-top:0}.fold-body>:last-child{margin-bottom:0}
+details.fold.hint{--fc:var(--amber)}
+details.fold.tip{--fc:var(--blue)}
+details.fold.ok{--fc:var(--green)}
+details.fold.ex{--fc:var(--muted)}
+details.fold.nts{--fc:var(--blue)}
+details.fold.warn{--fc:var(--amber)}
+details.fold.danger{--fc:var(--red)}
+details.fold.ask{--fc:var(--muted)}
+details.fold.idea{--fc:var(--margin)}
+.box details.fold{background:var(--paper)}
+
+/* ---- code ---- */
+.code{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 6px 3px 12px;border-bottom:1px solid var(--line);background:var(--soft-b);
+  font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.code-bar.plain{padding:5px 12px}
+.code pre{margin:0;padding:10px 14px;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.6;tab-size:2}
+.code code{background:none;padding:0;font-size:inherit;border-radius:0;word-break:normal;white-space:pre}
+.code.txt pre{color:var(--ink)}
+.copy{font:inherit;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 10px;cursor:pointer;min-height:30px}
+.copy:hover{border-color:var(--blue)}
+.kw{color:var(--blue);font-weight:600}
+.str{color:var(--str)}
+.cst{color:var(--amber)}
+.com{color:var(--muted);font-style:italic}
+.res{color:var(--green);font-weight:600}
+.res.err{color:var(--red)}
+.par{color:var(--muted)}
+.quo{color:var(--blue);font-weight:600}
+.predict .res{filter:blur(5px);cursor:pointer;-webkit-user-select:none;user-select:none}
+.predict .res.shown{filter:none;-webkit-user-select:text;user-select:text}
+
+/* ---- listes à cocher ---- */
+ul.tasks{list-style:none;padding-left:0}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+ul.tasks input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+ul.tasks label{cursor:pointer;min-width:0}
+ul.tasks input:checked+label{color:var(--muted);text-decoration:line-through}
+
+/* ---- bas de page ---- */
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+
+/* Bandeau du blog Vizion : retour à la Licence et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.hero{padding-top:20px}
+
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/licence/#pratique-des-machines">← Vizion.Blog / Licence / Pratique des machines</a>
+<p class="vz-note"><b>Notes de cours.</b> Le texte du cours vient des pads de mon enseignant ; les réponses et les compléments ont été rédigés avec Claude, une IA d'Anthropic, et s'adressent à moi. Dans cette version publique, j'ai retiré l'adresse des pads et reformulé les remarques sur le cours.</p>
+</div>
+<header class="hero" id="haut">
+<nav class="series" aria-label="Pages du même cours">
+<ul><li><a href="/cours/pdm-jour-1-flux-et-redirections.html">Jour 1, flux et redirections</a></li><li><span aria-current="page">Jour 2, hiérarchie et archives</span></li></ul>
+</nav>
+<p class="kicker">Pratique des machines, jour 2 (préambule)</p>
+<h1>Hiérarchie de fichiers et archives</h1>
+<p class="meta">Cours du 15 septembre 2026</p>
+</header>
+<main>
+<div class="box idea"><p class="lbl">Comment lire cette note</p><p>Le contenu du cours est conservé tel quel. Mes ajouts sont dans des encadrés : compléments, mises en garde, et une évaluation honnête de ma réponse.</p>
+</div>
+<p><strong>Voir aussi :</strong> <a href="/cours/pdm-jour-1-flux-et-redirections.html">Jour 1 : flux et redirections</a></p>
+<hr>
+<h2 id="enonce">Énoncé</h2>
+<p>Exercice : <strong>100% en ligne de commande</strong>, sans même utiliser un éditeur de texte.</p>
+<p>Créez une hiérarchie de fichiers adaptée à vos enseignements contenant a minima :</p>
+<ul><li>Un dossier par cours pour ce semestre (noms libres)</li><li>Pour ce cours :<ul><li>un fichier <code>liens_utiles.md</code> qui contient les liens vers les pads</li><li>une copie du pad d'hier au format <code>.md</code>. Vérifier son contenu et ajouter la ligne <code>Fin !</code> à la fin du fichier</li><li>des dossiers <code>TP1</code> <code>TP2</code> <code>TP3</code> <code>TP4</code> <code>TP5</code></li></ul>
+</li><li>Dans le home, créer un dossier <code>backup</code> contenant une copie de cette hiérarchie</li><li>Créer une archive zip contenant le dossier <code>backup</code></li><li>Déplacer cette archive sur le Bureau</li><li>La détruire</li><li>Recommencer l'opération une deuxième fois</li></ul>
+<div class="box nts"><p class="lbl">Conseils du prof</p><ul><li>Lister les commandes nécessaires pour chaque étape. Vous ne connaissez peut-être pas toutes les commandes : poser une question sur Zulip.</li><li>Essayer d'optimiser les commandes utilisées.</li></ul>
+</div>
+<hr>
+<h2 id="ma-reponse-liste-de-commandes">Ma réponse (liste de commandes)</h2>
+<details class="fold ask"><summary>Ce que j'avais répondu</summary><div class="fold-body"><div class="tw"><table><thead><tr><th>Étape</th><th>Commandes listées</th></tr></thead><tbody><tr><td>1</td><td><code>mkdir</code>, <code>cd</code></td></tr><tr><td>2</td><td><code>touch</code>, <code>cp</code>, <code>cat</code>, <code>echo</code>, <code>wget</code>, <code>mkdir</code></td></tr><tr><td>3</td><td><code>mkdir</code>, <code>mv</code></td></tr><tr><td>4</td><td><code>zip</code></td></tr><tr><td>5</td><td><code>mv</code></td></tr><tr><td>6</td><td><code>rm</code></td></tr></tbody></table></div>
+</div></details>
+<div class="box warn"><p class="lbl">Évaluation honnête de cette réponse</p><p>Les commandes sont les bonnes. Le problème n'est pas là : <strong>la moitié d'entre elles échouera telle quelle</strong>, parce qu'il manque les options qui les rendent capables de travailler sur des dossiers.</p>
+<p>C'est un point de fond, pas un détail. Sous Unix, beaucoup de commandes refusent par défaut de toucher à un répertoire. C'est une protection : un dossier peut contenir des milliers de fichiers, et une commande destructrice lancée par erreur dessus ferait des dégâts irréversibles. Le système exige donc que tu dises explicitement <em>"oui, je sais que c'est un dossier, descends dedans"</em>.</p>
+<p>Ce mot-clé est <strong>récursif</strong> (<em>recursive</em>) : appliquer l'opération au dossier, puis à tout ce qu'il contient, puis à tout ce que ça contient, et ainsi de suite jusqu'au bout.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Ta commande</th><th>Ce qu'il faut réellement</th><th>Sans l'option</th></tr></thead><tbody><tr><td><code>cp</code></td><td><code>cp -r</code> (ou mieux, <code>cp -a</code>)</td><td><code>cp: -r not specified; omitting directory</code></td></tr><tr><td><code>zip</code></td><td><code>zip -r</code></td><td>crée une archive vide ou presque</td></tr><tr><td><code>rm</code> sur un dossier</td><td><code>rm -r</code></td><td><code>rm: cannot remove: Is a directory</code></td></tr><tr><td><code>mv</code></td><td><code>mv</code> (pas d'option)</td><td>fonctionne déjà sur les dossiers</td></tr></tbody></table></div>
+<p><code>mv</code> est l'exception : déplacer un dossier ne fait que changer une entrée dans la table du système de fichiers, sans toucher au contenu. C'est pour ça qu'un <code>mv</code> est instantané même sur 50 Go, alors qu'un <code>cp</code> peut prendre plusieurs minutes.</p>
+</div>
+<hr>
+<h2 id="solution-complete-etape-par-etape">Solution complète, étape par étape</h2>
+<details class="fold ask"><summary>Dérouler la solution</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code><span class="com"># --- Étape 1 : la hiérarchie des cours -------------------------------</span>
+mkdir -p ~/Cours/{pdm,algo,maths,anglais}
+cd ~/Cours/pdm
+
+<span class="com"># --- Étape 2 : le contenu du dossier pdm ------------------------------</span>
+mkdir TP{1..5}
+
+echo "# Liens utiles - Pratique des machines" &gt; liens_utiles.md
+echo "- Jour 1 : https://pads.up8.edu/ADRESSE-DU-PAD" &gt;&gt; liens_utiles.md
+echo "- Jour 2 : https://pads.up8.edu/ADRESSE-DU-PAD" &gt;&gt; liens_utiles.md
+
+curl -L -o jour1.md "https://pads.up8.edu/ADRESSE-DU-PAD/download"
+less jour1.md            <span class="com"># vérifier le contenu (q pour quitter)</span>
+echo "Fin !" &gt;&gt; jour1.md
+tail -n 3 jour1.md       <span class="com"># vérifier que la ligne est bien à la fin</span>
+
+<span class="com"># --- Étape 3 : la copie de sauvegarde ---------------------------------</span>
+mkdir -p ~/backup
+cp -a ~/Cours ~/backup/
+
+<span class="com"># --- Étape 4 : l'archive ----------------------------------------------</span>
+cd ~
+zip -r backup.zip backup/
+unzip -l backup.zip      <span class="com"># lister le contenu SANS extraire : toujours vérifier</span>
+
+<span class="com"># --- Étape 5 : déplacer sur le Bureau ---------------------------------</span>
+mv backup.zip "$(xdg-user-dir DESKTOP)"
+
+<span class="com"># --- Étape 6 : détruire -----------------------------------------------</span>
+rm "$(xdg-user-dir DESKTOP)/backup.zip"</code></pre></div>
+</div></details>
+<h3 id="les-quatre-pieges-de-cet-exercice">Les quatre pièges de cet exercice</h3>
+<div class="box nts"><p class="lbl">Piège 1 - l'expansion d'accolades</p><div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>mkdir TP{1..5}</code></pre></div>
+<p>Cette syntaxe s'appelle l'<strong>expansion d'accolades</strong> (<em>brace expansion</em>). Le shell la remplace <strong>avant</strong> d'exécuter la commande : <code>mkdir TP{1..5}</code> devient littéralement <code>mkdir TP1 TP2 TP3 TP4 TP5</code>.</p>
+<p>Pour t'en convaincre, préfixe par <code>echo</code> pour voir ce que le shell fabrique :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>echo TP{1..5}
+echo ~/Cours/{pdm,algo,maths}</code></pre></div>
+<p><strong>Ce réflexe vaut de l'or.</strong> Devant une commande destructrice dont tu n'es pas sûr, mets <code>echo</code> devant : tu vois exactement ce qui allait s'exécuter, sans rien casser. C'est la ceinture de sécurité du shell.</p>
+<p>L'option <code>-p</code> de <code>mkdir</code> (<em>parents</em>) crée les dossiers parents manquants et <strong>ne râle pas</strong> si le dossier existe déjà. Indispensable dans un script.</p>
+</div>
+<div class="box nts"><p class="lbl">Piège 2 - <code>cp -r</code> contre <code>cp -a</code></p><p>Les deux copient un dossier. La différence est invisible à l'affichage et fondamentale pour une sauvegarde.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Option</th><th>Nom</th><th>Ce qui est préservé</th></tr></thead><tbody><tr><td><code>-r</code></td><td>recursive</td><td>l'arborescence et le contenu des fichiers</td></tr><tr><td><code>-a</code></td><td>archive</td><td>tout ça <strong>plus</strong> les permissions, les dates, les propriétaires, les liens symboliques</td></tr></tbody></table></div>
+<p>Avec <code>cp -r</code>, tous tes fichiers copiés prennent la date d'aujourd'hui et les permissions par défaut. Ta « sauvegarde » a donc perdu une partie de l'information. Ce n'est pas grave pour des notes de cours, ça l'est pour un vrai backup système.</p>
+<p><code>cp -a</code> équivaut à <code>cp -dR --preserve=all</code>. Retiens simplement : <strong>pour sauvegarder, <code>-a</code>. Pour dupliquer vite fait, <code>-r</code>.</strong></p>
+</div>
+<div class="box nts"><p class="lbl">Piège 3 - où est le Bureau ?</p><p>Sur ta Debian en français, le dossier s'appelle <code>~/Bureau</code>. Sur un système en anglais, <code>~/Desktop</code>. Un script qui code en dur l'un ou l'autre casse dès qu'il change de machine.</p>
+<p>La bonne façon interroge la configuration du système :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>xdg-user-dir DESKTOP</code></pre></div>
+<p>Ces chemins sont définis dans <code>~/.config/user-dirs.dirs</code>. Va le lire :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>cat ~/.config/user-dirs.dirs</code></pre></div>
+<p>Les guillemets autour de <code>"$(xdg-user-dir DESKTOP)"</code> ne sont pas décoratifs : si le chemin contenait une espace, le shell découperait le résultat en deux arguments et la commande échouerait. <strong>Prends l'habitude d'entourer de guillemets toute variable qui contient un chemin.</strong> C'est la source de bug numéro un des scripts bash, et aussi une porte d'entrée classique en sécurité.</p>
+</div>
+<div class="box danger"><p class="lbl">Piège 4 - <code>rm</code> ne pardonne pas</p><p>Il n'y a <strong>pas de corbeille</strong> en ligne de commande. <code>rm</code> détruit immédiatement et définitivement. Les données restent physiquement sur le disque un moment, mais les récupérer demande des outils de forensique et le résultat est incertain.</p>
+<p>Trois réflexes à prendre dès maintenant :</p>
+<ol><li><strong><code>ls</code> avant <code>rm</code>.</strong> Lance d'abord <code>ls</code> avec exactement les mêmes arguments. Ce que <code>ls</code> affiche est précisément ce que <code>rm</code> va détruire.</li><li><strong><code>rm -i</code></strong> demande confirmation fichier par fichier. Pénible, mais utile au début.</li><li><strong>Jamais d'espace parasite.</strong> <code>rm -r ~/ backup</code> au lieu de <code>rm -r ~/backup</code> efface ton dossier personnel entier. Une seule espace.</li></ol>
+<p>Et bien sûr : ne tape jamais <code>rm -rf /</code> ni <code>rm -rf /*</code>, même « pour voir ».</p>
+</div>
+<hr>
+<h2 id="complements">Compléments</h2>
+<div class="box nts"><p class="lbl">Vérifier une archive avant de s'y fier</p><p>Une archive que tu n'as jamais ouverte n'est pas une sauvegarde, c'est une supposition. Deux commandes qui <strong>listent sans extraire</strong> :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>unzip -l backup.zip      <span class="com"># pour un .zip</span>
+tar -tvf backup.tar.gz   <span class="com"># pour un .tar.gz</span></code></pre></div>
+<p>Fais-le systématiquement. Le jour où tu restaures, il est trop tard pour découvrir que l'archive était vide.</p>
+</div>
+<div class="box nts"><p class="lbl">zip contre tar.gz : pourquoi Linux préfère tar</p><p>Le cours demande du <code>zip</code> parce que c'est universel et que Windows l'ouvre nativement. Dans le monde Unix, la norme est plutôt <code>tar.gz</code>.</p>
+<p>Raison historique intéressante : <code>tar</code> (<em>tape archive</em>) ne sait que <strong>coller des fichiers bout à bout</strong> en préservant toutes leurs métadonnées Unix. Il ne compresse rien. <code>gzip</code> ne sait que <strong>compresser un flux</strong>. On les combine :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>tar -czvf backup.tar.gz backup/</code></pre></div>
+<div class="tw"><table><thead><tr><th>Lettre</th><th>Signification</th></tr></thead><tbody><tr><td><code>c</code></td><td>create, créer l'archive</td></tr><tr><td><code>z</code></td><td>passer le résultat dans gzip</td></tr><tr><td><code>v</code></td><td>verbose, afficher ce qui se passe</td></tr><tr><td><code>f</code></td><td>le nom de fichier qui suit</td></tr></tbody></table></div>
+<p>Pour extraire, <code>c</code> devient <code>x</code> (<em>extract</em>) : <code>tar -xzvf backup.tar.gz</code>.</p>
+<p>Tu reconnais le principe du pipe du Jour 1 : deux outils qui font une seule chose chacun, assemblés. C'est encore la philosophie Unix.</p>
+</div>
+<div class="box tip"><p class="lbl">Ce que ferait un vrai backup</p><p><code>cp -a</code> recopie tout à chaque fois. Sur des notes de cours, sans importance. Sur des dizaines de Go, c'est absurde. L'outil standard est <code>rsync</code>, qui ne transfère que ce qui a changé :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>rsync -av --delete ~/Cours/ ~/backup/Cours/</code></pre></div>
+<p>Tu le croiseras partout en administration système. Pas la peine de l'apprendre maintenant, mais sache qu'il existe.</p>
+</div>
+<hr>
+<h2 id="auto-test">Auto-test</h2>
+<ol><li>Pourquoi <code>cp</code> refuse-t-il de copier un dossier sans option, alors que <code>mv</code> accepte ?</li><li>Que devient <code>mkdir ~/Cours/{pdm,algo}</code> après expansion par le shell ? Comment le vérifier sans rien créer ?</li><li>Quelle différence concrète entre <code>cp -r</code> et <code>cp -a</code> pour une sauvegarde ?</li><li>Pourquoi coder <code>~/Bureau</code> en dur dans un script est-il une mauvaise idée ?</li><li>Quelle commande liste le contenu d'un <code>.zip</code> sans l'extraire, et pourquoi le faire systématiquement ?</li><li>Que détruit exactement <code>rm -r ~/ backup</code> et en quoi diffère-t-il de <code>rm -r ~/backup</code> ?</li></ol>
+<h2 id="a-faire">À faire</h2>
+<ul class="tasks"><li><input type="checkbox" id="tache-1"><label for="tache-1">Refaire l'exercice entier en une seule session, sans regarder la solution</label></li><li><input type="checkbox" id="tache-2"><label for="tache-2">Vérifier le contenu de <code>~/.config/user-dirs.dirs</code></label></li><li><input type="checkbox" id="tache-3"><label for="tache-3">Tester <code>echo</code> devant trois commandes avec accolades pour voir l'expansion</label></li><li><input type="checkbox" id="tache-4"><label for="tache-4">Comparer <code>ls -l</code> d'un dossier copié avec <code>cp -r</code> puis avec <code>cp -a</code></label></li></ul>
+
+</main>
+<footer>
+<p>Mis en page à partir de ma note Obsidian. Les commandes et le code se vérifient en les tapant soi-même.</p>
+</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+<script>
+var PAGE = "pdm-jour-2-hierarchie-et-archives";
+(function () {
+  function lire(cle) { try { return localStorage.getItem(cle); } catch (e) { return null; } }
+  function ecrire(cle, val) { try { localStorage.setItem(cle, val); } catch (e) {} }
+
+  // Boutons « Copier » des blocs Racket
+  function selectionner(bouton, code) {
+    var r = document.createRange();
+    r.selectNodeContents(code);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    bouton.textContent = 'Sélectionné : Ctrl+C';
+  }
+  document.querySelectorAll('.code .copy').forEach(function (bouton) {
+    bouton.addEventListener('click', function () {
+      var code = bouton.closest('.code').querySelector('code');
+      var texte = code.textContent;
+      var fini = function () {
+        bouton.textContent = 'Copié';
+        setTimeout(function () { bouton.textContent = 'Copier'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texte).then(fini, function () { selectionner(bouton, code); });
+      } else {
+        selectionner(bouton, code);
+      }
+    });
+  });
+
+  // Mode prédiction : les résultats « ; → » sont floutés jusqu'au clic
+  var bouton = document.getElementById('predict');
+  var CLE = 'pf1-mode-prediction';
+  if (bouton) {
+  function appliquer(actif) {
+    document.body.classList.toggle('predict', actif);
+    bouton.setAttribute('aria-pressed', actif ? 'true' : 'false');
+    bouton.textContent = actif ? 'Mode prédiction : activé' : 'Mode prédiction';
+    document.querySelectorAll('.res.shown').forEach(function (r) { r.classList.remove('shown'); });
+  }
+  appliquer(lire(CLE) === '1');
+  bouton.addEventListener('click', function () {
+    var actif = !document.body.classList.contains('predict');
+    appliquer(actif);
+    ecrire(CLE, actif ? '1' : '0');
+  });
+  document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('predict')) return;
+    var r = e.target.closest('.res');
+    if (r) r.classList.toggle('shown');
+  });
+  }
+
+  // Listes à cocher : chaque case est retenue dans ce navigateur
+  document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function (c) {
+    var cle = 'pf1-' + PAGE + '-' + c.id;
+    var v = lire(cle);
+    if (v !== null) c.checked = v === '1';
+    c.addEventListener('change', function () { ecrire(cle, c.checked ? '1' : '0'); });
+  });
+})();
+
+</script>
+</body>
+</html>

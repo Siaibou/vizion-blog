@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pratique des machines, jour 1 (partie 2) : flux et redirections</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+[hidden]{display:none!important}
+/* Cahier à lignes, marge rouge : la même famille que les cours « depuis le tout début ».
+   Ici le code Racket tient la place des formules : blocs façon DrRacket, résultats « ; → » repérables. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00; --str:#8a4a12;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.10);
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+
+/* ---- en-tête ---- */
+.hero{padding:28px 16px 8px 30px;max-width:760px;margin:0 auto;position:relative}
+.series{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 30px;font-size:.9rem}
+.series .hub{font-weight:700;color:var(--blue);text-decoration:none}
+.series .hub:hover{text-decoration:underline}
+.series ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.series li{margin:0}
+.series ul a,.series ul span{display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none}
+.series ul a:hover{border-color:var(--blue)}
+.series ul span[aria-current]{border-color:var(--margin);color:var(--margin);font-weight:700}
+.series ul span.todo{color:var(--muted)}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.42em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:10px;line-height:1.4}
+.meta{margin:0;color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.predict-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:20px 0 0;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.predict-box p{margin:0;font-size:.92rem;color:var(--muted);flex:1 1 260px;min-width:0}
+.predict-btn{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;cursor:pointer;min-height:40px}
+.predict-btn[aria-pressed="true"]{background:var(--blue);color:var(--paper)}
+
+/* ---- corps ---- */
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3,h4{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+li>p{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+strong{font-weight:700}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.katex math{font-size:1.1em}
+.m{font-family:var(--serif);font-style:italic}
+.xref{font-style:italic}
+blockquote{margin:16px 0;padding:4px 16px;border-left:4px solid var(--line);color:var(--muted)}
+
+/* ---- tableaux ---- */
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.wide{min-width:34rem}
+
+/* ---- encadrés ---- */
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.box.idea{border-left:5px solid var(--margin)}.box.idea .lbl{color:var(--margin)}
+.box.nts{border-left:5px solid var(--blue)}.box.nts .lbl{color:var(--blue)}
+.box.warn{border-left:5px solid var(--amber)}.box.warn .lbl{color:var(--amber)}
+.box.tip{border-left:5px solid var(--green)}.box.tip .lbl{color:var(--green)}
+.box.ask{border:1.5px dashed var(--muted)}
+.box.ask .lbl{font-size:1.05rem}
+.box.danger{border-left:5px solid var(--red)}.box.danger .lbl{color:var(--red)}
+mark{background:var(--soft-a);color:inherit;padding:0 .15em;border-radius:3px}
+
+/* ---- blocs repliés : indices, solutions, réponses ---- */
+details.fold{margin:12px 0;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:10px;padding:0 14px}
+details.fold>summary{cursor:pointer;font-weight:700;padding:9px 0;color:var(--fc)}
+details.fold[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+.fold-body{padding-bottom:10px}
+.fold-body>:first-child{margin-top:0}.fold-body>:last-child{margin-bottom:0}
+details.fold.hint{--fc:var(--amber)}
+details.fold.tip{--fc:var(--blue)}
+details.fold.ok{--fc:var(--green)}
+details.fold.ex{--fc:var(--muted)}
+details.fold.nts{--fc:var(--blue)}
+details.fold.warn{--fc:var(--amber)}
+details.fold.danger{--fc:var(--red)}
+details.fold.ask{--fc:var(--muted)}
+details.fold.idea{--fc:var(--margin)}
+.box details.fold{background:var(--paper)}
+
+/* ---- code ---- */
+.code{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 6px 3px 12px;border-bottom:1px solid var(--line);background:var(--soft-b);
+  font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.code-bar.plain{padding:5px 12px}
+.code pre{margin:0;padding:10px 14px;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.6;tab-size:2}
+.code code{background:none;padding:0;font-size:inherit;border-radius:0;word-break:normal;white-space:pre}
+.code.txt pre{color:var(--ink)}
+.copy{font:inherit;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 10px;cursor:pointer;min-height:30px}
+.copy:hover{border-color:var(--blue)}
+.kw{color:var(--blue);font-weight:600}
+.str{color:var(--str)}
+.cst{color:var(--amber)}
+.com{color:var(--muted);font-style:italic}
+.res{color:var(--green);font-weight:600}
+.res.err{color:var(--red)}
+.par{color:var(--muted)}
+.quo{color:var(--blue);font-weight:600}
+.predict .res{filter:blur(5px);cursor:pointer;-webkit-user-select:none;user-select:none}
+.predict .res.shown{filter:none;-webkit-user-select:text;user-select:text}
+
+/* ---- listes à cocher ---- */
+ul.tasks{list-style:none;padding-left:0}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+ul.tasks input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+ul.tasks label{cursor:pointer;min-width:0}
+ul.tasks input:checked+label{color:var(--muted);text-decoration:line-through}
+
+/* ---- bas de page ---- */
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+
+/* Bandeau du blog Vizion : retour à la Licence et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.hero{padding-top:20px}
+
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/licence/#pratique-des-machines">← Vizion.Blog / Licence / Pratique des machines</a>
+<p class="vz-note"><b>Notes de cours.</b> Le texte du cours vient des pads de mon enseignant ; les réponses et les compléments ont été rédigés avec Claude, une IA d'Anthropic, et s'adressent à moi. Dans cette version publique, j'ai retiré l'adresse des pads et reformulé les remarques sur le cours.</p>
+</div>
+<header class="hero" id="haut">
+<nav class="series" aria-label="Pages du même cours">
+<ul><li><span aria-current="page">Jour 1, flux et redirections</span></li><li><a href="/cours/pdm-jour-2-hierarchie-et-archives.html">Jour 2, hiérarchie et archives</a></li></ul>
+</nav>
+<p class="kicker">Pratique des machines, jour 1 (partie 2)</p>
+<h1>Flux et redirections</h1>
+<p class="meta">Cours du 14 septembre 2026</p>
+</header>
+<main>
+<div class="box idea"><p class="lbl">Comment lire cette note</p><p>Le contenu du cours original est conservé tel quel. Tout ce que j'ai ajouté est dans des encadrés : compléments, précisions et mises en garde. Tu peux ainsi distinguer ce qui vient de ton prof de ce qui vient d'ailleurs — c'est important quand tu réviseras pour un partiel.</p>
+</div>
+<hr>
+<h2 id="p1"><span class="num">1</span>Entrée standard et sortie standard</h2>
+<p>On appelle <mark><strong>entrée standard</strong></mark> le flux d'entrée par lequel du texte ou toute autre donnée peut être entré dans un programme, et <mark><strong>sortie standard</strong></mark> le flux de sortie dans lequel les données sont écrites par le programme.</p>
+<p>Dans le terminal, le flux d'entrée (les commandes) est saisi au clavier dans l'<mark><strong>invite de commande</strong></mark>. Le flux en sortie s'affiche sur l'écran dans la fenêtre du terminal. C'est le cas par exemple du résultat de la commande <code>ls</code>.</p>
+<p>Pour plus de commodité dans le traitement du résultat d'une commande, il est possible de <mark><strong>rediriger le flux de sortie</strong></mark> vers un fichier : au lieu de s'afficher sur l'écran, le résultat de la commande sera écrit dans un fichier.</p>
+<p>Il est aussi possible de rediriger le flux de sortie vers une autre commande pour enchaîner les commandes progressivement.</p>
+<p>Les opérateurs suivants permettent de rediriger la sortie standard vers :</p>
+<ul><li>un fichier en écrasant son contenu : opérateur <code>&gt;</code></li><li>un fichier en concaténant la sortie au contenu existant : double chevron droit <code>&gt;&gt;</code></li><li>une nouvelle commande avec l'opérateur <mark><strong>pipe</strong></mark> : <code>|</code></li></ul>
+<h3 id="complement-les-trois-flux-pas-deux">Complément : les trois flux, pas deux</h3>
+<div class="box nts"><p class="lbl">Complément - il y a un troisième flux que le cours ne mentionne pas</p><p>Ton prof parle de deux flux. En réalité tout programme Unix naît avec <strong>trois</strong> tuyaux branchés dessus. On les appelle des <em>descripteurs de fichier</em> (<em>file descriptors</em>, souvent abrégés <strong>fd</strong>) et ils sont numérotés.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Numéro</th><th>Nom court</th><th>Nom français</th><th>Par défaut connecté à</th><th>Sert à</th></tr></thead><tbody><tr><td><code>0</code></td><td><strong>stdin</strong></td><td>entrée standard</td><td>ton clavier</td><td>recevoir des données</td></tr><tr><td><code>1</code></td><td><strong>stdout</strong></td><td>sortie standard</td><td>ton écran</td><td>le résultat normal</td></tr><tr><td><code>2</code></td><td><strong>stderr</strong></td><td>sortie d'erreur standard</td><td>ton écran</td><td>les messages d'erreur</td></tr></tbody></table></div>
+<p><strong>Pourquoi séparer 1 et 2 alors que les deux s'affichent au même endroit ?</strong></p>
+<p>Analogie : imagine une usine. Le tapis roulant qui sort les produits finis, c'est <code>stdout</code>. La sonnerie d'alarme quand une machine casse, c'est <code>stderr</code>. Les deux "sortent" de l'usine et arrivent dans le même hangar, donc de loin tu ne vois pas la différence. Mais le jour où tu veux emballer les produits finis dans des cartons, tu ne veux surtout pas emballer la sonnerie avec.</p>
+<p>Concrètement :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>ls dossier_qui_existe dossier_bidon &gt; resultat.txt</code></pre></div>
+<p>Le contenu du dossier qui existe part dans <code>resultat.txt</code> (c'est <code>stdout</code>, donc c'est lui qui est redirigé). Le message d'erreur, lui, s'affiche quand même à l'écran : il est passé par <code>stderr</code>, que tu n'as pas redirigé.</p>
+<p>Pour rediriger les erreurs, on préfixe l'opérateur par le numéro du flux :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>commande 2&gt; erreurs.txt      <span class="com"># les erreurs dans un fichier</span>
+commande 2&gt; /dev/null        <span class="com"># les erreurs à la poubelle</span>
+commande &gt; tout.txt 2&gt;&amp;1     <span class="com"># les erreurs rejoignent la sortie normale</span>
+commande &amp;&gt; tout.txt         <span class="com"># raccourci bash du précédent</span></code></pre></div>
+<p><code>/dev/null</code> est un fichier spécial : tout ce qu'on y écrit disparaît. C'est le trou noir du système. On l'appelle parfois "le puits sans fond".</p>
+</div>
+<div class="box warn"><p class="lbl">Subtilité qui piège tout le monde : l'ordre compte</p><p>Ces deux lignes ne font <strong>pas</strong> la même chose :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>commande &gt; fichier.txt 2&gt;&amp;1     <span class="com"># correct : tout finit dans fichier.txt</span>
+commande 2&gt;&amp;1 &gt; fichier.txt     <span class="com"># piège : les erreurs restent à l'écran</span></code></pre></div>
+<p>Le shell lit de gauche à droite. <code>2&gt;&amp;1</code> veut dire <em>"envoie le flux 2 là où pointe actuellement le flux 1"</em>. Dans le second cas, au moment où il lit <code>2&gt;&amp;1</code>, le flux 1 pointe encore vers l'écran. Il copie donc cette destination-là. La redirection vers le fichier arrive après, et ne concerne plus que le flux 1.</p>
+<p>Analogie : c'est comme dire à quelqu'un "suis la même voiture que Paul" avant que Paul ait changé de voiture. Il suivra l'ancienne.</p>
+</div>
+<h3 id="complement-contre-et-pourquoi-c-est-dangereux">Complément : <code>&gt;</code> contre <code>&gt;&gt;</code>, et pourquoi c'est dangereux</h3>
+<div class="box danger"><p class="lbl">Attention - <code>&gt;</code> détruit sans prévenir</p><p><code>&gt;</code> ne fait pas qu'écrire dans le fichier : il le <strong>vide d'abord</strong>, intégralement, avant même que la commande ne s'exécute. Il n'y a ni confirmation, ni corbeille, ni annulation.</p>
+<p>Le classique qui détruit un fichier :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>cat mon_fichier.txt &gt; mon_fichier.txt    <span class="com"># mon_fichier.txt est maintenant vide</span></code></pre></div>
+<p>Le shell vide le fichier avant de lancer <code>cat</code>, qui lit donc... un fichier vide.</p>
+<p>Filet de sécurité : tu peux demander à bash de refuser d'écraser un fichier existant.</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>set -o noclobber       <span class="com"># active la protection</span>
+echo test &gt; existant.txt   <span class="com"># bash refuse : "cannot overwrite existing file"</span>
+echo test &gt;| existant.txt  <span class="com"># &gt;| force l'écrasement quand tu le veux vraiment</span></code></pre></div>
+<p>Pour rendre ça permanent, on ajoute <code>set -o noclobber</code> dans <code>~/.bashrc</code>. À toi de voir : certains trouvent ça pénible, mais quand tu travailleras sur des fichiers de config ou des captures réseau, tu seras content de l'avoir.</p>
+</div>
+<h3 id="complement-le-pipe-l-invention-la-plus-importante-d-unix">Complément : le pipe <code>|</code>, l'invention la plus importante d'Unix</h3>
+<div class="box nts"><p class="lbl">Complément - la philosophie derrière le pipe</p><p>Le pipe (en français on dit <em>tube</em>) branche la sortie standard d'une commande directement sur l'entrée standard de la suivante. Rien ne passe par le disque, tout transite en mémoire.</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>ls -l | grep ".txt" | wc -l</code></pre></div>
+<p>Traduction ligne à ligne :</p>
+<ol><li><code>ls -l</code> produit la liste détaillée des fichiers</li><li><code>grep ".txt"</code> reçoit cette liste et ne garde que les lignes contenant <code>.txt</code></li><li><code>wc -l</code> reçoit ces lignes et les compte (<code>wc</code> = <em>word count</em>, <code>-l</code> = <em>lines</em>)</li></ol>
+<p>Résultat : le nombre de fichiers <code>.txt</code> du dossier.</p>
+<p><strong>L'analogie de la chaîne de montage.</strong> Chaque commande Unix est un ouvrier spécialisé qui sait faire une seule chose, mais parfaitement. <code>grep</code> filtre. <code>sort</code> trie. <code>wc</code> compte. <code>cut</code> découpe des colonnes. Aucun ne sait tout faire, et c'est volontaire. Le pipe, c'est le tapis roulant qui les relie. La puissance ne vient pas des ouvriers, elle vient du fait qu'on peut les assembler dans n'importe quel ordre.</p>
+<p>C'est la <em>philosophie Unix</em>, formulée par Doug McIlroy en 1978 : <em>écris des programmes qui font une chose et la font bien ; écris des programmes qui travaillent ensemble ; écris des programmes qui manipulent du texte, parce que le texte est une interface universelle.</em></p>
+<p>Retiens bien ce dernier point. Si toutes les commandes échangent du texte brut, alors n'importe laquelle peut parler à n'importe quelle autre. C'est exactement pour ça que le terminal reste plus puissant qu'une interface graphique quarante ans après : dans une interface graphique, tu ne peux faire que ce que le développeur a prévu comme bouton.</p>
+</div>
+<div class="box tip"><p class="lbl">La commande qui manque au cours : <code>tee</code></p><p>Problème : <code>commande &gt; fichier.txt</code> écrit dans le fichier, mais tu ne vois plus rien à l'écran. Parfois tu veux les deux. <code>tee</code> fait exactement ça — son nom vient du raccord de plomberie en T qui sépare un tuyau en deux.</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>ls -l | tee liste.txt        <span class="com"># affiche ET enregistre</span>
+ls -l | tee -a liste.txt     <span class="com"># -a pour append (concaténer), comme &gt;&gt;</span></code></pre></div>
+</div>
+<hr>
+<h2 id="p2"><span class="num">2</span>Créer un fichier vide</h2>
+<h3 id="2-1-sans-l-ouvrir">2.1 Sans l'ouvrir</h3>
+<div class="box nts"><p class="lbl">À faire</p><ul><li>Ouvre le manuel de la commande <code>touch</code>, et utilise-la pour créer un fichier vide appelé <code>fichier_touch.txt</code>.</li><li>Vérifie que le fichier a bien été créé avec la commande <code>ls</code>.</li></ul>
+</div>
+<details class="fold ask"><summary>Ma réponse</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>man touch          <span class="com"># q pour quitter le manuel, / pour chercher dedans</span>
+touch fichier_touch.txt
+ls</code></pre></div>
+</div></details>
+<div class="box nts"><p class="lbl">Complément - <code>man</code>, le réflexe à installer maintenant</p><p><code>man</code> = <em>manual</em>. C'est la documentation officielle, installée sur ta machine, qui fonctionne sans internet. Dans un manuel :</p>
+<div class="tw"><table><thead><tr><th>Touche</th><th>Effet</th></tr></thead><tbody><tr><td><code>Espace</code></td><td>page suivante</td></tr><tr><td><code>flèches</code></td><td>ligne par ligne</td></tr><tr><td><code>/mot</code></td><td>chercher "mot" dans la page</td></tr><tr><td><code>n</code></td><td>occurrence suivante de la recherche</td></tr><tr><td><code>q</code></td><td>quitter</td></tr></tbody></table></div>
+<p>Les manuels sont découpés en sections numérotées. <code>man 1 printf</code> te donne la commande shell, <code>man 3 printf</code> la fonction du langage C. D'où les notations que tu croiseras dans la doc, du type <code>open(2)</code>.</p>
+<p>Si le manuel est trop dense, <code>commande --help</code> donne souvent un résumé d'une page. Et <code>apropos redirection</code> cherche par mot-clé quand tu ne connais pas le nom de la commande.</p>
+<p>Prends l'habitude de lire <code>man</code> <strong>avant</strong> de chercher sur internet. Ça te paraîtra lent au début, puis ça deviendra plus rapide qu'ouvrir un navigateur. Et le jour où tu seras sur une machine distante sans interface graphique, tu n'auras que ça.</p>
+</div>
+<h3 id="2-2-avec-un-editeur-de-texte">2.2 Avec un éditeur de texte</h3>
+<p>Il existe de nombreux éditeurs de texte, avec ou sans <strong>interface graphique</strong>.</p>
+<ul><li><strong>Sans interface graphique</strong> : <code>vim</code>, <code>nano</code>, <code>emacs</code>, etc.</li><li><strong>Avec interface graphique</strong> : <code>gedit</code>, <code>kate</code>, <code>vscode</code>, <code>emacs GUI</code>, etc.</li></ul>
+<div class="box nts"><p class="lbl">Question du cours</p><p>Que veut dire « GUI » ?</p>
+</div>
+<details class="fold ask"><summary>Ma réponse</summary><div class="fold-body"><p><strong>GUI</strong> = <em>Graphical User Interface</em>, en français <strong>interface graphique utilisateur</strong>. C'est tout ce qui se manipule à la souris : fenêtres, boutons, menus, icônes.</p>
+<p>Son opposé est la <strong>CLI</strong> = <em>Command Line Interface</em>, interface en ligne de commande : on tape du texte, la machine répond du texte.</p>
+<p>On croise aussi <strong>TUI</strong> = <em>Text User Interface</em> : une interface qui dessine des menus et des cadres, mais uniquement avec des caractères, dans le terminal. <code>htop</code> ou <code>nano</code> en sont des exemples.</p>
+</div></details>
+<p>Ces logiciels peuvent tous être utilisés pour ouvrir ou créer un fichier avec la commande :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>[text-editor] [path-to-file]</code></pre></div>
+<p>La commande <code>editor</code> ouvre un éditeur de texte par défaut.</p>
+<div class="box nts"><p class="lbl">À faire</p><ul><li>Trouve l'éditeur de texte par défaut installé sur ta machine.</li><li>Crée un nouveau fichier <code>fichier_editeur.txt</code>, ajoute une ligne dedans, sauvegarde-le et ferme-le.</li></ul>
+</div>
+<details class="fold ask"><summary>Ma réponse</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>which editor              <span class="com"># /usr/bin/editor</span>
+ls -l /usr/bin/editor     <span class="com"># montre que c'est un lien symbolique</span>
+update-alternatives --display editor   <span class="com"># montre vers quoi il pointe vraiment</span>
+echo $EDITOR              <span class="com"># la variable d'environnement (souvent vide au début)</span></code></pre></div>
+</div></details>
+<div class="box warn"><p class="lbl">Spécifique à ta machine (Debian 13, bureau KDE)</p><p>Le cours a été écrit pour les machines de la fac, qui tournent sous <strong>Ubuntu 24.04 avec GNOME</strong>. Ton portable est sous <strong>Debian 13 avec KDE</strong>. Deux conséquences concrètes :</p>
+<ol><li><strong><code>gedit</code> n'est probablement pas installé chez toi.</strong> C'est l'éditeur graphique historique de GNOME. Sous KDE, l'équivalent est <code>kate</code> (complet) ou <code>kwrite</code> (allégé). Vérifie avant de t'énerver sur un <code>command not found</code> :<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>which gedit kate kwrite</code></pre></div>
+<p>Tu peux installer gedit si tu veux suivre le TP à la lettre (<code>sudo apt install gedit</code>), mais ce n'est pas nécessaire : remplace simplement <code>gedit</code> par <code>kate</code> dans toutes les commandes du TP.</p>
+</li></ol>
+<ol start="2"><li><strong>Sur Debian, <code>editor</code> est un <em>lien symbolique</em></strong>, c'est-à-dire un raccourci qui pointe vers un autre fichier. Il est géré par un système appelé <em>update-alternatives</em>, et il pointe par défaut vers <code>nano</code>. Pour changer :<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>sudo update-alternatives --config editor</code></pre></div>
+<p>C'est ce mécanisme qui fait que <code>sudo crontab -e</code> ou <code>git commit</code> (sans <code>-m</code>) ouvrent nano et pas autre chose.</p>
+</li></ol>
+</div>
+<div class="box tip"><p class="lbl">Conseil pour la suite de ta licence</p><p>Apprends <code>nano</code> cette semaine (30 minutes suffisent, les raccourcis sont affichés en bas de l'écran, <code>^X</code> signifie <code>Ctrl+X</code>). Puis, sans te presser, commence <code>vim</code> : tape <code>vimtutor</code> dans un terminal, c'est un tutoriel interactif de 25 minutes livré avec vim.</p>
+<p>Pourquoi vim alors que tu as VS Code ? Parce que le jour où tu es connecté en SSH sur un serveur distant ou dans un conteneur Docker minimal, il n'y a pas de VS Code. Il y a vim, ou parfois rien d'autre. Ce n'est pas une question de goût, c'est une question de savoir travailler partout. Tu n'as pas besoin d'être bon, tu as besoin de savoir ouvrir, modifier, sauver, quitter.</p>
+</div>
+<h3 id="2-3-programmes-graphiques-et-l-operateur">2.3 Programmes graphiques et l'opérateur <code>&amp;</code></h3>
+<div class="box danger"><p class="lbl">Attention : programme GUI et utilisation de <code>&amp;</code></p><p>Lorsque tu utilises une commande qui ouvre un programme muni d'une interface graphique, tu dois utiliser l'opérateur <code>&amp;</code> qui permet de lancer le programme <strong>en arrière-plan</strong>.</p>
+</div>
+<p><strong>Explication du cours</strong> : lorsque tu lances une commande, tu ne peux récupérer l'accès à ton prompt qu'une fois celle-ci terminée. Or, si tu lances un programme avec interface graphique, la commande ne sera considérée comme terminée que lorsque tu auras fermé le programme. Entre-temps, ton terminal sera inutilisable car tu n'as plus accès au prompt.</p>
+<div class="box nts"><p class="lbl">À faire</p><p>Exécute la commande suivante :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>while true; do echo "coucou" ; sleep 2 ; done</code></pre></div>
+<p>Que se passe-t-il ? Exécute <code>Ctrl-C</code> dans le terminal : tu viens d'interrompre la commande.</p>
+<p>Essaie ensuite d'ouvrir un éditeur de texte graphique :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>gedit</code></pre></div>
+</div>
+<details class="fold ask"><summary>Ma réponse</summary><div class="fold-body"><p>La boucle affiche <code>coucou</code> toutes les 2 secondes, indéfiniment. Le prompt ne revient jamais : le shell attend la fin de la commande, et cette commande n'a pas de fin. <code>Ctrl-C</code> l'interrompt et rend le prompt.</p>
+<p>(Sous KDE, remplacer <code>gedit</code> par <code>kate</code>.)</p>
+</div></details>
+<div class="box nts"><p class="lbl">Complément - décortiquer <code>while true; do ... done</code></p><p>C'est ta première boucle shell. Mot à mot :</p>
+<div class="tw"><table><thead><tr><th>Élément</th><th>Rôle</th></tr></thead><tbody><tr><td><code>while</code></td><td>tant que (la condition est vraie)</td></tr><tr><td><code>true</code></td><td>une commande qui ne fait rien à part réussir, toujours</td></tr><tr><td><code>;</code></td><td>séparateur : équivaut à passer à la ligne</td></tr><tr><td><code>do</code></td><td>début du bloc à répéter</td></tr><tr><td><code>echo "coucou"</code></td><td>affiche coucou</td></tr><tr><td><code>sleep 2</code></td><td>attend 2 secondes</td></tr><tr><td><code>done</code></td><td>fin du bloc</td></tr></tbody></table></div>
+<p><code>while true</code> est donc une boucle dont la condition est vraie par construction : une boucle infinie. En Python, tu écrirais exactement la même chose :</p>
+<div class="code txt py"><div class="code-bar plain"><span>Python</span></div><pre><code>import time
+while True:
+    print("coucou")
+    time.sleep(2)</code></pre></div>
+<p>Note la différence de syntaxe : le shell délimite ses blocs par des mots-clés (<code>do</code> / <code>done</code>), Python par l'indentation. Même logique, deux habillages.</p>
+</div>
+<p>L'éditeur s'ouvre, mais si tu reviens sur le terminal, tu n'as plus accès au prompt.</p>
+<p>Pour conserver l'accès à ton terminal, tu dois utiliser l'opérateur <code>&amp;</code>.</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>gedit fichier_gedit.txt &amp;</code></pre></div>
+<div class="box warn"><p class="lbl">Précision - ce que fait vraiment <code>&amp;</code></p><p><strong>1. <code>&amp;</code> ne lance pas la commande dans un autre shell.</strong> Il la lance comme un <strong>job en arrière-plan</strong> (<em>background job</em>) du shell courant : le shell la démarre, puis n'attend pas sa fin et te rend immédiatement le prompt. Le processus reste rattaché à ton shell, ce qui a une conséquence pratique importante : <strong>si tu fermes le terminal, le programme meurt avec lui</strong> (il reçoit un signal <code>SIGHUP</code>, <em>hang up</em>). Pour qu'il survive, il faut <code>nohup commande &amp;</code> ou <code>disown</code> après coup.</p>
+<p><strong>2. Après un <code>&amp;</code>, <code>Ctrl-C</code> ne ferme pas la fenêtre.</strong> <code>Ctrl-C</code> envoie le signal d'interruption au <strong>processus au premier plan</strong> (<em>foreground</em>) uniquement. Un job lancé avec <code>&amp;</code> est justement en arrière-plan, donc il n'est pas concerné : ta fenêtre <code>kate</code> restera ouverte. C'est sans <code>&amp;</code> que <code>Ctrl-C</code> ferme la fenêtre.</p>
+<p>Teste toi-même, c'est en deux commandes.</p>
+</div>
+<div class="box nts"><p class="lbl">Complément - gérer les jobs, et les trois raccourcis à ne pas confondre</p><p>Commandes de gestion des jobs :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>jobs          <span class="com"># liste les jobs du shell courant</span>
+fg %1         <span class="com"># ramène le job 1 au premier plan (foreground)</span>
+bg %1         <span class="com"># relance le job 1 en arrière-plan (background)</span>
+kill %1       <span class="com"># termine le job 1</span>
+nohup cmd &amp;   <span class="com"># lance en arrière-plan ET survit à la fermeture du terminal</span></code></pre></div>
+<p>Et surtout, trois raccourcis que tout le monde confond au début :</p>
+<div class="tw"><table class="wide"><thead><tr><th>Raccourci</th><th>Nom technique</th><th>Ce que ça fait réellement</th></tr></thead><tbody><tr><td><code>Ctrl+C</code></td><td>signal <code>SIGINT</code></td><td>demande poliment au programme de s'arrêter. Le programme <strong>peut refuser</strong> ou faire du ménage avant.</td></tr><tr><td><code>Ctrl+Z</code></td><td>signal <code>SIGTSTP</code></td><td>met en pause (<em>suspend</em>). Le programme est gelé, pas tué. <code>fg</code> le réveille.</td></tr><tr><td><code>Ctrl+D</code></td><td><strong>pas un signal</strong></td><td>envoie une fin de fichier (EOF, <em>end of file</em>) sur l'entrée standard.</td></tr></tbody></table></div>
+<p>La troisième ligne mérite un développement, parce qu'on lit souvent que <code>Ctrl+D</code> « arrête le processus en cours », ce qui est trompeur.</p>
+<p><code>Ctrl+D</code> ne tue rien. Il dit au programme : <em>"l'entrée standard est terminée, il n'y aura plus rien à lire"</em>. Si le programme en question est ton shell, un shell qui n'a plus rien à lire n'a plus de raison d'exister, donc il se ferme — d'où l'impression qu'il "ferme le terminal". Mais la cause est différente.</p>
+<p>Vérifie la différence en deux essais :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>cat               <span class="com"># sans argument : cat lit ton clavier et le recopie</span>
+<span class="com"># tape du texte, puis Entrée : il te le répète</span>
+<span class="com"># Ctrl+D : cat se termine proprement, tu as "fermé le robinet"</span>
+
+cat
+<span class="com"># Ctrl+C : cat est interrompu de force</span></code></pre></div>
+<p>Même résultat apparent, deux mécanismes opposés. Cette distinction te servira beaucoup plus tard que tu ne le crois : elle est au cœur de la façon dont les programmes s'enchaînent dans un pipe.</p>
+</div>
+<h3 id="2-4-avec-la-redirection-en-sortie">2.4 Avec la redirection en sortie</h3>
+<p>La redirection de sortie permet également de créer un fichier.</p>
+<div class="box nts"><p class="lbl">À faire</p><p>Teste les commandes suivantes et explique ce qui se passe. À quoi sert la commande <code>cat</code> ?</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>echo "ligne 1"
+echo "ligne 1" &gt; sortie.txt
+cat sortie.txt
+echo "ligne 1" &gt;&gt; sortie.txt
+cat sortie.txt
+echo "ligne 2" &gt;&gt; sortie.txt
+cat sortie.txt
+echo "ligne 3" &gt; sortie.txt
+cat sortie.txt</code></pre></div>
+</div>
+<details class="fold ask"><summary>Ma réponse - déroulé complet</summary><div class="fold-body"><div class="tw"><table class="wide"><thead><tr><th>#</th><th>Commande</th><th>Effet sur <code>sortie.txt</code></th><th>Affichage écran</th></tr></thead><tbody><tr><td>1</td><td><code>echo "ligne 1"</code></td><td>aucun (pas de redirection)</td><td><code>ligne 1</code></td></tr><tr><td>2</td><td><code>echo "ligne 1" &gt; sortie.txt</code></td><td>crée le fichier, contenu : <code>ligne 1</code></td><td>rien</td></tr><tr><td>3</td><td><code>cat sortie.txt</code></td><td>—</td><td><code>ligne 1</code></td></tr><tr><td>4</td><td><code>echo "ligne 1" &gt;&gt; sortie.txt</code></td><td>ajoute à la fin</td><td>rien</td></tr><tr><td>5</td><td><code>cat sortie.txt</code></td><td>—</td><td><code>ligne 1</code> / <code>ligne 1</code></td></tr><tr><td>6</td><td><code>echo "ligne 2" &gt;&gt; sortie.txt</code></td><td>ajoute à la fin</td><td>rien</td></tr><tr><td>7</td><td><code>cat sortie.txt</code></td><td>—</td><td><code>ligne 1</code> / <code>ligne 1</code> / <code>ligne 2</code></td></tr><tr><td>8</td><td><code>echo "ligne 3" &gt; sortie.txt</code></td><td><strong>vide tout</strong>, écrit <code>ligne 3</code></td><td>rien</td></tr><tr><td>9</td><td><code>cat sortie.txt</code></td><td>—</td><td><code>ligne 3</code></td></tr></tbody></table></div>
+<p>La leçon est à l'étape 8 : trois lignes de travail effacées par un seul chevron, sans avertissement. C'est exactement l'intérêt pédagogique de cet exercice.</p>
+</div></details>
+<div class="box nts"><p class="lbl">Complément - à quoi sert vraiment <code>cat</code></p><p><code>cat</code> vient de <em>concatenate</em>, <strong>concaténer</strong> : mettre bout à bout. Sa fonction première n'est pas d'afficher un fichier, c'est de <strong>coller plusieurs fichiers</strong> en un seul flux :</p>
+<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>cat partie1.txt partie2.txt partie3.txt &gt; complet.txt</code></pre></div>
+<p>L'affichage à l'écran n'est qu'un effet de bord : quand tu écris <code>cat fichier.txt</code>, tu concatènes un seul fichier et le résultat part sur la sortie standard, qui est ton écran par défaut.</p>
+<p>Trois choses à savoir en plus :</p>
+<ul><li><strong><code>cat</code> sans argument lit ton clavier.</strong> Il attend sur l'entrée standard. D'où l'astuce pour écrire un fichier sans éditeur :<div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy">Copier</button></div><pre><code>cat &gt; note.txt
+je tape mon texte
+et une deuxième ligne
+<span class="com"># puis Ctrl+D pour terminer</span></code></pre></div>
+</li><li><strong>Ne pas utiliser <code>cat</code> sur un fichier long.</strong> Tout défile et tu ne peux pas remonter. Utilise <code>less fichier.txt</code> (navigation avec les flèches, <code>/</code> pour chercher, <code>q</code> pour quitter), ou <code>head -n 20</code> / <code>tail -n 20</code> pour les premières ou dernières lignes. <code>tail -f journal.log</code> suit un fichier en direct pendant qu'il se remplit — indispensable quand tu surveilleras des logs.</li><li><strong>Ne jamais faire <code>cat</code> sur un fichier binaire</strong> (une image, un exécutable). Ton terminal interprétera des octets aléatoires comme des codes de contrôle et deviendra illisible. Si ça t'arrive : tape <code>reset</code> à l'aveugle, puis Entrée.</li></ul>
+</div>
+<hr>
+<h2 id="p3"><span class="num">3</span>Le lien avec ce qui t'intéresse (sécurité)</h2>
+<div class="box nts"><p class="lbl">Ajout personnel - pourquoi ce cours banal est en fait central</p><p>Tu apprends à rediriger des flux dans un TP d'introduction. Voici où tu retrouveras exactement la même chose :</p>
+<ul><li><strong>Masquer le bruit pendant une reconnaissance.</strong> <code>nmap -p- cible 2&gt;/dev/null</code> envoie les erreurs à la poubelle pour ne garder que les résultats exploitables. Un pipe derrière (<code>| grep open</code>) et tu as une liste de ports ouverts propre.</li><li><strong>Effacer ses traces.</strong> Un attaquant qui obtient les droits root fait <code>&gt; /var/log/auth.log</code> : un seul caractère et le journal d'authentification est vide. C'est précisément pour ça qu'en défense on envoie les logs <strong>en temps réel vers une autre machine</strong> (un serveur SIEM). Un journal stocké uniquement sur la machine compromise ne vaut rien.</li><li><strong>Construire des outils en une ligne.</strong> <code>cat rockyou.txt | grep -E '^.{12,}$' | sort -u &gt; longs.txt</code> filtre une liste de mots de passe. Tu auras besoin d'exactement ça pour la V2 de ton Password Checker.</li><li><strong>Le danger de <code>curl | bash</code>.</strong> Beaucoup de tutoriels te disent d'installer un outil avec <code>curl https://site.tld/install.sh | bash</code>. Tu comprends maintenant ce que ça fait : télécharger du code et l'exécuter immédiatement, <strong>sans jamais le lire</strong>. Si le site est compromis, tu exécutes le code de l'attaquant avec tes droits. Le réflexe correct : <code>curl -o install.sh https://...</code>, puis <code>less install.sh</code>, puis exécuter si le contenu te convient.</li></ul>
+<p>C'est le genre de détail qui sépare quelqu'un qui récite des commandes de quelqu'un qui comprend ce qu'il fait.</p>
+</div>
+<hr>
+<h2 id="p4"><span class="num">4</span>Récapitulatif des opérateurs</h2>
+<div class="tw"><table class="wide"><thead><tr><th>Opérateur</th><th>Nom</th><th>Effet</th></tr></thead><tbody><tr><td><code>&gt;</code></td><td>redirection en écrasement</td><td>écrit <code>stdout</code> dans un fichier, en le vidant d'abord</td></tr><tr><td><code>&gt;&gt;</code></td><td>redirection en concaténation</td><td>ajoute <code>stdout</code> à la fin d'un fichier</td></tr><tr><td><code>&lt;</code></td><td>redirection d'entrée</td><td>lit <code>stdin</code> depuis un fichier au lieu du clavier</td></tr><tr><td><code>2&gt;</code></td><td>redirection d'erreur</td><td>écrit <code>stderr</code> dans un fichier</td></tr><tr><td><code>2&gt;&amp;1</code></td><td>fusion de flux</td><td>envoie <code>stderr</code> là où pointe <code>stdout</code></td></tr><tr><td><code>&amp;&gt;</code></td><td>redirection totale (bash)</td><td>raccourci de <code>&gt; fichier 2&gt;&amp;1</code></td></tr><tr><td><code>|</code></td><td>pipe / tube</td><td>branche <code>stdout</code> d'une commande sur <code>stdin</code> de la suivante</td></tr><tr><td><code>&amp;</code></td><td>arrière-plan</td><td>lance la commande en job d'arrière-plan, rend le prompt</td></tr><tr><td><code>;</code></td><td>séparateur</td><td>enchaîne deux commandes, quoi qu'il arrive</td></tr><tr><td><code>&amp;&amp;</code></td><td>et logique</td><td>n'exécute la seconde que si la première a réussi</td></tr><tr><td><code>||</code></td><td>ou logique</td><td>n'exécute la seconde que si la première a échoué</td></tr></tbody></table></div>
+<div class="box tip"><p class="lbl">Les trois dernières lignes ne sont pas au programme du TP</p><p>Mais tu les croiseras partout. <code>mkdir projet &amp;&amp; cd projet</code> : entre dans le dossier seulement s'il a bien été créé. C'est une sécurité élémentaire — avec <code>;</code>, le <code>cd</code> s'exécuterait même si le <code>mkdir</code> a échoué, et tu travaillerais au mauvais endroit sans t'en rendre compte.</p>
+</div>
+<hr>
+<h2 id="p5"><span class="num">5</span>Auto-test</h2>
+<p>Réponds à voix haute, sans regarder. Si tu hésites, retourne à la section concernée.</p>
+<ol><li>Quels sont les trois flux standard, leurs numéros, et à quoi chacun est connecté par défaut ?</li><li>Quelle différence entre <code>commande &gt; f.txt 2&gt;&amp;1</code> et <code>commande 2&gt;&amp;1 &gt; f.txt</code> ?</li><li>Pourquoi <code>cat fichier.txt &gt; fichier.txt</code> détruit le fichier ?</li><li>Que fait <code>ls -l | grep txt | wc -l</code> ? Décris ce qui circule dans chaque tuyau.</li><li>Ton terminal est bloqué après avoir lancé un programme graphique. Qu'est-ce que tu as oublié, et quelles sont tes deux options pour t'en sortir sans fermer le programme ?</li><li>Quelle est la différence exacte entre <code>Ctrl+C</code>, <code>Ctrl+Z</code> et <code>Ctrl+D</code> ?</li><li>Un job lancé avec <code>&amp;</code> survit-il à la fermeture du terminal ? Pourquoi, et comment changer ça ?</li><li>D'où vient le nom <code>cat</code> et quelle est sa fonction première ?</li><li>Pourquoi <code>/dev/null</code> existe-t-il, et dans quel cas l'utiliserais-tu ?</li><li>Sous KDE, pourquoi la commande <code>gedit</code> du TP risque-t-elle d'échouer, et par quoi la remplacer ?</li></ol>
+<hr>
+<h2 id="p6"><span class="num">6</span>À faire après ce cours</h2>
+<ul class="tasks"><li><input type="checkbox" id="tache-1"><label for="tache-1">Refaire l'exercice <code>echo</code> / <code>sortie.txt</code> en ajoutant <code>2&gt;</code> et <code>2&gt;&amp;1</code></label></li><li><input type="checkbox" id="tache-2"><label for="tache-2">Faire <code>vimtutor</code> en entier (25 min)</label></li><li><input type="checkbox" id="tache-3"><label for="tache-3">Tester <code>jobs</code>, <code>fg</code>, <code>bg</code>, <code>Ctrl+Z</code> sur <code>sleep 300</code></label></li><li><input type="checkbox" id="tache-4"><label for="tache-4">Vérifier <code>which gedit kate kwrite</code> et adapter les TP à KDE</label></li><li><input type="checkbox" id="tache-5"><label for="tache-5">Lire <code>man bash</code>, section REDIRECTION (<code>/REDIRECTION</code> puis <code>n</code>)</label></li></ul>
+
+</main>
+<footer>
+<p>Mis en page à partir de ma note Obsidian. Les commandes et le code se vérifient en les tapant soi-même.</p>
+</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+<script>
+var PAGE = "pdm-jour-1-flux-et-redirections";
+(function () {
+  function lire(cle) { try { return localStorage.getItem(cle); } catch (e) { return null; } }
+  function ecrire(cle, val) { try { localStorage.setItem(cle, val); } catch (e) {} }
+
+  // Boutons « Copier » des blocs Racket
+  function selectionner(bouton, code) {
+    var r = document.createRange();
+    r.selectNodeContents(code);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    bouton.textContent = 'Sélectionné : Ctrl+C';
+  }
+  document.querySelectorAll('.code .copy').forEach(function (bouton) {
+    bouton.addEventListener('click', function () {
+      var code = bouton.closest('.code').querySelector('code');
+      var texte = code.textContent;
+      var fini = function () {
+        bouton.textContent = 'Copié';
+        setTimeout(function () { bouton.textContent = 'Copier'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texte).then(fini, function () { selectionner(bouton, code); });
+      } else {
+        selectionner(bouton, code);
+      }
+    });
+  });
+
+  // Mode prédiction : les résultats « ; → » sont floutés jusqu'au clic
+  var bouton = document.getElementById('predict');
+  var CLE = 'pf1-mode-prediction';
+  if (bouton) {
+  function appliquer(actif) {
+    document.body.classList.toggle('predict', actif);
+    bouton.setAttribute('aria-pressed', actif ? 'true' : 'false');
+    bouton.textContent = actif ? 'Mode prédiction : activé' : 'Mode prédiction';
+    document.querySelectorAll('.res.shown').forEach(function (r) { r.classList.remove('shown'); });
+  }
+  appliquer(lire(CLE) === '1');
+  bouton.addEventListener('click', function () {
+    var actif = !document.body.classList.contains('predict');
+    appliquer(actif);
+    ecrire(CLE, actif ? '1' : '0');
+  });
+  document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('predict')) return;
+    var r = e.target.closest('.res');
+    if (r) r.classList.toggle('shown');
+  });
+  }
+
+  // Listes à cocher : chaque case est retenue dans ce navigateur
+  document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function (c) {
+    var cle = 'pf1-' + PAGE + '-' + c.id;
+    var v = lire(cle);
+    if (v !== null) c.checked = v === '1';
+    c.addEventListener('change', function () { ecrire(cle, c.checked ? '1' : '0'); });
+  });
+})();
+
+</script>
+</body>
+</html>

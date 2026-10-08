@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Programmation fonctionnelle 1, chapitre 1 : penser et écrire en Racket</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+[hidden]{display:none!important}
+/* Cahier à lignes, marge rouge : la même famille que les cours « depuis le tout début ».
+   Ici le code Racket tient la place des formules : blocs façon DrRacket, résultats « ; → » repérables. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00; --str:#8a4a12;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.10);
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+
+/* ---- en-tête ---- */
+.hero{padding:28px 16px 8px 30px;max-width:760px;margin:0 auto;position:relative}
+.series{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 30px;font-size:.9rem}
+.series .hub{font-weight:700;color:var(--blue);text-decoration:none}
+.series .hub:hover{text-decoration:underline}
+.series ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.series li{margin:0}
+.series ul a,.series ul span{display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none}
+.series ul a:hover{border-color:var(--blue)}
+.series ul span[aria-current]{border-color:var(--margin);color:var(--margin);font-weight:700}
+.series ul span.todo{color:var(--muted)}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.42em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:10px;line-height:1.4}
+.meta{margin:0;color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.predict-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:20px 0 0;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.predict-box p{margin:0;font-size:.92rem;color:var(--muted);flex:1 1 260px;min-width:0}
+.predict-btn{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;cursor:pointer;min-height:40px}
+.predict-btn[aria-pressed="true"]{background:var(--blue);color:var(--paper)}
+
+/* ---- corps ---- */
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3,h4{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+li>p{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+strong{font-weight:700}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.katex math{font-size:1.1em}
+.m{font-family:var(--serif);font-style:italic}
+.xref{font-style:italic}
+blockquote{margin:16px 0;padding:4px 16px;border-left:4px solid var(--line);color:var(--muted)}
+
+/* ---- tableaux ---- */
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.wide{min-width:34rem}
+
+/* ---- encadrés ---- */
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.box.idea{border-left:5px solid var(--margin)}.box.idea .lbl{color:var(--margin)}
+.box.nts{border-left:5px solid var(--blue)}.box.nts .lbl{color:var(--blue)}
+.box.warn{border-left:5px solid var(--amber)}.box.warn .lbl{color:var(--amber)}
+.box.tip{border-left:5px solid var(--green)}.box.tip .lbl{color:var(--green)}
+.box.ask{border:1.5px dashed var(--muted)}
+.box.ask .lbl{font-size:1.05rem}
+.box.danger{border-left:5px solid var(--red)}.box.danger .lbl{color:var(--red)}
+mark{background:var(--soft-a);color:inherit;padding:0 .15em;border-radius:3px}
+
+/* ---- blocs repliés : indices, solutions, réponses ---- */
+details.fold{margin:12px 0;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:10px;padding:0 14px}
+details.fold>summary{cursor:pointer;font-weight:700;padding:9px 0;color:var(--fc)}
+details.fold[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+.fold-body{padding-bottom:10px}
+.fold-body>:first-child{margin-top:0}.fold-body>:last-child{margin-bottom:0}
+details.fold.hint{--fc:var(--amber)}
+details.fold.tip{--fc:var(--blue)}
+details.fold.ok{--fc:var(--green)}
+details.fold.ex{--fc:var(--muted)}
+details.fold.nts{--fc:var(--blue)}
+details.fold.warn{--fc:var(--amber)}
+details.fold.danger{--fc:var(--red)}
+details.fold.ask{--fc:var(--muted)}
+details.fold.idea{--fc:var(--margin)}
+.box details.fold{background:var(--paper)}
+
+/* ---- code ---- */
+.code{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 6px 3px 12px;border-bottom:1px solid var(--line);background:var(--soft-b);
+  font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.code-bar.plain{padding:5px 12px}
+.code pre{margin:0;padding:10px 14px;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.6;tab-size:2}
+.code code{background:none;padding:0;font-size:inherit;border-radius:0;word-break:normal;white-space:pre}
+.code.txt pre{color:var(--ink)}
+.copy{font:inherit;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 10px;cursor:pointer;min-height:30px}
+.copy:hover{border-color:var(--blue)}
+.kw{color:var(--blue);font-weight:600}
+.str{color:var(--str)}
+.cst{color:var(--amber)}
+.com{color:var(--muted);font-style:italic}
+.res{color:var(--green);font-weight:600}
+.res.err{color:var(--red)}
+.par{color:var(--muted)}
+.quo{color:var(--blue);font-weight:600}
+.predict .res{filter:blur(5px);cursor:pointer;-webkit-user-select:none;user-select:none}
+.predict .res.shown{filter:none;-webkit-user-select:text;user-select:text}
+
+/* ---- listes à cocher ---- */
+ul.tasks{list-style:none;padding-left:0}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+ul.tasks input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+ul.tasks label{cursor:pointer;min-width:0}
+ul.tasks input:checked+label{color:var(--muted);text-decoration:line-through}
+
+/* ---- bas de page ---- */
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+
+/* Bandeau du blog Vizion : retour à la Licence et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.hero{padding-top:20px}
+
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/licence/#programmation-fonctionnelle">← Vizion.Blog / Licence / Programmation fonctionnelle</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ton enseignant »). Dans cette version publique, j'ai retiré les remarques sur les supports de mon enseignant.</p>
+</div>
+<header class="hero" id="haut">
+<nav class="series" aria-label="Pages du même cours">
+<ul><li><span aria-current="page">Chapitre 1, cours</span></li><li><a href="/cours/pf1-chapitre-1-exercices.html">Chapitre 1, exercices</a></li><li><a href="/cours/pf1-chapitre-2-cours.html">Chapitre 2, cours</a></li></ul>
+</nav>
+<p class="kicker">Programmation fonctionnelle 1, chapitre 1</p>
+<h1>Penser et écrire en Racket<small>CM1 : variables, fonctions et arité, prédicats, tests, récursivité, encapsulation, valeur par défaut</small></h1>
+<p class="meta">Racket 8.10 · note du 26 septembre 2026</p>
+<div class="predict-box">
+<button type="button" id="predict" class="predict-btn" aria-pressed="false">Mode prédiction</button>
+<p>Floute les résultats <code>; →</code> dans le code : prédis-les sur papier, puis clique sur un résultat pour le révéler.</p>
+</div>
+</header>
+<main>
+<div class="box idea"><p class="lbl">L'idée du chapitre</p><p>En Racket, un programme n'est pas une suite d'ordres donnés à la machine : c'est une <strong>expression</strong> dont on calcule la <strong>valeur</strong>. Toute l'étrangeté de la syntaxe vient de là, et toute sa simplicité aussi. Une fois que tu sais comment Racket évalue une expression (partie 3), le reste du chapitre (<code>define</code>, <code>if</code>, <code>cond</code>, <code>let</code>, la récursivité) n'est qu'une suite de variations sur cette règle.</p>
+</div>
+<h2 id="p0"><span class="num">0</span>Mode d'emploi</h2>
+<ul><li><strong>Ce cours suit ton CM1</strong> dans l'ordre : les numéros de slides entre parenthèses renvoient au PDF du cours (38 slides).</li><li><strong>Tout le code a été exécuté dans Racket 8.10</strong>, la version du cours. Ce qui suit <code>; →</code> est ce que DrRacket affiche. Quand une ligne provoque une erreur, j'indique le début du message : <code>; → erreur : ...</code>.</li><li><strong>Prédis avant de lire.</strong> Cache le résultat d'un exemple, écris ta prédiction sur une feuille, puis vérifie. Le DST se passe sur papier, avec la cheatsheet imprimée pour seul document (slide 5) : ce qui est noté, c'est ta capacité à exécuter du code dans ta tête et à en écrire sans machine.</li><li><strong>Les encadrés « À toi »</strong> : réponds par écrit avant de déplier les réponses (clique sur le titre replié).</li><li><strong>Les exercices</strong> sont dans <a href="/cours/pf1-chapitre-1-exercices.html">PF1 - Chapitre 1 - Exercices</a>, avec le fichier d'autocorrection <code>PF1-ch1-autocorrection.rkt</code> à ouvrir dans DrRacket.</li><li><strong>Rythme conseillé</strong> :<ul><li>séance 1 : parties 1 à 4, puis exercices A et B ;</li><li>séance 2 : parties 5 à 8, puis exercices C, D et E ;</li><li>séance 3 : parties 9 et 10, puis exercices F et G ;</li><li>séance 4 : parties 11 à 14, exercices H, puis le DST blanc chronométré.</li></ul>
+</li></ul>
+<div class="box warn"><p class="lbl">La règle du cours sur les LLM (slide 2)</p><p>Ton enseignant interdit les LLM <strong>dans le cours</strong>, sur papier comme sur machine. Hors du cours, il exige que tu <strong>vérifies et comprennes</strong> toute réponse qu'un LLM te donne. Ce document est donc un support de révision, pas une béquille : chaque résultat se vérifie en le tapant dans DrRacket, et le but est que tu saches tout refaire sans lui. Pour les TP à rendre, je m'en tiendrai à des indices.</p>
+</div>
+<p><strong>Plan</strong></p>
+<ol><li><a href="#p1">1. Programmer sans donner d'ordres</a></li><li><a href="#p2">2. DrRacket, ton atelier</a></li><li><a href="#p3">3. La syntaxe, une règle et des parenthèses</a></li><li><a href="#p4">4. Les nombres et les opérations</a></li><li><a href="#p5">5. Booléens, comparaisons et prédicats</a></li><li><a href="#p6">6. Nommer avec define</a></li><li><a href="#p7">7. Choisir avec if et cond</a></li><li><a href="#p8">8. Variables locales et portée</a></li><li><a href="#p9">9. La récursivité enveloppée</a></li><li><a href="#p10">10. La récursivité terminale</a></li><li><a href="#p11">11. Hors programme, à reconnaître</a></li><li><a href="#p12">12. Lire les messages d'erreur</a></li><li><a href="#p13">13. Tes notes du CM1, relues</a></li><li><a href="#p14">14. Checklist avant le DST</a></li></ol>
+<h2 id="p1"><span class="num">1</span>Programmer sans donner d'ordres</h2>
+<h3 id="1-1-quatre-facons-de-programmer-slide-3">1.1 Quatre façons de programmer (slide 3)</h3>
+<div class="tw"><table class="wide"><thead><tr><th>Paradigme</th><th>L'idée</th><th>Un exemple que tu connais</th></tr></thead><tbody><tr><td>impératif</td><td>une suite d'ordres qui modifient l'état de la machine (ses variables, ses fichiers)</td><td>un script bash ; une boucle <code>while</code> Python qui modifie un compteur</td></tr><tr><td>orienté objet</td><td>des objets qui regroupent un état et des méthodes</td><td>les classes Python ou PHP de ton BTS</td></tr><tr><td>déclaratif</td><td>on décrit des faits, des règles et des requêtes, pas les étapes du calcul</td><td>une requête SQL</td></tr><tr><td>fonctionnel</td><td>on déclare des fonctions et on les applique : le programme est une expression</td><td>Racket, ou les formules d'un tableur</td></tr></tbody></table></div>
+<p>Python, comme tu l'as noté, est <strong>multi-paradigme</strong> : on peut y écrire dans plusieurs de ces styles. Racket aussi, mais ce cours n'en utilise qu'un.</p>
+<p>La slide 3 range le fonctionnel du côté déclaratif. Pense à une requête SQL : <code>SELECT nom FROM etudiants WHERE moyenne &gt;= 10;</code>. Tu ne dis pas comment parcourir la table, ni dans quel ordre, ni où ranger les résultats : tu décris <strong>ce que tu veux</strong>. C'est le « quoi » de l'introduction du cours, par opposition au « comment ».</p>
+<h3 id="1-2-le-quoi-plutot-que-le-comment">1.2 Le « quoi » plutôt que le « comment »</h3>
+<p>Même problème, deux styles : la somme des carrés des entiers de 1 à n.</p>
+<div class="code txt py"><div class="code-bar plain"><span>Python</span></div><pre><code># Python, style impératif : le « comment »
+def somme_carres(n):
+    total = 0
+    i = 1
+    while i &lt;= n:
+        total = total + i * i
+        i = i + 1
+    return total</code></pre></div>
+<p>Pour comprendre ce code, tu dois simuler la mémoire : <code>total</code> et <code>i</code> changent de valeur à chaque tour. Le programme est une recette.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="com">;; Racket, style fonctionnel : le « quoi »</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme-carres n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span>
+      <span class="cst">0</span>
+      <span class="par">(</span>+ <span class="par">(</span>* n n<span class="par">)</span> <span class="par">(</span>somme-carres <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+
+<span class="par">(</span>somme-carres <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 14</span></code></pre></div>
+<p>Ce code se lit comme une définition mathématique : « la somme des carrés jusqu'à n vaut 0 si n = 0, et sinon n² plus la somme des carrés jusqu'à n − 1 ». En maths, tu écrirais <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">S(0) = 0</annotation></semantics></math></span> et <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>n</mi><mn>2</mn></msup><mo>+</mo><mi>S</mi><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">S(n) = n^2 + S(n-1)</annotation></semantics></math></span>. Aucune variable ne change de valeur. Si la syntaxe te paraît opaque pour l'instant, c'est normal : à la fin de la partie 9, tu sauras écrire ce genre de fonction seul.</p>
+<h3 id="1-3-ce-que-le-style-fonctionnel-s-interdit-slide-3">1.3 Ce que le style fonctionnel s'interdit (slide 3)</h3>
+<p>La slide 3 énumère trois absences, qui vont ensemble.</p>
+<ul><li><strong>Pas d'affectation</strong> (assignment). En Python, <code>x = x + 1</code> modifie <code>x</code>. Dans ce cours, un nom, une fois défini, garde sa valeur. <code>define</code> crée une <strong>liaison</strong> (binding) entre un nom et une valeur : c'est une étiquette collée sur une valeur, pas une boîte dont on change le contenu. Comme en maths : quand tu écris « soit x = 3 » au début d'une démonstration, x ne devient pas 4 trois lignes plus bas.</li><li><strong>Pas de variable globale ni d'état</strong> (state) : aucune donnée partagée que n'importe quelle partie du programme pourrait modifier.</li><li><strong>Pas d'effet de bord</strong> (side effect). La note de la slide précise : modification de l'environnement, affectation, entrées/sorties. Afficher quelque chose, lire un fichier, modifier une variable : tout ce qui change le monde au lieu de simplement calculer une valeur.</li></ul>
+<p>Une fonction sans effet de bord est une <strong>fonction pure</strong> (pure function) : avec les mêmes arguments, elle renvoie toujours le même résultat. <code>(+ 2 3)</code> vaut 5 aujourd'hui, demain et le jour du DST. Contre-exemple : <code>(random 10)</code>, qui peut renvoyer une valeur différente à chaque appel.</p>
+<p>La récompense s'appelle la <strong>transparence référentielle</strong> (referential transparency) : on peut remplacer n'importe quelle expression par sa valeur sans changer le sens du programme. C'est exactement ce qui permet de calculer un programme à la main, étape par étape (partie 3.6). En Python, impossible de raisonner aussi tranquillement si une fonction modifie une variable globale en douce.</p>
+<div class="box nts"><p class="lbl">Ta note « le = veut dire ... est-il ... »</p><p>Exactement. En Racket, <code>(= a b)</code> pose une question, « a est-il égal à b ? », et répond <code>#t</code> (vrai) ou <code>#f</code> (faux). Il ne modifie ni a ni b. L'équivalent du <code>=</code> d'affectation de Python n'existe pas dans ce cours.</p>
+</div>
+<h3 id="1-4-d-ou-vient-racket-slide-4">1.4 D'où vient Racket (slide 4)</h3>
+<ul><li><strong>Le lambda-calcul</strong> (Alonzo Church, années 1930) : un modèle mathématique du calcul où tout est fonction. C'est de là que vient le mot <code>lambda</code>, que tu croiseras sur la cheatsheet.</li><li><strong>Lisp</strong> (John McCarthy, 1958) : l'un des plus anciens langages encore utilisés. Il reprend la notation <code>lambda</code> de Church, et il est célèbre pour ses parenthèses.</li><li><strong>VLisp</strong> (1971) : le V est celui de <strong>Vincennes</strong>. Ce Lisp a été développé à l'université Paris 8, quand elle était encore installée à Vincennes. Ton université fait partie de l'histoire de ce langage.</li><li><strong>Scheme</strong> (1975) et <strong>Common Lisp</strong> (1984) : deux grands dialectes de Lisp. Racket descend de Scheme.</li><li><strong>DrScheme</strong> (1995), l'environnement devenu <strong>DrRacket</strong> en 2010, quand le langage a pris le nom de <strong>Racket</strong>.</li></ul>
+<h3 id="1-5-interpreteur-compilateur-machine-virtuelle">1.5 Interpréteur, compilateur, machine virtuelle</h3>
+<p>Tes notes mélangent un peu les trois. La distinction propre :</p>
+<ul><li>Un <strong>interpréteur</strong> (interpreter) lit ton programme et l'exécute directement, au fur et à mesure.</li><li>Un <strong>compilateur</strong> (compiler) <em>traduit</em> ton programme dans un autre langage : le code machine du processeur, ou un code intermédiaire appelé bytecode. Il n'exécute rien lui-même : l'exécution est une étape à part.</li><li>Une <strong>machine virtuelle</strong> (virtual machine) est un programme qui exécute du bytecode. Java en est l'exemple type : <code>javac</code> compile en bytecode, puis la JVM l'exécute. Python fait la même chose en coulisse : il compile ton <code>.py</code> en bytecode, que sa machine virtuelle exécute.</li></ul>
+<p>Racket, dans sa version « CS » (celle du cours : DrRacket affiche <code>[cs]</code> au démarrage, slide 6), compile tes expressions en code machine juste avant de les exécuter, même celles que tu tapes à la main. Pour toi, tout se passe comme avec un interpréteur : tu tapes une expression, Racket affiche sa valeur. Cette boucle s'appelle le <strong>REPL</strong> (read-eval-print loop) : lire, évaluer, afficher, recommencer. Retiens surtout qu'« interprété » ou « compilé » décrit une <em>implémentation</em> d'un langage, pas le langage lui-même.</p>
+<h3 id="1-6-ce-que-dit-la-slide-7">1.6 Ce que dit la slide 7</h3>
+<ul><li><strong>Typage dynamique</strong> (dynamic typing) : comme en Python, le type d'une valeur n'est vérifié qu'au moment où le calcul a lieu. <code>(+ 1 "2")</code> n'est refusé que lorsqu'on l'exécute. Typed Racket (<code>#lang typed/racket</code>) vérifie au contraire les types avant l'exécution : c'est le typage statique.</li><li><strong>Références et ramasse-miettes</strong> (garbage collector) : un nom désigne une valeur rangée en mémoire (ta note « référence = lien vers case mémoire ») ; quand plus aucun nom ne mène à une valeur, le ramasse-miettes récupère sa place. Pas de <code>free</code> à faire à la main comme en C : Python fonctionne pareil.</li><li><strong>« Évaluation paresseuse »</strong> : attention, voir la partie 3.5. Racket évalue les arguments d'une fonction <em>avant</em> l'appel ; seules quelques formes spéciales n'évaluent que le nécessaire.</li></ul>
+<div class="box ask"><p class="lbl">À toi (partie 1)</p><ol><li>À quel paradigme appartient chacun de ces morceaux de code : <code>SELECT * FROM notes WHERE note &gt; 15;</code>, <code>for i in range(10): total += i</code>, <code>(define (double x) (* 2 x))</code> ?</li><li>Pourquoi <code>(random 10)</code> n'est-elle pas une fonction pure ? Et <code>(+ 2 3)</code> ?</li><li>Un camarade affirme : « Racket est un langage interprété. » Que lui réponds-tu ?</li><li>Pourquoi l'absence d'affectation permet-elle de calculer un programme sur papier ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><ol><li>Déclaratif (on décrit le résultat) ; impératif (on modifie <code>total</code> à chaque tour) ; fonctionnel (une définition, sans modification).</li><li>Avec le même argument, <code>(random 10)</code> peut renvoyer un résultat différent à chaque appel : elle n'est pas pure. <code>(+ 2 3)</code> vaut toujours 5 : elle l'est.</li><li>Qu'« interprété » décrit une implémentation, pas un langage, et que Racket CS compile ses expressions en code machine avant de les exécuter, même si l'usage ressemble à celui d'un interpréteur.</li><li>Parce qu'un nom garde toujours la même valeur : on peut remplacer chaque nom et chaque appel par sa valeur, ligne après ligne, sans se demander si quelque chose a changé entre-temps.</li></ol>
+</div></details>
+</div>
+<h2 id="p2"><span class="num">2</span>DrRacket, ton atelier</h2>
+<ul><li><strong>Lancer</strong> : commande <code>drracket</code> (slide 6). Sur ta Debian, le paquet <code>racket</code> fournit <code>racket</code> et <code>drracket</code> (<code>sudo apt install racket</code>).</li><li><strong>Deux zones.</strong> En haut, la <strong>zone de définitions</strong> (definitions window) : ton fichier <code>.rkt</code>, qui commence toujours par la ligne <code>#lang racket</code>. Ton enseignant l'omet dans ses slides (slide 6) ; toi, ne l'oublie jamais. En bas, la <strong>zone d'interactions</strong> (interactions window) : le REPL, avec son invite <code>&gt;</code>.</li><li><strong>Run</strong> repart de zéro : Racket oublie tout, relit le fichier depuis le haut, vérifie la syntaxe et les noms, exécute les définitions et affiche la valeur de chaque expression écrite au premier niveau du fichier. Ensuite, la zone d'interactions connaît tes définitions.</li><li><strong>Conséquence</strong> : une définition tapée seulement dans la zone d'interactions disparaît au Run suivant. Ce qui doit rester va en haut.</li><li><strong>Les erreurs</strong> s'affichent en rouge, avec le code fautif surligné et un bouton « Jump To Error » (slide 19). Dans <code>3-unsaved-editor:2:1: f: unbound identifier in: f</code>, lis : le fichier, la ligne 2, la colonne 1 (les colonnes se comptent à partir de 0), puis le nom qui pose problème et la raison.</li><li><strong>Stop</strong> interrompt un calcul qui ne se termine pas (partie 9.4). Au démarrage, DrRacket annonce <code>memory limit: 256 MB</code> : au-delà, il arrête tout avec <code>Interactions disabled; out of memory</code> (slide 34).</li><li><strong>L'indentation est ton détecteur de parenthèses.</strong> DrRacket indente tout seul (la touche Tab réindente la ligne courante) : si une ligne se place bizarrement, une parenthèse est mal placée au-dessus. Quand le curseur touche une parenthèse, DrRacket surligne sa jumelle.</li></ul>
+<h2 id="p3"><span class="num">3</span>La syntaxe, une règle et des parenthèses</h2>
+<h3 id="3-1-atomes-et-applications-slide-8">3.1 Atomes et applications (slide 8)</h3>
+<p>Un programme Racket est fait de deux sortes de briques.</p>
+<ul><li>Les <strong>atomes</strong> (atoms), qui s'écrivent d'un seul bloc : des nombres (<code>42</code>, <code>-7</code>, <code>3.14</code>, <code>1/3</code>), des booléens (<code>#t</code>, <code>#f</code>), des chaînes de caractères (<code>"abc"</code>), et des <strong>identificateurs</strong> (identifiers), c'est-à-dire des noms : <code>x</code>, <code>carre</code>, <code>even?</code>, et même <code>+</code>.</li><li>Les <strong>applications</strong> (applications) : une paire de parenthèses qui contient d'abord une fonction, puis ses arguments, séparés par des espaces.</li></ul>
+<div class="code txt"><pre><code>(fonction argument1 argument2 ...)</code></pre></div>
+<p>C'est la <strong>notation préfixée</strong> (prefix notation) de la slide 8 : la fonction vient en premier, <em>à l'intérieur</em> de la parenthèse. Pour passer de Python à Racket, une seule règle : <strong>la parenthèse ouvrante passe devant le nom de la fonction, et les virgules disparaissent.</strong></p>
+<div class="tw"><table><thead><tr><th>Python</th><th>Racket</th></tr></thead><tbody><tr><td><code>max(3, 5)</code></td><td><code>(max 3 5)</code></td></tr><tr><td><code>abs(-7)</code></td><td><code>(abs -7)</code></td></tr><tr><td><code>f(g(x), 10)</code></td><td><code>(f (g x) 10)</code></td></tr><tr><td><code>f()</code></td><td><code>(f)</code></td></tr><tr><td><code>2 + 3</code></td><td><code>(+ 2 3)</code></td></tr><tr><td><code>1 + 2 * 3</code></td><td><code>(+ 1 (* 2 3))</code></td></tr></tbody></table></div>
+<p>Les deux dernières lignes sont le vrai changement : en Racket, <code>+</code> et <code>*</code> sont des fonctions comme les autres, donc elles se placent en tête, comme <code>max</code>.</p>
+<p>Le nombre d'arguments d'une fonction s'appelle son <strong>arité</strong> (arity). Dans <code>(f 1 10)</code>, <code>f</code> reçoit deux arguments : elle est d'arité 2 (slide 8). Un point de vocabulaire utile au DST : dans la définition <code>(define (f x y) ...)</code>, <code>x</code> et <code>y</code> sont les <strong>paramètres</strong> (parameters) ; dans l'appel <code>(f 1 10)</code>, 1 et 10 sont les <strong>arguments</strong> (arguments). La slide dit « 1 est le premier paramètre » : c'est l'usage courant en français, où l'on parle aussi de paramètres effectifs.</p>
+<h3 id="3-2-pas-de-priorites-les-parentheses-decident">3.2 Pas de priorités, les parenthèses décident</h3>
+<p>En maths et en Python, <code>1 + 2 * 3</code> repose sur une convention : la multiplication passe avant l'addition. Racket n'a <strong>aucune règle de priorité</strong> : chaque opération a sa propre paire de parenthèses, et la structure du calcul est écrite noir sur blanc.</p>
+<p>Méthode pour traduire une expression mathématique :</p>
+<ol><li><strong>Parenthèse tout</strong>, selon les priorités habituelles.</li><li><strong>Réécris chaque paire en préfixe</strong>, de l'intérieur vers l'extérieur.</li></ol>
+<p>Exemple, avec l'expression de la slide 11 : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mfrac><mrow><mn>2</mn><mo>×</mo><mn>3</mn></mrow><mn>4</mn></mfrac><mo>+</mo><mn>5</mn><mo>×</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">1 + \frac{2 \times 3}{4} + 5 \times 6</annotation></semantics></math></span>.</p>
+<ol><li>Tout parenthéser : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mo stretchy="false">(</mo><mn>2</mn><mo>×</mo><mn>3</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>4</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>5</mn><mo>×</mo><mn>6</mn><mo stretchy="false">)</mo><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><annotation encoding="application/x-tex">\big(1 + ((2 \times 3) / 4) + (5 \times 6)\big)</annotation></semantics></math></span>.</li><li>En préfixe : <code>(* 2 3)</code>, puis <code>(/ (* 2 3) 4)</code>, puis <code>(* 5 6)</code>, puis le tout, avec un seul <code>+</code> puisqu'il accepte trois arguments :</li></ol>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>/ <span class="par">(</span>* <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="cst">4</span><span class="par">)</span> <span class="par">(</span>* <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 65/2</span></code></pre></div>
+<p><code>65/2</code>, c'est 32,5 écrit comme une fraction exacte (partie 4.1). L'expression est un <strong>arbre</strong> (syntax tree) : chaque parenthèse est un nœud, sa fonction en est l'étiquette, ses arguments en sont les enfants.</p>
+<div class="code txt"><pre><code>          +
+       /  |  \
+      1   /    *
+         / \   / \
+        *   4 5   6
+       / \
+      2   3</code></pre></div>
+<p>Racket évalue de l'intérieur vers l'extérieur, des feuilles vers la racine :</p>
+<div class="code txt"><pre><code>(+ 1 (/ (* 2 3) 4) (* 5 6))
+(+ 1 (/ 6 4) (* 5 6))
+(+ 1 3/2 (* 5 6))
+(+ 1 3/2 30)
+65/2</code></pre></div>
+<h3 id="3-3-les-parentheses-ne-sont-jamais-decoratives">3.3 Les parenthèses ne sont jamais décoratives</h3>
+<p>En Python, on peut ajouter des parenthèses sans rien changer : <code>((x))</code> vaut <code>x</code>. En Racket, <strong>chaque parenthèse ouvrante signifie « applique ce qui suit »</strong>. Une paire en trop change le sens ou provoque une erreur. Tape ces lignes une par une dans la zone d'interactions :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="cst">5</span><span class="par">)</span>          <span class="res err">; → erreur : application: not a procedure</span>
+<span class="par">(</span><span class="par">(</span>+ <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>    <span class="res err">; → erreur : application: not a procedure</span>
+<span class="par">(</span><span class="cst">1</span> + <span class="cst">2</span><span class="par">)</span>      <span class="res err">; → erreur : application: not a procedure</span></code></pre></div>
+<p>Le message complet du deuxième cas est :</p>
+<div class="code txt"><pre><code>application: not a procedure;
+ expected a procedure that can be applied to arguments
+  given: 3</code></pre></div>
+<p>Racket a calculé <code>(+ 1 2)</code>, obtenu 3, puis a essayé d'utiliser 3 comme une fonction, parce que la parenthèse extérieure le lui demandait. Dans le troisième cas, il essaie d'appliquer la « fonction » 1 aux arguments <code>+</code> et 2. C'est le message le plus fréquent chez ceux qui viennent de Python : quand tu le vois, cherche une parenthèse en trop ou une notation infixe.</p>
+<p>C'est la réponse à ta note « ouvrir une parenthèse c'est appeler une fonction » : oui, à une exception près, les formes spéciales (partie 3.5).</p>
+<h3 id="3-4-les-espaces-separent-tout">3.4 Les espaces séparent tout</h3>
+<p>Les espaces sont les seuls séparateurs, et les tirets sont autorisés dans les noms (<code>une-fonction</code>, slide 18). D'où trois pièges. Le premier :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="cst">+1</span> <span class="cst">2</span><span class="par">)</span>   <span class="res err">; → erreur : application: not a procedure</span></code></pre></div>
+<p><code>+1</code> sans espace est lu comme le nombre 1 (« plus un ») : Racket essaie d'appliquer 1 à 2. Le deuxième, le plus sournois :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>fact n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      <span class="cst">1</span>
+      <span class="par">(</span>* n <span class="par">(</span>fact n-1<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : n-1: unbound identifier</span></code></pre></div>
+<p><code>n-1</code> est <strong>un seul nom</strong>, pas une soustraction, et ce nom n'est défini nulle part : il faut écrire <code>(- n 1)</code>. L'erreur apparaît dès le Run, avant tout appel, car Racket vérifie que chaque nom existe avant d'exécuter le fichier. Le troisième : dans <code>(-x)</code>, Racket voit un seul nom, <code>-x</code>, qui n'existe pas ; l'opposé de x s'écrit <code>(- x)</code>.</p>
+<p>Enfin, les retours à la ligne et l'indentation ne comptent pas pour Racket, contrairement à Python. Ils ne comptent que pour les humains, dont celui qui corrige ta copie.</p>
+<h3 id="3-5-les-formes-speciales-exceptions-a-la-regle">3.5 Les formes spéciales, exceptions à la règle</h3>
+<p>Pour une application <code>(f a b)</code>, Racket suit toujours la même règle : il évalue <code>f</code>, <code>a</code> et <code>b</code>, <strong>tous les arguments d'abord</strong>, puis il applique la fonction aux valeurs obtenues. C'est l'<strong>évaluation stricte</strong> (strict evaluation, ou eager evaluation). La preuve :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>ignore x<span class="par">)</span> <span class="cst">1</span><span class="par">)</span>   <span class="com">; une fonction qui n'utilise pas son argument</span>
+<span class="par">(</span>ignore <span class="par">(</span>/ <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>        <span class="res err">; → erreur : /: division by zero</span></code></pre></div>
+<p><code>ignore</code> n'a pas besoin de <code>x</code>, mais Racket calcule quand même <code>(/ 1 0)</code> avant l'appel, et échoue.</p>
+<p>Certains mots ne sont pourtant <strong>pas des fonctions</strong> : ce sont des <strong>formes spéciales</strong> (special forms), qui ont chacune leur propre règle d'évaluation. Dans ce chapitre : <code>define</code>, <code>if</code>, <code>cond</code>, <code>and</code>, <code>or</code>, <code>let</code>, <code>let*</code>, <code>lambda</code> et <code>when</code>. Par exemple, <code>if</code> évalue la condition, puis <strong>une seule</strong> des deux branches :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">if</span> <span class="cst">#t</span> <span class="cst">1</span> <span class="par">(</span>/ <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 1</span>
+<span class="par">(</span><span class="kw">and</span> <span class="cst">#f</span> <span class="par">(</span>/ <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #f</span>
+<span class="par">(</span><span class="kw">or</span> <span class="cst">#t</span> <span class="par">(</span>/ <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → #t</span></code></pre></div>
+<p>La division par zéro n'est jamais calculée : c'est là, et seulement là, que Racket évalue « uniquement si nécessaire ». C'est sans doute ce que la slide 7 appelle « évaluation paresseuse ». Mais dans le vocabulaire de Racket, l'évaluation paresseuse (lazy evaluation) désigne autre chose : le mode <code>#lang lazy</code>, cité sur la même slide, dans lequel l'exemple <code>ignore</code> renvoie 1 sans erreur.</p>
+<p>C'est aussi pour cela que <code>(define x 5)</code> ne provoque pas d'erreur alors que <code>x</code> n'existe pas encore : <code>define</code> n'évalue pas le nom qu'on lui donne.</p>
+<h3 id="3-6-le-modele-de-substitution-pour-executer-a-la-main">3.6 Le modèle de substitution, pour exécuter à la main</h3>
+<p>Voici ton outil principal pour le DST. Pour évaluer l'appel d'une fonction que tu as définie :</p>
+<ol><li>évalue les arguments ;</li><li>remplace l'appel par le <strong>corps</strong> de la fonction, où chaque paramètre est remplacé par la valeur de l'argument correspondant ;</li><li>continue jusqu'à obtenir une valeur.</li></ol>
+<p>Avec la fonction de la slide 18, <code>(define (f x) (+ 1 (* 3 x)))</code> :</p>
+<div class="code txt"><pre><code>(f (+ 2 3))
+(f 5)             ; on évalue l'argument
+(+ 1 (* 3 5))     ; on remplace x par 5 dans le corps de f
+(+ 1 15)
+16</code></pre></div>
+<p>Ce <strong>modèle de substitution</strong> (substitution model) ne fonctionne que parce qu'il n'y a pas d'affectation (partie 1.3) : un nom désigne toujours la même valeur. Il servira à suivre la récursivité pas à pas (partie 9.2).</p>
+<h3 id="3-7-parentheses-crochets-accolades-slide-8">3.7 Parenthèses, crochets, accolades (slide 8)</h3>
+<p><code>()</code>, <code>[]</code> et <code>{}</code> sont interchangeables, à condition d'aller par paires du même type :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">[</span>+ <span class="cst">1</span> <span class="cst">2</span><span class="par">]</span>   <span class="res">; → 3</span>
+<span class="par">{</span>* <span class="cst">2</span> <span class="cst">3</span><span class="par">}</span>   <span class="res">; → 6</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>+ <span class="cst">1</span> <span class="cst">2</span><span class="par">]</span>   <span class="res err">; → erreur : read-syntax: expected `)` to close preceding `(`, found instead `]`</span></code></pre></div>
+<p>L'usage (slides 23 et 26) : des parenthèses partout, et des crochets pour les lignes d'un <code>cond</code> et les liaisons d'un <code>let</code>, parce que c'est plus lisible.</p>
+<h3 id="3-8-les-commentaires-slides-8-11-et-21">3.8 Les commentaires (slides 8, 11 et 21)</h3>
+<ul><li><code>;</code> : commentaire jusqu'à la fin de la ligne. L'usage : <code>;</code> après du code, <code>;;</code> pour une ligne entière, <code>;;;</code> pour un titre de section (la cheatsheet l'utilise).</li><li><code>#|</code> ... <code>|#</code> : commentaire sur plusieurs lignes. <strong>Correction de tes notes</strong> : tu as écrit <code>#! !#</code>, c'est <code>#|</code> et <code>|#</code>.</li><li><code>#;</code> : met en commentaire <strong>l'expression suivante tout entière</strong>, même si elle tient sur plusieurs lignes. Pratique pour garder l'ancienne version d'une définition (slide 21).</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="com">#| Un commentaire
+   sur deux lignes |#</span>
+<span class="com">#;</span><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="com">; cette définition est ignorée</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">2</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">10</span><span class="par">)</span>   <span class="res">; → 32</span></code></pre></div>
+<div class="box ask"><p class="lbl">À toi (partie 3)</p><ol><li>Traduis en Racket : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{a + b}{2}</annotation></semantics></math></span>, puis <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">3x^2 - 2x + 1</annotation></semantics></math></span>.</li><li>Traduis en maths : <code>(- (* 2 x) (/ y 3))</code>.</li><li>Que vaut <code>(* 2 (+ 3 4) 5)</code> ? Et que se passe-t-il avec <code>(* 2 ((+ 3 4)) 5)</code> ?</li><li>Écris la trace par substitution de <code>(f (* 2 2))</code>, avec <code>(define (f x) (+ 1 (* 3 x)))</code>.</li><li>Pourquoi <code>(ignore (/ 1 0))</code> échoue-t-il, alors que <code>(if #t 1 (/ 1 0))</code> réussit ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><ol><li><code>(/ (+ a b) 2)</code>, puis <code>(+ (* 3 x x) (* -2 x) 1)</code> ou <code>(+ (- (* 3 x x) (* 2 x)) 1)</code>. Vérification avec a = 3, b = 5 et x = 2 :</li></ol>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> a <span class="cst">3</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> b <span class="cst">5</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> x <span class="cst">2</span><span class="par">)</span>
+<span class="par">(</span>/ <span class="par">(</span>+ a b<span class="par">)</span> <span class="cst">2</span><span class="par">)</span>                 <span class="res">; → 4</span>
+<span class="par">(</span>+ <span class="par">(</span>* <span class="cst">3</span> x x<span class="par">)</span> <span class="par">(</span>* <span class="cst">-2</span> x<span class="par">)</span> <span class="cst">1</span><span class="par">)</span>      <span class="res">; → 9</span>
+<span class="par">(</span>+ <span class="par">(</span>- <span class="par">(</span>* <span class="cst">3</span> x x<span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> x<span class="par">)</span><span class="par">)</span> <span class="cst">1</span><span class="par">)</span>   <span class="res">; → 9</span></code></pre></div>
+<ol start="2"><li><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>x</mi><mo>−</mo><mfrac><mi>y</mi><mn>3</mn></mfrac></mrow><annotation encoding="application/x-tex">2x - \frac{y}{3}</annotation></semantics></math></span>.</li><li><code>(* 2 (+ 3 4) 5)</code> vaut 70. Dans le second cas, la paire en trop autour de <code>(+ 3 4)</code> demande d'appliquer 7 comme une fonction : <code>application: not a procedure</code>.</li><li><code>(f (* 2 2))</code>, puis <code>(f 4)</code>, puis <code>(+ 1 (* 3 4))</code>, puis <code>(+ 1 12)</code>, puis <code>13</code>.</li><li><code>ignore</code> est une fonction : tous ses arguments sont évalués avant l'appel. <code>if</code> est une forme spéciale : il n'évalue que la branche choisie.</li></ol>
+</div></details>
+</div>
+<h2 id="p4"><span class="num">4</span>Les nombres et les opérations</h2>
+<h3 id="4-1-exact-ou-inexact-slides-9-a-11">4.1 Exact ou inexact (slides 9 à 11)</h3>
+<p>Racket distingue deux familles de nombres :</p>
+<ul><li>les <strong>nombres exacts</strong> (exact numbers) : les entiers, de taille illimitée, et les rationnels, c'est-à-dire les fractions. Les calculs sont exacts, sans arrondi ;</li><li>les <strong>nombres inexacts</strong> (inexact numbers) : les flottants (floating-point numbers), comme les <code>float</code> de Python, qui sont des approximations.</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>/ <span class="cst">7</span> <span class="cst">2</span><span class="par">)</span>               <span class="res">; → 7/2</span>
+<span class="par">(</span>/ <span class="cst">6</span> <span class="cst">4</span><span class="par">)</span>               <span class="res">; → 3/2</span>
+<span class="par">(</span>/ <span class="cst">8</span> <span class="cst">4</span><span class="par">)</span>               <span class="res">; → 2</span>
+<span class="par">(</span>/ <span class="cst">7</span> <span class="cst">2.0</span><span class="par">)</span>             <span class="res">; → 3.5</span>
+<span class="par">(</span>exact-&gt;inexact <span class="cst">7/2</span><span class="par">)</span>  <span class="res">; → 3.5</span>
+<span class="par">(</span>+ <span class="cst">1</span> <span class="cst">2.0</span><span class="par">)</span>             <span class="res">; → 3.0</span>
+<span class="par">(</span>expt <span class="cst">2</span> <span class="cst">100</span><span class="par">)</span>          <span class="res">; → 1267650600228229401496703205376</span>
+<span class="par">(</span>+ <span class="cst">0.1</span> <span class="cst">0.2</span><span class="par">)</span>           <span class="res">; → 0.30000000000000004</span>
+<span class="par">(</span>+ <span class="cst">1/10</span> <span class="cst">2/10</span><span class="par">)</span>         <span class="res">; → 3/10</span></code></pre></div>
+<p>Trois règles à retenir :</p>
+<ul><li>la division de deux entiers donne une <strong>fraction exacte et simplifiée</strong>, pas un flottant comme <code>7 / 2</code> en Python (qui donne 3.5) ;</li><li>il suffit d'<strong>un seul</strong> nombre inexact dans un calcul pour que le résultat soit inexact ;</li><li><code>exact-&gt;inexact</code> convertit en flottant (slide 11).</li></ul>
+<p>Les slides 9 et 10 (bases 16, 8 et 2, infinis, NaN) sont hors programme. Retiens seulement que <code>2</code> et <code>2.0</code> sont égaux pour <code>=</code>, mais différents pour <code>equal?</code> (partie 5.2).</p>
+<h3 id="4-2-des-operations-a-nombre-d-arguments-variable">4.2 Des opérations à nombre d'arguments variable</h3>
+<p><code>+</code>, <code>-</code>, <code>*</code> et <code>/</code> acceptent autant d'arguments que tu veux : elles sont <strong>variadiques</strong> (variadic), ou n-aires, comme dit la slide 28.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>+ <span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span>    <span class="res">; → 10</span>
+<span class="par">(</span>- <span class="cst">10</span> <span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 4</span>
+<span class="par">(</span>* <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span>      <span class="res">; → 24</span>
+<span class="par">(</span>/ <span class="cst">60</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>     <span class="res">; → 10</span>
+<span class="par">(</span>- <span class="cst">5</span><span class="par">)</span>          <span class="res">; → -5</span>
+<span class="par">(</span>/ <span class="cst">2</span><span class="par">)</span>          <span class="res">; → 1/2</span>
+<span class="par">(</span>+<span class="par">)</span>            <span class="res">; → 0</span>
+<span class="par">(</span>*<span class="par">)</span>            <span class="res">; → 1</span></code></pre></div>
+<p><code>(- a b c)</code> calcule a − b − c, et <code>(/ a b c)</code> calcule a / b / c. Avec un seul argument, <code>-</code> donne l'opposé et <code>/</code> l'inverse. Sans argument, <code>+</code> et <code>*</code> renvoient leur élément neutre, 0 et 1. Cette souplesse a un revers : une parenthèse mal placée ne provoque pas toujours d'erreur, elle peut changer le calcul en silence. L'exercice B4 te montre un exemple réel.</p>
+<h3 id="4-3-la-division-entiere-avec-quotient-remainder-et-modulo-sl">4.3 La division entière avec quotient, remainder et modulo (slide 12)</h3>
+<p>Pour les entiers positifs, pas de surprise :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>quotient <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span>    <span class="res">; → 3</span>
+<span class="par">(</span>remainder <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span>   <span class="res">; → 2</span>
+<span class="par">(</span>modulo <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span>      <span class="res">; → 2</span></code></pre></div>
+<p>Avec des négatifs, les trois se séparent, et la slide 12 utilise justement −13 :</p>
+<div class="tw"><table class="wide"><thead><tr><th></th><th><code>(quotient a b)</code></th><th><code>(remainder a b)</code></th><th><code>(modulo a b)</code></th></tr></thead><tbody><tr><td>a = 13, b = 3</td><td>4</td><td>1</td><td>1</td></tr><tr><td>a = −13, b = 3</td><td>−4</td><td>−1</td><td>2</td></tr><tr><td>a = 13, b = −3</td><td>−4</td><td>1</td><td>−2</td></tr></tbody></table></div>
+<ul><li><code>quotient</code> <strong>tronque vers zéro</strong> : −13/3 ≈ −4,33 devient −4.</li><li><code>remainder</code> a <strong>le signe de a</strong> (le dividende) et va avec <code>quotient</code> : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mi>b</mi><mo>×</mo><mtext>quotient</mtext><mo>+</mo><mtext>remainder</mtext></mrow><annotation encoding="application/x-tex">a = b \times \text{quotient} + \text{remainder}</annotation></semantics></math></span>, soit <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>13</mn><mo>=</mo><mn>3</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>4</mn><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">-13 = 3 \times (-4) + (-1)</annotation></semantics></math></span>.</li><li><code>modulo</code> a <strong>le signe de b</strong> (le diviseur) et va avec la division arrondie vers le bas : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>13</mn><mo>=</mo><mn>3</mn><mo>×</mo><mo stretchy="false">(</mo><mo>−</mo><mn>5</mn><mo stretchy="false">)</mo><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">-13 = 3 \times (-5) + 2</annotation></semantics></math></span>.</li></ul>
+<div class="box nts"><p class="lbl">Si tu viens de Python</p><p>Le <code>%</code> de Python correspond à <code>modulo</code> : <code>-13 % 3</code> vaut 2. Mais <code>//</code> arrondit vers le bas (<code>-13 // 3</code> vaut −5), alors que <code>quotient</code> tronque vers zéro (−4). Pour les négatifs, <code>quotient</code> n'est donc <strong>pas</strong> l'équivalent de <code>//</code>.</p>
+</div>
+<p>Deux usages reviendront sans cesse dans les exercices :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>modulo <span class="cst">2026</span> <span class="cst">10</span><span class="par">)</span>      <span class="res">; → 6</span>
+<span class="par">(</span>quotient <span class="cst">2026</span> <span class="cst">10</span><span class="par">)</span>    <span class="res">; → 202</span>
+<span class="par">(</span>= <span class="par">(</span>modulo <span class="cst">12</span> <span class="cst">4</span><span class="par">)</span> <span class="cst">0</span><span class="par">)</span>   <span class="res">; → #t</span></code></pre></div>
+<p>Pour n ≥ 0, <code>(modulo n 10)</code> donne le dernier chiffre de n et <code>(quotient n 10)</code> enlève ce dernier chiffre. <code>(= (modulo a b) 0)</code> teste si a est divisible par b.</p>
+<h3 id="4-4-les-autres-fonctions-de-la-slide-12">4.4 Les autres fonctions de la slide 12</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>expt <span class="cst">3</span> <span class="cst">3</span><span class="par">)</span>    <span class="res">; → 27</span>
+<span class="par">(</span>expt <span class="cst">2</span> <span class="cst">-1</span><span class="par">)</span>   <span class="res">; → 1/2</span>
+<span class="par">(</span>sqrt <span class="cst">16</span><span class="par">)</span>     <span class="res">; → 4</span>
+<span class="par">(</span>sqrt <span class="cst">2</span><span class="par">)</span>      <span class="res">; → 1.4142135623730951</span>
+<span class="par">(</span>max <span class="cst">3</span> <span class="cst">5</span> <span class="cst">1</span><span class="par">)</span>   <span class="res">; → 5</span>
+<span class="par">(</span>min <span class="cst">3</span> <span class="cst">5</span><span class="par">)</span>     <span class="res">; → 3</span>
+<span class="par">(</span>max <span class="cst">1</span> <span class="cst">2.0</span><span class="par">)</span>   <span class="res">; → 2.0</span>
+<span class="par">(</span>abs <span class="cst">-7</span><span class="par">)</span>      <span class="res">; → 7</span>
+pi            <span class="res">; → 3.141592653589793</span></code></pre></div>
+<p><code>sqrt</code> renvoie un résultat exact quand c'est possible (16 est un carré parfait), un flottant sinon. <code>max</code> et <code>min</code> suivent la règle de contamination : un seul argument inexact rend le résultat inexact. <code>(sqrt -4)</code> renvoie le nombre complexe <code>0+2i</code>, hors programme. Enfin, Racket fournit déjà <code>pi</code> ; le <code>(define PI 3)</code> de la cheatsheet n'est qu'un exemple de syntaxe.</p>
+<h3 id="4-5-le-hasard-avec-random-slide-12">4.5 Le hasard avec random (slide 12)</h3>
+<ul><li><code>(random 10)</code> renvoie un entier exact entre 0 et 9 : dix valeurs possibles, 10 exclu.</li><li><code>(random)</code>, sans argument, renvoie un flottant <strong>strictement</strong> compris entre 0 et 1, donc dans <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">]</mo><mn>0</mn><mo separator="true">;</mo><mn>1</mn><mo stretchy="false">[</mo></mrow><annotation encoding="application/x-tex">]0 ; 1[</annotation></semantics></math></span> et pas dans <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">;</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0 ; 1]</annotation></semantics></math></span>. La documentation de Racket dit « between 0 and 1, exclusive » ; la slide et tes notes écrivent [0 ; 1].</li><li>Pour un dé : <code>(+ 1 (random 6))</code>, un entier entre 1 et 6.</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>random <span class="cst">10</span><span class="par">)</span>        <span class="res">; → (aléatoire) un entier entre 0 et 9</span>
+<span class="par">(</span>random<span class="par">)</span>           <span class="res">; → (aléatoire) un flottant entre 0 et 1, bornes exclues</span>
+<span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>random <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → (aléatoire) un entier entre 1 et 6</span></code></pre></div>
+<p><code>random</code> n'est pas une fonction pure (partie 1.3). Un détail qui t'intéressera : la documentation précise que ce générateur est <strong>pseudo-aléatoire</strong> (pseudo-random), donc prévisible pour qui connaît son état interne, et qu'il faut utiliser <code>crypto-random-bytes</code> dès que la sécurité est en jeu (un mot de passe, un jeton). C'est la même règle qu'en Python avec les modules <code>random</code> et <code>secrets</code>.</p>
+<div class="box ask"><p class="lbl">À toi (partie 4)</p><p>Sans machine, puis vérifie dans DrRacket :</p>
+<ol><li><code>(/ 9 6)</code>, <code>(/ 9 6.0)</code>, <code>(* 1.0 1/4)</code></li><li><code>(quotient 17 -5)</code>, <code>(remainder -17 5)</code>, <code>(modulo -17 5)</code></li><li><code>(- 20 5 5)</code>, <code>(/ 100 5 2)</code>, <code>(- (- 3))</code></li><li>Comment obtenir le chiffre des dizaines de 2026 avec <code>quotient</code> et <code>modulo</code> ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>/ <span class="cst">9</span> <span class="cst">6</span><span class="par">)</span>                         <span class="res">; → 3/2</span>
+<span class="par">(</span>/ <span class="cst">9</span> <span class="cst">6.0</span><span class="par">)</span>                       <span class="res">; → 1.5</span>
+<span class="par">(</span>* <span class="cst">1.0</span> <span class="cst">1/4</span><span class="par">)</span>                     <span class="res">; → 0.25</span>
+<span class="par">(</span>quotient <span class="cst">17</span> <span class="cst">-5</span><span class="par">)</span>                <span class="res">; → -3</span>
+<span class="par">(</span>remainder <span class="cst">-17</span> <span class="cst">5</span><span class="par">)</span>               <span class="res">; → -2</span>
+<span class="par">(</span>modulo <span class="cst">-17</span> <span class="cst">5</span><span class="par">)</span>                  <span class="res">; → 3</span>
+<span class="par">(</span>- <span class="cst">20</span> <span class="cst">5</span> <span class="cst">5</span><span class="par">)</span>                      <span class="res">; → 10</span>
+<span class="par">(</span>/ <span class="cst">100</span> <span class="cst">5</span> <span class="cst">2</span><span class="par">)</span>                     <span class="res">; → 10</span>
+<span class="par">(</span>- <span class="par">(</span>- <span class="cst">3</span><span class="par">)</span><span class="par">)</span>                       <span class="res">; → 3</span>
+<span class="par">(</span>modulo <span class="par">(</span>quotient <span class="cst">2026</span> <span class="cst">10</span><span class="par">)</span> <span class="cst">10</span><span class="par">)</span>  <span class="res">; → 2</span></code></pre></div>
+<p>Pour la question 4 : <code>(quotient 2026 10)</code> enlève le dernier chiffre (il reste 202), puis <code>(modulo 202 10)</code> garde le dernier chiffre de ce qui reste, 2.</p>
+</div></details>
+</div>
+<h2 id="p5"><span class="num">5</span>Booléens, comparaisons et prédicats</h2>
+<h3 id="5-1-deux-valeurs-de-verite-slide-13">5.1 Deux valeurs de vérité (slide 13)</h3>
+<p>Racket a deux booléens : <code>#t</code> (vrai, true) et <code>#f</code> (faux, false). Les noms <code>true</code> et <code>false</code> existent aussi (« #t abrège true », slide 13), mais DrRacket affiche toujours <code>#t</code> et <code>#f</code>.</p>
+<h3 id="5-2-comparer-des-nombres-slides-14-et-15">5.2 Comparer des nombres (slides 14 et 15)</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>&lt; <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span>       <span class="res">; → #t</span>
+<span class="par">(</span>&lt;= <span class="cst">3</span> <span class="cst">3</span><span class="par">)</span>      <span class="res">; → #t</span>
+<span class="par">(</span>&lt; <span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>     <span class="res">; → #t</span>
+<span class="par">(</span>&lt; <span class="cst">1</span> <span class="cst">3</span> <span class="cst">2</span><span class="par">)</span>     <span class="res">; → #f</span>
+<span class="par">(</span>= <span class="cst">2</span> <span class="cst">2</span> <span class="cst">2</span><span class="par">)</span>     <span class="res">; → #t</span>
+<span class="par">(</span>= <span class="cst">1</span> <span class="cst">1.0</span><span class="par">)</span>     <span class="res">; → #t</span>
+<span class="par">(</span>= <span class="cst">1/2</span> <span class="cst">0.5</span><span class="par">)</span>   <span class="res">; → #t</span></code></pre></div>
+<p>Les comparaisons sont variadiques elles aussi : <code>(&lt; a b c)</code> signifie a &lt; b &lt; c, exactement comme <code>1 &lt; 2 &lt; 3</code> en Python. C'est très pratique : <code>(&lt;= 0 x 10)</code> teste si x est dans l'intervalle [0 ; 10].</p>
+<p><code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code> et <code>&gt;=</code> ne comparent que des <strong>nombres</strong> (slides 14 et 15) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>= <span class="cst">#t</span> <span class="cst">#t</span><span class="par">)</span>   <span class="res err">; → erreur : =: contract violation</span></code></pre></div>
+<p>Pour comparer autre chose, la cheatsheet donne <code>equal?</code> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>equal? <span class="str">"abc"</span> <span class="str">"abc"</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span>equal? <span class="cst">1</span> <span class="cst">1.0</span><span class="par">)</span>         <span class="res">; → #f</span>
+<span class="par">(</span>equal? <span class="quo">'</span>a <span class="quo">'</span>b<span class="par">)</span>         <span class="res">; → #f</span></code></pre></div>
+<p>Sur les nombres, <code>equal?</code> est plus strict que <code>=</code> : 1 (exact) et 1.0 (inexact) ont la même valeur numérique, mais ce ne sont pas les mêmes valeurs Racket. <code>'a</code> est un symbole, un type que tu verras dans un prochain chapitre.</p>
+<h3 id="5-3-not-and-or-slides-14-et-24">5.3 not, and, or (slides 14 et 24)</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>not <span class="cst">#f</span><span class="par">)</span>                <span class="res">; → #t</span>
+<span class="par">(</span>not <span class="par">(</span>= <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → #t</span>
+<span class="par">(</span><span class="kw">and</span> <span class="cst">#t</span> <span class="cst">#f</span><span class="par">)</span>             <span class="res">; → #f</span>
+<span class="par">(</span><span class="kw">and</span> <span class="par">(</span>= <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>= <span class="cst">2</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span><span class="kw">or</span> <span class="cst">#f</span> <span class="cst">#t</span><span class="par">)</span>              <span class="res">; → #t</span>
+<span class="par">(</span><span class="kw">or</span> <span class="par">(</span>= <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="par">(</span>= <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #f</span></code></pre></div>
+<ul><li><code>and</code> est vrai si tous ses arguments le sont. Il les évalue de gauche à droite et <strong>s'arrête au premier <code>#f</code></strong>.</li><li><code>or</code> est vrai si l'un au moins de ses arguments l'est. Il <strong>s'arrête à la première valeur vraie</strong>.</li><li>Ce sont des formes spéciales (partie 3.5) : c'est l'<strong>évaluation en court-circuit</strong> (short-circuit evaluation).</li><li>Ils acceptent autant d'arguments qu'on veut, et renvoient une valeur, pas forcément un booléen, comme en Python :</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">and</span> <span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 3</span>
+<span class="par">(</span><span class="kw">or</span> <span class="cst">#f</span> <span class="cst">5</span><span class="par">)</span>     <span class="res">; → 5</span></code></pre></div>
+<h3 id="5-4-le-piege-de-la-verite-seul-f-est-faux">5.4 Le piège de la vérité : seul #f est faux</h3>
+<p>En Python, <code>0</code>, <code>""</code>, <code>[]</code> et <code>None</code> comptent comme faux. En Racket, <strong>tout ce qui n'est pas <code>#f</code> compte comme vrai</strong>, y compris 0 et la chaîne vide :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">if</span> <span class="cst">0</span> <span class="str">"vrai"</span> <span class="str">"faux"</span><span class="par">)</span>    <span class="res">; → "vrai"</span>
+<span class="par">(</span><span class="kw">if</span> <span class="str">""</span> <span class="str">"vrai"</span> <span class="str">"faux"</span><span class="par">)</span>   <span class="res">; → "vrai"</span>
+<span class="par">(</span>not <span class="cst">0</span><span class="par">)</span>                 <span class="res">; → #f</span></code></pre></div>
+<p>La slide 14 dit que <code>not</code> s'utilise « uniquement pour des booléens ». C'est une excellente règle de style (ne lui donne que des booléens), mais Racket accepte n'importe quelle valeur, et <code>not</code> ne répond <code>#t</code> que pour <code>#f</code>.</p>
+<h3 id="5-5-les-predicats-slide-13">5.5 Les prédicats (slide 13)</h3>
+<p>Un <strong>prédicat</strong> (predicate) est une fonction qui renvoie un booléen, <code>#t</code> ou <code>#f</code>. Par convention, son nom se termine par <code>?</code> et se lit comme une question : <code>even?</code>, c'est « est-ce pair ? ». Les prédicats de la slide 13 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>even? <span class="cst">2</span><span class="par">)</span>        <span class="res">; → #t</span>
+<span class="par">(</span>odd? <span class="cst">1</span><span class="par">)</span>         <span class="res">; → #t</span>
+<span class="par">(</span>zero? <span class="cst">0</span><span class="par">)</span>        <span class="res">; → #t</span>
+<span class="par">(</span>positive? <span class="cst">0</span><span class="par">)</span>    <span class="res">; → #f</span>
+<span class="par">(</span>negative? <span class="cst">-1</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span>integer? <span class="cst">2.0</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span>number? <span class="str">"12"</span><span class="par">)</span>   <span class="res">; → #f</span>
+<span class="par">(</span>boolean? <span class="cst">#f</span><span class="par">)</span>    <span class="res">; → #t</span>
+<span class="par">(</span>boolean? <span class="cst">0</span><span class="par">)</span>     <span class="res">; → #f</span></code></pre></div>
+<p>Deux pièges dans cette liste : 0 n'est ni positif ni négatif pour Racket (les deux tests sont stricts), et <code>2.0</code> est un entier au sens de <code>integer?</code>, même s'il est inexact.</p>
+<p>Ta note disait « définir un prédicat (?????) ». On le définit comme n'importe quelle fonction ; simplement, son corps est une expression booléenne : une comparaison, un autre prédicat, ou une combinaison avec <code>and</code>, <code>or</code> et <code>not</code>.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>majeur? age<span class="par">)</span> <span class="par">(</span>&gt;= age <span class="cst">18</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>majeur? <span class="cst">20</span><span class="par">)</span>        <span class="res">; → #t</span>
+<span class="par">(</span>majeur? <span class="cst">15</span><span class="par">)</span>        <span class="res">; → #f</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>divisible? a b<span class="par">)</span> <span class="par">(</span>= <span class="par">(</span>modulo a b<span class="par">)</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>divisible? <span class="cst">12</span> <span class="cst">4</span><span class="par">)</span>   <span class="res">; → #t</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>entre? x a b<span class="par">)</span> <span class="par">(</span>&lt;= a x b<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>entre? <span class="cst">5</span> <span class="cst">1</span> <span class="cst">10</span><span class="par">)</span>     <span class="res">; → #t</span></code></pre></div>
+<p>C'est le même objet que dans ton cours de logique : un prédicat P(x) est une proposition avec un trou, qui devient vraie ou fausse dès qu'on donne une valeur à x. <code>majeur?</code> en est un.</p>
+<div class="box warn"><p class="lbl">Style : jamais de <code>(if condition #t #f)</code></p><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>majeur-bof? age<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt;= age <span class="cst">18</span><span class="par">)</span> <span class="cst">#t</span> <span class="cst">#f</span><span class="par">)</span><span class="par">)</span>   <span class="com">; juste, mais maladroit</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>majeur? age<span class="par">)</span> <span class="par">(</span>&gt;= age <span class="cst">18</span><span class="par">)</span><span class="par">)</span>                   <span class="com">; la comparaison est déjà un booléen</span></code></pre></div>
+<p>De même, <code>(if c #f #t)</code> s'écrit <code>(not c)</code>. Et comparer un booléen avec <code>=</code> est une erreur, puisque <code>=</code> ne compare que des nombres : écris <code>(even? n)</code>, pas ceci :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>= <span class="par">(</span>even? <span class="cst">4</span><span class="par">)</span> <span class="cst">#t</span><span class="par">)</span>   <span class="res err">; → erreur : =: contract violation</span></code></pre></div>
+</div>
+<div class="box ask"><p class="lbl">À toi (partie 5)</p><ol><li>Sans machine : <code>(and 1 #f 3)</code>, <code>(or #f #f)</code>, <code>(or (&gt; 2 1) (/ 1 0))</code>, <code>(if "" 1 2)</code>, <code>(&lt;= 1 1 2 2)</code>, <code>(equal? 2 2.0)</code>.</li><li>Écris le prédicat <code>(impair? n)</code> sans utiliser <code>odd?</code>.</li><li>Écris <code>(meme-parite? a b)</code>, vrai si a et b sont tous les deux pairs ou tous les deux impairs.</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">and</span> <span class="cst">1</span> <span class="cst">#f</span> <span class="cst">3</span><span class="par">)</span>           <span class="res">; → #f</span>
+<span class="par">(</span><span class="kw">or</span> <span class="cst">#f</span> <span class="cst">#f</span><span class="par">)</span>             <span class="res">; → #f</span>
+<span class="par">(</span><span class="kw">or</span> <span class="par">(</span>&gt; <span class="cst">2</span> <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>/ <span class="cst">1</span> <span class="cst">0</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span><span class="kw">if</span> <span class="str">""</span> <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span>            <span class="res">; → 1</span>
+<span class="par">(</span>&lt;= <span class="cst">1</span> <span class="cst">1</span> <span class="cst">2</span> <span class="cst">2</span><span class="par">)</span>           <span class="res">; → #t</span>
+<span class="par">(</span>equal? <span class="cst">2</span> <span class="cst">2.0</span><span class="par">)</span>         <span class="res">; → #f</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>impair? n<span class="par">)</span> <span class="par">(</span>not <span class="par">(</span>even? n<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>impair? <span class="cst">7</span><span class="par">)</span>            <span class="res">; → #t</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>meme-parite? a b<span class="par">)</span> <span class="par">(</span>even? <span class="par">(</span>+ a b<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>meme-parite? <span class="cst">3</span> <span class="cst">7</span><span class="par">)</span>     <span class="res">; → #t</span>
+<span class="par">(</span>meme-parite? <span class="cst">2</span> <span class="cst">7</span><span class="par">)</span>     <span class="res">; → #f</span></code></pre></div>
+<p>Pour <code>meme-parite?</code>, la version directe <code>(or (and (even? a) (even? b)) (and (odd? a) (odd? b)))</code> est juste aussi. La version courte utilise un résultat de maths : a + b est pair exactement quand a et b ont la même parité. <code>(or (&gt; 2 1) (/ 1 0))</code> ne provoque pas d'erreur, car <code>or</code> s'arrête à la première valeur vraie.</p>
+</div></details>
+</div>
+<h2 id="p6"><span class="num">6</span>Nommer avec define</h2>
+<h3 id="6-1-definir-une-constante-slide-18">6.1 Définir une constante (slide 18)</h3>
+<p><code>(define NOM expression)</code> évalue l'expression <strong>une seule fois</strong>, puis lie le nom à la valeur obtenue. Convention de ton enseignant : les constantes en majuscules (<code>UNE_CONSTANTE</code>).</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> SIZE <span class="cst">10</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> HALFSIZE <span class="par">(</span>/ SIZE <span class="cst">2</span><span class="par">)</span><span class="par">)</span>
+HALFSIZE   <span class="res">; → 5</span></code></pre></div>
+<h3 id="6-2-definir-une-fonction">6.2 Définir une fonction</h3>
+<div class="code txt"><pre><code>(define (nom-de-la-fonction param1 param2 ...)
+  corps)</code></pre></div>
+<p>La valeur d'un appel est la valeur du corps. Il n'y a pas de <code>return</code> : le corps <em>est</em> le résultat.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">10</span><span class="par">)</span>   <span class="res">; → 31</span></code></pre></div>
+<p>C'est l'équivalent de <code>def f(x): return 1 + 3 * x</code>. Convention : les fonctions en minuscules, les mots séparés par des tirets (<code>une-fonction</code>, slide 18). La cheatsheet écrit <code>plus_petit</code> ; ça fonctionne aussi, mais les tirets sont l'usage en Racket. Attention, Racket distingue majuscules et minuscules : <code>A</code> et <code>a</code> sont deux noms différents.</p>
+<h3 id="6-3-myr-contre-myr-la-lecon-de-la-slide-18">6.3 MYR contre (myr), la leçon de la slide 18</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> MYR <span class="par">(</span>random <span class="cst">100</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>myr<span class="par">)</span> <span class="par">(</span>random <span class="cst">100</span><span class="par">)</span><span class="par">)</span>
+MYR           <span class="res">; → (aléatoire) par exemple 29</span>
+<span class="par">(</span>= MYR MYR<span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span>myr<span class="par">)</span>         <span class="res">; → (aléatoire) par exemple 18</span>
+<span class="par">(</span>myr<span class="par">)</span>         <span class="res">; → (aléatoire) probablement un autre nombre</span>
+myr           <span class="res">; → #&lt;procedure:myr&gt;</span></code></pre></div>
+<ul><li><code>MYR</code> est une <strong>constante</strong> : <code>(random 100)</code> a été évalué une fois, au moment de la définition. Ensuite, MYR est un nombre, toujours le même (29, puis 29, sur la slide).</li><li><code>(myr)</code> est l'appel d'une <strong>fonction d'arité 0</strong> : son corps est réévalué à chaque appel (18, puis 90, sur la slide).</li><li><code>myr</code> sans parenthèses désigne la fonction elle-même, pas son résultat : DrRacket affiche <code>#&lt;procedure:myr&gt;</code>.</li></ul>
+<p>Toute la différence tient dans une paire de parenthèses : exactement le genre de détail qu'une question de DST peut tester.</p>
+<h3 id="6-4-lambda-les-fonctions-sans-nom-slide-20-hors-programme">6.4 lambda, les fonctions sans nom (slide 20, hors programme)</h3>
+<p><code>(define (f x) corps)</code> est un raccourci, un <strong>sucre syntaxique</strong> (syntactic sugar), pour <code>(define f (lambda (x) corps))</code>. <code>lambda</code> fabrique une fonction sans nom, une <strong>fonction anonyme</strong> (anonymous function), comme <code>lambda x: x + 1</code> en Python. La cheatsheet en montre deux, dont celle-ci :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> suivant <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>x<span class="par">)</span> <span class="par">(</span>+ x <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>suivant <span class="cst">41</span><span class="par">)</span>                      <span class="res">; → 42</span>
+<span class="par">(</span><span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span> <span class="cst">11</span><span class="par">)</span>   <span class="res">; → 34</span></code></pre></div>
+<p>Dans la dernière ligne, le premier élément de la parenthèse n'est pas un nom mais une fonction fabriquée sur place, appliquée aussitôt à 11 (slide 20). La slide la classe hors programme : sache la lire, et au DST, écris la forme courte sauf si on te demande <code>lambda</code>.</p>
+<h3 id="6-5-les-erreurs-de-definition-slides-19-et-21">6.5 Les erreurs de définition (slides 19 et 21)</h3>
+<p><strong>Un nom inconnu</strong> donne <code>unbound identifier</code> : faute de frappe, nom jamais défini, nom utilisé hors de sa portée (partie 8.4), ou <code>n-1</code> collé (partie 3.4). Dans un fichier où <code>f</code> n'est pas défini :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>f <span class="cst">10</span><span class="par">)</span>   <span class="res err">; → erreur : f: unbound identifier</span></code></pre></div>
+<p>Dans la zone d'interactions, le même oubli donne un autre message, <code>f: undefined; cannot reference an identifier before its definition</code>. Les deux veulent dire : ce nom n'a pas de valeur ici.</p>
+<p><strong>Définir deux fois le même nom</strong> dans le fichier est interdit (slide 21). Dans la zone d'interactions, on peut redéfinir ; dans le fichier, non. Pour garder une ancienne version, mets-la en commentaire avec <code>#;</code>.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>* <span class="cst">3</span> x<span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : module: identifier already defined</span></code></pre></div>
+<p><strong>Le mauvais nombre d'arguments</strong> donne <code>arity mismatch</code> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>carre x<span class="par">)</span> <span class="par">(</span>* x x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>carre <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res err">; → erreur : carre: arity mismatch</span></code></pre></div>
+<div class="code txt"><pre><code>carre: arity mismatch;
+ the expected number of arguments does not match the given number
+  expected: 1
+  given: 2</code></pre></div>
+<p><strong>L'ordre des définitions.</strong> Une fonction peut appeler une fonction définie <em>plus bas</em> dans le fichier, car son corps n'est évalué qu'au moment de l'appel :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>a x<span class="par">)</span> <span class="par">(</span>b x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>b x<span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>a <span class="cst">5</span><span class="par">)</span>   <span class="res">; → 10</span></code></pre></div>
+<p>Une constante, en revanche, est calculée immédiatement : elle ne peut pas utiliser une fonction définie plus bas.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> Y <span class="par">(</span>b <span class="cst">3</span><span class="par">)</span><span class="par">)</span>         <span class="res err">; → erreur : b: undefined</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>b x<span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> x<span class="par">)</span><span class="par">)</span></code></pre></div>
+<p>Le message complet est <code>b: undefined; cannot reference an identifier before its definition</code>.</p>
+<div class="box ask"><p class="lbl">À toi (partie 6)</p><ol><li>Quelle différence entre <code>(define A (* 2 21))</code> et <code>(define (a) (* 2 21))</code> ? Que valent <code>A</code>, <code>(a)</code>, <code>a</code> et <code>(A)</code> ?</li><li>Traduis en Racket : <code>def aire_rectangle(l, h): return l * h</code>.</li><li>Pourquoi <code>(define (f x) (x + 1))</code> est-il accepté au Run, mais échoue-t-il à l'appel <code>(f 3)</code> ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> A <span class="par">(</span>* <span class="cst">2</span> <span class="cst">21</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>a<span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> <span class="cst">21</span><span class="par">)</span><span class="par">)</span>
+A      <span class="res">; → 42</span>
+<span class="par">(</span>a<span class="par">)</span>    <span class="res">; → 42</span>
+a      <span class="res">; → #&lt;procedure:a&gt;</span>
+<span class="par">(</span>A<span class="par">)</span>    <span class="res err">; → erreur : application: not a procedure</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>aire-rectangle l h<span class="par">)</span> <span class="par">(</span>* l h<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>aire-rectangle <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span>   <span class="res">; → 12</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span>x + <span class="cst">1</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">3</span><span class="par">)</span>   <span class="res err">; → erreur : application: not a procedure</span></code></pre></div>
+<ol><li><code>A</code> est un nombre calculé une fois ; <code>a</code> est une fonction d'arité 0. <code>(A)</code> échoue parce qu'on essaie d'appliquer le nombre 42.</li><li>La syntaxe est correcte (une application avec <code>x</code> en tête) et tous les noms existent : Racket n'a rien à reprocher avant l'exécution. C'est à l'appel que <code>x</code> vaut 3, et que Racket essaie d'appliquer 3 comme une fonction.</li></ol>
+</div></details>
+</div>
+<h2 id="p7"><span class="num">7</span>Choisir avec if et cond</h2>
+<h3 id="7-1-if-slide-22">7.1 if (slide 22)</h3>
+<div class="code txt"><pre><code>(if condition
+    expression-si-vrai
+    expression-si-faux)</code></pre></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; x <span class="cst">10</span><span class="par">)</span> <span class="par">(</span>+ x <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>- x <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">15</span><span class="par">)</span>   <span class="res">; → 16</span>
+<span class="par">(</span>f <span class="cst">5</span><span class="par">)</span>    <span class="res">; → 4</span></code></pre></div>
+<p>Les trois parties sont <strong>obligatoires</strong>. Sans la branche « sinon », le fichier ne se lance même pas :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; x <span class="cst">0</span><span class="par">)</span> x<span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : if: missing an "else" expression</span></code></pre></div>
+<p><code>if</code> est une expression, qui a une valeur. L'analogie avec Python n'est pas l'instruction <code>if:</code>, mais l'expression conditionnelle <code>a if c else b</code>. On peut donc la placer partout où l'on attend une valeur :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>valeur-absolue x<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&lt; x <span class="cst">0</span><span class="par">)</span> <span class="par">(</span>- x<span class="par">)</span> x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>valeur-absolue <span class="cst">-4</span><span class="par">)</span>        <span class="res">; → 4</span>
+<span class="par">(</span>* <span class="cst">2</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; <span class="cst">3</span> <span class="cst">1</span><span class="par">)</span> <span class="cst">10</span> <span class="cst">20</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 20</span></code></pre></div>
+<p>La cheatsheet en donne un autre exemple : <code>(define (plus_petit x y) (if (&lt; x y) x y))</code>.</p>
+<h3 id="7-2-cond-slide-23">7.2 cond (slide 23)</h3>
+<p>Dès qu'il y a plus de deux cas, les <code>if</code> imbriqués deviennent illisibles (la fonction <code>f1</code> de la slide 23). On utilise <code>cond</code> :</p>
+<div class="code txt"><pre><code>(cond [condition1 résultat1]
+      [condition2 résultat2]
+      ...
+      [else résultat-par-défaut])</code></pre></div>
+<p>Racket teste les conditions <strong>dans l'ordre</strong>. La première vraie l'emporte : son résultat est la valeur du <code>cond</code>, et les suivantes ne sont même pas évaluées. <code>else</code> attrape tout le reste.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>mention note<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>&gt;= note <span class="cst">16</span><span class="par">)</span> <span class="str">"très bien"</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>&gt;= note <span class="cst">14</span><span class="par">)</span> <span class="str">"bien"</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>&gt;= note <span class="cst">12</span><span class="par">)</span> <span class="str">"assez bien"</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>&gt;= note <span class="cst">10</span><span class="par">)</span> <span class="str">"passable"</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="str">"ajourné"</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+
+<span class="par">(</span>mention <span class="cst">15</span><span class="par">)</span>   <span class="res">; → "bien"</span>
+<span class="par">(</span>mention <span class="cst">8</span><span class="par">)</span>    <span class="res">; → "ajourné"</span></code></pre></div>
+<p>Pour 15, la première condition est fausse et la deuxième vraie. Inutile d'écrire <code>(and (&gt;= note 14) (&lt; note 16))</code> : si Racket arrive à la deuxième ligne, c'est que la première était fausse, donc que la note est déjà inférieure à 16.</p>
+<p><strong>L'ordre compte.</strong> Reprenons la slide 23 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f2 x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">(</span><span class="par">(</span>&gt; x <span class="cst">10</span><span class="par">)</span> <span class="par">(</span>+ x <span class="cst">1</span><span class="par">)</span><span class="par">)</span>
+        <span class="par">(</span><span class="par">(</span>&gt; x <span class="cst">100</span><span class="par">)</span> <span class="par">(</span>+ x <span class="cst">10</span><span class="par">)</span><span class="par">)</span>
+        <span class="par">(</span><span class="kw">else</span> <span class="par">(</span>- x <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f2 <span class="cst">200</span><span class="par">)</span>   <span class="res">; → 201</span></code></pre></div>
+<p>Pour 200, la première condition est déjà vraie. En fait, la deuxième ligne n'est atteinte pour <strong>aucun</strong> x, puisque tout nombre supérieur à 100 est aussi supérieur à 10 : c'est du <strong>code mort</strong> (dead code). Règle : place les conditions les plus restrictives en premier. Même piège dans <code>mention</code> : si tu commences par <code>(&gt;= note 10)</code>, tout le monde a « passable ».</p>
+<p>Un <code>cond</code> sans <code>else</code> dont aucune condition n'est vraie ne renvoie rien, et ce « rien » fait échouer le calcul suivant :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>signe-bof x<span class="par">)</span> <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>&gt; x <span class="cst">0</span><span class="par">)</span> <span class="cst">1</span><span class="par">]</span> <span class="par">[</span><span class="par">(</span>&lt; x <span class="cst">0</span><span class="par">)</span> <span class="cst">-1</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>signe-bof <span class="cst">0</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : +: contract violation</span></code></pre></div>
+<h3 id="7-3-when-slide-22-hors-programme">7.3 when (slide 22, hors programme)</h3>
+<p><code>(when condition expression)</code> n'a pas de branche « sinon » : quand la condition est fausse, il ne renvoie rien (une valeur spéciale, <code>#&lt;void&gt;</code>, que DrRacket n'affiche pas). La slide le dit « dangereux », pour la raison qu'on vient de voir. Dans ce cours, préfère <code>if</code> et <code>cond</code>.</p>
+<h3 id="7-4-ecrire-proprement-sur-papier">7.4 Écrire proprement sur papier</h3>
+<p>Recopie l'indentation de DrRacket : les deux branches d'un <code>if</code> alignées sous la condition, les lignes d'un <code>cond</code> alignées sous la première.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>signe x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>&gt; x <span class="cst">0</span><span class="par">)</span> <span class="cst">1</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>&lt; x <span class="cst">0</span><span class="par">)</span> <span class="cst">-1</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="cst">0</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+
+<span class="par">(</span>signe <span class="cst">-5</span><span class="par">)</span>   <span class="res">; → -1</span></code></pre></div>
+<p>Tu peux regrouper les parenthèses fermantes en fin de ligne, comme ici, ou les mettre sur une ligne à part, comme ton enseignant le fait parfois : l'essentiel est que l'indentation montre la structure.</p>
+<div class="box ask"><p class="lbl">À toi (partie 7)</p><ol><li>Réécris la fonction <code>f2</code> de la slide 23 pour que <code>(+ x 10)</code> soit calculé quand x &gt; 100.</li><li>Que renvoie <code>(mention 16)</code> ? Et si l'on permute les deux premières lignes du <code>cond</code> ?</li><li>Écris <code>(max3 a b c)</code> avec des <code>if</code>, sans utiliser <code>max</code>.</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f2 x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>&gt; x <span class="cst">100</span><span class="par">)</span> <span class="par">(</span>+ x <span class="cst">10</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>&gt; x <span class="cst">10</span><span class="par">)</span> <span class="par">(</span>+ x <span class="cst">1</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>- x <span class="cst">1</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f2 <span class="cst">200</span><span class="par">)</span>   <span class="res">; → 210</span>
+<span class="par">(</span>f2 <span class="cst">50</span><span class="par">)</span>    <span class="res">; → 51</span>
+<span class="par">(</span>f2 <span class="cst">5</span><span class="par">)</span>     <span class="res">; → 4</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>max3 a b c<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; a b<span class="par">)</span>
+      <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; a c<span class="par">)</span> a c<span class="par">)</span>
+      <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&gt; b c<span class="par">)</span> b c<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>max3 <span class="cst">3</span> <span class="cst">9</span> <span class="cst">4</span><span class="par">)</span>   <span class="res">; → 9</span>
+<span class="par">(</span>max3 <span class="cst">9</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span>   <span class="res">; → 9</span>
+<span class="par">(</span>max3 <span class="cst">3</span> <span class="cst">4</span> <span class="cst">9</span><span class="par">)</span>   <span class="res">; → 9</span></code></pre></div>
+<ol start="2"><li>« très bien ». Si l'on permute, la ligne <code>(&gt;= note 14)</code> arrive en premier : 16 passe ce test et obtient « bien », et la ligne « très bien » devient du code mort.</li><li>Teste toujours plusieurs cas, dont un où le maximum est en première, en deuxième et en troisième position.</li></ol>
+</div></details>
+</div>
+<h2 id="p8"><span class="num">8</span>Variables locales et portée</h2>
+<h3 id="8-1-let-pour-nommer-un-calcul-intermediaire-slide-26">8.1 let, pour nommer un calcul intermédiaire (slide 26)</h3>
+<p>La slide 26 calcule <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></msqrt><mo>+</mo><msqrt><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn></mrow></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{x^2+1} + \sqrt{x^2+2}</annotation></semantics></math></span>, donc x² deux fois. <code>let</code> permet de le nommer et de ne le calculer qu'une fois :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>x2 <span class="par">(</span>* x x<span class="par">)</span><span class="par">]</span><span class="par">)</span>
+    <span class="par">(</span>+ <span class="par">(</span>sqrt <span class="par">(</span>+ <span class="cst">1</span> x2<span class="par">)</span><span class="par">)</span> <span class="par">(</span>sqrt <span class="par">(</span>+ <span class="cst">2</span> x2<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">0</span><span class="par">)</span>   <span class="res">; → 2.414213562373095</span></code></pre></div>
+<div class="code txt"><pre><code>(let ([nom1 expression1]
+      [nom2 expression2])
+  corps)</code></pre></div>
+<p>Racket calcule <code>expression1</code> et <code>expression2</code>, lie les noms à leurs valeurs, puis évalue le corps : la valeur du <code>let</code> est celle du corps. Les noms n'existent qu'entre les parenthèses du <code>let</code> : c'est leur <strong>portée</strong> (scope). Deux avantages : on calcule une seule fois (slide 26 : « réduire le calcul nécessaire »), et on donne un nom à une idée intermédiaire, ce qui rend le code lisible.</p>
+<h3 id="8-2-let-en-parallele-let-en-sequence-slide-27">8.2 let en parallèle, let* en séquence (slide 27)</h3>
+<p>Dans un <code>let</code>, toutes les expressions sont calculées <strong>avant</strong> qu'aucun nom n'existe : une liaison ne peut pas utiliser une autre liaison du même <code>let</code>.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>a <span class="cst">1</span><span class="par">]</span> <span class="par">[</span>b <span class="par">(</span>+ a <span class="cst">1</span><span class="par">)</span><span class="par">]</span><span class="par">)</span> b<span class="par">)</span>   <span class="res err">; → erreur : a: unbound identifier</span></code></pre></div>
+<p><code>let*</code> lie les noms un par un, et chacun peut utiliser les précédents :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">let*</span> <span class="par">(</span><span class="par">[</span>a <span class="cst">1</span><span class="par">]</span> <span class="par">[</span>b <span class="par">(</span>+ a <span class="cst">1</span><span class="par">)</span><span class="par">]</span><span class="par">)</span> b<span class="par">)</span>   <span class="res">; → 2</span></code></pre></div>
+<p>C'est exactement la même chose que deux <code>let</code> imbriqués :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>a <span class="cst">1</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>b <span class="par">(</span>+ a <span class="cst">1</span><span class="par">)</span><span class="par">]</span><span class="par">)</span>
+    b<span class="par">)</span><span class="par">)</span>   <span class="res">; → 2</span></code></pre></div>
+<p>D'où les deux versions de la slide 27 : avec <code>let</code>, il faut calculer x³ par <code>(* x x x)</code> ; avec <code>let*</code>, on peut réutiliser x² :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">let*</span> <span class="par">(</span><span class="par">[</span>x2 <span class="par">(</span>* x x<span class="par">)</span><span class="par">]</span>
+         <span class="par">[</span>x3 <span class="par">(</span>* x2 x<span class="par">)</span><span class="par">]</span><span class="par">)</span>
+    <span class="par">(</span>+ <span class="par">(</span>sqrt <span class="par">(</span>+ x2 x3<span class="par">)</span><span class="par">)</span> <span class="par">(</span>sqrt <span class="par">(</span>+ <span class="cst">1</span> x2<span class="par">)</span><span class="par">)</span> x3<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>g <span class="cst">2</span><span class="par">)</span>   <span class="res">; → 13.700169592637543</span></code></pre></div>
+<h3 id="8-3-define-a-l-interieur-d-une-fonction-slides-29-et-32">8.3 define à l'intérieur d'une fonction (slides 29 et 32)</h3>
+<p>On peut aussi placer des <code>define</code> au début du corps d'une fonction : ce sont des <strong>définitions locales</strong> (local definitions).</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">define</span> x2 <span class="par">(</span>* x x<span class="par">)</span><span class="par">)</span>
+  <span class="par">(</span>+ <span class="par">(</span>sqrt <span class="par">(</span>+ <span class="cst">1</span> x2<span class="par">)</span><span class="par">)</span> <span class="par">(</span>sqrt <span class="par">(</span>+ <span class="cst">2</span> x2<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>g <span class="cst">0</span><span class="par">)</span>   <span class="res">; → 2.414213562373095</span></code></pre></div>
+<p>La slide 32 compare les deux outils. <code>define</code> : un niveau de parenthèses en moins, et des fonctions locales qui peuvent s'appeler entre elles. <code>let</code> : une portée bien visible, délimitée par ses parenthèses. Quand le corps d'une fonction contient plusieurs expressions, la fonction renvoie la valeur de la dernière (slide 29) ; en dehors d'un <code>define</code>, pour enchaîner plusieurs expressions, il faut <code>begin</code> (la rubrique « séquences » de la cheatsheet).</p>
+<h3 id="8-4-la-portee-et-le-masquage-slides-29-et-30">8.4 La portée et le masquage (slides 29 et 30)</h3>
+<p><strong>Portée lexicale</strong> (lexical scope) : un nom local n'est visible qu'entre les parenthèses où il est défini. C'est l'exemple de la slide 30 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g x<span class="par">)</span> <span class="par">(</span>* x x<span class="par">)</span><span class="par">)</span>
+  <span class="par">(</span>h x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>h x<span class="par">)</span>
+  <span class="par">(</span>g x<span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : g: unbound identifier</span>
+<span class="par">(</span>f <span class="cst">1</span><span class="par">)</span></code></pre></div>
+<p><code>g</code> vit à l'intérieur de <code>f</code> ; <code>h</code>, écrite ailleurs, ne la voit pas. L'erreur apparaît dès le Run, avant même l'exécution de <code>(f 1)</code>, puisque Racket vérifie les noms d'abord.</p>
+<p>Point important : la portée dépend de l'endroit où le code est <strong>écrit</strong>, pas de celui qui l'appelle.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> x <span class="cst">10</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>ajoute-x y<span class="par">)</span> <span class="par">(</span>+ x y<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>x <span class="cst">1</span><span class="par">]</span><span class="par">)</span> <span class="par">(</span>ajoute-x <span class="cst">5</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 15</span></code></pre></div>
+<p>Dans le <code>let</code>, x vaut 1 ; mais <code>ajoute-x</code> a été écrite dehors, là où x vaut 10, et c'est ce x-là qu'elle utilise.</p>
+<p><strong>Masquage</strong> (shadowing) : un nom local peut porter le même nom qu'un nom plus global ; dans sa portée, il le cache. Slide 29 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x y<span class="par">)</span>
+  <span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f a b<span class="par">)</span> <span class="par">(</span>expt a b<span class="par">)</span><span class="par">)</span>
+  <span class="par">(</span>f <span class="par">(</span>f x y<span class="par">)</span> <span class="par">(</span>f y x<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 134217728</span></code></pre></div>
+<p>Dans le corps, <code>f</code> désigne la fonction <strong>locale</strong>, donc <code>expt</code> : ce n'est pas un appel récursif. <code>(f 2 3)</code> calcule <code>(expt (expt 2 3) (expt 3 2))</code>, soit <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>8</mn><mn>9</mn></msup><mo>=</mo><mn>134</mn><mtext> </mtext><mn>217</mn><mtext> </mtext><mn>728</mn></mrow><annotation encoding="application/x-tex">8^9 = 134\,217\,728</annotation></semantics></math></span>. La slide 28 fait la même chose avec un <code>f</code> local défini par <code>lambda</code>. Un paramètre masque lui aussi un nom global : dans <code>(define (f x) ...)</code>, le <code>x</code> du corps est le paramètre, même s'il existe un <code>x</code> global.</p>
+<p><strong>Encapsulation</strong> (le mot du titre du CM) : cacher les fonctions auxiliaires à l'intérieur de la fonction qui s'en sert. Personne d'autre ne peut les appeler ni en dépendre, donc on peut les modifier sans rien casser ailleurs. On s'en servira en partie 10.4.</p>
+<div class="box ask"><p class="lbl">À toi (partie 8)</p><ol><li>Sans machine : <code>(let ([x 2] [y 3]) (let ([x 10]) (+ x y)))</code>.</li><li>Avec <code>(define x 10)</code> : que valent <code>(let ([x 2] [y x]) y)</code> et <code>(let* ([x 2] [y x]) y)</code> ?</li><li>Réécris avec un <code>let</code> : <code>(define (h a b) (+ (* (+ a b) (+ a b)) (/ 1 (+ a b))))</code>.</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>x <span class="cst">2</span><span class="par">]</span> <span class="par">[</span>y <span class="cst">3</span><span class="par">]</span><span class="par">)</span> <span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>x <span class="cst">10</span><span class="par">]</span><span class="par">)</span> <span class="par">(</span>+ x y<span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 13</span>
+
+<span class="par">(</span><span class="kw">define</span> x <span class="cst">10</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>x <span class="cst">2</span><span class="par">]</span> <span class="par">[</span>y x<span class="par">]</span><span class="par">)</span> y<span class="par">)</span>    <span class="res">; → 10</span>
+<span class="par">(</span><span class="kw">let*</span> <span class="par">(</span><span class="par">[</span>x <span class="cst">2</span><span class="par">]</span> <span class="par">[</span>y x<span class="par">]</span><span class="par">)</span> y<span class="par">)</span>   <span class="res">; → 2</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>h a b<span class="par">)</span>
+  <span class="par">(</span><span class="kw">let</span> <span class="par">(</span><span class="par">[</span>s <span class="par">(</span>+ a b<span class="par">)</span><span class="par">]</span><span class="par">)</span>
+    <span class="par">(</span>+ <span class="par">(</span>* s s<span class="par">)</span> <span class="par">(</span>/ <span class="cst">1</span> s<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>h <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span>   <span class="res">; → 9/2</span></code></pre></div>
+<ol><li>Le x intérieur (10) masque le x extérieur (2), et y vaut 3.</li><li>Avec <code>let</code>, l'expression de y est calculée avant que le nouveau x n'existe : elle voit le x global, 10. Avec <code>let*</code>, x vaut déjà 2 quand y est calculé.</li></ol>
+</div></details>
+</div>
+<h2 id="p9"><span class="num">9</span>La récursivité enveloppée</h2>
+<h3 id="9-1-se-definir-a-partir-d-un-cas-plus-petit-slide-33">9.1 Se définir à partir d'un cas plus petit (slide 33)</h3>
+<p>La slide 33 rapproche la récursivité de la <strong>définition par récurrence des suites</strong> : <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">U_n</annotation></semantics></math></span> est définie à partir de n et de <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">U_{n-1}</annotation></semantics></math></span>, comme f(n) à partir de n et de f(n − 1). Prends une suite de ton cours de maths, définie par <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mn>0</mn></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">u_0 = 3</annotation></semantics></math></span> et <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>n</mi></msub><mo>=</mo><mn>2</mn><msub><mi>u</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">u_n = 2u_{n-1} - 1</annotation></semantics></math></span> pour n ≥ 1 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>u n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span>
+      <span class="cst">3</span>
+      <span class="par">(</span>- <span class="par">(</span>* <span class="cst">2</span> <span class="par">(</span>u <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span> <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>u <span class="cst">0</span><span class="par">)</span>   <span class="res">; → 3</span>
+<span class="par">(</span>u <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 17</span></code></pre></div>
+<p>Le code est une traduction mot à mot de la définition. L'exemple du cours est la factorielle : n! = n × (n − 1) × … × 1, autrement dit n! = n × (n − 1)! et 1! = 1.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      <span class="cst">1</span>
+      <span class="par">(</span>* n <span class="par">(</span>f <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">5</span><span class="par">)</span>   <span class="res">; → 120</span></code></pre></div>
+<p>Toute fonction récursive a deux ingrédients :</p>
+<ul><li>un <strong>cas de base</strong> (base case) : un cas dont on connaît la réponse directement, sans appel récursif (ici n = 1, réponse 1). C'est là que la récursion s'arrête ;</li><li>un <strong>cas récursif</strong> (recursive case) : la fonction s'appelle elle-même sur un problème plus petit (n − 1) et fait quelque chose du résultat (elle le multiplie par n).</li></ul>
+<p>En Racket, la récursivité est <strong>la</strong> façon de répéter un calcul : dans ce cours, pas de boucle <code>while</code> ni <code>for</code> (les boucles <code>for</code> existent, mais la slide 37 les classe hors programme et « peu désirables en fonctionnel »).</p>
+<h3 id="9-2-suivre-l-execution-avec-une-trace">9.2 Suivre l'exécution avec une trace</h3>
+<p>Le modèle de substitution (partie 3.6), appliqué à <code>(f 4)</code> :</p>
+<div class="code txt"><pre><code>(f 4)
+(* 4 (f 3))
+(* 4 (* 3 (f 2)))
+(* 4 (* 3 (* 2 (f 1))))
+(* 4 (* 3 (* 2 1)))
+(* 4 (* 3 2))
+(* 4 6)
+24</code></pre></div>
+<p>Regarde la forme : l'expression s'allonge, puis se replie. Chaque <code>(* 4 ...</code> est une <strong>opération en attente</strong> (deferred operation) : Racket ne peut pas multiplier par 4 tant qu'il ne connaît pas <code>(f 3)</code>. L'appel récursif est <em>enveloppé</em> dans une multiplication : d'où le nom de <strong>récursivité enveloppée</strong> que lui donne ton enseignant (en anglais, on dit simplement recursion, ou non-tail recursion).</p>
+<p>Au DST, « donnez la trace de <code>(f 4)</code> » attend exactement cela : une ligne par étape, sans sauter la phase où l'expression grandit.</p>
+<h3 id="9-3-ecrire-une-fonction-recursive-la-methode-des-quatre-ques">9.3 Écrire une fonction récursive, la méthode des quatre questions</h3>
+<ol><li><strong>Quel est le cas le plus simple ?</strong> Celui dont tu connais la réponse sans calcul : c'est le cas de base.</li><li><strong>Si j'avais la réponse pour le cas juste plus petit, comment obtiendrais-je la réponse pour n ?</strong> C'est le cas récursif. Ne simule pas tous les appels dans ta tête : <em>suppose</em> que <code>(f (- n 1))</code> renvoie la bonne réponse, et sers-t'en. Cet acte de confiance est l'étape la plus difficile au début, et la plus importante.</li><li><strong>Chaque appel se rapproche-t-il du cas de base, et finit-il par l'atteindre ?</strong> Si n diminue de 1 à chaque appel et que le cas de base est n = 0, c'est bon pour tout n ≥ 0.</li><li><strong>Teste</strong> le cas de base, un petit cas tracé à la main (n = 2 ou 3), et un cas bizarre (0, un négatif, un très grand nombre).</li></ol>
+<div class="box nts"><p class="lbl">C'est une démonstration par récurrence, écrite en code</p><p>Dans ton cours de logique, une récurrence a besoin d'une initialisation et d'une hérédité, P(n) ⇒ P(n + 1) : les dominos. Une fonction récursive est juste pour la même raison. La question 1, c'est l'initialisation (le cas de base est juste). La question 2, c'est l'hérédité (si f est juste pour n − 1, elle l'est pour n). La question 3 garantit qu'on finit par atteindre le premier domino. Quand tu écris « je suppose que <code>(f (- n 1))</code> est juste », tu fais exactement ce que tu fais en écrivant « supposons P(n) vraie ».</p>
+</div>
+<p>Appliquons la méthode à la somme des entiers de 1 à n.</p>
+<ol><li>Cas le plus simple : n = 0, la somme vaut 0.</li><li>Si je connais la somme jusqu'à n − 1, la somme jusqu'à n vaut n plus cette somme.</li><li>n diminue de 1 à chaque appel : on atteint 0 si l'on part de n ≥ 0.</li></ol>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span>
+      <span class="cst">0</span>
+      <span class="par">(</span>+ n <span class="par">(</span>somme <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>somme <span class="cst">0</span><span class="par">)</span>     <span class="res">; → 0</span>
+<span class="par">(</span>somme <span class="cst">4</span><span class="par">)</span>     <span class="res">; → 10</span>
+<span class="par">(</span>somme <span class="cst">100</span><span class="par">)</span>   <span class="res">; → 5050</span></code></pre></div>
+<ol start="4"><li>Tests : le cas de base donne 0, et voici la trace de <code>(somme 3)</code> :</li></ol>
+<div class="code txt"><pre><code>(somme 3)
+(+ 3 (somme 2))
+(+ 3 (+ 2 (somme 1)))
+(+ 3 (+ 2 (+ 1 (somme 0))))
+(+ 3 (+ 2 (+ 1 0)))
+(+ 3 (+ 2 1))
+(+ 3 3)
+6</code></pre></div>
+<p>Au passage, 5050 = 100 × 101 / 2 : c'est la formule <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>n</mi><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{n(n+1)}{2}</annotation></semantics></math></span>, que tu démontreras justement par récurrence en maths. Le nombre de chiffres d'un entier, la somme de ses chiffres ou la puissance se traitent avec la même méthode : ce sont les exercices F.</p>
+<h3 id="9-4-quand-la-recursion-ne-s-arrete-pas-slide-31">9.4 Quand la récursion ne s'arrête pas (slide 31)</h3>
+<p>Trois façons de ne jamais atteindre le cas de base :</p>
+<ul><li><strong>pas de cas de base</strong> du tout. C'est le premier exemple de la slide 31, une fonction qui s'appelle elle-même avec le même argument :</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span>
+  <span class="par">(</span>f x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">1</span><span class="par">)</span>   <span class="res">; → (ne termine pas) : clique sur Stop</span></code></pre></div>
+<ul><li><strong>pas de progrès</strong> : l'argument ne diminue pas, par exemple <code>(+ n (somme n))</code> au lieu de <code>(+ n (somme (- n 1)))</code> ;</li><li><strong>un cas de base qu'on enjambe</strong>. La factorielle du cours s'arrête à n = 1. Que se passe-t-il pour <code>(f 0)</code> ?</li></ul>
+<div class="box ask"><p class="lbl">Réfléchis avant de déplier : que fait <code>(f 0)</code> avec la factorielle de la slide 33 ?</p><details class="fold ok"><summary>Réponse</summary><div class="fold-body"><p><code>(f 0)</code> donne <code>(* 0 (f -1))</code>, puis <code>(* 0 (* -1 (f -2)))</code>… n passe par −1, −2, −3 et ne vaut jamais 1. Chaque appel laisse une multiplication en attente, donc la mémoire se remplit : dans DrRacket, tout s'arrête sur <code>Interactions disabled; out of memory</code>. Correction : un cas de base <code>(&lt;= n 1)</code>, ou bien <code>(= n 0)</code> avec la réponse 1, puisque 0! = 1 par convention. Un cas de base robuste couvre tout ce qui peut l'atteindre.</p>
+</div></details>
+</div>
+<p>La boucle de la slide 31 ne se comporte pas comme <code>(f 0)</code> : <code>(f x)</code> qui appelle <code>(f x)</code> tourne indéfiniment <strong>sans jamais épuiser la mémoire</strong>, jusqu'à ce que tu cliques sur Stop. La partie 10.5 explique pourquoi. Le deuxième exemple de la slide, deux fonctions qui s'appellent mutuellement (<code>f</code> appelle <code>g</code>, qui appelle <code>f</code>), se comporte de la même façon.</p>
+<h3 id="9-5-ce-que-ca-coute-la-pile-d-execution-slides-34-et-35">9.5 Ce que ça coûte, la pile d'exécution (slides 34 et 35)</h3>
+<p>Chaque appel en cours doit se souvenir de ce qu'il lui reste à faire après l'appel récursif : « multiplier le résultat par 4 », puis « par 3 »… Ce pense-bête est rangé dans un <strong>cadre de pile</strong> (stack frame), sur la <strong>pile d'exécution</strong> (call stack). Avec la récursivité enveloppée, les cadres s'empilent : pour <code>(f n)</code>, n cadres attendent en même temps. La mémoire utilisée grandit avec n.</p>
+<p>L'image : une pile de post-it. Chaque appel colle un post-it « quand tu auras le résultat, multiplie-le par 4 ». Au cas de base, n post-it sont empilés ; ensuite, on les décolle un par un, en partant du dessus.</p>
+<p>Racket et Python ne réagissent pas pareil :</p>
+<ul><li>en Python, la pile est limitée par défaut à environ 1000 appels : une factorielle récursive de 5000 lève <code>RecursionError: maximum recursion depth exceeded</code> ;</li><li>en Racket, la pile n'a pas de taille fixe : elle grandit dans la mémoire tant qu'il en reste. Dans DrRacket, le <code>(f 5000000)</code> de la slide 34 s'arrête sur <code>Interactions disabled; out of memory</code>, à cause de la limite de 256 Mo et du mode « debugging » (annoncé au démarrage), qui ajoute des informations à chaque appel. En ligne de commande (<code>racket fichier.rkt</code>), sans ces deux freins, le même appel a réussi dans mon test, avec environ 150 Mo de mémoire. C'est exactement le message de la slide 35 : la taille de la pile dépend du langage, du processeur, de la RAM, du système et de ses paramètres.</li></ul>
+<h2 id="p10"><span class="num">10</span>La récursivité terminale</h2>
+<h3 id="10-1-qu-est-ce-qu-un-appel-terminal">10.1 Qu'est-ce qu'un appel terminal ?</h3>
+<p>Un <strong>appel terminal</strong> (tail call) est un appel dont le résultat est directement le résultat de la fonction : il ne reste plus rien à faire après lui. Une fonction est <strong>récursive terminale</strong> (tail-recursive) quand tous ses appels récursifs sont terminaux.</p>
+<p>Le test à retenir : <strong>« Que fait-on du résultat de l'appel récursif ? »</strong> Si l'on en fait quelque chose (l'ajouter, le multiplier, le passer à une autre fonction, le comparer), la récursivité est enveloppée. Si on le renvoie tel quel, elle est terminale.</p>
+<ul><li>Dans <code>(* n (f (- n 1)))</code>, le résultat de <code>(f (- n 1))</code> est ensuite multiplié par n : enveloppée.</li><li>Dans <code>(g (- n 1) (* n acc))</code>, le résultat de <code>g</code> est renvoyé tel quel : terminale. La multiplication <code>(* n acc)</code> est faite <em>avant</em> l'appel, puisque c'est un argument (évaluation stricte, partie 3.5), et non après.</li></ul>
+<p>Les positions terminales sont les branches d'un <code>if</code> (quand ce <code>if</code> est lui-même en position terminale), le résultat de chaque ligne d'un <code>cond</code>, le corps d'un <code>let</code>, et la dernière expression d'un <code>and</code> ou d'un <code>or</code>. Un appel placé en argument d'une autre fonction n'est jamais terminal.</p>
+<h3 id="10-2-l-accumulateur-faire-le-travail-avant-l-appel-slide-33">10.2 L'accumulateur, faire le travail avant l'appel (slide 33)</h3>
+<p>L'idée : au lieu de laisser des multiplications en attente, on transporte le résultat partiel dans un paramètre supplémentaire, l'<strong>accumulateur</strong> (accumulator). C'est la version de la slide 33 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g n <span class="par">[</span>acc <span class="cst">1</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      acc
+      <span class="par">(</span>g <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>* n acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>g <span class="cst">5</span><span class="par">)</span>   <span class="res">; → 120</span></code></pre></div>
+<p><code>[acc 1]</code> déclare un paramètre facultatif avec une <strong>valeur par défaut</strong> (default value, slide 25) : si tu appelles <code>(g 5)</code> avec un seul argument, acc commence à 1. La trace de <code>(g 4)</code> :</p>
+<div class="code txt"><pre><code>(g 4)       ; acc vaut 1 par défaut
+(g 4 1)
+(g 3 4)
+(g 2 12)
+(g 1 24)
+24</code></pre></div>
+<p>Compare avec la partie 9.2 : l'expression garde la même largeur. Il n'y a aucune opération en attente, le résultat partiel voyage dans <code>acc</code>.</p>
+<p>L'image : un caissier de supermarché. La version enveloppée note chaque prix sur un post-it et additionne tout à la fin ; la version terminale tient le total à jour sur l'écran de la caisse, article après article.</p>
+<p>Et l'analogie avec Python : c'est la boucle <code>while</code> de la partie 1.2. <code>acc</code> joue le rôle de <code>total</code>, n celui du compteur, et chaque appel récursif correspond à un tour de boucle avec de nouvelles valeurs. À une différence près : aucune variable n'est modifiée, chaque appel reçoit ses propres n et acc.</p>
+<h3 id="10-3-la-methode-pour-rendre-une-fonction-terminale">10.3 La méthode pour rendre une fonction terminale</h3>
+<ol><li>Ajoute un paramètre <code>acc</code>. Sa valeur de départ est ce que renvoie le cas de base de la version enveloppée : 1 pour la factorielle, 0 pour la somme. C'est l'<strong>élément neutre</strong> (identity element) de l'opération.</li><li>Cas de base : renvoie <code>acc</code>.</li><li>Cas récursif : fais l'opération maintenant, sur acc, et transmets le résultat : <code>(g (- n 1) (op n acc))</code>.</li></ol>
+<p>Avec la somme de la partie 9.3 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme-t n <span class="par">[</span>acc <span class="cst">0</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span>
+      acc
+      <span class="par">(</span>somme-t <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>+ n acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>somme-t <span class="cst">4</span><span class="par">)</span>     <span class="res">; → 10</span>
+<span class="par">(</span>somme-t <span class="cst">100</span><span class="par">)</span>   <span class="res">; → 5050</span></code></pre></div>
+<div class="code txt"><pre><code>(somme-t 3)
+(somme-t 3 0)
+(somme-t 2 3)
+(somme-t 1 5)
+(somme-t 0 6)
+6</code></pre></div>
+<p>Attention à l'ordre des opérations. <code>somme</code> calculait 3 + (2 + (1 + 0)) ; <code>somme-t</code> calcule ((0 + 3) + 2) + 1 : les nombres sont combinés dans l'ordre inverse. Pour + et ×, aucune différence, car ces opérations sont commutatives et associatives. Pour d'autres calculs, le résultat peut sortir à l'envers : l'exercice G5 joue là-dessus.</p>
+<h3 id="10-4-la-version-avec-fonction-auxiliaire">10.4 La version avec fonction auxiliaire</h3>
+<p>Avec <code>[acc 1]</code>, l'accumulateur est visible de l'extérieur, et rien n'empêche d'appeler <code>g</code> avec deux arguments :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g n <span class="par">[</span>acc <span class="cst">1</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      acc
+      <span class="par">(</span>g <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>* n acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>g <span class="cst">5</span> <span class="cst">2</span><span class="par">)</span>   <span class="res">; → 240</span></code></pre></div>
+<p>Le résultat est faux, parce que l'accumulateur est parti de 2. La solution classique cache l'accumulateur dans une <strong>fonction auxiliaire locale</strong> (encapsulation, partie 8.4) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>fact-t n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">define</span> <span class="par">(</span>boucle n acc<span class="par">)</span>
+    <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+        acc
+        <span class="par">(</span>boucle <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>* n acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+  <span class="par">(</span>boucle n <span class="cst">1</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>fact-t <span class="cst">5</span><span class="par">)</span>   <span class="res">; → 120</span></code></pre></div>
+<p>Seule <code>fact-t</code>, à un paramètre, est visible de l'extérieur ; <code>boucle</code> est locale. Les deux versions sont justes. Ton enseignant utilise la valeur par défaut (slides 33 et 34), alors que la slide 25 classe les valeurs par défaut hors programme : demande-lui quelle forme il attend au DST, et sache écrire les deux.</p>
+<h3 id="10-5-pourquoi-la-version-terminale-economise-la-memoire-slid">10.5 Pourquoi la version terminale économise la mémoire (slide 34)</h3>
+<p>Quand un appel est terminal, l'appel en cours n'a plus rien à faire : son cadre de pile ne sert plus. Racket garantit qu'il le réutilise au lieu d'en empiler un nouveau : c'est l'<strong>élimination des appels terminaux</strong> (tail call optimization). Une récursivité terminale s'exécute donc en mémoire constante, comme une boucle. C'est ce que la slide 34 appelle « mettre à jour les valeurs de la pile d'exécution ».</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      <span class="cst">1</span>
+      <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>f <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>g n <span class="par">[</span>acc <span class="cst">1</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">1</span><span class="par">)</span>
+      acc
+      <span class="par">(</span>g <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>g <span class="cst">5000000</span><span class="par">)</span>   <span class="res">; → 5000000</span>
+<span class="par">(</span>f <span class="cst">5000000</span><span class="par">)</span>   <span class="res err">; → (mémoire) out of memory dans DrRacket, voir la partie 9.5</span></code></pre></div>
+<p>Deux conséquences :</p>
+<ul><li>en Racket, une récursivité terminale <strong>est</strong> une boucle ;</li><li>une récursivité terminale infinie (le <code>(f x)</code> qui appelle <code>(f x)</code> de la slide 31) est une boucle infinie qui n'épuise jamais la mémoire : elle tourne jusqu'au Stop. Une récursivité enveloppée infinie, comme <code>(f 0)</code> en partie 9.4, finit en <code>out of memory</code>.</li></ul>
+<p>Python ne fait pas cette optimisation : même écrite sous forme terminale, une fonction récursive s'arrête vers 1000 appels. C'est une des raisons pour lesquelles Python préfère les boucles, et Racket la récursivité.</p>
+<h3 id="10-6-le-conseil-de-ton-enseignant-slide-35">10.6 Le conseil de ton enseignant (slide 35)</h3>
+<p>La slide 35 est claire : « ne pas se dédier à l'écriture de fonctions récursives terminales », « ne pas voir des dépassements de pile partout », « commencer par écrire une première version simple » et se poser les questions d'optimisation ensuite. En pratique :</p>
+<ol><li>écris d'abord la version enveloppée, la plus proche de la définition mathématique, donc la plus facile à rendre juste ;</li><li>teste-la ;</li><li>transforme-la en version terminale seulement si l'énoncé le demande, ou si n peut devenir énorme.</li></ol>
+<h3 id="10-7-reconnaitre-au-premier-coup-d-il">10.7 Reconnaître au premier coup d'œil</h3>
+<div class="box ask"><p class="lbl">Pour chaque fonction : enveloppée ou terminale ? Et que calcule-t-elle ?</p><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>a n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">0</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>a <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>b n acc<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> acc <span class="par">(</span>b <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>+ acc <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>c n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&lt; n <span class="cst">10</span><span class="par">)</span> n <span class="par">(</span>c <span class="par">(</span>quotient n <span class="cst">10</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>d n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">#t</span> <span class="par">(</span>not <span class="par">(</span>d <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>e n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">0</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>even? n<span class="par">)</span> <span class="par">(</span>e <span class="par">(</span>quotient n <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>e <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span></code></pre></div>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>a n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">0</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>a <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>b n acc<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> acc <span class="par">(</span>b <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>+ acc <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>c n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>&lt; n <span class="cst">10</span><span class="par">)</span> n <span class="par">(</span>c <span class="par">(</span>quotient n <span class="cst">10</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>d n<span class="par">)</span> <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">#t</span> <span class="par">(</span>not <span class="par">(</span>d <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>e n<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>= n <span class="cst">0</span><span class="par">)</span> <span class="cst">0</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>even? n<span class="par">)</span> <span class="par">(</span>e <span class="par">(</span>quotient n <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>e <span class="par">(</span>- n <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>a <span class="cst">5</span><span class="par">)</span>      <span class="res">; → 5</span>
+<span class="par">(</span>b <span class="cst">5</span> <span class="cst">0</span><span class="par">)</span>    <span class="res">; → 10</span>
+<span class="par">(</span>c <span class="cst">2026</span><span class="par">)</span>   <span class="res">; → 2</span>
+<span class="par">(</span>d <span class="cst">4</span><span class="par">)</span>      <span class="res">; → #t</span>
+<span class="par">(</span>e <span class="cst">13</span><span class="par">)</span>     <span class="res">; → 3</span></code></pre></div>
+<ul><li><code>a</code> : enveloppée (on ajoute 1 après l'appel). Elle renvoie n, péniblement.</li><li><code>b</code> : terminale. Avec acc = 0 au départ, elle calcule 2n.</li><li><code>c</code> : terminale, l'appel est directement le résultat du <code>if</code>. Elle renvoie le premier chiffre de n.</li><li><code>d</code> : enveloppée, car <code>not</code> s'applique au résultat. Elle répond <code>#t</code> quand n est pair.</li><li><code>e</code> : ni l'une ni l'autre tout à fait. L'appel de la ligne <code>even?</code> est terminal, celui de la ligne <code>else</code> est enveloppé ; il suffit d'un appel enveloppé pour que la fonction ne soit pas récursive terminale. Elle compte les 1 dans l'écriture binaire de n (13 s'écrit 1101) : un clin d'œil à ton cours d'architecture.</li></ul>
+</div></details>
+</div>
+<h2 id="p11"><span class="num">11</span>Hors programme, à reconnaître</h2>
+<p>Le CM montre plusieurs outils marqués « hors programme ». Sache les lire, sans t'en servir au DST sauf si l'énoncé le demande.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Slide</th><th>Outil</th><th>Ce qu'il faut en retenir</th></tr></thead><tbody><tr><td>9 et 10</td><td>bases 16, 8 et 2, exacts et inexacts, infinis</td><td><code>#x29</code> vaut 41 et <code>#b010101</code> vaut 21 ; lecture seulement</td></tr><tr><td>16 et 17</td><td>caractères et chaînes</td><td><code>string-append</code>, <code>string-length</code>, <code>string-ref</code> ; <code>string-set!</code> modifie une chaîne, c'est une affectation, « pas souhaitable » selon la slide</td></tr><tr><td>20</td><td><code>lambda</code>, <code>case-lambda</code></td><td><code>lambda</code> est sur la cheatsheet : sache la lire (partie 6.4)</td></tr><tr><td>22</td><td><code>when</code></td><td>à éviter, il peut ne rien renvoyer (partie 7.3)</td></tr><tr><td>25</td><td>valeurs par défaut, mots-clés</td><td><code>[acc 1]</code> sert pour la récursivité terminale (partie 10.2) ; les mots-clés comme <code>#:x</code> permettent de passer les arguments dans n'importe quel ordre</td></tr><tr><td>28 et 36</td><td><code>let</code> avec <code>lambda</code>, <code>letrec</code></td><td>des fonctions locales ; le <code>define</code> local fait la même chose plus simplement</td></tr><tr><td>37 et 38</td><td>boucles <code>for</code> et <code>for*</code></td><td>des boucles « peu désirables en fonctionnel », qui travaillent par effets de bord (<code>printf</code>) ; au DST, écris une récursion</td></tr></tbody></table></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="cst">#x29</span>                                    <span class="res">; → 41</span>
+<span class="cst">#b010101</span>                                <span class="res">; → 21</span>
+<span class="par">(</span>string-append <span class="str">"a"</span> <span class="str">"bc"</span><span class="par">)</span>                <span class="res">; → "abc"</span>
+<span class="par">(</span>string-length <span class="str">"abcde"</span><span class="par">)</span>                 <span class="res">; → 5</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f #:x x #:y y<span class="par">)</span> <span class="par">(</span>+ x <span class="par">(</span>* <span class="cst">2</span> y<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f #:y <span class="cst">1</span> #:x <span class="cst">2</span><span class="par">)</span>                         <span class="res">; → 4</span>
+<span class="par">(</span><span class="kw">for</span> <span class="par">(</span><span class="par">[</span>i <span class="cst">3</span><span class="par">]</span><span class="par">)</span> <span class="par">(</span>printf <span class="str">"~a~n"</span> i<span class="par">)</span><span class="par">)</span>         <span class="res">; affiche : 0 1 2</span></code></pre></div>
+<h3 id="afficher-n-est-pas-renvoyer">Afficher n'est pas renvoyer</h3>
+<p>C'est la confusion classique quand on vient de Python, entre <code>print</code> et <code>return</code>.</p>
+<ul><li>Une fonction <strong>renvoie</strong> la valeur de son corps : c'est ce qu'on utilise dans les calculs.</li><li><code>display</code>, <code>print</code> et <code>printf</code> <strong>affichent</strong> du texte : c'est un effet de bord (une sortie), et ils ne renvoient rien d'utilisable.</li></ul>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>carre x<span class="par">)</span> <span class="par">(</span>* x x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>carre-affiche x<span class="par">)</span> <span class="par">(</span>display <span class="par">(</span>* x x<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>carre <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → 10</span>
+<span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>carre-affiche <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : +: contract violation</span></code></pre></div>
+<p><code>carre-affiche</code> montre bien 9 à l'écran, mais ce qu'elle renvoie est « rien », et <code>+</code> ne peut pas l'additionner. La cheatsheet utilise <code>print</code> ; voici la différence entre les trois :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>print <span class="str">"bonjour"</span><span class="par">)</span>                 <span class="res">; affiche : "bonjour"</span>
+<span class="par">(</span>display <span class="str">"bonjour"</span><span class="par">)</span>               <span class="res">; affiche : bonjour</span>
+<span class="par">(</span>printf <span class="str">"~a + ~a = ~a~n"</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">5</span><span class="par">)</span>   <span class="res">; affiche : 2 + 3 = 5</span></code></pre></div>
+<p><code>print</code> affiche comme le REPL (avec les guillemets), <code>display</code> affiche pour un humain, et <code>printf</code> insère des valeurs à la place des <code>~a</code> (<code>~n</code> passe à la ligne).</p>
+<h2 id="p12"><span class="num">12</span>Lire les messages d'erreur</h2>
+<p>Une erreur arrive à l'un de ces deux moments :</p>
+<ul><li><strong>avant l'exécution</strong>, au Run : Racket lit le fichier (les parenthèses), analyse la syntaxe (<code>define</code>, <code>if</code>, <code>let</code>…) et vérifie que chaque nom existe. En cas d'erreur à ce stade, <strong>rien</strong> n'est exécuté ;</li><li><strong>pendant l'exécution</strong> : mauvais type, mauvais nombre d'arguments, division par zéro. Ces erreurs n'apparaissent que si la ligne fautive est réellement exécutée.</li></ul>
+<p>C'est une précision sur la slide 7 (« détection des erreurs à l'exécution ») : c'est vrai pour les types, pas pour la syntaxe ni pour les noms.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Message (début)</th><th>Moment</th><th>Cause probable</th></tr></thead><tbody><tr><td><code>read-syntax: expected a `)` to close `(`</code></td><td>avant</td><td>une parenthèse fermante manque ; réindente, la ligne qui se place mal te montre où</td></tr><tr><td><code>read-syntax: unexpected `)`</code></td><td>avant</td><td>une parenthèse fermante en trop</td></tr><tr><td><code>read-syntax: expected `)` to close preceding `(`, found instead `]`</code></td><td>avant</td><td>une paire mélangée, comme <code>( ]</code></td></tr><tr><td><code>x: unbound identifier</code></td><td>avant</td><td>nom inconnu : faute de frappe, nom hors de sa portée, <code>n-1</code> collé, <code>let</code> au lieu de <code>let*</code></td></tr><tr><td><code>module: identifier already defined</code></td><td>avant</td><td>deux <code>define</code> du même nom ; mets l'ancien en commentaire avec <code>#;</code></td></tr><tr><td><code>if: missing an "else" expression</code></td><td>avant</td><td>un <code>if</code> sans branche « sinon »</td></tr><tr><td><code>define: bad syntax</code></td><td>avant</td><td>par exemple <code>(define f x (+ x 1))</code> : il manque la parenthèse autour de <code>(f x)</code></td></tr><tr><td><code>application: not a procedure</code></td><td>pendant</td><td>parenthèses en trop, notation infixe <code>(x + 1)</code>, ou <code>(+1 2)</code></td></tr><tr><td><code>f: arity mismatch</code></td><td>pendant</td><td>mauvais nombre d'arguments ; compare <code>expected</code> et <code>given</code></td></tr><tr><td><code>+: contract violation</code></td><td>pendant</td><td>mauvais type d'argument, souvent un « rien » venu d'un <code>cond</code> sans <code>else</code> ou d'un <code>display</code> ; lis <code>expected</code> et <code>given</code></td></tr><tr><td><code>/: division by zero</code></td><td>pendant</td><td>division par un zéro exact</td></tr><tr><td><code>x: undefined; cannot reference an identifier before its definition</code></td><td>pendant</td><td>une constante qui utilise une fonction définie plus bas, ou un nom inconnu tapé dans la zone d'interactions</td></tr><tr><td><code>Interactions disabled; out of memory</code></td><td>pendant</td><td>récursivité enveloppée infinie (cas de base jamais atteint) ou trop profonde</td></tr><tr><td>aucun message, ça ne s'arrête pas</td><td>pendant</td><td>récursivité terminale infinie : clique sur Stop</td></tr></tbody></table></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> f x <span class="par">(</span>+ x <span class="cst">1</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : define: bad syntax</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>moyenne a b<span class="par">)</span> <span class="par">(</span>/ <span class="par">(</span>+ a b<span class="par">)</span> <span class="cst">2</span><span class="par">)</span>   <span class="res err">; → erreur : read-syntax: expected a `)` to close `(`</span></code></pre></div>
+<h2 id="p13"><span class="num">13</span>Tes notes du CM1, relues</h2>
+<p><strong>Ce qui est juste.</strong> Les définitions des paradigmes (séquence d'ordres pour l'impératif, décrire le problème plutôt que l'algorithme pour le déclaratif), Python multi-paradigme, l'absence d'affectation et le sens du <code>=</code>, la filiation lambda-calcul, Lisp, VLisp, l'interpréteur qui lit et exécute, la référence comme lien vers une case mémoire, <code>;</code> pour commenter, la liste des opérations, <code>(random 10)</code> dans [0 ; 9], la définition du prédicat, <code>define</code> pour les variables et les fonctions. Et tu as noté le bon objectif : la récursivité terminale, c'est la partie 10.</p>
+<p><strong>Ce qu'il faut corriger ou compléter.</strong></p>
+<ul><li><code>#! !#</code> → les commentaires sur plusieurs lignes s'écrivent <code>#|</code> … <code>|#</code> (partie 3.8).</li><li>« pas d'affection » → pas d'<strong>affectation</strong> (assignment) (partie 1.3).</li><li>« random [0;1] » → <code>(random)</code> sans argument renvoie un flottant dans ]0 ; 1[, bornes exclues (partie 4.5).</li><li>Le compilateur « exécute le code dans une machine virtuelle » → le compilateur traduit, il n'exécute pas ; c'est la machine virtuelle qui exécute le bytecode (partie 1.5).</li><li>« ouvrir une parenthèse c'est appeler une fonction » → oui, sauf pour les formes spéciales (<code>define</code>, <code>if</code>, <code>cond</code>, <code>and</code>, <code>or</code>, <code>let</code>), et une parenthèse n'est jamais décorative (parties 3.3 et 3.5).</li><li>« définir un prédicat (?????) » → une fonction dont le corps est une expression booléenne, avec un nom terminé par <code>?</code> (partie 5.5).</li><li>« pro obj = rendre un travail rébarbatif amusant » → je ne sais pas à quoi renvoie « pro obj » (programmation objet ? objectif du prof ?) : à compléter avec un camarade. Le CM définit la programmation orientée objet par « manipulation d'objets » (partie 1.1).</li><li>La liste des opérations → ajoute <code>quotient</code>, <code>expt</code> et <code>sqrt</code>, qui sont sur la slide 12 et sur la cheatsheet (parties 4.3 et 4.4).</li></ul>
+<details class="fold ex"><summary>Tes notes du CM1 remises au propre, à coller dans ta note Obsidian</summary><div class="fold-body"><p><strong>Objectif du cours</strong> : apprendre la programmation. Le fonctionnel dès le S1 pour prendre de bonnes habitudes : réfléchir au « quoi » (l'objectif de l'algorithme) et pas seulement au « comment » (les étapes de l'algorithme). Langage : Racket 8.10, dans DrRacket.</p>
+<p><strong>Paradigmes</strong></p>
+<ul><li>programmation impérative : programme = séquence d'ordres</li><li>programmation orientée objet : manipulation d'objets</li><li>programmation déclarative : décrire le problème, et non pas l'algorithme qui le résout (ex. : une requête SQL sur une base de données)</li><li>programmation fonctionnelle : des expressions qui représentent ce qu'on veut résoudre ; pas d'affectation, pas d'état, pas d'effet de bord ; le = veut dire « est-il égal à ? »</li><li>Python = langage multi-paradigme</li></ul>
+<p><strong>Histoire</strong> : lambda-calcul (Church, 1930) → Lisp (McCarthy, 1958) → VLisp (1971, Vincennes-Lisp, développé à Paris 8) → Scheme (1975) → Racket (2010)</p>
+<p><strong>Exécution d'un programme</strong></p>
+<ul><li>interpréteur : lit le programme et l'exécute</li><li>compilateur : traduit le programme en code machine, ou en bytecode qu'une machine virtuelle exécute ensuite</li><li>référence = lien vers une case mémoire ; le ramasse-miettes libère ce qui n'est plus référencé</li></ul>
+<p><strong>Racket, les bases</strong></p>
+<ul><li><code>;</code> = commenter une ligne ; <code>#|</code> … <code>|#</code> = commenter plusieurs lignes ; <code>#;</code> = commenter une expression entière</li><li>ouvrir une parenthèse = appliquer une fonction, sauf pour les formes spéciales (<code>define</code>, <code>if</code>, <code>cond</code>, <code>and</code>, <code>or</code>, <code>let</code>)</li><li>opérations : <code>+ - * /</code> (acceptent n arguments), <code>quotient</code>, <code>modulo</code>, <code>expt</code>, <code>sqrt</code>, <code>max</code>, <code>min</code>, <code>abs</code> ; <code>(random 10)</code> → entier dans [0 ; 9] ; <code>(random)</code> → flottant dans ]0 ; 1[</li><li>prédicat = fonction qui retourne vrai ou faux (<code>#t</code> ou <code>#f</code>), nom terminé par <code>?</code></li><li><code>define</code> pour définir des constantes et des fonctions</li><li>à maîtriser : la récursivité terminale (avec un accumulateur)</li></ul>
+</div></details>
+<h2 id="p14"><span class="num">14</span>Checklist avant le DST</h2>
+<p>Tu dois pouvoir, sur papier et sans machine :</p>
+<ul class="tasks"><li><input type="checkbox" id="tache-1"><label for="tache-1">traduire une expression mathématique ou Python en Racket, et l'inverse (parties 3.1 et 3.2) ;</label></li><li><input type="checkbox" id="tache-2"><label for="tache-2">évaluer à la main les pièges du chapitre : <code>(/ 7 2)</code>, <code>(quotient -13 3)</code>, <code>(modulo -13 3)</code>, <code>(and 1 2)</code>, <code>(if 0 1 2)</code>, <code>((+ 1 2))</code> (parties 3 à 5) ;</label></li><li><input type="checkbox" id="tache-3"><label for="tache-3">expliquer la différence entre <code>(define A ...)</code> et <code>(define (a) ...)</code> (partie 6.3) ;</label></li><li><input type="checkbox" id="tache-4"><label for="tache-4">écrire un prédicat sans <code>if</code> inutile (partie 5.5) ;</label></li><li><input type="checkbox" id="tache-5"><label for="tache-5">écrire un <code>cond</code> dans le bon ordre et repérer du code mort (partie 7.2) ;</label></li><li><input type="checkbox" id="tache-6"><label for="tache-6">choisir entre <code>let</code> et <code>let*</code>, et dire pourquoi (partie 8.2) ;</label></li><li><input type="checkbox" id="tache-7"><label for="tache-7">expliquer la portée et le masquage sur l'exemple de la slide 29 (partie 8.4) ;</label></li><li><input type="checkbox" id="tache-8"><label for="tache-8">écrire une fonction récursive avec la méthode des quatre questions, et donner sa trace (parties 9.2 et 9.3) ;</label></li><li><input type="checkbox" id="tache-9"><label for="tache-9">dire si une fonction est enveloppée ou terminale, et passer de l'une à l'autre avec un accumulateur, dans les deux styles (partie 10) ;</label></li><li><input type="checkbox" id="tache-10"><label for="tache-10">expliquer pourquoi <code>(f 5000000)</code> échoue dans DrRacket et pas <code>(g 5000000)</code> (partie 10.5) ;</label></li><li><input type="checkbox" id="tache-11"><label for="tache-11">reconnaître chaque message d'erreur de la partie 12, et dire s'il arrive avant ou pendant l'exécution.</label></li></ul>
+<p><strong>Et après ?</strong> La cheatsheet annonce la suite du semestre : les listes (<code>cons</code>, <code>first</code>, <code>rest</code>, <code>empty?</code>), <code>map</code>, <code>filter</code> et <code>foldl</code>, <code>match</code>, puis les images. Tout reposera sur ce chapitre : une fonction récursive sur une liste suit exactement la méthode des quatre questions, avec la liste vide comme cas de base.</p>
+
+</main>
+<footer>
+<p>Mis en page à partir de ma note Obsidian. Les commandes et le code se vérifient en les tapant soi-même.</p>
+</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+<script>
+var PAGE = "pf1-chapitre-1-cours";
+(function () {
+  function lire(cle) { try { return localStorage.getItem(cle); } catch (e) { return null; } }
+  function ecrire(cle, val) { try { localStorage.setItem(cle, val); } catch (e) {} }
+
+  // Boutons « Copier » des blocs Racket
+  function selectionner(bouton, code) {
+    var r = document.createRange();
+    r.selectNodeContents(code);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    bouton.textContent = 'Sélectionné : Ctrl+C';
+  }
+  document.querySelectorAll('.code .copy').forEach(function (bouton) {
+    bouton.addEventListener('click', function () {
+      var code = bouton.closest('.code').querySelector('code');
+      var texte = code.textContent;
+      var fini = function () {
+        bouton.textContent = 'Copié';
+        setTimeout(function () { bouton.textContent = 'Copier'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texte).then(fini, function () { selectionner(bouton, code); });
+      } else {
+        selectionner(bouton, code);
+      }
+    });
+  });
+
+  // Mode prédiction : les résultats « ; → » sont floutés jusqu'au clic
+  var bouton = document.getElementById('predict');
+  var CLE = 'pf1-mode-prediction';
+  if (bouton) {
+  function appliquer(actif) {
+    document.body.classList.toggle('predict', actif);
+    bouton.setAttribute('aria-pressed', actif ? 'true' : 'false');
+    bouton.textContent = actif ? 'Mode prédiction : activé' : 'Mode prédiction';
+    document.querySelectorAll('.res.shown').forEach(function (r) { r.classList.remove('shown'); });
+  }
+  appliquer(lire(CLE) === '1');
+  bouton.addEventListener('click', function () {
+    var actif = !document.body.classList.contains('predict');
+    appliquer(actif);
+    ecrire(CLE, actif ? '1' : '0');
+  });
+  document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('predict')) return;
+    var r = e.target.closest('.res');
+    if (r) r.classList.toggle('shown');
+  });
+  }
+
+  // Listes à cocher : chaque case est retenue dans ce navigateur
+  document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function (c) {
+    var cle = 'pf1-' + PAGE + '-' + c.id;
+    var v = lire(cle);
+    if (v !== null) c.checked = v === '1';
+    c.addEventListener('change', function () { ecrire(cle, c.checked ? '1' : '0'); });
+  });
+})();
+
+</script>
+</body>
+</html>

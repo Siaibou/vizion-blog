@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Programmation fonctionnelle 1, chapitre 2 : les listes</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+[hidden]{display:none!important}
+/* Cahier à lignes, marge rouge : la même famille que les cours « depuis le tout début ».
+   Ici le code Racket tient la place des formules : blocs façon DrRacket, résultats « ; → » repérables. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00; --str:#8a4a12;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.10);
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a; --str:#f0a36e;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.14);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+
+/* ---- en-tête ---- */
+.hero{padding:28px 16px 8px 30px;max-width:760px;margin:0 auto;position:relative}
+.series{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 30px;font-size:.9rem}
+.series .hub{font-weight:700;color:var(--blue);text-decoration:none}
+.series .hub:hover{text-decoration:underline}
+.series ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.series li{margin:0}
+.series ul a,.series ul span{display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none}
+.series ul a:hover{border-color:var(--blue)}
+.series ul span[aria-current]{border-color:var(--margin);color:var(--margin);font-weight:700}
+.series ul span.todo{color:var(--muted)}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.42em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:10px;line-height:1.4}
+.meta{margin:0;color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.predict-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:20px 0 0;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.predict-box p{margin:0;font-size:.92rem;color:var(--muted);flex:1 1 260px;min-width:0}
+.predict-btn{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;cursor:pointer;min-height:40px}
+.predict-btn[aria-pressed="true"]{background:var(--blue);color:var(--paper)}
+
+/* ---- corps ---- */
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3,h4{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+li>p{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+strong{font-weight:700}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.katex math{font-size:1.1em}
+.m{font-family:var(--serif);font-style:italic}
+.xref{font-style:italic}
+blockquote{margin:16px 0;padding:4px 16px;border-left:4px solid var(--line);color:var(--muted)}
+
+/* ---- tableaux ---- */
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.wide{min-width:34rem}
+
+/* ---- encadrés ---- */
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.box.idea{border-left:5px solid var(--margin)}.box.idea .lbl{color:var(--margin)}
+.box.nts{border-left:5px solid var(--blue)}.box.nts .lbl{color:var(--blue)}
+.box.warn{border-left:5px solid var(--amber)}.box.warn .lbl{color:var(--amber)}
+.box.tip{border-left:5px solid var(--green)}.box.tip .lbl{color:var(--green)}
+.box.ask{border:1.5px dashed var(--muted)}
+.box.ask .lbl{font-size:1.05rem}
+.box.danger{border-left:5px solid var(--red)}.box.danger .lbl{color:var(--red)}
+mark{background:var(--soft-a);color:inherit;padding:0 .15em;border-radius:3px}
+
+/* ---- blocs repliés : indices, solutions, réponses ---- */
+details.fold{margin:12px 0;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:10px;padding:0 14px}
+details.fold>summary{cursor:pointer;font-weight:700;padding:9px 0;color:var(--fc)}
+details.fold[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+.fold-body{padding-bottom:10px}
+.fold-body>:first-child{margin-top:0}.fold-body>:last-child{margin-bottom:0}
+details.fold.hint{--fc:var(--amber)}
+details.fold.tip{--fc:var(--blue)}
+details.fold.ok{--fc:var(--green)}
+details.fold.ex{--fc:var(--muted)}
+details.fold.nts{--fc:var(--blue)}
+details.fold.warn{--fc:var(--amber)}
+details.fold.danger{--fc:var(--red)}
+details.fold.ask{--fc:var(--muted)}
+details.fold.idea{--fc:var(--margin)}
+.box details.fold{background:var(--paper)}
+
+/* ---- code ---- */
+.code{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 6px 3px 12px;border-bottom:1px solid var(--line);background:var(--soft-b);
+  font-size:.74rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.code-bar.plain{padding:5px 12px}
+.code pre{margin:0;padding:10px 14px;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.6;tab-size:2}
+.code code{background:none;padding:0;font-size:inherit;border-radius:0;word-break:normal;white-space:pre}
+.code.txt pre{color:var(--ink)}
+.copy{font:inherit;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 10px;cursor:pointer;min-height:30px}
+.copy:hover{border-color:var(--blue)}
+.kw{color:var(--blue);font-weight:600}
+.str{color:var(--str)}
+.cst{color:var(--amber)}
+.com{color:var(--muted);font-style:italic}
+.res{color:var(--green);font-weight:600}
+.res.err{color:var(--red)}
+.par{color:var(--muted)}
+.quo{color:var(--blue);font-weight:600}
+.predict .res{filter:blur(5px);cursor:pointer;-webkit-user-select:none;user-select:none}
+.predict .res.shown{filter:none;-webkit-user-select:text;user-select:text}
+
+/* ---- listes à cocher ---- */
+ul.tasks{list-style:none;padding-left:0}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+ul.tasks input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+ul.tasks label{cursor:pointer;min-width:0}
+ul.tasks input:checked+label{color:var(--muted);text-decoration:line-through}
+
+/* ---- bas de page ---- */
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+
+/* Bandeau du blog Vizion : retour à la Licence et mention de l'auteur */
+.vz-bar{max-width:760px;margin:0 auto;padding:14px 16px 0 30px;font-size:.93rem;line-height:1.5;color:var(--muted)}
+@media (min-width:720px){.vz-bar{padding-left:64px}}
+.vz-back{display:inline-block;color:var(--blue);font-weight:700;text-decoration:none;padding:4px 0}
+.vz-back:hover{text-decoration:underline}
+.vz-note{margin:6px 0 0;padding:8px 12px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.hero{padding-top:20px}
+
+</style>
+</head>
+<body>
+<div class="vz-bar">
+<a class="vz-back" href="/licence/#programmation-fonctionnelle">← Vizion.Blog / Licence / Programmation fonctionnelle</a>
+<p class="vz-note"><b>Cours rédigé par Claude</b>, une IA d'Anthropic, pour mes révisions de L1, à partir de mes notes de cours : il s'adresse donc à moi (« tes notes », « ton enseignant »). Dans cette version publique, j'ai retiré les remarques sur les supports de mon enseignant.</p>
+</div>
+<header class="hero" id="haut">
+<nav class="series" aria-label="Pages du même cours">
+<ul><li><a href="/cours/pf1-chapitre-1-cours.html">Chapitre 1, cours</a></li><li><a href="/cours/pf1-chapitre-1-exercices.html">Chapitre 1, exercices</a></li><li><span aria-current="page">Chapitre 2, cours</span></li></ul>
+</nav>
+<p class="kicker">Programmation fonctionnelle 1, chapitre 2</p>
+<h1>Les listes<small>CM2 : listes (17 slides), TD2 et TP2</small></h1>
+<p class="meta">Racket 8.10 · note du 4 octobre 2026</p>
+<div class="predict-box">
+<button type="button" id="predict" class="predict-btn" aria-pressed="false">Mode prédiction</button>
+<p>Floute les résultats <code>; →</code> dans le code : prédis-les sur papier, puis clique sur un résultat pour le révéler.</p>
+</div>
+</header>
+<main>
+<div class="box idea"><p class="lbl">L'idée du chapitre</p><p>Une liste est <strong>soit vide, soit un premier élément suivi d'une autre liste</strong>. Cette définition, qui se mord la queue, explique tout le chapitre : comment on construit une liste (<code>cons</code>), comment on la lit (<code>first</code> et <code>rest</code>), et pourquoi presque toutes les fonctions sur les listes sont récursives, avec la liste vide comme cas de base. C'est la récursivité du chapitre 1, où <code>(- n 1)</code> devient <code>(rest x)</code>.</p>
+</div>
+<h2 id="p0"><span class="num">0</span>Mode d'emploi</h2>
+<ul><li><strong>Ce cours suit le CM2</strong> dans l'ordre (les numéros de slides renvoient au PDF de 17 slides), puis ajoute ce que le TD2 et le TP2 utilisent sans que le CM le montre : les paires (pour le TP2), <code>map</code>, <code>foldl</code>, <code>foldr</code>, <code>andmap</code> et <code>ormap</code> (dans des solutions du TD), et <code>filter</code>, que cite la cheatsheet.</li><li><strong>Tout le code a été exécuté dans Racket 8.10.</strong> Ce qui suit <code>; →</code> est ce que DrRacket affiche. Le cours renvoie souvent au <a href="/cours/pf1-chapitre-1-cours.html">PF1 - Chapitre 1 - Cours</a> : relis la partie indiquée si un point te semble flou.</li><li><strong>Les exercices</strong> du TD2 et du TP2 sont travaillés à part : cette page ne contient que le cours.</li><li><strong>Attention au copier-coller depuis les PDF.</strong> Les slides du CM2 et les solutions du TD affichent une apostrophe typographique (’) au lieu de l'apostrophe droite ('). Collé dans DrRacket, <code>(list-&gt;list2 ’(1 2 3 4 5))</code> donne <code>’: unbound identifier</code>. Retape les apostrophes, ou mieux, retape le code : c'est en l'écrivant qu'on l'apprend.</li><li><strong>Rythme conseillé</strong> :<ul><li>séance 1 : parties 1 à 5 ;</li><li>séance 2 : parties 6 et 7, puis les questions 1 à 12 du TD (laisse de côté, pour l'instant, les variantes de solutions qui utilisent <code>map</code>, <code>foldl</code>, <code>foldr</code>, <code>andmap</code> ou <code>ormap</code> : c'est la partie 8) ;</li><li>séance 3 : parties 8 à 12, puis la fin du TD, la slide 17 et le TP.</li></ul>
+</li></ul>
+<div class="box warn"><p class="lbl">Rappel de la règle du cours sur les LLM (CM1, slide 2)</p><p>Interdits pendant le cours, sur papier comme sur machine ; hors du cours, tu dois vérifier et comprendre. Le TD2 contient ses propres solutions. Le TP2 demande ton numéro d'étudiant, il est donc sans doute à rendre : pour lui, uniquement des indices.</p>
+</div>
+<p><strong>Plan</strong></p>
+<ol><li><a href="#p1">1. Pourquoi des listes</a></li><li><a href="#p2">2. Écrire une liste avec list et quote</a></li><li><a href="#p3">3. Lire une liste avec first et rest</a></li><li><a href="#p4">4. Construire une liste avec cons</a></li><li><a href="#p5">5. Les paires, quand cons ne fabrique pas une liste</a></li><li><a href="#p6">6. Parcourir une liste par récursion</a></li><li><a href="#p7">7. La récursivité terminale sur les listes</a></li><li><a href="#p8">8. Les fonctions sont des valeurs</a></li><li><a href="#p9">9. Les fonctions toutes faites, hors programme</a></li><li><a href="#p10">10. Lire les messages d'erreur des listes</a></li><li><a href="#p11">11. Ce que le TD2 utilise</a></li><li><a href="#p12">12. Checklist avant le DST</a></li></ol>
+<h2 id="p1"><span class="num">1</span>Pourquoi des listes</h2>
+<p>Jusqu'ici, une valeur Racket était un nombre, un booléen ou une chaîne : une seule chose à la fois. Une <strong>liste</strong> (list) range plusieurs valeurs, dans un ordre donné, à l'intérieur d'une seule valeur. Tu connais l'idée avec Python :</p>
+<div class="tw"><table class="wide"><thead><tr><th>Python</th><th>Racket</th><th>Ce que ça fait</th></tr></thead><tbody><tr><td><code>[1, 2, 3]</code></td><td><code>'(1 2 3)</code> ou <code>(list 1 2 3)</code></td><td>une liste de trois nombres</td></tr><tr><td><code>[]</code></td><td><code>'()</code> ou <code>empty</code></td><td>la liste vide</td></tr><tr><td><code>L[0]</code></td><td><code>(first L)</code></td><td>le premier élément</td></tr><tr><td><code>L[1:]</code></td><td><code>(rest L)</code></td><td>la liste privée de son premier élément</td></tr><tr><td><code>[x] + L</code></td><td><code>(cons x L)</code></td><td>ajouter x en tête</td></tr><tr><td><code>L1 + L2</code></td><td><code>(append L1 L2)</code></td><td>mettre deux listes bout à bout</td></tr><tr><td><code>len(L)</code></td><td><code>(length L)</code></td><td>le nombre d'éléments</td></tr><tr><td><code>x in L</code></td><td><code>(member x L)</code></td><td>x est-il dans L ?</td></tr></tbody></table></div>
+<p>Mais trois différences changent tout :</p>
+<ol><li><strong>Une liste Racket ne se modifie jamais.</strong> Pas de <code>L.append(4)</code> ni de <code>L[0] = 9</code> : on fabrique une nouvelle liste (partie 4.5). C'est l'absence d'affectation du chapitre 1 (partie 1.3), appliquée aux listes.</li><li><strong>On ne lit pas une liste par indice, mais par la tête.</strong> Une liste est une chaîne de maillons : on accède directement au premier, et pour atteindre le dixième, on enlève neuf fois le premier. <code>list-ref</code> existe, mais la slide 10 la classe hors programme.</li><li><strong>La liste vide est le point de départ de tout.</strong> Toute liste est construite à partir de <code>'()</code>, et toute fonction sur les listes s'arrête sur <code>'()</code>.</li></ol>
+<h2 id="p2"><span class="num">2</span>Écrire une liste avec list et quote</h2>
+<h3 id="2-1-avec-la-fonction-list-slide-2">2.1 Avec la fonction list (slide 2)</h3>
+<p><code>list</code> est une fonction comme les autres : elle <strong>évalue ses arguments</strong>, puis range leurs valeurs dans une liste.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>list <span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>              <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>list <span class="str">"a"</span> <span class="str">"b"</span> <span class="str">"c"</span><span class="par">)</span>        <span class="res">; → '("a" "b" "c")</span>
+<span class="par">(</span>list <span class="par">(</span>+ <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(2 6)</span></code></pre></div>
+<p>DrRacket affiche une liste précédée d'une apostrophe, <code>'(1 2 3)</code>, parce que c'est ainsi qu'on l'écrirait dans un programme.</p>
+<h3 id="2-2-avec-quote-slide-2">2.2 Avec quote (slide 2)</h3>
+<p>L'apostrophe, ou <code>quote</code>, dit à Racket : <strong>n'évalue pas ce qui suit, c'est une donnée</strong>.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>             <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span><span class="kw">quote</span> <span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>      <span class="res">; → '(1 2 3)</span>
+<span class="quo">'</span><span class="par">(</span><span class="par">(</span>+ <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>         <span class="res">; → '((+ 1 1) 3)</span></code></pre></div>
+<p>Pourquoi en a-t-on besoin ? Parce qu'au chapitre 1, une parenthèse ouvrante voulait dire « applique » (partie 3.3). Sans l'apostrophe, Racket essaie d'appliquer 1 comme une fonction :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res err">; → erreur : application: not a procedure</span></code></pre></div>
+<p>La troisième ligne de l'exemple précédent montre la vraie différence avec <code>list</code> : sous l'apostrophe, <strong>rien</strong> n'est calculé. <code>'((+ 1 1) 3)</code> est une liste de deux éléments, dont le premier est lui-même une liste de trois éléments : le symbole <code>+</code>, puis 1, puis 1. Avec <code>list</code>, <code>(+ 1 1)</code> aurait été calculé et aurait donné 2.</p>
+<p>Le premier élément est bien une liste, pas un nombre :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>first <span class="quo">'</span><span class="par">(</span><span class="par">(</span>+ <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(+ 1 1)</span></code></pre></div>
+<p><code>quote</code> ne peut donc pas être une fonction : une fonction évalue toujours ses arguments avant l'appel (évaluation stricte, partie 3.5 du chapitre 1), et <code>(1 2 3)</code> provoquerait une erreur avant même que <code>quote</code> ne reçoive quoi que ce soit. C'est une <strong>forme spéciale</strong>, comme <code>if</code> ou <code>define</code>. La slide 2 parle de « la fonction quote » : c'est un abus de langage, voir la partie 12.</p>
+<div class="box tip"><p class="lbl">La règle pratique</p><p><code>list</code> quand les éléments sont à calculer, l'apostrophe quand tu écris une donnée telle quelle.</p>
+</div>
+<h3 id="2-3-les-symboles-slides-2-3-et-7">2.3 Les symboles (slides 2, 3 et 7)</h3>
+<p><code>'a</code> est un <strong>symbole</strong> (symbol) : un nom utilisé comme une valeur, sans rien derrière. Comme le dit la slide 3, un symbole existe dès qu'on l'écrit, alors qu'une variable n'existe que si on l'a définie avant.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>list <span class="quo">'</span>a <span class="quo">'</span>b <span class="quo">'</span>c<span class="par">)</span>   <span class="res">; → '(a b c)</span>
+<span class="quo">'</span><span class="par">(</span>a b c<span class="par">)</span>          <span class="res">; → '(a b c)</span></code></pre></div>
+<p>Sans apostrophe, <code>a</code> est un nom de variable, que Racket cherche :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>list a b c<span class="par">)</span>   <span class="res err">; → erreur : a: unbound identifier</span></code></pre></div>
+<p>Avec des variables définies (slide 3), la liste contient leurs <strong>valeurs</strong> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> a <span class="cst">2</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> b <span class="par">(</span>* a a<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> c <span class="par">(</span>* b b<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>list a b c<span class="par">)</span>   <span class="res">; → '(2 4 16)</span></code></pre></div>
+<p>Et voici le piège de la slide 7 : avec des variables définies, l'apostrophe donne quand même des symboles, pas les valeurs.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> a <span class="cst">1</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> b <span class="cst">2</span><span class="par">)</span>
+<span class="quo">'</span><span class="par">(</span>a b<span class="par">)</span>       <span class="res">; → '(a b)</span>
+<span class="par">(</span>list a b<span class="par">)</span>   <span class="res">; → '(1 2)</span></code></pre></div>
+<p>Un symbole n'est pas une chaîne de caractères : <code>'a</code> et <code>"a"</code> sont deux valeurs de types différents. Pour comparer des symboles, ou des listes, on utilise <code>equal?</code> ; le <code>=</code> du chapitre 1 ne compare que des nombres.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>equal? <span class="quo">'</span>a <span class="quo">'</span>a<span class="par">)</span>              <span class="res">; → #t</span>
+<span class="par">(</span>equal? <span class="str">"a"</span> <span class="quo">'</span>a<span class="par">)</span>             <span class="res">; → #f</span>
+<span class="par">(</span>equal? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="par">(</span>list <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>  <span class="res">; → #t</span>
+<span class="par">(</span>= <span class="quo">'</span>a <span class="quo">'</span>a<span class="par">)</span>                   <span class="res err">; → erreur : =: contract violation</span></code></pre></div>
+<h3 id="2-4-la-liste-vide-slide-5">2.4 La liste vide (slide 5)</h3>
+<p>Elle a trois écritures, qui désignent exactement la même valeur, affichée <code>'()</code> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="quo">'</span><span class="par">(</span><span class="par">)</span>       <span class="res">; → '()</span>
+empty     <span class="res">; → '()</span>
+<span class="par">(</span>list<span class="par">)</span>    <span class="res">; → '()</span></code></pre></div>
+<h3 id="2-5-ce-qu-une-liste-peut-contenir">2.5 Ce qu'une liste peut contenir</h3>
+<p>N'importe quoi, et pas forcément des valeurs du même type, comme en Python : des nombres, des chaînes, des symboles, des booléens, et d'autres listes.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="quo">'</span><span class="par">(</span>a <span class="str">"a"</span> <span class="cst">1</span> <span class="cst">#t</span> <span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → '(a "a" 1 #t (2 3))</span>
+<span class="par">(</span>length <span class="quo">'</span><span class="par">(</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="par">(</span><span class="cst">3</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → 2</span></code></pre></div>
+<p><code>'((1 2) (3))</code> contient <strong>deux</strong> éléments, qui sont deux listes. <code>length</code> ne compte que les éléments du premier niveau.</p>
+<h3 id="2-6-une-fonction-qui-renvoie-une-liste-slide-4">2.6 Une fonction qui renvoie une liste (slide 4)</h3>
+<p>Une liste permet à une fonction de renvoyer plusieurs résultats d'un coup. La slide 4 renvoie x, x² et x⁴ :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">let*</span> <span class="par">(</span><span class="par">[</span>x2 <span class="par">(</span>* x x<span class="par">)</span><span class="par">]</span>
+         <span class="par">[</span>x4 <span class="par">(</span>* x2 x2<span class="par">)</span><span class="par">]</span><span class="par">)</span>
+    <span class="par">(</span>list x x2 x4<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>f <span class="cst">3</span><span class="par">)</span>   <span class="res">; → '(3 9 81)</span></code></pre></div>
+<p>Les deux autres versions de la slide (avec <code>(list x (* x x) (* x x x x))</code>, ou avec des <code>define</code> locaux) donnent le même résultat. La version <code>let*</code> calcule x² une seule fois : c'est la partie 8 du chapitre 1.</p>
+<div class="box ask"><p class="lbl">À toi (partie 2)</p><ol><li>Que valent <code>(list 1 (+ 1 1) 3)</code>, <code>'(1 (+ 1 1) 3)</code>, <code>(list 'x "x")</code> et <code>(length '(a (b c) d))</code> ?</li><li>Pourquoi <code>(1 2 3)</code> provoque-t-il une erreur, et pas <code>'(1 2 3)</code> ?</li><li>Avec <code>(define x 5)</code>, que valent <code>(list x 'x)</code> et <code>'(x x)</code> ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>list <span class="cst">1</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>       <span class="res">; → '(1 2 3)</span>
+<span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="cst">1</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>           <span class="res">; → '(1 (+ 1 1) 3)</span>
+<span class="par">(</span>list <span class="quo">'</span>x <span class="str">"x"</span><span class="par">)</span>            <span class="res">; → '(x "x")</span>
+<span class="par">(</span>length <span class="quo">'</span><span class="par">(</span>a <span class="par">(</span>b c<span class="par">)</span> d<span class="par">)</span><span class="par">)</span>    <span class="res">; → 3</span>
+<span class="par">(</span><span class="kw">define</span> x <span class="cst">5</span><span class="par">)</span>
+<span class="par">(</span>list x <span class="quo">'</span>x<span class="par">)</span>              <span class="res">; → '(5 x)</span>
+<span class="quo">'</span><span class="par">(</span>x x<span class="par">)</span>                   <span class="res">; → '(x x)</span></code></pre></div>
+<ol><li>Sous l'apostrophe, <code>(+ 1 1)</code> n'est pas calculé : c'est une liste de trois éléments rangée dans la liste. <code>(b c)</code> compte pour un seul élément.</li><li>Sans apostrophe, la parenthèse demande d'appliquer 1 comme une fonction. Avec, elle annonce une donnée.</li><li><code>x</code> sans apostrophe est la variable (5) ; <code>'x</code> est le symbole x.</li></ol>
+</div></details>
+</div>
+<h2 id="p3"><span class="num">3</span>Lire une liste avec first et rest</h2>
+<h3 id="3-1-une-tete-et-un-reste-slide-5">3.1 Une tête et un reste (slide 5)</h3>
+<p>Pense à un train. <code>first</code> donne la <strong>tête</strong> (head), le premier wagon. <code>rest</code> donne le <strong>reste</strong> (tail), c'est-à-dire tout le train sauf le premier wagon : c'est encore un train, éventuellement vide.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>first <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 1</span>
+<span class="par">(</span>rest <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(2 3)</span>
+<span class="par">(</span>rest <span class="quo">'</span><span class="par">(</span><span class="cst">3</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → '()</span></code></pre></div>
+<p>La règle à graver (slide 6) : <strong><code>first</code> renvoie un élément, <code>rest</code> renvoie toujours une liste.</strong> C'est l'équivalent de <code>L[0]</code> et de <code>L[1:]</code> en Python. Historiquement, ces fonctions s'appellent <code>car</code> et <code>cdr</code> (slide 5) ; elles existent toujours, on y revient en partie 5.</p>
+<h3 id="3-2-aller-chercher-plus-loin">3.2 Aller chercher plus loin</h3>
+<p>Pour atteindre le troisième élément, on enlève deux fois la tête, puis on prend la tête de ce qui reste :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> L <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="cst">20</span> <span class="cst">30</span> <span class="cst">40</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>first <span class="par">(</span>rest <span class="par">(</span>rest L<span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 30</span>
+<span class="par">(</span>cadr L<span class="par">)</span>                  <span class="res">; → 20</span>
+<span class="par">(</span>caddr L<span class="par">)</span>                 <span class="res">; → 30</span></code></pre></div>
+<p><code>cadr</code> (« le car du cdr ») est un raccourci pour <code>(first (rest L))</code>, et <code>caddr</code> pour <code>(first (rest (rest L)))</code>. La cheatsheet cite <code>cadr</code> et <code>cddr</code> ; tu peux t'en passer et composer <code>first</code> et <code>rest</code>.</p>
+<h3 id="3-3-le-piege-de-la-liste-vide-slide-6">3.3 Le piège de la liste vide (slide 6)</h3>
+<p><code>first</code> et <code>rest</code> n'ont de sens que sur une liste d'au moins un élément. Sur la liste vide :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>first empty<span class="par">)</span>   <span class="res err">; → erreur : first: contract violation</span>
+<span class="par">(</span>rest <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>      <span class="res err">; → erreur : rest: contract violation</span></code></pre></div>
+<div class="code txt"><pre><code>first: contract violation
+  expected: (and/c list? (not/c empty?))
+  given: '()</code></pre></div>
+<p>Lis le message : <code>first</code> attendait « une liste, et pas une liste vide », et on lui a donné <code>'()</code>. D'où la règle qui va structurer toute la partie 6 : <strong>on teste toujours <code>empty?</code> avant d'utiliser <code>first</code> ou <code>rest</code></strong>.</p>
+<h3 id="3-4-les-listes-de-listes-slide-6">3.4 Les listes de listes (slide 6)</h3>
+<p>Quand les éléments sont des listes, <code>first</code> renvoie une liste (puisque l'élément en est une), et <code>rest</code> renvoie une liste de listes :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>first <span class="par">(</span>list <span class="par">(</span>list <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>list <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(1)</span>
+<span class="par">(</span>rest <span class="par">(</span>list <span class="par">(</span>list <span class="cst">1</span><span class="par">)</span> <span class="par">(</span>list <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '((2 3))</span></code></pre></div>
+<h3 id="3-5-length-empty-et-list-slides-5-et-7">3.5 length, empty? et list? (slides 5 et 7)</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>length <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → 3</span>
+<span class="par">(</span>empty? <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>                <span class="res">; → #t</span>
+<span class="par">(</span>empty? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → #f</span>
+<span class="par">(</span>empty? <span class="quo">'</span><span class="par">(</span><span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>              <span class="res">; → #f</span>
+<span class="par">(</span>list? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>              <span class="res">; → #t</span>
+<span class="par">(</span>list? <span class="cst">5</span><span class="par">)</span>                   <span class="res">; → #f</span>
+<span class="par">(</span>list? <span class="par">(</span>first <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>      <span class="res">; → #f</span>
+<span class="par">(</span>list? <span class="par">(</span>rest <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → #t</span></code></pre></div>
+<p>Le piège de la liste : <code>'(())</code> n'est <strong>pas</strong> vide. C'est une liste d'un élément, et cet élément est la liste vide. Comme une boîte qui contient une boîte vide : la grande boîte n'est pas vide.</p>
+<div class="box ask"><p class="lbl">À toi (partie 3)</p><p>Avec <code>(define L '(10 (20 30) 40))</code>, sans machine :</p>
+<ol><li>Que valent <code>(first L)</code>, <code>(rest L)</code>, <code>(first (rest L))</code>, <code>(length L)</code> et <code>(rest (rest (rest L)))</code> ?</li><li>Écris l'expression qui renvoie 30.</li><li>Que se passe-t-il avec <code>(first (rest (rest (rest L))))</code> ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> L <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="par">(</span><span class="cst">20</span> <span class="cst">30</span><span class="par">)</span> <span class="cst">40</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>first L<span class="par">)</span>                       <span class="res">; → 10</span>
+<span class="par">(</span>rest L<span class="par">)</span>                        <span class="res">; → '((20 30) 40)</span>
+<span class="par">(</span>first <span class="par">(</span>rest L<span class="par">)</span><span class="par">)</span>                <span class="res">; → '(20 30)</span>
+<span class="par">(</span>length L<span class="par">)</span>                      <span class="res">; → 3</span>
+<span class="par">(</span>rest <span class="par">(</span>rest <span class="par">(</span>rest L<span class="par">)</span><span class="par">)</span><span class="par">)</span>          <span class="res">; → '()</span>
+<span class="par">(</span>first <span class="par">(</span>rest <span class="par">(</span>first <span class="par">(</span>rest L<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span> <span class="res">; → 30</span>
+<span class="par">(</span>first <span class="par">(</span>rest <span class="par">(</span>rest <span class="par">(</span>rest L<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>  <span class="res err">; → erreur : first: contract violation</span></code></pre></div>
+<p>Pour 30 : <code>(rest L)</code> donne <code>'((20 30) 40)</code>, <code>first</code> donne <code>'(20 30)</code>, <code>rest</code> donne <code>'(30)</code>, et <code>first</code> donne 30. Lis l'expression de l'intérieur vers l'extérieur. Dans la question 3, après trois <code>rest</code>, il ne reste que la liste vide, et <code>first</code> refuse.</p>
+</div></details>
+</div>
+<h2 id="p4"><span class="num">4</span>Construire une liste avec cons</h2>
+<h3 id="4-1-cons-ajoute-un-element-en-tete-slide-7">4.1 cons ajoute un élément en tête (slide 7)</h3>
+<p><code>(cons e L)</code> fabrique une nouvelle liste dont la tête est e et le reste est L.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>cons <span class="cst">1</span> empty<span class="par">)</span>    <span class="res">; → '(1)</span></code></pre></div>
+<p>Toute liste est en réalité une suite de <code>cons</code> emboîtés, qui se termine par la liste vide. <code>list</code> n'est qu'un raccourci :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">1</span> <span class="par">(</span>cons <span class="cst">2</span> <span class="par">(</span>cons <span class="cst">3</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(1 2 3)</span></code></pre></div>
+<p>Dessinée, une liste est une chaîne de <strong>cellules</strong> (cells), chacune avec deux cases : la tête à gauche, et à droite une flèche vers le reste.</p>
+<div class="code txt"><pre><code>'(1 2 3)
+
+ ┌───┬───┐    ┌───┬───┐    ┌───┬───┐
+ │ 1 │ ●─┼───&gt;│ 2 │ ●─┼───&gt;│ 3 │ ●─┼───&gt; '()
+ └───┴───┘    └───┴───┘    └───┴───┘
+ (first)(rest)</code></pre></div>
+<p><code>first</code> lit la case de gauche de la première cellule, <code>rest</code> suit la flèche. <code>cons</code> fabrique une cellule de plus, au début de la chaîne : c'est pour ça qu'il est instantané, quelle que soit la longueur de la liste.</p>
+<h3 id="4-2-la-tete-est-le-dernier-element-ajoute-slide-7">4.2 La tête est le dernier élément ajouté (slide 7)</h3>
+<p>Si tu ajoutes 1, puis 2, puis 3 avec <code>cons</code>, chaque nouvel élément passe devant les précédents :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">3</span> <span class="par">(</span>cons <span class="cst">2</span> <span class="par">(</span>cons <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(3 2 1)</span></code></pre></div>
+<p>La liste se lit dans l'ordre inverse de l'ajout (la note de la slide 7). Retiens-le bien : c'est ce qui fera sortir certaines listes à l'envers en partie 7.</p>
+<h3 id="4-3-cons-list-et-append-a-ne-pas-confondre-slides-7-et-8">4.3 cons, list et append, à ne pas confondre (slides 7 et 8)</h3>
+<p>C'est la confusion numéro un du chapitre. Compare :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>list <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → '(1 (2 3))</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">1</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>      <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>cons <span class="quo">'</span><span class="par">(</span><span class="cst">1</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → '((1) 2 3)</span>
+<span class="par">(</span>list <span class="quo">'</span><span class="par">(</span><span class="cst">1</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → '((1) (2 3))</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">1</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">4</span><span class="par">)</span><span class="par">)</span> <span class="res">; → '(1 2 3 4)</span></code></pre></div>
+<div class="tw"><table class="wide"><thead><tr><th>Fonction</th><th>Ce qu'elle prend</th><th>Ce qu'elle fait</th><th>En Python</th></tr></thead><tbody><tr><td><code>cons</code></td><td>un élément et une liste</td><td>ajoute l'élément devant la liste</td><td><code>[e] + L</code></td></tr><tr><td><code>list</code></td><td>des éléments, autant qu'on veut</td><td>fabrique une liste qui les contient tels quels</td><td><code>[a, b, c]</code></td></tr><tr><td><code>append</code></td><td>des listes</td><td>les met bout à bout</td><td><code>L1 + L2</code></td></tr></tbody></table></div>
+<p>Le réflexe : avant d'écrire, demande-toi ce que tu as en main. Un élément et une liste : <code>cons</code>. Deux listes : <code>append</code>. Des éléments séparés : <code>list</code>. Si un résultat affiche des parenthèses en trop, comme <code>'(1 (2 3))</code>, c'est souvent un <code>list</code> à la place d'un <code>cons</code> ou d'un <code>append</code>.</p>
+<h3 id="4-4-et-pour-ajouter-a-la-fin">4.4 Et pour ajouter à la fin ?</h3>
+<p>Aucune fonction ne le fait directement : <code>cons</code> n'ajoute qu'en tête, et <code>append</code> est fait pour coller des <strong>listes</strong>. Le piège classique :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>          <span class="res">; → '(1 2 . 3)</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="par">(</span>list <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>append <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>          <span class="res err">; → erreur : append: contract violation</span></code></pre></div>
+<p>Avec un nombre en dernier argument, <code>append</code> ne proteste pas, mais fabrique un objet bizarre, <code>'(1 2 . 3)</code>, qui n'est pas une vraie liste (partie 5). Ajouter à la fin coûte cher : <code>append</code> doit recopier toute la première liste, cellule par cellule, pour accrocher la suite. La question 2 du TP2 te fait écrire ta propre fonction.</p>
+<h3 id="4-5-rien-n-est-jamais-modifie">4.5 Rien n'est jamais modifié</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> L <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>cons <span class="cst">1</span> L<span class="par">)</span>   <span class="res">; → '(1 2 3)</span>
+L            <span class="res">; → '(2 3)</span></code></pre></div>
+<p><code>cons</code> fabrique une nouvelle liste ; L n'a pas bougé. Même chose pour <code>list-set</code> (slide 10), qui renvoie une <strong>nouvelle</strong> liste avec un élément changé, sans toucher à l'ancienne. En Python, <code>L.append(4)</code> modifie L ; en Racket, jamais. C'est aussi ce qui permet à <code>cons</code> de ne pas recopier L : la nouvelle cellule pointe simplement vers L, qui ne risque pas de changer.</p>
+<div class="box ask"><p class="lbl">À toi (partie 4)</p><ol><li>Sans machine : <code>(cons 0 '(1 2))</code>, <code>(list 0 '(1 2))</code>, <code>(append '(0) '(1 2))</code>, <code>(cons '(0) '(1 2))</code>, <code>(append '(1 2) '())</code>, <code>(cons '() '())</code>, <code>(list '() '())</code> et <code>(append '() '())</code>.</li><li>Écris <code>'(a b c)</code> en n'utilisant que <code>cons</code>, des symboles et <code>'()</code>.</li><li>Pourquoi <code>(append '(1 2) 3)</code> n'est-il pas une bonne façon d'ajouter 3 à la fin ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → '(0 1 2)</span>
+<span class="par">(</span>list <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → '(0 (1 2))</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">0</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>      <span class="res">; → '(0 1 2)</span>
+<span class="par">(</span>cons <span class="quo">'</span><span class="par">(</span><span class="cst">0</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → '((0) 1 2)</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → '(1 2)</span>
+<span class="par">(</span>cons <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>            <span class="res">; → '(())</span>
+<span class="par">(</span>list <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>            <span class="res">; → '(() ())</span>
+<span class="par">(</span>append <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>          <span class="res">; → '()</span>
+<span class="par">(</span>cons <span class="quo">'</span>a <span class="par">(</span>cons <span class="quo">'</span>b <span class="par">(</span>cons <span class="quo">'</span>c <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(a b c)</span></code></pre></div>
+<p><code>(cons '() '())</code> ajoute la liste vide comme élément devant une liste vide : on obtient une liste d'un élément. Pour la question 3 : <code>append</code> accepte n'importe quelle valeur en dernier argument, mais si ce n'est pas une liste, le résultat n'en est pas une non plus : avec 3, il fabrique <code>'(1 2 . 3)</code>. Il faut <code>(append '(1 2) (list 3))</code>.</p>
+</div></details>
+</div>
+<h2 id="p5"><span class="num">5</span>Les paires, quand cons ne fabrique pas une liste</h2>
+<p>Cette partie n'est pas dans le CM, mais la question 3 du TP2 en a besoin : elle attend un résultat comme <code>'(6 . 6)</code>.</p>
+<h3 id="5-1-la-paire-pointee">5.1 La paire pointée</h3>
+<p><code>cons</code> fabrique en réalité une <strong>paire</strong> (pair) : une cellule à deux cases. Si la case de droite contient une liste, le résultat est une liste. Sinon, on obtient une <strong>paire pointée</strong> (dotted pair), que Racket affiche avec un point.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">6</span> <span class="cst">6</span><span class="par">)</span>            <span class="res">; → '(6 . 6)</span>
+<span class="par">(</span>list? <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #f</span>
+<span class="par">(</span>pair? <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #t</span>
+<span class="par">(</span>pair? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → #t</span>
+<span class="par">(</span>pair? <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → #f</span></code></pre></div>
+<div class="code txt"><pre><code>'(6 . 6)                  '(6)
+
+ ┌───┬───┐                 ┌───┬───┐
+ │ 6 │ 6 │                 │ 6 │ ●─┼───&gt; '()
+ └───┴───┘                 └───┴───┘
+ une paire, pas une liste  une liste d'un élément</code></pre></div>
+<p>La définition exacte d'une liste devient : <strong>une liste est soit <code>'()</code>, soit une paire dont la case de droite contient une liste.</strong> Ce qui explique ces deux affichages :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="quo">'</span><span class="par">(</span><span class="cst">1</span> . <span class="par">(</span><span class="cst">2</span> . <span class="par">(</span><span class="cst">3</span> . <span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>cons <span class="cst">1</span> <span class="par">(</span>cons <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → '(1 2 . 3)</span></code></pre></div>
+<p>Le premier est une vraie liste écrite sous forme de paires emboîtées : Racket l'affiche normalement. Le second se termine par 3 au lieu de <code>'()</code> : c'est une <strong>liste impropre</strong> (improper list), et le point montre l'endroit où la chaîne ne finit pas par la liste vide. Quand un point apparaît dans un de tes résultats, c'est qu'une valeur qui n'est pas une liste a atterri dans une case de droite : souvent un <code>(append L 3)</code> au lieu de <code>(append L (list 3))</code> (partie 4.4).</p>
+<h3 id="5-2-car-et-cdr-pour-lire-une-paire">5.2 car et cdr pour lire une paire</h3>
+<p><code>first</code> et <code>rest</code> refusent une paire qui n'est pas une liste. Il faut <code>car</code> (la case de gauche) et <code>cdr</code> (la case de droite), les anciens noms cités par la slide 5 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>first <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">7</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : first: contract violation</span>
+<span class="par">(</span>car <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">7</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → 6</span>
+<span class="par">(</span>cdr <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">7</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → 7</span>
+<span class="par">(</span>car <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → 1</span>
+<span class="par">(</span>cdr <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → '(2 3)</span></code></pre></div>
+<p><code>car</code> et <code>cdr</code> marchent sur n'importe quelle paire, donc aussi sur les listes non vides, où ils font la même chose que <code>first</code> et <code>rest</code>. La différence : <code>first</code> et <code>rest</code> vérifient qu'on leur donne une vraie liste non vide, ce qui donne des messages d'erreur plus clairs. <code>length</code> refuse aussi les paires pointées :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>length <span class="par">(</span>cons <span class="cst">6</span> <span class="cst">7</span><span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : length: contract violation</span>
+<span class="par">(</span>car <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>             <span class="res err">; → erreur : car: contract violation</span></code></pre></div>
+<h3 id="5-3-a-quoi-servent-les-paires">5.3 À quoi servent les paires</h3>
+<p>À renvoyer deux valeurs dans une seule, comme un <code>return (a, b)</code> en Python :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>div-euclide a b<span class="par">)</span>
+  <span class="par">(</span>cons <span class="par">(</span>quotient a b<span class="par">)</span> <span class="par">(</span>remainder a b<span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>div-euclide <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span>          <span class="res">; → '(3 . 2)</span>
+<span class="par">(</span>car <span class="par">(</span>div-euclide <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → 3</span>
+<span class="par">(</span>cdr <span class="par">(</span>div-euclide <span class="cst">17</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → 2</span></code></pre></div>
+<p>Ne confonds pas une paire et une liste de deux éléments. <code>'(3 . 2)</code> est une seule cellule ; <code>'(3 2)</code> en contient deux, puisque c'est <code>(cons 3 (cons 2 '()))</code>. Le deuxième élément d'une paire se lit avec <code>cdr</code> ; celui d'une liste de deux éléments, avec <code>(first (rest L))</code>, ou <code>cadr</code>.</p>
+<div class="box ask"><p class="lbl">À toi (partie 5)</p><ol><li>Sans machine : <code>(cons 1 2)</code>, <code>(cons 1 '(2))</code>, <code>(car (cons 1 2))</code>, <code>(cdr (cons 1 '(2)))</code>, <code>(list? (cons 1 2))</code>, <code>(pair? '(1))</code> et <code>(cons (cons 1 2) (cons 3 4))</code>.</li><li>Pourquoi <code>(first (cons 1 2))</code> provoque-t-il une erreur, alors que <code>(car (cons 1 2))</code> marche ?</li><li>Dessine les cellules de <code>'(1 . 2)</code> et de <code>'(1 2)</code>.</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>cons <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span>                     <span class="res">; → '(1 . 2)</span>
+<span class="par">(</span>cons <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span><span class="par">)</span><span class="par">)</span>                  <span class="res">; → '(1 2)</span>
+<span class="par">(</span>car <span class="par">(</span>cons <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>               <span class="res">; → 1</span>
+<span class="par">(</span>cdr <span class="par">(</span>cons <span class="cst">1</span> <span class="quo">'</span><span class="par">(</span><span class="cst">2</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>            <span class="res">; → '(2)</span>
+<span class="par">(</span>list? <span class="par">(</span>cons <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>             <span class="res">; → #f</span>
+<span class="par">(</span>pair? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span><span class="par">)</span><span class="par">)</span>                   <span class="res">; → #t</span>
+<span class="par">(</span>cons <span class="par">(</span>cons <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="par">(</span>cons <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '((1 . 2) 3 . 4)</span>
+<span class="par">(</span>first <span class="par">(</span>cons <span class="cst">1</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>             <span class="res err">; → erreur : first: contract violation</span></code></pre></div>
+<p>Le dernier affichage est déroutant : la tête est la paire <code>(1 . 2)</code>, et le reste est la paire <code>(3 . 4)</code>, que Racket écrit « 3 . 4 » à la suite de la tête. Question 2 : <code>first</code> exige une liste, et <code>'(1 . 2)</code> n'en est pas une ; <code>car</code> accepte n'importe quelle paire. Question 3 : <code>'(1 . 2)</code> est une seule cellule, avec 1 à gauche et 2 à droite ; <code>'(1 2)</code> en a deux, la seconde pointant vers <code>'()</code>.</p>
+</div></details>
+</div>
+<h2 id="p6"><span class="num">6</span>Parcourir une liste par récursion</h2>
+<p>C'est le cœur du chapitre, et des slides 15 et 16.</p>
+<h3 id="6-1-la-meme-methode-qu-au-chapitre-1">6.1 La même méthode qu'au chapitre 1</h3>
+<div class="tw"><table class="wide"><thead><tr><th></th><th>Sur un entier n (chapitre 1)</th><th>Sur une liste x</th></tr></thead><tbody><tr><td>cas de base</td><td>n = 0</td><td>x est vide : <code>(empty? x)</code></td></tr><tr><td>ce qu'on traite à chaque appel</td><td>n</td><td><code>(first x)</code></td></tr><tr><td>l'appel récursif porte sur</td><td><code>(- n 1)</code></td><td><code>(rest x)</code></td></tr><tr><td>pourquoi ça termine</td><td>n diminue jusqu'à 0</td><td>chaque <code>rest</code> enlève un élément, la liste finit vide</td></tr></tbody></table></div>
+<p>Le gabarit (template) de presque toutes les fonctions du chapitre :</p>
+<div class="code txt"><pre><code>(define (f x)
+  (if (empty? x)
+      réponse-pour-la-liste-vide
+      (combiner (first x) (f (rest x)))))</code></pre></div>
+<p>Et les quatre questions du chapitre 1 (partie 9.3), adaptées aux listes :</p>
+<ol><li><strong>Que doit renvoyer f pour la liste vide ?</strong> Souvent l'élément neutre : 0 pour une somme, 1 pour un produit, <code>'()</code> quand on construit une liste, <code>#f</code> quand on cherche.</li><li><strong>Si je connais <code>(f (rest x))</code>, la réponse pour le reste, comment obtenir <code>(f x)</code> avec <code>(first x)</code> ?</strong> C'est l'acte de confiance : ne simule pas tous les appels, suppose que l'appel sur le reste est juste.</li><li><strong>Est-ce que j'appelle f sur <code>(rest x)</code>, une liste plus courte ?</strong> Alors la fonction termine.</li><li><strong>Teste</strong> sur <code>'()</code>, sur une liste d'un élément, puis sur une liste de trois.</li></ol>
+<p>Avant tout <code>first</code> ou <code>rest</code>, un test doit garantir que la liste n'est pas vide, puisqu'ils échouent sur la liste vide (partie 3.3) : c'est pour ça que <code>(empty? x)</code> vient en général en premier.</p>
+<h3 id="6-2-reduire-une-liste-a-une-valeur">6.2 Réduire une liste à une valeur</h3>
+<p>Le nombre d'éléments. Question 1 : une liste vide a 0 élément. Question 2 : si je connais la longueur du reste, j'ajoute 1.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>longueur x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      <span class="cst">0</span>
+      <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>longueur <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>longueur <span class="quo">'</span><span class="par">(</span>a b c<span class="par">)</span><span class="par">)</span>   <span class="res">; → 3</span>
+<span class="par">(</span>longueur <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → 0</span></code></pre></div>
+<div class="code txt"><pre><code>(longueur '(a b c))
+(+ 1 (longueur '(b c)))
+(+ 1 (+ 1 (longueur '(c))))
+(+ 1 (+ 1 (+ 1 (longueur '()))))
+(+ 1 (+ 1 (+ 1 0)))
+3</code></pre></div>
+<p>Les éléments eux-mêmes ne servent pas : on les compte, c'est tout, d'où l'absence de <code>(first x)</code>. Pour la somme, en revanche, on ajoute la tête au résultat sur le reste :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      <span class="cst">0</span>
+      <span class="par">(</span>+ <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>somme <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>somme <span class="quo">'</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 15</span></code></pre></div>
+<div class="code txt"><pre><code>(somme '(4 5 6))
+(+ 4 (somme '(5 6)))
+(+ 4 (+ 5 (somme '(6))))
+(+ 4 (+ 5 (+ 6 (somme '()))))
+(+ 4 (+ 5 (+ 6 0)))
+15</code></pre></div>
+<p>Compare avec la <code>somme</code> du chapitre 1 (partie 9.3) : même forme, avec <code>(first x)</code> à la place de n et <code>(rest x)</code> à la place de <code>(- n 1)</code>.</p>
+<h3 id="6-3-chercher-dans-une-liste-slide-15">6.3 Chercher dans une liste (slide 15)</h3>
+<p>La slide 15 décrit d'abord la version itérative, « non désirable en fonctionnel » : tant que la liste n'est pas vide, si la tête est l'élément cherché, on renvoie vrai ; après la boucle, on renvoie faux. Puis la version récursive : si la liste est vide, faux ; si la tête est l'élément, vrai ; sinon, on cherche dans le reste.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>isin? elt x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      <span class="cst">#f</span>
+      <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>equal? elt <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span>
+          <span class="cst">#t</span>
+          <span class="par">(</span>isin? elt <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>isin? <span class="cst">2</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #t</span>
+<span class="par">(</span>isin? <span class="cst">4</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #f</span>
+<span class="par">(</span>isin? <span class="quo">'</span>b <span class="quo">'</span><span class="par">(</span>a b c<span class="par">)</span><span class="par">)</span>   <span class="res">; → #t</span></code></pre></div>
+<p>Il y a deux façons de s'arrêter : la liste est vide (pas trouvé), ou la tête est l'élément (trouvé, inutile de continuer). J'ai écrit <code>equal?</code> là où la slide écrit <code>=</code> : avec <code>=</code>, la fonction ne marche que sur des nombres, et <code>(isin? 'b '(a b c))</code> provoque <code>=: contract violation</code>. Attention aussi, la question 11 du TD place les arguments dans l'autre ordre, la liste d'abord : suis toujours l'énoncé (partie 12).</p>
+<p>La même fonction avec <code>and</code> et <code>or</code>, qui s'arrêtent dès que le résultat est connu (chapitre 1, partie 5.3) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>isin? elt x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">and</span> <span class="par">(</span>not <span class="par">(</span>empty? x<span class="par">)</span><span class="par">)</span>
+       <span class="par">(</span><span class="kw">or</span> <span class="par">(</span>equal? elt <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span>
+           <span class="par">(</span>isin? elt <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>isin? <span class="cst">3</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → #t</span></code></pre></div>
+<p>Dans les deux versions, l'appel récursif est directement le résultat : <code>isin?</code> est récursive terminale, comme le dit la slide 16.</p>
+<h3 id="6-4-transformer-chaque-element-slide-16">6.4 Transformer chaque élément (slide 16)</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>apply-fun x fun<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      empty
+      <span class="par">(</span>cons <span class="par">(</span>fun <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>apply-fun <span class="par">(</span>rest x<span class="par">)</span> fun<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>apply-fun <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span><span class="par">)</span> add1<span class="par">)</span>   <span class="res">; → '(2 3 4 5 6)</span></code></pre></div>
+<p><code>add1</code> ajoute 1 à un nombre (et <code>sub1</code> retire 1). Le paramètre <code>fun</code> reçoit une fonction : la partie 8 y revient. La trace montre comment la nouvelle liste se construit :</p>
+<div class="code txt"><pre><code>(apply-fun '(1 2 3) add1)
+(cons 2 (apply-fun '(2 3) add1))
+(cons 2 (cons 3 (apply-fun '(3) add1)))
+(cons 2 (cons 3 (cons 4 (apply-fun '() add1))))
+(cons 2 (cons 3 (cons 4 '())))
+'(2 3 4)</code></pre></div>
+<p>La nouvelle liste est fabriquée <strong>au retour</strong>, par les <code>cons</code> en attente : c'est pour ça que la slide 16 dit qu'<code>apply-fun</code> est enveloppée. Le cas de base renvoie <code>empty</code>, qui devient la fin de la nouvelle liste. La règle à retenir : <strong>quand une fonction construit une liste, le cas de base renvoie <code>'()</code> et le cas récursif fait <code>(cons quelque-chose (f (rest x)))</code></strong>.</p>
+<h3 id="6-5-garder-certains-elements">6.5 Garder certains éléments</h3>
+<p>Trois cas : la liste est vide ; on garde la tête ; on l'ignore.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>garde-pairs x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>empty? x<span class="par">)</span> empty<span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>even? <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>cons <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>garde-pairs <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>garde-pairs <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>garde-pairs <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(2 4 6)</span>
+<span class="par">(</span>garde-pairs <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → '()</span></code></pre></div>
+<p>La deuxième ligne garde la tête (avec <code>cons</code>), la troisième la laisse tomber (on continue simplement sur le reste). Ce schéma en trois lignes sert à supprimer un élément (question 12 du TD), à filtrer (partie 8), et à beaucoup d'autres choses.</p>
+<h3 id="6-6-quand-la-liste-vide-n-a-pas-de-reponse">6.6 Quand la liste vide n'a pas de réponse</h3>
+<p>Le plus petit élément de <code>'()</code> n'existe pas : aucune valeur ne convient comme cas de base. On prend alors pour cas de base la liste d'un seul élément, testée par <code>(empty? (rest x))</code> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>minimum x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span>
+      <span class="par">(</span>first x<span class="par">)</span>
+      <span class="par">(</span>min <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>minimum <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>minimum <span class="quo">'</span><span class="par">(</span><span class="cst">5</span> <span class="cst">3</span> <span class="cst">8</span> <span class="cst">1</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 1</span>
+<span class="par">(</span>minimum <span class="quo">'</span><span class="par">(</span><span class="cst">7</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → 7</span></code></pre></div>
+<p><code>(minimum '())</code> provoque une erreur, et c'est normal : il n'y a pas de minimum. Les solutions du TD testent la même chose avec <code>(= (length x) 1)</code>. Ça marche, mais <code>length</code> parcourt toute la liste à chaque appel : pour une liste de n éléments, n appels qui font chacun jusqu'à n pas. <code>(empty? (rest x))</code> répond immédiatement : prends cette habitude.</p>
+<h3 id="6-7-parcourir-avec-un-compteur">6.7 Parcourir avec un compteur</h3>
+<p>Quand la position des éléments compte, on transporte un compteur qui augmente pendant que la liste raccourcit. Par exemple, pour numéroter chaque élément avec une paire (partie 5) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>numerote x <span class="par">[</span>i <span class="cst">0</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      empty
+      <span class="par">(</span>cons <span class="par">(</span>cons i <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>numerote <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>+ i <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>numerote <span class="quo">'</span><span class="par">(</span>a b c<span class="par">)</span><span class="par">)</span>   <span class="res">; → '((0 . a) (1 . b) (2 . c))</span></code></pre></div>
+<p>La valeur par défaut <code>[i 0]</code> (chapitre 1, partie 10.2) fait partir le compteur de 0. Les solutions du TD préfèrent une fonction auxiliaire, comme <code>(f x p)</code> à la question 5 : les deux formes sont présentées en partie 7.1. Deux choses changent à chaque appel : la liste perd sa tête, le compteur gagne 1. Les questions 4, 5, 9 et 20 du TD reposent sur cette idée.</p>
+<h3 id="6-8-deux-listes-a-la-fois">6.8 Deux listes à la fois</h3>
+<p>Pour additionner deux listes terme à terme, on avance dans les deux en même temps, et on s'arrête dès que l'une est vide :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>sommes x y<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span><span class="kw">or</span> <span class="par">(</span>empty? x<span class="par">)</span> <span class="par">(</span>empty? y<span class="par">)</span><span class="par">)</span>
+      empty
+      <span class="par">(</span>cons <span class="par">(</span>+ <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>first y<span class="par">)</span><span class="par">)</span> <span class="par">(</span>sommes <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>rest y<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>sommes <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="cst">20</span> <span class="cst">30</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(11 22 33)</span>
+<span class="par">(</span>sommes <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="cst">20</span> <span class="cst">30</span><span class="par">)</span><span class="par">)</span>     <span class="res">; → '(11 22)</span></code></pre></div>
+<p>Dans d'autres fonctions à deux listes, on n'avance que dans la première : c'est le cas de <code>merge</code> (question 8 du TD) et de <code>my-append</code> (slide 17).</p>
+<h3 id="6-9-listes-de-listes-la-recursion-en-profondeur">6.9 Listes de listes, la récursion en profondeur</h3>
+<p>Quand les éléments peuvent eux-mêmes être des listes, il faut parfois descendre aussi dans <code>(first x)</code> : c'est le cas de la question 6 du TD (la question 7, elle, se contente de repérer une sous-liste). Par exemple, pour compter les nombres à tous les niveaux :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>compte-nombres x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>empty? x<span class="par">)</span> <span class="cst">0</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>list? <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>+ <span class="par">(</span>compte-nombres <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span>
+                              <span class="par">(</span>compte-nombres <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>compte-nombres <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>compte-nombres <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="par">(</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span> <span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 5</span>
+<span class="par">(</span>length <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="par">(</span><span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="par">(</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span> <span class="par">(</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → 4</span></code></pre></div>
+<p>Trois cas : la liste est vide ; la tête est une liste, et l'on fait <strong>deux</strong> appels récursifs, l'un dans la tête, l'autre dans le reste ; la tête est un simple élément. <code>length</code>, elle, ne compte que les quatre éléments du premier niveau. Une liste de listes est en fait un <strong>arbre</strong> (tree) :</p>
+<div class="code txt"><pre><code>'(1 (2 3) ((4 5)) ())
+
+          ●
+   ┌──────┼──────┬──────┐
+   1      ●      ●      ()
+         / \     │
+        2   3    ●
+                / \
+               4   5</code></pre></div>
+<p>Avec deux appels récursifs, on parle de récursivité en arbre (tree recursion), comme pour <code>fibo</code> au chapitre 1 (exercice F9).</p>
+<div class="box ask"><p class="lbl">À toi (partie 6)</p><ol><li>Écris <code>(produit x)</code>, le produit des éléments d'une liste. Pourquoi le cas de base vaut-il 1, et pas 0 ?</li><li>Écris <code>(compte e x)</code>, le nombre de fois où e apparaît dans x.</li><li>Écris <code>(garde-negatifs x)</code>, qui ne garde que les nombres strictement négatifs.</li><li>Qu'est-ce qui ne va pas dans <code>(define (longueur x) (if (empty? x) 0 (+ 1 (longueur x))))</code> ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>produit x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      <span class="cst">1</span>
+      <span class="par">(</span>* <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>produit <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>produit <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 24</span>
+<span class="par">(</span>produit <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → 1</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>compte e x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>empty? x<span class="par">)</span> <span class="cst">0</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>equal? e <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>+ <span class="cst">1</span> <span class="par">(</span>compte e <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>compte e <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>compte <span class="quo">'</span>a <span class="quo">'</span><span class="par">(</span>a b a c a<span class="par">)</span><span class="par">)</span>   <span class="res">; → 3</span>
+
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>garde-negatifs x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>empty? x<span class="par">)</span> empty<span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>negative? <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>cons <span class="par">(</span>first x<span class="par">)</span> <span class="par">(</span>garde-negatifs <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>garde-negatifs <span class="par">(</span>rest x<span class="par">)</span><span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>garde-negatifs <span class="quo">'</span><span class="par">(</span><span class="cst">3</span> <span class="cst">-1</span> <span class="cst">0</span> <span class="cst">-5</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(-1 -5)</span></code></pre></div>
+<ol><li>1 est l'élément neutre de la multiplication : avec 0, tout le produit vaudrait 0.</li><li>L'appel récursif porte sur x au lieu de <code>(rest x)</code> : la liste ne raccourcit jamais, et la récursion ne s'arrête pas (le « pas de progrès » du chapitre 1, partie 9.4). Dans DrRacket, elle finit en <code>out of memory</code>.</li></ol>
+</div></details>
+</div>
+<h2 id="p7"><span class="num">7</span>La récursivité terminale sur les listes</h2>
+<h3 id="7-1-reduire-avec-un-accumulateur">7.1 Réduire avec un accumulateur</h3>
+<p>Même méthode qu'au chapitre 1 (partie 10.3) : l'accumulateur part de la réponse pour la liste vide, et l'opération se fait avant l'appel.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme-t x <span class="par">[</span>acc <span class="cst">0</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      acc
+      <span class="par">(</span>somme-t <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>+ acc <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>somme-t <span class="quo">'</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 15</span></code></pre></div>
+<div class="code txt"><pre><code>(somme-t '(4 5 6) 0)
+(somme-t '(5 6) 4)
+(somme-t '(6) 9)
+(somme-t '() 15)
+15</code></pre></div>
+<p>Les solutions du TD écrivent l'accumulateur autrement : avec une <strong>fonction auxiliaire locale</strong>, qui le cache à l'utilisateur (chapitre 1, partie 10.4). C'est le <code>(define (f x p) ...)</code> de la question 5, ou le <code>(define (f x y i) ...)</code> de la question 9 :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme-t x<span class="par">)</span>
+  <span class="par">(</span><span class="kw">define</span> <span class="par">(</span>f x acc<span class="par">)</span>
+    <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+        acc
+        <span class="par">(</span>f <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>+ acc <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+  <span class="par">(</span>f x <span class="cst">0</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>somme-t <span class="quo">'</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 15</span></code></pre></div>
+<p>Les deux formes sont justes. Rappel du chapitre 1 : la slide 25 du CM1 classe les valeurs par défaut hors programme, alors que ton enseignant s'en sert. Sache écrire les deux, et demande-lui laquelle il attend au DST.</p>
+<h3 id="7-2-construire-avec-un-accumulateur-la-liste-sort-a-l-envers">7.2 Construire avec un accumulateur, la liste sort à l'envers</h3>
+<p>Essayons de recopier une liste avec un accumulateur :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>copie-t x <span class="par">[</span>acc <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      acc
+      <span class="par">(</span>copie-t <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>cons <span class="par">(</span>first x<span class="par">)</span> acc<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>copie-t <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(3 2 1)</span></code></pre></div>
+<div class="code txt"><pre><code>(copie-t '(1 2 3) '())
+(copie-t '(2 3) '(1))
+(copie-t '(3) '(2 1))
+(copie-t '() '(3 2 1))
+'(3 2 1)</code></pre></div>
+<p>On prend les éléments par la gauche, mais <code>cons</code> place chacun en tête de l'accumulateur : le dernier pris se retrouve devant (partie 4.2). Cette fonction est donc exactement <code>reverse</code> (slide 8). C'est une loi générale : <strong>une récursion terminale qui construit une liste avec <code>cons</code> la fabrique à l'envers</strong>. C'est la même raison que pour <code>miroir</code>, dans l'exercice G5 du chapitre 1.</p>
+<h3 id="7-3-trois-facons-de-retrouver-le-bon-ordre">7.3 Trois façons de retrouver le bon ordre</h3>
+<p><strong>Première façon : retourner une seule fois, à la fin</strong>, avec <code>reverse</code> :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>garde-pairs-t x <span class="par">[</span>acc <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">cond</span> <span class="par">[</span><span class="par">(</span>empty? x<span class="par">)</span> <span class="par">(</span>reverse acc<span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="par">(</span>even? <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>garde-pairs-t <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>cons <span class="par">(</span>first x<span class="par">)</span> acc<span class="par">)</span><span class="par">)</span><span class="par">]</span>
+        <span class="par">[</span><span class="kw">else</span> <span class="par">(</span>garde-pairs-t <span class="par">(</span>rest x<span class="par">)</span> acc<span class="par">)</span><span class="par">]</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>garde-pairs-t <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(2 4 6)</span></code></pre></div>
+<p>C'est ce que fait ton enseignant dans la solution 1 de la question 9 du TD. Attention au mot <strong>une seule fois</strong> : si la fonction s'appelle aussi sur des sous-listes (la récursion en profondeur de la partie 6.9) et retourne l'accumulateur dans son cas de base, il est retourné plusieurs fois. C'est l'erreur de la troisième solution de la question 6 du TD (partie 12).</p>
+<p><strong>Deuxième façon : ajouter à la fin avec <code>append</code>.</strong> <code>(append acc (list (first x)))</code> garde l'ordre, mais chaque <code>append</code> recopie tout l'accumulateur, soit environ n²/2 copies pour n éléments. La solution de la question 13 du TD fait ainsi.</p>
+<p><strong>Troisième façon : garder la version enveloppée.</strong> Pour construire une liste, <code>(cons ... (f (rest x)))</code> donne le bon ordre sans effort, et c'est souvent le plus clair : c'est le conseil de la slide 35 du CM1, commencer par la version simple.</p>
+<p>Quand l'ordre ne compte pas (somme, produit, longueur, maximum, recherche), l'accumulateur ne pose aucun problème.</p>
+<h3 id="7-4-en-resume">7.4 En résumé</h3>
+<div class="tw"><table class="wide"><thead><tr><th>Ce que fait la fonction</th><th>Version enveloppée</th><th>Version terminale</th></tr></thead><tbody><tr><td>réduire (somme, longueur, minimum)</td><td><code>(+ (first x) (f (rest x)))</code></td><td><code>(f (rest x) (+ acc (first x)))</code> : aucun problème d'ordre</td></tr><tr><td>chercher (<code>isin?</code>)</td><td>inutile</td><td>naturelle : l'appel récursif est le résultat</td></tr><tr><td>construire (<code>apply-fun</code>, <code>garde-pairs</code>)</td><td><code>(cons ... (f (rest x)))</code> : ordre conservé</td><td><code>(cons ... acc)</code>, puis <code>reverse</code>, une seule fois</td></tr></tbody></table></div>
+<div class="box ask"><p class="lbl">À toi (partie 7)</p><ol><li>Écris la trace de <code>(copie-t '(a b c))</code>.</li><li>Écris <code>(produit-t x [acc 1])</code> et <code>(longueur-t x [acc 0])</code>.</li><li>Pourquoi <code>somme-t</code> n'a-t-elle pas besoin de <code>reverse</code>, alors que <code>garde-pairs-t</code> en a besoin ?</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code txt"><pre><code>(copie-t '(a b c) '())
+(copie-t '(b c) '(a))
+(copie-t '(c) '(b a))
+(copie-t '() '(c b a))
+'(c b a)</code></pre></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>produit-t x <span class="par">[</span>acc <span class="cst">1</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      acc
+      <span class="par">(</span>produit-t <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>* acc <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>longueur-t x <span class="par">[</span>acc <span class="cst">0</span><span class="par">]</span><span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      acc
+      <span class="par">(</span>longueur-t <span class="par">(</span>rest x<span class="par">)</span> <span class="par">(</span>+ acc <span class="cst">1</span><span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>produit-t <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 24</span>
+<span class="par">(</span>longueur-t <span class="quo">'</span><span class="par">(</span>a b c<span class="par">)</span><span class="par">)</span>  <span class="res">; → 3</span></code></pre></div>
+<ol start="3"><li><code>somme-t</code> renvoie un nombre : l'ordre des additions ne change pas le résultat. <code>garde-pairs-t</code> renvoie une liste, et une liste construite par <code>cons</code> dans un accumulateur sort à l'envers.</li></ol>
+</div></details>
+</div>
+<h2 id="p8"><span class="num">8</span>Les fonctions sont des valeurs</h2>
+<p>Le CM s'en sert sans s'y arrêter (aux slides 9 et 13, <code>build-list</code>, <code>list-update</code> et <code>sort</code> reçoivent une fonction), puis le montre avec <code>apply-fun</code> à la slide 16. La cheatsheet (rubrique « map et fold ») présente la plupart des fonctions de cette partie, et plusieurs solutions du TD s'en servent.</p>
+<h3 id="8-1-passer-une-fonction-en-argument-slide-16">8.1 Passer une fonction en argument (slide 16)</h3>
+<p>Dans <code>apply-fun</code>, le paramètre <code>fun</code> reçoit une fonction. En Racket, une fonction est une valeur comme une autre : on peut la passer en argument, la renvoyer, la ranger dans une liste. C'est comme en Python, où l'on peut passer <code>len</code> à <code>map</code>.</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>apply-fun x fun<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      empty
+      <span class="par">(</span>cons <span class="par">(</span>fun <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>apply-fun <span class="par">(</span>rest x<span class="par">)</span> fun<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>carre v<span class="par">)</span> <span class="par">(</span>* v v<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>apply-fun <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> carre<span class="par">)</span>                    <span class="res">; → '(1 4 9)</span>
+<span class="par">(</span>apply-fun <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>v<span class="par">)</span> <span class="par">(</span>* <span class="cst">10</span> v<span class="par">)</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(10 20 30)</span></code></pre></div>
+<p>La dernière ligne passe une fonction fabriquée sur place, sans nom : <code>(lambda (v) (* 10 v))</code> (chapitre 1, partie 6.4). La slide 9 en utilise aussi, avec <code>build-list</code> et <code>list-update</code>. Le chapitre 1 la classe hors programme : sache la lire. Pour t'en passer, il suffit de nommer la fonction d'abord, <code>(define (fois10 v) (* 10 v))</code>, puis d'écrire <code>(apply-fun '(1 2 3) fois10)</code>.</p>
+<p>Les opérateurs sont des fonctions eux aussi, donc on peut les passer :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>applique op a b<span class="par">)</span> <span class="par">(</span>op a b<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>applique + <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>     <span class="res">; → 5</span>
+<span class="par">(</span>applique &lt; <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>     <span class="res">; → #t</span>
+<span class="par">(</span>applique max <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span>   <span class="res">; → 3</span></code></pre></div>
+<p>C'est exactement ce que fait la question 19 du TD : <code>(chk? 0 &lt; '(1 2 3 4 5))</code> reçoit la fonction <code>&lt;</code> en deuxième argument.</p>
+<p>Le piège : on passe la fonction <strong>sans parenthèses</strong>. <code>carre</code> est la fonction ; <code>(carre)</code> est un appel, qui échoue ici faute d'argument (chapitre 1, partie 6.3, <code>myr</code> contre <code>(myr)</code>).</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span><span class="kw">define</span> <span class="par">(</span>apply-fun x fun<span class="par">)</span>
+  <span class="par">(</span><span class="kw">if</span> <span class="par">(</span>empty? x<span class="par">)</span>
+      empty
+      <span class="par">(</span>cons <span class="par">(</span>fun <span class="par">(</span>first x<span class="par">)</span><span class="par">)</span> <span class="par">(</span>apply-fun <span class="par">(</span>rest x<span class="par">)</span> fun<span class="par">)</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>carre v<span class="par">)</span> <span class="par">(</span>* v v<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>apply-fun <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span> <span class="par">(</span>carre<span class="par">)</span><span class="par">)</span>   <span class="res err">; → erreur : carre: arity mismatch</span></code></pre></div>
+<p>Une fonction qui prend ou renvoie une fonction s'appelle une <strong>fonction d'ordre supérieur</strong> (higher-order function). Racket en fournit plusieurs pour les listes.</p>
+<h3 id="8-2-map-l-apply-fun-de-racket">8.2 map, l'apply-fun de Racket</h3>
+<p><code>(map f L)</code> applique f à chaque élément de L. La fonction vient en premier, la liste ensuite :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>map sqrt <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">4</span> <span class="cst">9</span><span class="par">)</span><span class="par">)</span>                    <span class="res">; → '(1 2 3)</span>
+<span class="par">(</span>map add1 <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>                    <span class="res">; → '(2 3 4)</span>
+<span class="par">(</span>map <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>v<span class="par">)</span> <span class="par">(</span>* v v<span class="par">)</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(1 4 9)</span>
+<span class="par">(</span>map + <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="cst">20</span><span class="par">)</span><span class="par">)</span>                <span class="res">; → '(11 22)</span>
+<span class="par">(</span>map + <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">10</span> <span class="cst">20</span> <span class="cst">30</span><span class="par">)</span><span class="par">)</span>             <span class="res err">; → erreur : map: all lists must have same size</span></code></pre></div>
+<p>Avec plusieurs listes, <code>map</code> prend un élément de chacune : l'avant-dernière ligne refait la fonction <code>sommes</code> de la partie 6.8, à une différence près, que montre la dernière ligne : <code>map</code> exige des listes de même longueur, alors que <code>sommes</code> s'arrête à la fin de la plus courte. En Python, <code>(map f L)</code> s'écrit <code>[f(v) for v in L]</code>.</p>
+<h3 id="8-3-filter-garder-ceux-qui-verifient-un-predicat">8.3 filter, garder ceux qui vérifient un prédicat</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>filter even? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>               <span class="res">; → '(2 4 6)</span>
+<span class="par">(</span>filter <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>v<span class="par">)</span> <span class="par">(</span>&gt; v <span class="cst">2</span><span class="par">)</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(3 4)</span></code></pre></div>
+<p>C'est <code>garde-pairs</code> (partie 6.5), avec n'importe quel prédicat. En Python : <code>[v for v in L if p(v)]</code>.</p>
+<h3 id="8-4-foldl-et-foldr-plier-une-liste">8.4 foldl et foldr, plier une liste</h3>
+<p>Plier (fold) une liste, c'est combiner tous ses éléments avec une fonction, en partant d'une valeur initiale qui joue le rôle d'accumulateur. La fonction reçoit <strong>l'élément, puis l'accumulateur</strong> :</p>
+<div class="code txt"><pre><code>(foldl f init '(a b c))   =   (f c (f b (f a init)))     de gauche à droite
+(foldr f init '(a b c))   =   (f a (f b (f c init)))     de droite à gauche</code></pre></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>foldl + <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>         <span class="res">; → 6</span>
+<span class="par">(</span>foldl cons <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(3 2 1)</span>
+<span class="par">(</span>foldr cons <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → '(1 2 3)</span></code></pre></div>
+<p><code>(foldl cons '() '(1 2 3))</code> calcule <code>(cons 3 (cons 2 (cons 1 '())))</code> : la liste à l'envers. <code>(foldr cons '() '(1 2 3))</code> calcule <code>(cons 1 (cons 2 (cons 3 '())))</code> : une copie. Avec une opération où l'ordre compte, la différence saute aux yeux :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>foldl <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>e acc<span class="par">)</span> <span class="par">(</span>+ <span class="par">(</span>* <span class="cst">10</span> acc<span class="par">)</span> e<span class="par">)</span><span class="par">)</span> <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 123</span>
+<span class="par">(</span>foldr <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>e acc<span class="par">)</span> <span class="par">(</span>+ <span class="par">(</span>* <span class="cst">10</span> acc<span class="par">)</span> e<span class="par">)</span><span class="par">)</span> <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 321</span></code></pre></div>
+<p><code>foldl</code> est la récursivité terminale avec accumulateur de la partie 7 ; <code>foldr</code> est la version enveloppée. Avec + ou × sur des entiers, les deux donnent le même résultat. Avec des flottants, chaque opération arrondit, si bien que l'ordre des additions peut changer le dernier chiffre (la partie 12 montre un autre effet de ces arrondis, à la question 22) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>foldl + <span class="cst">0.0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">0.1</span> <span class="cst">0.2</span> <span class="cst">0.3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 0.6000000000000001</span>
+<span class="par">(</span>foldr + <span class="cst">0.0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">0.1</span> <span class="cst">0.2</span> <span class="cst">0.3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → 0.6</span></code></pre></div>
+<p>La question 21 du TD utilise <code>(foldl + 0.0 x)</code> : la valeur initiale 0.0 rend la somme inexacte, donc la moyenne décimale (chapitre 1, partie 4.1) :</p>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>/ <span class="par">(</span>foldl + <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">3</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>      <span class="res">; → 10/3</span>
+<span class="par">(</span>/ <span class="par">(</span>foldl + <span class="cst">0.0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">3</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span> <span class="cst">3</span><span class="par">)</span>    <span class="res">; → 3.3333333333333335</span></code></pre></div>
+<h3 id="8-5-andmap-et-ormap-pour-tout-et-il-existe">8.5 andmap et ormap, « pour tout » et « il existe »</h3>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>andmap even? <span class="quo">'</span><span class="par">(</span><span class="cst">2</span> <span class="cst">4</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → #t</span>
+<span class="par">(</span>andmap even? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">3</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → #f</span>
+<span class="par">(</span>ormap even? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">3</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>    <span class="res">; → #t</span>
+<span class="par">(</span>andmap even? <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>        <span class="res">; → #t</span>
+<span class="par">(</span>ormap even? <span class="quo">'</span><span class="par">(</span><span class="par">)</span><span class="par">)</span>         <span class="res">; → #f</span></code></pre></div>
+<p><code>andmap</code> répond à « tous les éléments vérifient-ils le prédicat ? » ; <code>ormap</code>, à « au moins un le vérifie-t-il ? ». Ce sont le ∀ et le ∃ de ton cours <a href="/cours/la-logique.html">La logique, depuis le tout début</a> (partie 8.2), ou <code>all()</code> et <code>any()</code> en Python. Sur la liste vide, <code>andmap</code> répond vrai : aucun élément ne vient contredire la propriété, c'est la vérité par vacuité de la partie 8.3 de ce même cours de logique (« tous les dragons de ma chambre sont verts »). Et <code>ormap</code> répond faux : il n'y a aucun élément pour la vérifier. Les deuxièmes solutions des questions 7, 11 et 19 du TD s'en servent.</p>
+<h3 id="8-6-quand-t-en-servir">8.6 Quand t'en servir</h3>
+<p>Toutes ces fonctions, sauf <code>foldr</code>, sont sur la cheatsheet, ton seul document au DST : tu les auras sous les yeux. Mais un énoncé peut interdire une fonction toute faite (le TP2 interdit <code>make-list</code>, plusieurs questions du TD interdisent celle qu'elles font réécrire), et les « fonctions utiles » indiquées sous chaque question disent ce qui est attendu : <code>foldl</code> est suggérée aux questions 21 et 22, et <code>map</code> à la question 22, alors que la plupart des autres questions ne citent que des fonctions de base, comme <code>empty?</code>, <code>cons</code>, <code>first</code> et <code>rest</code>. Dans le doute, sache toujours écrire la version récursive : c'est tout l'objet de la slide 17.</p>
+<div class="box ask"><p class="lbl">À toi (partie 8)</p><ol><li>Sans machine : <code>(map (lambda (v) (* 2 v)) '(1 2 3))</code>, <code>(filter odd? '(1 2 3 4 5))</code>, <code>(foldl + 0 (map add1 '(1 2 3)))</code>, <code>(andmap positive? '(1 -2 3))</code>, <code>(ormap negative? '(1 -2 3))</code>, <code>(foldl cons '() '(a b))</code>, <code>(foldr cons '() '(a b))</code> et <code>(foldl max 0 '(3 9 2))</code>.</li><li>Réécris <code>garde-pairs</code> avec <code>filter</code>, et <code>somme</code> avec <code>foldl</code>.</li></ol>
+<details class="fold ok"><summary>Réponses</summary><div class="fold-body"><div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>map <span class="par">(</span><span class="kw">lambda</span> <span class="par">(</span>v<span class="par">)</span> <span class="par">(</span>* <span class="cst">2</span> v<span class="par">)</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>   <span class="res">; → '(2 4 6)</span>
+<span class="par">(</span>filter odd? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span>            <span class="res">; → '(1 3 5)</span>
+<span class="par">(</span>foldl + <span class="cst">0</span> <span class="par">(</span>map add1 <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span><span class="par">)</span>       <span class="res">; → 9</span>
+<span class="par">(</span>andmap positive? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">-2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>          <span class="res">; → #f</span>
+<span class="par">(</span>ormap negative? <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">-2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span>           <span class="res">; → #t</span>
+<span class="par">(</span>foldl cons <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span>a b<span class="par">)</span><span class="par">)</span>               <span class="res">; → '(b a)</span>
+<span class="par">(</span>foldr cons <span class="quo">'</span><span class="par">(</span><span class="par">)</span> <span class="quo">'</span><span class="par">(</span>a b<span class="par">)</span><span class="par">)</span>               <span class="res">; → '(a b)</span>
+<span class="par">(</span>foldl max <span class="cst">0</span> <span class="quo">'</span><span class="par">(</span><span class="cst">3</span> <span class="cst">9</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>                <span class="res">; → 9</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>garde-pairs x<span class="par">)</span> <span class="par">(</span>filter even? x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> <span class="par">(</span>somme x<span class="par">)</span> <span class="par">(</span>foldl + <span class="cst">0</span> x<span class="par">)</span><span class="par">)</span>
+<span class="par">(</span>garde-pairs <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>              <span class="res">; → '(2 4)</span>
+<span class="par">(</span>somme <span class="quo">'</span><span class="par">(</span><span class="cst">4</span> <span class="cst">5</span> <span class="cst">6</span><span class="par">)</span><span class="par">)</span>                      <span class="res">; → 15</span></code></pre></div>
+<p><code>(foldl max 0 '(3 9 2))</code> calcule <code>(max 2 (max 9 (max 3 0)))</code>. Attention : avec 0 comme valeur de départ, le maximum d'une liste de nombres tous négatifs serait faux (il vaudrait 0).</p>
+</div></details>
+</div>
+<h2 id="p9"><span class="num">9</span>Les fonctions toutes faites, hors programme</h2>
+<p>Les slides 8 à 14 présentent des fonctions marquées hors programme. Il faut savoir ce qu'elles renvoient <strong>exactement</strong>, car la slide 17 (et le TD) te demandent de les réécrire.</p>
+<div class="tw"><table class="wide"><thead><tr><th>Slide</th><th>Fonction</th><th>Exemple</th><th>Résultat</th><th>À savoir</th></tr></thead><tbody><tr><td>8</td><td><code>reverse</code></td><td><code>(reverse '(1 2 3))</code></td><td><code>'(3 2 1)</code></td><td>la copie terminale de la partie 7.2</td></tr><tr><td>9</td><td><code>list*</code></td><td><code>(list* 1 2 '(3 4))</code></td><td><code>'(1 2 3 4)</code></td><td>plusieurs <code>cons</code> d'un coup ; <code>(list* L)</code> renvoie L</td></tr><tr><td>9</td><td><code>flatten</code></td><td><code>(flatten '((1) 2 (3 4)))</code></td><td><code>'(1 2 3 4)</code></td><td>aplatit à tous les niveaux</td></tr><tr><td>9</td><td><code>make-list</code></td><td><code>(make-list 5 1)</code></td><td><code>'(1 1 1 1 1)</code></td><td>c'est la question 1 du TP2</td></tr><tr><td>9</td><td><code>build-list</code></td><td><code>(build-list 5 (lambda (x) (* x x)))</code></td><td><code>'(0 1 4 9 16)</code></td><td>la fonction reçoit les indices 0, 1, 2…</td></tr><tr><td>9</td><td><code>list-update</code></td><td><code>(list-update '(1 2 3) 1 (lambda (x) (+ 10 x)))</code></td><td><code>'(1 12 3)</code></td><td>applique la fonction à l'élément d'indice donné</td></tr><tr><td>10</td><td><code>list-ref</code></td><td><code>(list-ref '(1 2 3 4 5) 1)</code></td><td><code>2</code></td><td>indices de 0 à n − 1</td></tr><tr><td>10</td><td><code>list-set</code></td><td><code>(list-set '(1 2 3 4 5) 1 42)</code></td><td><code>'(1 42 3 4 5)</code></td><td>une nouvelle liste ; l'ancienne ne change pas</td></tr><tr><td>11</td><td><code>last</code></td><td><code>(last '(1 2 3 4 5))</code></td><td><code>5</code></td><td>le dernier élément</td></tr><tr><td>11</td><td><code>drop</code></td><td><code>(drop '(1 2 3 4 5) 3)</code></td><td><code>'(4 5)</code></td><td>enlève les n premiers</td></tr><tr><td>11</td><td><code>take</code></td><td><code>(take '(1 2 3 4 5) 3)</code></td><td><code>'(1 2 3)</code></td><td>erreur si n dépasse la longueur</td></tr><tr><td>12</td><td><code>remove</code></td><td><code>(remove 2 '(1 2 3 2))</code></td><td><code>'(1 3 2)</code></td><td>enlève <strong>seulement la première</strong> occurrence</td></tr><tr><td>12</td><td><code>remove*</code></td><td><code>(remove* '(1 3) '(1 2 3 1 2 3))</code></td><td><code>'(2 2)</code></td><td>enlève toutes les occurrences des éléments de la première liste</td></tr><tr><td>13</td><td><code>sort</code></td><td><code>(sort '(1 3 4 2) &lt;)</code></td><td><code>'(1 2 3 4)</code></td><td>on lui donne la fonction de comparaison</td></tr><tr><td>13</td><td><code>shuffle</code></td><td><code>(shuffle '(1 2 3 4 5))</code></td><td>au hasard</td><td>c'est la question 4 du TP2</td></tr><tr><td>14</td><td><code>member</code></td><td><code>(member 3 '(1 2 3 4))</code></td><td><code>'(3 4)</code></td><td>renvoie la fin de la liste à partir de l'élément, ou <code>#f</code></td></tr><tr><td>14</td><td><code>index-of</code></td><td><code>(index-of '(1 2 3 4) 3)</code></td><td><code>2</code></td><td><code>#f</code> si l'élément est absent</td></tr><tr><td>14</td><td><code>indexes-of</code></td><td><code>(indexes-of '(1 2 3 1 2 3) 3)</code></td><td><code>'(2 5)</code></td><td>toutes les positions</td></tr></tbody></table></div>
+<div class="code"><div class="code-bar"><span>Racket</span><button type="button" class="copy">Copier</button></div><pre><code><span class="par">(</span>remove <span class="cst">2</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">2</span><span class="par">)</span><span class="par">)</span>                <span class="res">; → '(1 3 2)</span>
+<span class="par">(</span>member <span class="cst">5</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span><span class="par">)</span>                <span class="res">; → #f</span>
+<span class="par">(</span>index-of <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span><span class="par">)</span> <span class="cst">5</span><span class="par">)</span>              <span class="res">; → #f</span>
+<span class="par">(</span>take <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span><span class="par">)</span> <span class="cst">5</span><span class="par">)</span>                      <span class="res err">; → erreur : take: contract violation</span>
+<span class="par">(</span><span class="kw">define</span> A <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span> <span class="cst">4</span> <span class="cst">5</span><span class="par">)</span><span class="par">)</span>
+<span class="par">(</span><span class="kw">define</span> B <span class="par">(</span>list-set A <span class="cst">1</span> <span class="cst">42</span><span class="par">)</span><span class="par">)</span>
+A                                    <span class="res">; → '(1 2 3 4 5)</span>
+B                                    <span class="res">; → '(1 42 3 4 5)</span>
+<span class="par">(</span><span class="kw">if</span> <span class="par">(</span>member <span class="cst">3</span> <span class="quo">'</span><span class="par">(</span><span class="cst">1</span> <span class="cst">2</span> <span class="cst">3</span><span class="par">)</span><span class="par">)</span> <span class="str">"oui"</span> <span class="str">"non"</span><span class="par">)</span> <span class="res">; → "oui"</span></code></pre></div>
+<p><code>member</code> ne renvoie pas <code>#t</code>, mais une liste. Ça suffit pour un test, puisque toute valeur autre que <code>#f</code> compte comme vraie (chapitre 1, partie 5.4).</p>
+<h2 id="p10"><span class="num">10</span>Lire les messages d'erreur des listes</h2>
+<div class="tw"><table><thead><tr><th>Message (début)</th><th>Cause probable</th></tr></thead><tbody><tr><td><code>first: contract violation</code>, <code>given: '()</code></td><td><code>first</code> sur la liste vide : cas de base absent, ou testé trop tard</td></tr><tr><td><code>rest: contract violation</code>, <code>given: '()</code></td><td>même chose avec <code>rest</code></td></tr><tr><td><code>first: contract violation</code>, <code>given: '(6 . 7)</code></td><td><code>first</code> sur une paire pointée : utilise <code>car</code></td></tr><tr><td><code>car: contract violation</code>, <code>expected: pair?</code></td><td><code>car</code> ou <code>cdr</code> sur la liste vide</td></tr><tr><td><code>application: not a procedure</code>, <code>given: 1</code></td><td>apostrophe oubliée devant une liste : <code>(1 2 3)</code></td></tr><tr><td><code>a: unbound identifier</code></td><td>apostrophe oubliée devant un symbole, ou variable non définie</td></tr><tr><td><code>’: unbound identifier</code></td><td>apostrophe typographique copiée depuis un PDF</td></tr><tr><td><code>append: contract violation</code>, <code>expected: list?</code></td><td><code>append</code> avec un élément au lieu d'une liste</td></tr><tr><td><code>length: contract violation</code>, <code>expected: list?</code></td><td><code>length</code> sur une paire pointée ou sur un nombre</td></tr><tr><td><code>=: contract violation</code>, <code>expected: number?</code></td><td><code>=</code> sur des symboles ou des listes : utilise <code>equal?</code></td></tr><tr><td><code>take: contract violation</code></td><td><code>take</code> avec un n plus grand que la longueur</td></tr><tr><td>un résultat avec un point, comme <code>'(1 2 . 3)</code></td><td>une valeur qui n'est pas une liste dans une case de droite : <code>(append L 3)</code>, ou <code>(cons a b)</code> avec un b qui n'est pas une liste</td></tr><tr><td>des parenthèses en trop, comme <code>'(1 (2 3))</code></td><td><code>list</code> à la place de <code>cons</code> ou d'<code>append</code></td></tr><tr><td>un résultat à l'envers</td><td>accumulateur construit avec <code>cons</code>, sans <code>reverse</code> final (partie 7.2)</td></tr><tr><td><code>out of memory</code>, ou un calcul qui ne s'arrête pas</td><td>appel récursif sur x au lieu de <code>(rest x)</code></td></tr></tbody></table></div>
+<h2 id="p11"><span class="num">11</span>Ce que le TD2 utilise</h2>
+<div class="tw"><table class="wide"><thead><tr><th>Questions</th><th>Ce qu'il faut savoir faire</th><th>Parties</th></tr></thead><tbody><tr><td>TD 1, 2, 3</td><td>construire une liste en dupliquant chaque tête ; un compteur pour N</td><td>4.1, 6.4, 6.7</td></tr><tr><td>TD 4, 5</td><td>parcourir avec un compteur, s'arrêter au bon endroit</td><td>6.3, 6.7</td></tr><tr><td>TD 6, 7</td><td>repérer les sous-listes avec <code>list?</code>, et descendre dedans (question 6)</td><td>6.9, 4.3</td></tr><tr><td>TD 8</td><td>avancer dans une seule des deux listes</td><td>6.8, 7.2</td></tr><tr><td>TD 9</td><td>un indicateur qui alterne entre 0 et 1</td><td>6.7, 7.3</td></tr><tr><td>TD 10</td><td>construire à l'envers</td><td>7.2, 4.3</td></tr><tr><td>TD 11, 12</td><td>chercher ; garder certains éléments</td><td>6.3, 6.5</td></tr><tr><td>TD 13, 14, 15, 16</td><td>les n premiers, les n derniers, le dernier, tous sauf le dernier</td><td>6.6, 6.7, 7.3</td></tr><tr><td>TD 17, 18</td><td>réduire une liste non vide ; deux accumulateurs</td><td>6.6, 7.1</td></tr><tr><td>TD 19</td><td>une fonction en argument</td><td>8.1, 8.5</td></tr><tr><td>TD 20</td><td>reconstruire la liste en changeant un élément</td><td>6.4, 6.7</td></tr><tr><td>TD 21, 22</td><td>moyenne et écart-type, flottants</td><td>6.2, 8.2, 8.4</td></tr><tr><td>TD 23</td><td>construire une liste à partir d'un nombre ; comparer deux listes</td><td>6.8, chapitre 1</td></tr><tr><td>TD 24</td><td>fabriquer une chaîne de caractères</td><td>chapitre 1, partie 11</td></tr><tr><td>TD 25, 26, 27</td><td>des suites de listes : <code>let</code>, <code>append</code>, double récursion</td><td>4.3, chapitre 1</td></tr></tbody></table></div>
+<h2 id="p12"><span class="num">12</span>Checklist avant le DST</h2>
+<p>Tu dois pouvoir, sur papier :</p>
+<ul class="tasks"><li><input type="checkbox" id="tache-1"><label for="tache-1">écrire une liste avec <code>list</code> ou avec l'apostrophe, et dire ce qui est évalué (parties 2.1 et 2.2) ;</label></li><li><input type="checkbox" id="tache-2"><label for="tache-2">distinguer un symbole, une chaîne et une variable (partie 2.3) ;</label></li><li><input type="checkbox" id="tache-3"><label for="tache-3">prédire <code>first</code>, <code>rest</code> et <code>cadr</code> sur une liste de listes (partie 3) ;</label></li><li><input type="checkbox" id="tache-4"><label for="tache-4">choisir entre <code>cons</code>, <code>list</code> et <code>append</code> (partie 4.3), et repérer un point ou des parenthèses en trop dans un résultat (parties 5.1 et 10) ;</label></li><li><input type="checkbox" id="tache-5"><label for="tache-5">expliquer une paire pointée, et lire ses deux cases avec <code>car</code> et <code>cdr</code> (partie 5) ;</label></li><li><input type="checkbox" id="tache-6"><label for="tache-6">écrire une fonction sur une liste avec le gabarit et les quatre questions, et donner sa trace (parties 6.1 et 6.2) ;</label></li><li><input type="checkbox" id="tache-7"><label for="tache-7">reconnaître la famille d'une question : réduire, chercher, transformer, garder, compteur, deux listes, profondeur (partie 6) ;</label></li><li><input type="checkbox" id="tache-8"><label for="tache-8">passer d'une version enveloppée à une version terminale, et savoir quand la liste sort à l'envers (partie 7) ;</label></li><li><input type="checkbox" id="tache-9"><label for="tache-9">passer une fonction en argument, et utiliser <code>map</code>, <code>filter</code>, <code>foldl</code>, <code>foldr</code>, <code>andmap</code> et <code>ormap</code> (partie 8) ;</label></li><li><input type="checkbox" id="tache-10"><label for="tache-10">connaître le comportement exact des fonctions hors programme, pour pouvoir les réécrire (partie 9 et slide 17) ;</label></li><li><input type="checkbox" id="tache-11"><label for="tache-11">lire les messages d'erreur de la partie 10.</label></li></ul>
+<p><strong>Et après ?</strong> La cheatsheet contient aussi ce qui vient ensuite : <code>match</code>, les images (<code>2htdp/image</code>) et la tortue (<code>graphics/turtles</code>). <code>match</code> sert justement à découper une liste en tête et reste en une seule ligne : tout ce chapitre te servira encore.</p>
+
+</main>
+<footer>
+<p>Mis en page à partir de ma note Obsidian. Les commandes et le code se vérifient en les tapant soi-même.</p>
+</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+<script>
+var PAGE = "pf1-chapitre-2-cours";
+(function () {
+  function lire(cle) { try { return localStorage.getItem(cle); } catch (e) { return null; } }
+  function ecrire(cle, val) { try { localStorage.setItem(cle, val); } catch (e) {} }
+
+  // Boutons « Copier » des blocs Racket
+  function selectionner(bouton, code) {
+    var r = document.createRange();
+    r.selectNodeContents(code);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    bouton.textContent = 'Sélectionné : Ctrl+C';
+  }
+  document.querySelectorAll('.code .copy').forEach(function (bouton) {
+    bouton.addEventListener('click', function () {
+      var code = bouton.closest('.code').querySelector('code');
+      var texte = code.textContent;
+      var fini = function () {
+        bouton.textContent = 'Copié';
+        setTimeout(function () { bouton.textContent = 'Copier'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texte).then(fini, function () { selectionner(bouton, code); });
+      } else {
+        selectionner(bouton, code);
+      }
+    });
+  });
+
+  // Mode prédiction : les résultats « ; → » sont floutés jusqu'au clic
+  var bouton = document.getElementById('predict');
+  var CLE = 'pf1-mode-prediction';
+  if (bouton) {
+  function appliquer(actif) {
+    document.body.classList.toggle('predict', actif);
+    bouton.setAttribute('aria-pressed', actif ? 'true' : 'false');
+    bouton.textContent = actif ? 'Mode prédiction : activé' : 'Mode prédiction';
+    document.querySelectorAll('.res.shown').forEach(function (r) { r.classList.remove('shown'); });
+  }
+  appliquer(lire(CLE) === '1');
+  bouton.addEventListener('click', function () {
+    var actif = !document.body.classList.contains('predict');
+    appliquer(actif);
+    ecrire(CLE, actif ? '1' : '0');
+  });
+  document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('predict')) return;
+    var r = e.target.closest('.res');
+    if (r) r.classList.toggle('shown');
+  });
+  }
+
+  // Listes à cocher : chaque case est retenue dans ce navigateur
+  document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function (c) {
+    var cle = 'pf1-' + PAGE + '-' + c.id;
+    var v = lire(cle);
+    if (v !== null) c.checked = v === '1';
+    c.addEventListener('change', function () { ecrire(cle, c.checked ? '1' : '0'); });
+  });
+})();
+
+</script>
+</body>
+</html>

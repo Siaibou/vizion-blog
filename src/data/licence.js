@@ -23,7 +23,11 @@ export const semestres = [
             nom: 'Programmation fonctionnelle',
             description:
               "L'objectif de ce cours est l'apprentissage de la programmation. Le choix du paradigme fonctionnel dès le premier semestre de la première année a pour but de donner de bonnes habitudes de programmation, notamment de faire réfléchir au « quoi » (l'objectif de l'algorithme) et pas seulement au « comment » (les étapes de l'algorithme) lors de la conception de programme. Ce cours utilise le langage Racket.",
-            contenus: [],
+            contenus: [
+              { titre: 'Chapitre 1 : penser et écrire en Racket', href: '/cours/pf1-chapitre-1-cours.html', meta: 'Cours · rédigé avec Claude' },
+              { titre: 'Chapitre 1 : exercices et DST blanc', href: '/cours/pf1-chapitre-1-exercices.html', meta: 'Exercices corrigés · rédigés avec Claude' },
+              { titre: 'Chapitre 2 : les listes', href: '/cours/pf1-chapitre-2-cours.html', meta: 'Cours · rédigé avec Claude' },
+            ],
           },
           {
             id: 'architecture-des-ordinateurs',
@@ -47,7 +51,10 @@ export const semestres = [
             nom: 'Pratique des machines',
             description:
               "L'objectif de ce cours est de se familiariser avec l'environnement GNU/Linux, la ligne de commande et apprendre à connaître d'un peu plus près les machines qui vont être utilisées tout au long de la formation.",
-            contenus: [],
+            contenus: [
+              { titre: 'Jour 1 : flux et redirections', href: '/cours/pdm-jour-1-flux-et-redirections.html', meta: 'Notes de cours · compléments rédigés avec Claude' },
+              { titre: 'Jour 2 : hiérarchie de fichiers et archives', href: '/cours/pdm-jour-2-hierarchie-et-archives.html', meta: 'Notes de cours · compléments rédigés avec Claude' },
+            ],
           },
           {
             id: 'gestion-d-identite-en-ligne',
