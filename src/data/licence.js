@@ -100,7 +100,9 @@ export const semestres = [
             id: 'langue-chinoise',
             nom: 'Langue chinoise',
             description: 'Niveau A1.2.',
-            contenus: [],
+            contenus: [
+              { titre: 'Lire le TOP 5', href: '/cours/top-5.html', meta: 'Chapitre 0 · ' + COURS_CLAUDE },
+            ],
           },
         ],
       },
