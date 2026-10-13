@@ -76,6 +76,7 @@ export const semestres = [
               "Ce cours donne une première introduction calculatoire et pratique à l'analyse, via l'étude de fonctions à valeurs réelles, le calcul d'intégrales et les opérations sur les complexes. On gardera une approche concrète à ces sujets, par exemple en donnant une interprétation géométrique des éléments étudiés.",
             contenus: [
               { titre: 'Géométrie et trigonométrie, depuis le tout début', href: '/cours/geometrie-et-trigonometrie.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
+              { titre: 'Cercle trigonométrique par coeurs', href: '/cours/cercle_trigo_par_coeur.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
               leCalcul,
             ],
           },

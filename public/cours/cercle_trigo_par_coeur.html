@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>Cercle trigo par cœur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* Mise en page : un rapporteur posé sur du papier millimétré. À gauche la scène (consigne, cercle, réponse), à droite la fiche (explications, bilan). Une seule colonne sur téléphone. */
+:root{
+  --paper:#f2f4f7; --panel:#ffffff; --ink:#172031; --muted:#59647a; --line:#d4dae4;
+  --grid:rgba(31,91,216,.075); --grid2:rgba(31,91,216,.11);
+  --cos:#1f5bd8; --sin:#cf4510; --tan:#7a3fb4;
+  --good:#11805b; --good-soft:rgba(17,128,91,.12); --bad:#c42b3b; --bad-soft:rgba(196,43,59,.10);
+  --m0:#c42b3b; --m1:#df7417; --m2:#c99a06; --m3:#5d9e33; --m4:#11805b; --unseen:#b4bdcc;
+  --f-ui:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-math:'STIX Two Text', 'Cambria Math', 'Times New Roman', serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0d1219; --panel:#151c27; --ink:#e7ecf4; --muted:#9ca8bc; --line:#2b3547;
+    --grid:rgba(126,166,255,.055); --grid2:rgba(126,166,255,.09);
+    --cos:#82a8ff; --sin:#ff9061; --tan:#c49dff;
+    --good:#4fd1a0; --good-soft:rgba(79,209,160,.14); --bad:#ff7f8a; --bad-soft:rgba(255,127,138,.13);
+    --m0:#ff7f8a; --m1:#ffa45c; --m2:#efcd45; --m3:#9bd46a; --m4:#4fd1a0; --unseen:#46526a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0d1219; --panel:#151c27; --ink:#e7ecf4; --muted:#9ca8bc; --line:#2b3547;
+  --grid:rgba(126,166,255,.055); --grid2:rgba(126,166,255,.09);
+  --cos:#82a8ff; --sin:#ff9061; --tan:#c49dff;
+  --good:#4fd1a0; --good-soft:rgba(79,209,160,.14); --bad:#ff7f8a; --bad-soft:rgba(255,127,138,.13);
+  --m0:#ff7f8a; --m1:#ffa45c; --m2:#efcd45; --m3:#9bd46a; --m4:#4fd1a0; --unseen:#46526a;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cos);outline-offset:2px}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:16px;padding-block:22px 64px}
+
+/* en-tête */
+.top{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 4px;font-weight:700}
+h1{font-family:var(--f-math);font-style:italic;font-weight:600;font-size:clamp(2rem,6.5vw,2.75rem);line-height:1.04;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{margin:8px 0 0;max-width:62ch;color:var(--muted)}
+.save{font-size:.84rem;color:var(--muted);margin:0;display:flex;align-items:center;gap:7px}
+.save::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--unseen);flex:none}
+.save[data-s="compte"]::before{background:var(--good)}
+.save[data-s="navigateur"]::before{background:var(--m2)}
+
+/* onglets et réglages */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 10px}
+.tab{font-weight:700;font-size:.95rem;padding:8px 14px;min-height:44px;border-radius:4px;border:1.5px solid var(--line);background:var(--panel);cursor:pointer}
+.tab:hover{border-color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:0 0 12px}
+.opts:empty{display:none}
+.og{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.og>span{font-size:.74rem;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-right:2px}
+.chip{font-size:.9rem;padding:5px 11px;min-height:38px;border:1.5px solid var(--line);border-radius:4px;background:var(--panel);cursor:pointer}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--ink);font-weight:700}
+.chip.preset{border-style:dashed}
+
+/* grille principale */
+.layout{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.stage{background:var(--panel);border:1.5px solid var(--line);border-radius:6px;padding:14px 14px 16px;min-width:0;scroll-margin-top:12px}
+.side{min-width:0;display:grid;gap:14px;align-content:start}
+.card{background:var(--panel);border:1.5px solid var(--line);border-radius:6px;padding:14px 16px;min-width:0}
+.card>:first-child{margin-top:0}.card>:last-child{margin-bottom:0}
+.card h2{font-size:1.12rem;line-height:1.25;margin:0 0 8px;text-wrap:balance}
+.card h3{font-size:1rem;line-height:1.3;margin:16px 0 6px;text-wrap:balance}
+.card p{margin:8px 0}
+@media (min-width:900px){
+  .layout{grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);align-items:start}
+  .stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+  #cv{max-height:calc(100vh - 330px);min-height:300px}
+}
+
+/* scène */
+.qhead:empty{display:none}
+.qmeta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+.qnum{font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.dots{display:flex;flex-wrap:wrap;gap:4px}
+.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line);display:block}
+.dots i.ok{background:var(--good);border-color:var(--good)}
+.dots i.ko{background:var(--bad);border-color:var(--bad)}
+.dots i.cur{border-color:var(--ink);border-width:2px}
+.prompt{margin:4px 0 0;line-height:1.25}
+.prompt .verb{display:block;font-size:.78rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.prompt .big{font-family:var(--f-math);font-size:clamp(2rem,8vw,2.7rem);line-height:1.3}
+.tool{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:2px 0 0}
+.tool:empty{display:none}
+.tool>span{font-size:.74rem;color:var(--muted);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-right:2px}
+#cv{display:block;width:100%;max-width:470px;aspect-ratio:1/1;height:auto;margin:6px auto 0;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:visible}
+.cap:empty,.pad:empty{display:none}
+.cap{margin-top:6px}
+.pad{display:grid;gap:10px;margin-top:10px}
+
+/* maths */
+.m{font-family:var(--f-math);font-size:1.07em;white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.06;font-size:.8em;margin:0 .08em}
+.fr>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .12em .04em}
+.fr>span:last-child{padding-top:.05em}
+.nd{font-family:var(--f-ui);font-size:.9em}
+.c-cos{color:var(--cos)}.c-sin{color:var(--sin)}.c-tan{color:var(--tan)}
+
+/* clavier de réponse */
+.prow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.prow .lab{width:100%;font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.key{font-family:var(--f-math);font-size:1.2rem;min-width:54px;min-height:50px;padding:4px 10px;border:1.5px solid var(--line);border-radius:4px;background:var(--paper);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.key:hover{border-color:var(--ink)}
+.key[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--panel)}
+.key:disabled{opacity:.35;cursor:not-allowed}
+.key.wide{font-family:var(--f-ui);font-size:.92rem}
+.btn{font-weight:700;border:1.5px solid var(--ink);border-radius:4px;padding:10px 18px;min-height:48px;background:var(--ink);color:var(--panel);cursor:pointer}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hint{margin:0;color:var(--muted);font-size:.95rem}
+.kbd{display:none;font-size:.8rem;color:var(--muted)}
+@media (hover:hover) and (pointer:fine){.kbd{display:inline}}
+.verdict{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:4px}
+.verdict.ok{background:var(--good-soft)}
+.verdict.ko{background:var(--bad-soft)}
+.verdict p{margin:0;min-width:0}
+.verdict .w{font-weight:700}
+.verdict.ok .w{color:var(--good)}
+.verdict.ko .w{color:var(--bad)}
+
+/* lecture sous le cercle */
+.ro{display:grid;gap:4px;justify-items:center;text-align:center}
+.ro .head{font-family:var(--f-math);font-size:1.5rem;line-height:1.3}
+.ro .vals{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center}
+.ro .vals>span{white-space:nowrap}
+.ro .where{margin:0;color:var(--muted);font-size:.93rem;max-width:46ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:.84rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid transparent}
+.detail{text-align:center;margin:8px 0 0;font-size:.93rem}
+
+/* fiches */
+.steps{margin:6px 0 0;padding-left:1.25em}
+.steps li{margin:7px 0}
+.note{color:var(--muted);font-size:.92rem}
+.kn{display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;border:1.5px solid var(--ink);font-size:.82rem;margin-right:8px;vertical-align:.08em;font-variant-numeric:tabular-nums}
+.key-sec{border-top:1.5px solid var(--line);padding-top:4px;margin-top:14px}
+.key-sec:first-of-type{border-top:0;margin-top:4px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.stepper{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.stepper output{flex:1 1 180px;min-width:0;font-size:.95rem}
+.tw{overflow-x:auto;margin:10px 0}
+table.vals{border-collapse:collapse;width:100%;min-width:300px;font-size:.95rem}
+table.vals th,table.vals td{border:1px solid var(--line);padding:6px 6px;text-align:center}
+table.vals th{background:var(--paper);font-weight:700;font-size:.82rem}
+table.vals td.rh{text-align:left;font-weight:700;font-size:.85rem;white-space:nowrap}
+.fams{margin:8px 0;padding-left:1.2em}
+.fams li{margin:6px 0}
+.quads{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:300px;margin:10px auto;border:1.5px solid var(--ink);position:relative}
+.quads div{padding:8px 6px;text-align:center;font-size:.92rem;border:1px solid var(--line)}
+.quads small{display:block;color:var(--muted);font-size:.76rem}
+.score{font-size:1.05rem;margin:4px 0 8px}
+.score b{font-family:var(--f-math);font-size:2rem}
+.errs,.weak,.hist{margin:6px 0 0;padding-left:1.15em}
+.errs li,.weak li,.hist li{margin:6px 0}
+.bars{display:grid;gap:8px;margin-top:6px}
+.bars .row{display:grid;grid-template-columns:6.4em minmax(0,1fr) auto;gap:10px;align-items:center;font-size:.93rem}
+.bar{height:10px;border-radius:5px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good)}
+.mx{display:inline-block;font-size:.76rem;font-weight:700;padding:1px 7px;border-radius:999px;border:1.5px solid currentColor;margin-left:4px;white-space:nowrap}
+.mx.h0{color:var(--m0)}.mx.h1{color:var(--m1)}.mx.h2{color:var(--m2)}.mx.h3{color:var(--m3)}.mx.h4{color:var(--m4)}
+textarea.bilan{width:100%;min-height:150px;margin-top:8px;font:inherit;font-size:.88rem;padding:8px;border:1.5px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink)}
+footer{margin-top:22px;color:var(--muted);font-size:.86rem;max-width:72ch}
+
+/* dessin */
+#cv text{font-family:var(--f-math);fill:var(--ink)}
+#cv .lbl{font-size:12px;fill:var(--muted)}
+#cv .lbl.hot{fill:var(--ink);font-weight:600}
+#cv .lbl.off{display:none}
+#cv .halo{paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+#cv .axl{font-family:var(--f-ui);font-size:10.5px;font-weight:700;letter-spacing:.06em}
+#cv .axl.c-cos,#cv .vlab.c-cos{fill:var(--cos)}
+#cv .axl.c-sin,#cv .vlab.c-sin{fill:var(--sin)}
+#cv .gridl{stroke:var(--grid2);stroke-width:.7;fill:none}
+#cv .ax{stroke:var(--muted);stroke-width:1}
+#cv .ahp{fill:var(--muted)}
+#cv .ahp2{fill:var(--ink)}
+#cv .circ{fill:none;stroke:var(--ink);stroke-width:1.8}
+#cv .tick{stroke:var(--muted);stroke-width:.8;fill:none}
+#cv .arc{fill:none;stroke:var(--ink);stroke-width:1.6}
+#cv .radius{stroke:var(--ink);stroke-width:1.3}
+#cv .part{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+#cv .pnum{font-family:var(--f-ui);font-size:9.5px;fill:var(--muted)}
+#cv .proj{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+#cv .seg-cos{stroke:var(--cos);stroke-width:3.4;stroke-linecap:round}
+#cv .seg-sin{stroke:var(--sin);stroke-width:3.4;stroke-linecap:round}
+#cv .vlab{font-size:11.5px;font-weight:600}
+#cv .eqline{stroke-width:2.2;stroke-dasharray:7 4;fill:none}
+#cv .eqline.cos{stroke:var(--cos)}#cv .eqline.sin{stroke:var(--sin)}#cv .eqline.tan{stroke:var(--tan)}
+#cv .pt{cursor:default}
+#cv.live .pt{cursor:pointer}
+#cv .pt .hit{fill:transparent}
+#cv .pt .dot{fill:var(--panel);stroke:var(--ink);stroke-width:1.6}
+#cv .pt:focus{outline:none}
+#cv .pt:focus-visible .dot{stroke:var(--cos);stroke-width:3.4}
+#cv .pt.sel .dot{fill:var(--ink)}
+#cv .pt.ok .dot{fill:var(--good);stroke:var(--good)}
+#cv .pt.bad .dot{fill:var(--bad);stroke:var(--bad)}
+#cv .pt.miss .dot{fill:var(--panel);stroke:var(--good);stroke-width:2.6;stroke-dasharray:2.4 1.8}
+#cv .pt.dim .dot{opacity:.4}
+#cv .pt.hu .dot{fill:var(--panel);stroke:var(--unseen);stroke-width:2.2}
+#cv .pt.h0 .dot{fill:var(--m0);stroke:var(--m0)}
+#cv .pt.h1 .dot{fill:var(--m1);stroke:var(--m1)}
+#cv .pt.h2 .dot{fill:var(--m2);stroke:var(--m2)}
+#cv .pt.h3 .dot{fill:var(--m3);stroke:var(--m3)}
+#cv .pt.h4 .dot{fill:var(--m4);stroke:var(--m4)}
+#cv .pt.pick .dot{stroke:var(--ink);stroke-width:3}
+#cv .fade{animation:fadein .35s ease-out both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){#cv .fade{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Fonctions élémentaires · trigonométrie</p>
+      <h1>Cercle trigo par cœur</h1>
+      <p class="lede">Place les angles, retrouve cos, sin et tan, résous les équations de base. Les angles qui te résistent reviennent plus souvent.</p>
+    </div>
+    <p class="save" id="save" data-s="memoire" aria-live="polite">Sauvegarde : en cours de chargement</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Modes du jeu">
+    <button type="button" class="tab" role="tab" id="tab-c" data-act="tab" data-tab="c" aria-controls="main" aria-selected="true">Comprendre</button>
+    <button type="button" class="tab" role="tab" id="tab-p" data-act="tab" data-tab="p" aria-controls="main" aria-selected="false">Placer</button>
+    <button type="button" class="tab" role="tab" id="tab-v" data-act="tab" data-tab="v" aria-controls="main" aria-selected="false">Valeurs</button>
+    <button type="button" class="tab" role="tab" id="tab-e" data-act="tab" data-tab="e" aria-controls="main" aria-selected="false">Équations</button>
+    <button type="button" class="tab" role="tab" id="tab-g" data-act="tab" data-tab="g" aria-controls="main" aria-selected="false">Progrès</button>
+  </nav>
+
+  <div class="opts" id="opts"></div>
+
+  <main class="layout" id="main">
+    <section class="stage" id="stage" aria-label="Cercle trigonométrique">
+      <div class="qhead" id="qhead" aria-live="polite"></div>
+      <div class="tool" id="tool"></div>
+      <svg id="cv" viewBox="-150 -150 300 300" role="group" aria-label="Cercle trigonométrique de rayon 1"></svg>
+      <div class="cap" id="cap"></div>
+      <div class="pad" id="pad"></div>
+    </section>
+    <section class="side" id="side" aria-live="polite"></section>
+  </main>
+
+  <footer>Angles en radians, comptés à partir du point (1 ; 0) dans le sens inverse des aiguilles d'une montre. Les graduations du cercle sont tous les 5°, plus longues tous les 15° (π/12). Conçu pour la feuille 1 de trigonométrie de Fonctions élémentaires.</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+var doc = document;
+function $(id){ return doc.getElementById(id); }
+var NS = 'http://www.w3.org/2000/svg';
+var R = 104;
+var S = [0,2,3,4,6,8,9,10,12,14,15,16,18,20,21,22];   /* angles de [0 ; 2π[ en unités de π/12 (15°) */
+var SINV = ['0','1/2','√2/2','√3/2','1'];
+var TANV = ['0','√3/3','1','√3'];
+var FN = ['cos','sin','tan'];
+var LET = {c:'cos', s:'sin', t:'tan'};
+var MX = ['à revoir','fragile','en cours','solide','acquis'];
+var RM = false; try { RM = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e) {}
+
+/* ---------- modèle mathématique ---------- */
+function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ var t=a%b; a=b; b=t; } return a; }
+function fracOf(u){ if(u===0) return {num:0, den:1}; var g=gcd(u,12); return {num:u/g, den:12/g}; }
+function base(u){ return ((u%24)+24)%24; }
+function A(u){ var f=fracOf(u); if(f.num===0) return '0'; var s=f.num<0?'−':''; var a=Math.abs(f.num); var top=(a===1?'':a)+'π'; return f.den===1 ? s+top : s+top+'/'+f.den; }
+function frH(top,bot){ return '<span class="fr"><span>'+top+'</span><span>'+bot+'</span></span>'; }
+function AH(u){ var f=fracOf(u); if(f.num===0) return '0'; var s=f.num<0?'−':''; var a=Math.abs(f.num); var top=(a===1?'':a)+'π'; return f.den===1 ? s+top : s+frH(top,f.den); }
+function nfH(n,den){ if(n===0) return '0'; if(den===1) return (n===1?'':n)+'π'; return frH((n===1?'':n)+'π', den); }
+function refDeg(d){ if(d<=90) return d; if(d<=180) return 180-d; if(d<=270) return d-180; return 360-d; }
+var SINL = {0:0,30:1,45:2,60:3,90:4};
+var TANL = {0:0,30:1,45:2,60:3};
+function sgnCos(d){ if(d===90||d===270) return 0; return (d>90&&d<270) ? -1 : 1; }
+function sgnSin(d){ if(d===0||d===180) return 0; return d<180 ? 1 : -1; }
+function values(u){
+  var d=15*base(u), a=refDeg(d), sl=SINL[a], cl=4-sl, cs=sgnCos(d), ss=sgnSin(d);
+  return {
+    cos: {sign: cl===0?0:cs, lvl: cl},
+    sin: {sign: sl===0?0:ss, lvl: sl},
+    tan: cl===0 ? {undef:true} : {sign: TANL[a]===0?0:cs*ss, lvl: TANL[a]}
+  };
+}
+function num(f,v){ if(v.undef) return NaN; var m = f==='tan' ? [0,1/Math.sqrt(3),1,Math.sqrt(3)][v.lvl] : Math.sqrt(v.lvl)/2; return v.sign<0 ? -m : m; }
+function frS(s){ var i=s.indexOf('/'); return i<0 ? s : frH(s.slice(0,i), s.slice(i+1)); }
+function valH(f,v){ if(v.undef) return '<span class="nd">non définie</span>'; return (v.sign<0?'−':'')+frS((f==='tan'?TANV:SINV)[v.lvl]); }
+function valT(f,v){ if(v.undef) return 'non définie'; return (v.sign<0?'−':'')+(f==='tan'?TANV:SINV)[v.lvl]; }
+function sameVal(x,y){ if(x.undef||y.undef) return !!x.undef && !!y.undef; if(x.lvl!==y.lvl) return false; return x.lvl===0 || x.sign===y.sign; }
+function M(h){ return '<span class="m">'+h+'</span>'; }
+
+/* équations */
+var EQ = [];
+['cos','sin'].forEach(function(f){ EQ.push({f:f, code:{sign:0,lvl:0}}); for(var l=1;l<=4;l++){ EQ.push({f:f, code:{sign:1,lvl:l}}); EQ.push({f:f, code:{sign:-1,lvl:l}}); } });
+EQ.push({f:'tan', code:{sign:0,lvl:0}}); for(var l2=1;l2<=3;l2++){ EQ.push({f:'tan', code:{sign:1,lvl:l2}}); EQ.push({f:'tan', code:{sign:-1,lvl:l2}}); }
+function codeS(c){ return c.lvl===0 ? '0' : (c.sign<0?'-':'')+c.lvl; }
+function eqKey(f,c){ return 'e:'+f[0]+':'+codeS(c); }
+function solve(f,c){ return S.filter(function(b){ var v=values(b)[f]; return !v.undef && sameVal(v,c); }); }
+function principal(f,c){
+  var sols = solve(f,c);
+  if(f==='cos') return sols.filter(function(b){ return b<=12; })[0];
+  var signed = sols.map(function(b){ return b>12 ? b-24 : b; });
+  if(f==='sin') return signed.filter(function(u){ return u>=-6 && u<=6; })[0];
+  return signed.filter(function(u){ return u>-6 && u<6; })[0];
+}
+function plusK(u,two){ var k = two ? '2kπ' : 'kπ'; return u===0 ? k : AH(u)+' + '+k; }
+function realH(f,c){
+  var a = principal(f,c);
+  if(f==='cos'){ if(a===0) return 'x = 2kπ'; if(a===12) return 'x = π + 2kπ'; return 'x = '+plusK(a,true)+' ou x = '+plusK(-a,true); }
+  if(f==='sin'){ if(a===6||a===-6) return 'x = '+plusK(a,true); return 'x = '+plusK(a,true)+' ou x = '+plusK(12-a,true); }
+  return 'x = '+plusK(a,false);
+}
+function eqH(f,c){ return f+' x = '+valH(f,c); }
+function eqT(f,c){ return f+' x = '+valT(f,c); }
+
+/* repères de position */
+function where(b){ var d=15*b; if(d===0) return 'à droite, au point de départ'; if(d===90) return 'tout en haut'; if(d===180) return 'à gauche'; if(d===270) return 'tout en bas'; if(d<90) return 'en haut à droite'; if(d<180) return 'en haut à gauche'; if(d<270) return 'en bas à gauche'; return 'en bas à droite'; }
+function relation(b){
+  var d=15*b, a=refDeg(d)/15;
+  if(d>0&&d<90) return {q:1};
+  if(d>90&&d<180) return {q:2, ref:a, rel:AH(b)+' = π − '+AH(a), sym:"par rapport à l'axe vertical"};
+  if(d>180&&d<270) return {q:3, ref:a, rel:AH(b)+' = π + '+AH(a), sym:'par rapport au centre O'};
+  if(d>270) return {q:4, ref:a, rel:AH(b)+' = 2π − '+AH(a), sym:"par rapport à l'axe horizontal"};
+  return {q:0};
+}
+
+/* ---------- état ---------- */
+var st = {
+  tab: 'c',
+  o: { pSpan:'base', vF:{cos:true,sin:true,tan:false}, vHelp:'pt', vSpan:'base', eF:{cos:true,sin:true,tan:false}, heat:'p', lab:'rad' },
+  ses: { p:null, v:null, e:null },
+  ex: { d:6, k:5 },
+  heatB: null,
+  resetAsk: false,
+  copyMsg: ''
+};
+var SLEN = { p:10, v:10, e:8 };
+
+/* ---------- progression et sauvegarde ---------- */
+var LS = 'cercle-trigo-progres-v1', LSO = 'cercle-trigo-reglages-v1';
+function blank(){ return { v:1, updated:0, items:{}, sessions:[] }; }
+var Prog = blank();
+function normalize(d){
+  var out = blank();
+  if(!d || typeof d!=='object') return out;
+  out.updated = +d.updated || 0;
+  if(d.items && typeof d.items==='object'){ Object.keys(d.items).forEach(function(k){ var it=d.items[k]; if(it && typeof it==='object') out.items[k] = { b: Math.max(0,Math.min(4,+it.b||0)), n: +it.n||0, k: +it.k||0, t: +it.t||0 }; }); }
+  if(Array.isArray(d.sessions)) out.sessions = d.sessions.filter(function(s){ return s && typeof s==='object' && s.id; }).slice(0,60);
+  return out;
+}
+function merge(a,b){
+  var out = blank(); out.updated = Math.max(a.updated, b.updated);
+  var keys = {}; Object.keys(a.items).concat(Object.keys(b.items)).forEach(function(k){ keys[k]=1; });
+  Object.keys(keys).forEach(function(k){ var x=a.items[k], y=b.items[k]; if(!x) out.items[k]=y; else if(!y) out.items[k]=x; else out.items[k] = (y.t>x.t || (y.t===x.t && y.n>x.n)) ? y : x; });
+  var seen = {}; out.sessions = a.sessions.concat(b.sessions).filter(function(s){ if(seen[s.id]) return false; seen[s.id]=1; return true; }).sort(function(x,y){ return (y.d||0)-(x.d||0); }).slice(0,60);
+  return out;
+}
+var Store = {
+  mode: 'memoire', ref: null, busy: false, dirty: false, timer: 0, off: false, retried: false,
+  loadLocal: function(){
+    try { var s = localStorage.getItem(LS); if(s) Prog = normalize(JSON.parse(s)); this.mode = 'navigateur'; }
+    catch(e){ this.mode = 'memoire'; }
+    try { var o = localStorage.getItem(LSO); if(o){ var p = JSON.parse(o); if(p && typeof p==='object'){ ['pSpan','vHelp','vSpan','heat','lab','tab'].forEach(function(k){ if(typeof p[k]==='string') st.o[k]=p[k]; }); ['vF','eF'].forEach(function(k){ if(p[k] && typeof p[k]==='object'){ FN.forEach(function(f){ if(typeof p[k][f]==='boolean') st.o[k][f]=p[k][f]; }); } }); } } } catch(e){}
+  },
+  saveLocal: function(){ try { localStorage.setItem(LS, JSON.stringify(Prog)); if(this.mode==='memoire') this.mode='navigateur'; } catch(e){} },
+  saveOpts: function(){ try { var o = JSON.parse(JSON.stringify(st.o)); o.tab = st.tab; localStorage.setItem(LSO, JSON.stringify(o)); } catch(e){} },
+  touch: function(){ Prog.updated = Date.now(); this.saveLocal(); this.dirty = true; this.schedule(); showSave(); },
+  schedule: function(){ var self=this; if(!this.ref || this.off) return; clearTimeout(this.timer); this.timer = setTimeout(function(){ self.flush(); }, 2500); },
+  flush: function(){
+    var self = this;
+    if(!this.ref || this.off || !this.dirty) return;
+    if(this.busy){ this.schedule(); return; }
+    this.busy = true; this.dirty = false;
+    this.ref.set(JSON.parse(JSON.stringify(Prog))).then(function(){
+      self.mode = 'compte'; self.retried = false;
+    }, function(e){
+      var c = e && e.code;
+      if(c==='unavailable' && !self.retried){ self.retried = true; self.dirty = true; setTimeout(function(){ self.flush(); }, 3000 + Math.random()*3000); }
+      else { self.off = true; self.mode = 'navigateur'; }
+    }).then(function(){ self.busy = false; showSave(); });
+  },
+  connect: function(){
+    var self = this;
+    if(!window.claude || typeof window.claude.use!=='function'){ showSave(); return; }
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function(r){
+      var db = r[0], user = r[1];
+      if(!db || !user) return null;
+      return user.id().then(function(uid){
+        if(!uid) return null;
+        var ref = db.doc('data/users/'+uid+'/progres');
+        return ref.get().then(function(snap){
+          self.ref = ref; self.mode = 'compte';
+          var hasLocal = Object.keys(Prog.items).length || Prog.sessions.length;
+          if(snap.exists){
+            var remote = normalize(JSON.parse(JSON.stringify(snap.data())));
+            var merged = merge(Prog, remote);
+            var differs = JSON.stringify(merged) !== JSON.stringify(remote);
+            Prog = merged; self.saveLocal();
+            if(differs){ self.dirty = true; self.schedule(); }
+            render();
+          } else if(hasLocal){ self.dirty = true; self.schedule(); }
+        });
+      });
+    }).catch(function(){ /* on reste sur la sauvegarde du navigateur */ }).then(function(){ showSave(); });
+  }
+};
+function showSave(){
+  var el = $('save'); if(!el) return;
+  var t = { compte:'Progression enregistrée sur ton compte', navigateur:'Progression enregistrée dans ce navigateur', memoire:'Progression non enregistrée (navigation privée ?)' };
+  el.setAttribute('data-s', Store.mode); el.textContent = t[Store.mode];
+}
+doc.addEventListener('visibilitychange', function(){ if(doc.visibilityState==='hidden'){ clearTimeout(Store.timer); Store.flush(); } });
+
+function record(key, ok){
+  var it = Prog.items[key] ? { b:Prog.items[key].b, n:Prog.items[key].n, k:Prog.items[key].k, t:0 } : { b:0, n:0, k:0, t:0 };
+  it.n++; if(ok){ it.k++; it.b = Math.min(4, it.b+1); } else it.b = 0;
+  it.t = Date.now(); Prog.items[key] = it; Store.touch();
+}
+function hcls(key){ var it=Prog.items[key]; if(!it || !it.n) return 'hu'; return 'h'+it.b; }
+
+/* ---------- séries de questions ---------- */
+function wOf(key, recent){ var it=Prog.items[key]; var w = (!it || !it.n) ? 9 : (5-it.b)*(5-it.b); if(recent.indexOf(key)>=0) w *= 0.06; return w; }
+function pickKey(keys, recent){ var tot=0; var ws=keys.map(function(k){ var w=wOf(k,recent); tot+=w; return w; }); var r=Math.random()*tot; for(var i=0;i<keys.length;i++){ r-=ws[i]; if(r<=0) return keys[i]; } return keys[keys.length-1]; }
+function cands(mode){
+  if(mode==='p') return S.map(function(b){ return 'p:'+b; });
+  if(mode==='v'){ var out=[]; FN.forEach(function(f){ if(st.o.vF[f]) S.forEach(function(b){ out.push(f[0]+':'+b); }); }); return out; }
+  return EQ.filter(function(q){ return st.o.eF[q.f]; }).map(function(q){ return eqKey(q.f,q.code); });
+}
+function rep(b, span){ if(span!=='tous') return b; var r=Math.random(); if(r<0.4) return b; return r<0.72 ? b+24 : b-24; }
+function mkP(u){ return { mode:'p', u:u, b:base(u), key:'p:'+base(u) }; }
+function mkV(f,u){ return { mode:'v', f:f, u:u, b:base(u), key:f[0]+':'+base(u) }; }
+function mkE(f,c){ return { mode:'e', f:f, code:c, key:eqKey(f,c), sols:solve(f,c) }; }
+function fromKey(mode, key){
+  var p = key.split(':');
+  if(mode==='p') return mkP(rep(+p[1], st.o.pSpan));
+  if(mode==='v') return mkV(LET[p[0]], rep(+p[1], st.o.vSpan));
+  var lvl = Math.abs(+p[2]); return mkE(LET[p[1]], { sign: lvl===0 ? 0 : (p[2].charAt(0)==='-' ? -1 : 1), lvl: lvl });
+}
+function freshAns(){ return { done:false, ok:false, chosen:null, sign:null, mag:null, sel:[] }; }
+function startSes(mode, preset, qs){
+  if(!qs){
+    if(preset==='ex1') qs = [['cos',8],['cos',21],['sin',26],['sin',20],['tan',9],['tan',10]].map(function(x){ return mkV(x[0],x[1]); });
+    else if(preset==='ex7') qs = [['sin',1,1],['cos',-1,3],['tan',-1,2]].map(function(x){ return mkE(x[0],{sign:x[1],lvl:x[2]}); });
+    else {
+      qs = []; var recent = []; var keys = cands(mode);
+      for(var i=0;i<SLEN[mode];i++){ var k = pickKey(keys, recent); recent.push(k); if(recent.length>3) recent.shift(); qs.push(fromKey(mode,k)); }
+    }
+  }
+  st.ses[mode] = { mode:mode, preset:preset||null, qs:qs, i:0, res:[], done:false, t:Date.now(), qt:Date.now(), ans:freshAns() };
+}
+function curQ(m){ var s=st.ses[m]; return (s && !s.done) ? s.qs[s.i] : null; }
+function finishQ(s, q, ok, given){ record(q.key, ok); s.ans.done = true; s.ans.ok = ok; s.res.push({ q:q, ok:ok, g:given, ms:Date.now()-s.qt }); render(); focusNext(); }
+function nextQ(m){
+  var s = st.ses[m]; if(!s || !s.ans.done) return;
+  if(s.i < s.qs.length-1){ s.i++; s.ans = freshAns(); s.qt = Date.now(); }
+  else { s.done = true; saveSession(s); }
+  render(); scrollStage();
+}
+function saveSession(s){
+  var k = s.res.filter(function(r){ return r.ok; }).length;
+  var ms = s.res.length ? Math.round(s.res.reduce(function(a,r){ return a+r.ms; },0)/s.res.length) : 0;
+  Prog.sessions.unshift({ id:String(s.t), m:s.mode, p:s.preset, n:s.res.length, k:k, d:Date.now(), ms:ms });
+  Prog.sessions = Prog.sessions.slice(0,60); Store.touch();
+}
+function answerP(b){ var s=st.ses.p, q=curQ('p'); if(!q || s.ans.done) return; s.ans.chosen = b; finishQ(s, q, b===q.b, M(AH(b))); }
+function canValV(a){ return a.mag!==null && (a.mag===0 || a.mag==='u' || a.sign!==null); }
+function answerV(){
+  var s=st.ses.v, q=curQ('v'); if(!q || s.ans.done || !canValV(s.ans)) return;
+  var a = s.ans, given = a.mag==='u' ? {undef:true} : { sign: a.mag===0 ? 0 : a.sign, lvl: a.mag };
+  finishQ(s, q, sameVal(given, values(q.b)[q.f]), M(valH(q.f, given)));
+}
+function toggleSel(b){ var s=st.ses.e; if(!s || s.done || s.ans.done) return; var i=s.ans.sel.indexOf(b); if(i>=0) s.ans.sel.splice(i,1); else s.ans.sel.push(b); render(); }
+function answerE(){
+  var s=st.ses.e, q=curQ('e'); if(!q || s.ans.done || !s.ans.sel.length) return;
+  var sel = s.ans.sel.slice().sort(function(a,b){ return a-b; });
+  var ok = sel.length===q.sols.length && sel.every(function(b,i){ return b===q.sols[i]; });
+  finishQ(s, q, ok, sel.map(function(b){ return M(AH(b)); }).join(', '));
+}
+
+/* ---------- explications ---------- */
+function reduceH(u){
+  var b = base(u); if(u===b) return null;
+  var f = fracOf(u), k = (u-b)/24;
+  if(b===0){ return k>0 ? M(AH(u))+' : '+(k===1?'un tour complet':k+' tours complets')+', on revient au point de départ, le même que 0.' : M(AH(u))+' : un tour complet dans le sens des aiguilles d\'une montre, on revient au point de départ, le même que 0.'; }
+  if(k>0){ return M(AH(u)+(f.den>1 ? ' = '+nfH(2*k*f.den, f.den)+' + '+AH(b) : '')+' = '+(k===1?'2π':2*k+'π')+' + '+AH(b))+' : '+(k===1?'un tour complet':k+' tours complets')+', puis on avance encore de '+M(AH(b))+'. C\'est le même point que '+M(AH(b))+'.'; }
+  return M(AH(u))+' est négatif : on tourne dans le sens des aiguilles d\'une montre. Pour retrouver un angle entre 0 et 2π, on ajoute '+(k===-1?'un tour':(-k)+' tours')+' : '+M(AH(u)+' + '+(k===-1?'2π':(-2*k)+'π')+(f.den>1 ? ' = '+AH(u)+' + '+nfH(-2*k*f.den, f.den) : '')+' = '+AH(b))+'. C\'est le même point.';
+}
+function partsH(b){
+  if(b===0) return M('0')+' : c\'est le point de départ, à droite du cercle.';
+  var f = fracOf(b);
+  if(f.den===1) return M('π')+' = 180° : un demi-tour.';
+  var part = 180/f.den;
+  var head = M(AH(b))+' = '+f.num+' × '+M(AH(12/f.den))+'. Le demi-tour (π = 180°) est coupé en '+f.den+' parts de '+part+'°';
+  if(f.num===1) return head+', et on avance d\'une seule part : '+part+'°.';
+  return head+', et on avance de '+f.num+' parts : '+f.num+' × '+part+'° = '+(15*b)+'°.';
+}
+function famH(a, f){
+  var v = values(a);
+  if(f==='tan') return '|cos| = '+M(valH('cos',{sign:1,lvl:v.cos.lvl}))+' et |sin| = '+M(valH('sin',{sign:1,lvl:v.sin.lvl}))+', donc |tan| = |sin| / |cos| = '+M(valH('tan',{sign:1,lvl:v.tan.lvl}));
+  return '|cos| = '+M(valH('cos',{sign:1,lvl:v.cos.lvl}))+' et |sin| = '+M(valH('sin',{sign:1,lvl:v.sin.lvl}));
+}
+function signH(b, f){
+  var v = values(b), cs = v.cos.sign, ss = v.sin.sign;
+  var pos = function(x){ return x>0 ? 'positif' : 'négatif'; };
+  if(f==='cos') return 'cos est l\'abscisse du point : il est '+(cs>0?'à droite':'à gauche')+', donc cos est '+pos(cs)+'.';
+  if(f==='sin') return 'sin est l\'ordonnée du point : il est '+(ss>0?'en haut':'en bas')+', donc sin est '+pos(ss)+'.';
+  return 'tan = sin / cos : ici sin est '+pos(ss)+' et cos est '+pos(cs)+', donc tan est '+pos(cs*ss)+'.';
+}
+function axisH(b, f){
+  var v = values(b);
+  var line = 'Le point est sur un axe : ses coordonnées sont (cos ; sin) = '+M('('+valH('cos',v.cos)+' ; '+valH('sin',v.sin)+')')+'.';
+  if(f==='tan') line += v.tan.undef ? ' Ici cos = 0 : on ne peut pas diviser par 0, tan n\'est pas définie.' : ' Ici sin = 0, donc tan = 0.';
+  return line;
+}
+function explainP(q, chosen){
+  var L = [];
+  if(chosen!==null && chosen!==q.b) L.push('Tu as touché '+M(AH(chosen))+', c\'est-à-dire '+(15*chosen)+'°.');
+  var red = reduceH(q.u); if(red) L.push(red);
+  L.push(partsH(q.b));
+  L.push('Le point est '+where(q.b)+'.');
+  return L;
+}
+function explainV(q){
+  var L = [], b = q.b, f = q.f, v = values(b)[f];
+  var red = reduceH(q.u); if(red) L.push(red);
+  var r = relation(b);
+  if(r.q===0){ L.push(axisH(b,f)); }
+  else if(r.q===1){ L.push(M(AH(b))+' est un angle du premier quart, où tout est positif : '+famH(b,f)+'.'); }
+  else {
+    L.push('Le point de '+M(AH(b))+' est '+where(b)+'. '+M(r.rel)+' : c\'est le symétrique de '+M(AH(r.ref))+' '+r.sym+'.');
+    L.push('Famille de '+M(AH(r.ref))+' : '+famH(r.ref,f)+'.');
+    L.push(signH(b,f));
+  }
+  L.push('Donc '+M(f+'('+AH(q.u)+') = '+valH(f,v))+'.');
+  return L;
+}
+function explainE(q){
+  var L = [], n = q.sols.length, vh = M(valH(q.f, q.code));
+  if(q.f==='cos') L.push('cos x est l\'abscisse du point. On cherche les points du cercle d\'abscisse '+vh+' : la droite verticale tracée coupe le cercle '+(n===1?'en un seul point':'en deux points')+'.');
+  else if(q.f==='sin') L.push('sin x est l\'ordonnée du point. On cherche les points du cercle d\'ordonnée '+vh+' : la droite horizontale tracée coupe le cercle '+(n===1?'en un seul point':'en deux points')+'.');
+  else L.push('tan x = sin x / cos x. Les deux solutions sont sur une même droite qui passe par O : elles sont symétriques par rapport au centre, donc écartées de π.');
+  if(n===2 && q.f==='cos'){ var ac = principal('cos', q.code); L.push('Les deux points sont symétriques par rapport à l\'axe horizontal : '+M(AH(ac))+' et '+M('−'+AH(ac))+'. Dans [0 ; 2π[, on écrit '+M('−'+AH(ac))+' sous la forme '+M('2π − '+AH(ac)+' = '+AH(24-ac))+'.'); }
+  if(n===2 && q.f==='sin'){ var a = principal('sin', q.code); L.push('Les deux points sont symétriques par rapport à l\'axe vertical : '+M(AH(a))+' et '+M((a<0 ? 'π − ('+AH(a)+')' : 'π − '+AH(a))+' = '+AH(12-a))+'.'); }
+  L.push('Dans [0 ; 2π[ : '+q.sols.map(function(b){ return M('x = '+AH(b)); }).join(' ou ')+'.');
+  L.push('Dans ℝ : '+M(realH(q.f, q.code))+', avec '+M('k ∈ ℤ')+'.');
+  return L;
+}
+function qLabelH(q){
+  if(q.mode==='p') return 'Placer '+M(AH(q.u));
+  if(q.mode==='v') return M(q.f+'('+AH(q.u)+')');
+  return M(eqH(q.f, q.code));
+}
+function goodH(q){
+  if(q.mode==='p') return M(AH(q.b))+' ('+(15*q.b)+'°)';
+  if(q.mode==='v') return M(valH(q.f, values(q.b)[q.f]));
+  return q.sols.map(function(b){ return M(AH(b)); }).join(' et ');
+}
+
+/* ---------- dessin du cercle ---------- */
+var cv, dyn, ptEls = {}, lbEls = {};
+function el(tag, attrs, parent){ var e = doc.createElementNS(NS, tag); for(var k in attrs) e.setAttribute(k, attrs[k]); if(parent) parent.appendChild(e); return e; }
+function P(deg, r){ var t = deg*Math.PI/180; return [r*Math.cos(t), -r*Math.sin(t)]; }
+function f2(x){ return (Math.round(x*100)/100).toString(); }
+function buildSVG(){
+  cv = $('cv');
+  var defs = el('defs', {}, cv);
+  var m1 = el('marker', {id:'ah', viewBox:'0 0 10 10', refX:'8', refY:'5', markerWidth:'7', markerHeight:'7', orient:'auto-start-reverse'}, defs);
+  el('path', {d:'M0,1 L10,5 L0,9 z', 'class':'ahp'}, m1);
+  var m2 = el('marker', {id:'ah2', viewBox:'0 0 10 10', refX:'7', refY:'5', markerWidth:'6', markerHeight:'6', orient:'auto'}, defs);
+  el('path', {d:'M0,1 L10,5 L0,9 z', 'class':'ahp2'}, m2);
+  var g = el('g', {'class':'static', 'aria-hidden':'true'}, cv);
+  var gd = '';
+  for(var i=-5;i<=5;i++){ var x = i*R/4; gd += 'M'+f2(x)+' -138V138M-138 '+f2(x)+'H138'; }
+  el('path', {d:gd, 'class':'gridl'}, g);
+  el('line', {x1:-142, y1:0, x2:143, y2:0, 'class':'ax', 'marker-end':'url(#ah)'}, g);
+  el('line', {x1:0, y1:142, x2:0, y2:-143, 'class':'ax', 'marker-end':'url(#ah)'}, g);
+  el('circle', {cx:0, cy:0, r:R, 'class':'circ'}, g);
+  var td = '';
+  for(var d=0; d<360; d+=5){ var len = d%90===0 ? 9 : (d%15===0 ? 6 : 3); var a=P(d,R), b=P(d,R-len); td += 'M'+f2(a[0])+' '+f2(a[1])+'L'+f2(b[0])+' '+f2(b[1]); }
+  el('path', {d:td, 'class':'tick'}, g);
+  var tc = el('text', {x:147, y:16, 'text-anchor':'end', 'class':'axl c-cos'}, g); tc.textContent = 'cos';
+  var ts = el('text', {x:8, y:-137, 'text-anchor':'start', 'class':'axl c-sin'}, g); ts.textContent = 'sin';
+  dyn = el('g', {'class':'dyn', 'aria-hidden':'true'}, cv);
+  var pg = el('g', {'class':'pts'}, cv);
+  S.forEach(function(b){ var p = P(15*b, R); var gg = el('g', {'class':'pt', 'data-b':String(b), role:'button', tabindex:'-1'}, pg); el('circle', {cx:f2(p[0]), cy:f2(p[1]), r:15, 'class':'hit'}, gg); el('circle', {cx:f2(p[0]), cy:f2(p[1]), r:4.6, 'class':'dot'}, gg); ptEls[b] = gg; });
+  var lg = el('g', {'class':'lbls', 'aria-hidden':'true'}, cv);
+  S.forEach(function(b){
+    var d = 15*b, c = Math.cos(d*Math.PI/180), s = Math.sin(d*Math.PI/180), rr = 118;
+    var x = rr*c, y = -rr*s, anchor = 'middle';
+    if(c>0.3){ anchor='start'; x+=1; } else if(c<-0.3){ anchor='end'; x-=1; }
+    if(s>0.3) y -= 2; else if(s<-0.3) y += 10; else y += 4;
+    lbEls[b] = el('text', {x:f2(x), y:f2(y), 'text-anchor':anchor, 'class':'lbl halo off'}, lg);
+  });
+  cv.addEventListener('click', onSvgClick);
+  cv.addEventListener('keydown', onSvgKey);
+}
+function toSvg(e){ try { var pt = cv.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; var m = cv.getScreenCTM(); if(!m) return null; return pt.matrixTransform(m.inverse()); } catch(err){ return null; } }
+function nearestB(x, y){
+  var r = Math.hypot(x, y); if(r < R*0.3 || r > R*1.5) return null;
+  var d = Math.atan2(-y, x)*180/Math.PI; if(d<0) d += 360;
+  var best = null, bd = 1e9;
+  S.forEach(function(b){ var diff = Math.abs(d-15*b); diff = Math.min(diff, 360-diff); if(diff<bd){ bd=diff; best=b; } });
+  return best;
+}
+function onSvgClick(e){ if(!cv.classList.contains('live')) return; var p = toSvg(e); if(!p) return; var b = nearestB(p.x, p.y); if(b===null) return; act(b); }
+function onSvgKey(e){ var g = e.target && e.target.closest ? e.target.closest('.pt') : null; if(!g) return; if(e.key==='Enter' || e.key===' '){ e.preventDefault(); e.stopPropagation(); act(+g.getAttribute('data-b')); } }
+function act(b){
+  if(st.tab==='c'){ setExplore(b); return; }
+  if(st.tab==='p'){ answerP(b); return; }
+  if(st.tab==='e'){ toggleSel(b); return; }
+  if(st.tab==='g'){ st.heatB = b; render(); }
+}
+function animDraw(p){
+  if(RM) return;
+  try { var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p.getBoundingClientRect(); p.style.transition = 'stroke-dashoffset .6s ease-out'; requestAnimationFrame(function(){ p.style.strokeDashoffset = '0'; }); } catch(e){}
+}
+function drawArc(u){
+  var deg = 15*u; if(deg===0) return;
+  var turns = Math.abs(deg)/360, r0 = 20, r1 = turns>1 ? 40 : 20, steps = Math.max(10, Math.ceil(Math.abs(deg)/3)), d = '';
+  for(var i=0;i<=steps;i++){ var t = deg*i/steps, r = r0+(r1-r0)*i/steps, p = P(t, r); d += (i?'L':'M')+f2(p[0])+' '+f2(p[1]); }
+  var path = el('path', {d:d, 'class':'arc', 'marker-end':'url(#ah2)'}, dyn); animDraw(path);
+  var e = P(deg, R); el('line', {x1:0, y1:0, x2:f2(e[0]), y2:f2(e[1]), 'class':'radius'}, dyn);
+}
+function drawParts(den, k){
+  var part = 180/den;
+  for(var j=1;j<=k;j++){
+    var e = P(j*part, R), ln = el('line', {x1:0, y1:0, x2:f2(e[0]), y2:f2(e[1]), 'class':'part fade'}, dyn); ln.style.setProperty('--i', j);
+    var c = P((j-0.5)*part, R*0.8), t = el('text', {x:f2(c[0]), y:f2(c[1]+3.5), 'text-anchor':'middle', 'class':'pnum fade'}, dyn); t.textContent = String(j); t.style.setProperty('--i', j);
+  }
+}
+function drawProj(b){
+  var v = values(b), x = num('cos', v.cos)*R, y = -num('sin', v.sin)*R;
+  if(Math.abs(y)>0.5 && Math.abs(x)>0.5) el('line', {x1:f2(x), y1:f2(y), x2:f2(x), y2:0, 'class':'proj'}, dyn);
+  if(Math.abs(x)>0.5 && Math.abs(y)>0.5) el('line', {x1:f2(x), y1:f2(y), x2:0, y2:f2(y), 'class':'proj'}, dyn);
+  if(Math.abs(x)>0.5) el('line', {x1:0, y1:0, x2:f2(x), y2:0, 'class':'seg-cos'}, dyn);
+  if(Math.abs(y)>0.5) el('line', {x1:0, y1:0, x2:0, y2:f2(y), 'class':'seg-sin'}, dyn);
+  var tc = el('text', {x:f2(x), y:(y<-0.5 ? 16 : -8), 'text-anchor':'middle', 'class':'vlab c-cos halo'}, dyn); tc.textContent = valT('cos', v.cos);
+  var tsn = el('text', {x:(x>0.5 ? -6 : 6), y:f2(y+4), 'text-anchor':(x>0.5 ? 'end' : 'start'), 'class':'vlab c-sin halo'}, dyn); tsn.textContent = valT('sin', v.sin);
+}
+function drawLine(f, c){
+  if(f==='cos'){ var x = num('cos', c)*R; el('line', {x1:f2(x), y1:-R-16, x2:f2(x), y2:R+16, 'class':'eqline cos'}, dyn); }
+  else if(f==='sin'){ var y = -num('sin', c)*R; el('line', {x1:-R-16, y1:f2(y), x2:R+16, y2:f2(y), 'class':'eqline sin'}, dyn); }
+  else { var a = principal('tan', c)*15, p1 = P(a, R+24), p2 = P(a+180, R+24); el('line', {x1:f2(p1[0]), y1:f2(p1[1]), x2:f2(p2[0]), y2:f2(p2[1]), 'class':'eqline tan'}, dyn); }
+}
+function drawCircle(v){
+  cv.classList.toggle('live', !!v.live);
+  S.forEach(function(b, i){
+    var g = ptEls[b];
+    g.setAttribute('class', 'pt '+(v.pts[b]||''));
+    g.querySelector('.dot').setAttribute('r', v.big ? 8 : (v.pts[b] && v.pts[b]!=='dim' ? 6 : 4.6));
+    g.setAttribute('tabindex', v.live ? '0' : '-1');
+    if(v.live){ g.setAttribute('role', 'button'); g.setAttribute('aria-label', v.named ? A(b)+', '+(15*b)+' degrés' : 'Point '+(i+1)+' sur 16, en partant de la droite'); }
+    else { g.removeAttribute('role'); g.removeAttribute('aria-label'); }
+    var t = lbEls[b], show = v.labs==='all' ? v.lab!=='none' : (Array.isArray(v.labs) && v.labs.indexOf(b)>=0);
+    t.setAttribute('class', 'lbl halo'+(show ? '' : ' off')+(v.hot && v.hot.indexOf(b)>=0 ? ' hot' : ''));
+    t.textContent = v.lab==='deg' ? (15*b)+'°' : A(b);
+  });
+  while(dyn.firstChild) dyn.removeChild(dyn.firstChild);
+  if(v.parts && v.parts.k>0) drawParts(v.parts.d, v.parts.k);
+  if(v.line) drawLine(v.line.f, v.line.c);
+  if(v.arc!=null) drawArc(v.arc);
+  if(v.proj!=null) drawProj(v.proj);
+}
+
+/* ---------- vues ---------- */
+function exU(){ return st.ex.k*12/st.ex.d; }
+function setExplore(b){
+  var f = fracOf(b);
+  if(b===0) st.ex.k = 0;
+  else if([6,4,3,2].indexOf(f.den)>=0){ st.ex.d = f.den; st.ex.k = f.num; }
+  else if(b===12) st.ex.k = st.ex.d;
+  render();
+}
+function viewFor(){
+  var v = { pts:{}, labs:null, lab:'rad', live:false, named:false, big:false, arc:null, parts:null, proj:null, line:null, hot:null };
+  var t = st.tab;
+  if(t==='c'){
+    var b = base(exU());
+    v.live = true; v.named = true; v.labs = 'all'; v.lab = st.o.lab; v.pts[b] = 'sel'; v.hot = [b];
+    v.parts = { d:st.ex.d, k:st.ex.k }; v.proj = b; v.arc = st.ex.k ? exU() : null;
+    return v;
+  }
+  if(t==='g'){
+    v.live = true; v.named = true; v.big = true; v.labs = 'all'; v.lab = 'rad';
+    S.forEach(function(b){ v.pts[b] = hcls((st.o.heat==='p' ? 'p' : st.o.heat)+':'+b) + (st.heatB===b ? ' pick' : ''); });
+    if(st.heatB!==null) v.hot = [st.heatB];
+    return v;
+  }
+  var s = st.ses[t]; if(!s) return v;
+  if(s.done){
+    if(t!=='e'){ S.forEach(function(b){ v.pts[b] = 'dim'; }); s.res.forEach(function(r){ var bb = r.q.b; if(v.pts[bb]!=='bad') v.pts[bb] = r.ok ? 'ok' : 'bad'; }); }
+    return v;
+  }
+  var q = s.qs[s.i], a = s.ans;
+  if(t==='p'){
+    if(!a.done){ v.live = true; return v; }
+    v.pts[q.b] = 'ok'; v.labs = [q.b]; v.hot = [q.b];
+    if(a.chosen!==q.b){ v.pts[a.chosen] = 'bad'; v.labs.push(a.chosen); }
+    var fq = fracOf(q.b); if(q.b!==0) v.parts = { d:fq.den, k:fq.num };
+    v.arc = q.u; return v;
+  }
+  if(t==='v'){
+    if(!a.done){ if(st.o.vHelp==='pt') v.pts[q.b] = 'sel'; return v; }
+    v.pts[q.b] = 'sel'; v.labs = [q.b]; v.hot = [q.b]; v.proj = q.b; v.arc = q.u; return v;
+  }
+  if(!a.done){ v.live = true; a.sel.forEach(function(b){ v.pts[b] = 'sel'; }); return v; }
+  S.forEach(function(b){ var inS = q.sols.indexOf(b)>=0, inA = a.sel.indexOf(b)>=0; if(inS && inA) v.pts[b]='ok'; else if(inS) v.pts[b]='miss'; else if(inA) v.pts[b]='bad'; });
+  v.labs = q.sols.concat(a.sel.filter(function(b){ return q.sols.indexOf(b)<0; })); v.hot = q.sols.slice(); v.line = { f:q.f, c:q.code };
+  return v;
+}
+
+/* ---------- rendu HTML ---------- */
+function chip(act, k, v, label, pressed, extra){ return '<button type="button" class="chip'+(extra?' '+extra:'')+'" id="o-'+k+'-'+v+'" data-act="'+act+'" data-k="'+k+'" data-v="'+v+'" aria-pressed="'+(pressed?'true':'false')+'">'+label+'</button>'; }
+function renderOpts(){
+  var t = st.tab, h = '';
+  if(t==='p'){
+    h = '<div class="og"><span>Angles</span>'+chip('opt','pSpan','base','Entre 0 et 2π',st.o.pSpan==='base')+chip('opt','pSpan','tous','Tous : négatifs, plus d\'un tour',st.o.pSpan==='tous')+'</div>';
+  } else if(t==='v'){
+    var s = st.ses.v, pre = s && s.preset==='ex1';
+    h = '<div class="og"><span>Fonctions</span>'+FN.map(function(f){ return chip('optf','vF',f,f,st.o.vF[f] && !pre); }).join('')+'</div>'
+      + '<div class="og"><span>Aide</span>'+chip('opt','vHelp','pt','Point affiché',st.o.vHelp==='pt')+chip('opt','vHelp','tete','De tête',st.o.vHelp==='tete')+'</div>'
+      + '<div class="og"><span>Angles</span>'+chip('opt','vSpan','base','Entre 0 et 2π',st.o.vSpan==='base')+chip('opt','vSpan','tous','Tous',st.o.vSpan==='tous')+'</div>'
+      + '<div class="og">'+chip('preset','v','ex1','Feuille 1, exercice 1',pre,'preset')+'</div>';
+  } else if(t==='e'){
+    var se = st.ses.e, pre7 = se && se.preset==='ex7';
+    h = '<div class="og"><span>Fonctions</span>'+FN.map(function(f){ return chip('optf','eF',f,f,st.o.eF[f] && !pre7); }).join('')+'</div>'
+      + '<div class="og">'+chip('preset','e','ex7','Feuille 1, exercice 7',pre7,'preset')+'</div>';
+  } else if(t==='g'){
+    h = '<div class="og"><span>Carte</span>'+chip('opt','heat','p','Placer',st.o.heat==='p')+chip('opt','heat','c','cos',st.o.heat==='c')+chip('opt','heat','s','sin',st.o.heat==='s')+chip('opt','heat','t','tan',st.o.heat==='t')+'</div>';
+  }
+  $('opts').innerHTML = h;
+}
+function dotsH(s){ var h = ''; for(var i=0;i<s.qs.length;i++){ var r = s.res[i]; h += '<i class="'+(r ? (r.ok?'ok':'ko') : (i===s.i && !s.done ? 'cur' : ''))+'"></i>'; } return '<span class="dots" aria-hidden="true">'+h+'</span>'; }
+function presetName(p){ return p==='ex1' ? 'Feuille 1, exercice 1' : p==='ex7' ? 'Feuille 1, exercice 7' : null; }
+function renderQhead(){
+  var t = st.tab, h = '';
+  if('pve'.indexOf(t)>=0){
+    var s = st.ses[t];
+    if(s && s.done){
+      var k = s.res.filter(function(r){ return r.ok; }).length;
+      h = '<div class="qmeta"><span class="qnum">'+(presetName(s.preset) || 'Série')+' terminée</span>'+dotsH(s)+'</div><p class="prompt"><span class="verb">Score</span><span class="big">'+k+' / '+s.res.length+'</span></p>';
+    } else if(s){
+      var q = s.qs[s.i], pn = presetName(s.preset);
+      h = '<div class="qmeta"><span class="qnum">'+(pn ? pn+' · ' : '')+'Question '+(s.i+1)+' sur '+s.qs.length+'</span>'+dotsH(s)+'</div>';
+      if(t==='p') h += '<p class="prompt"><span class="verb">Place l\'angle</span><span class="big">'+AH(q.u)+'</span></p>';
+      else if(t==='v') h += '<p class="prompt"><span class="verb">Donne la valeur exacte</span><span class="big">'+q.f+'('+AH(q.u)+') = ?</span></p>';
+      else h += '<p class="prompt"><span class="verb">Résous dans [0 ; 2π[</span><span class="big">'+eqH(q.f, q.code)+'</span></p>';
+    }
+  }
+  $('qhead').innerHTML = h;
+}
+function renderTool(){
+  var h = '';
+  if(st.tab==='c') h = '<span>Étiquettes</span>'+chip('opt','lab','rad','radians',st.o.lab==='rad')+chip('opt','lab','deg','degrés',st.o.lab==='deg')+chip('opt','lab','none','aucune',st.o.lab==='none');
+  $('tool').innerHTML = h;
+}
+function readoutH(b){
+  var v = values(b), r = relation(b), w;
+  if(r.q===0) w = 'Point sur un axe : '+where(b)+'.';
+  else if(r.q===1) w = 'Premier quart : c\'est un angle de référence.';
+  else w = 'Le point est '+where(b)+' : '+M(r.rel)+', symétrique de '+M(AH(r.ref))+' '+r.sym+'.';
+  return '<div class="ro"><div class="head">'+AH(b)+' = '+(15*b)+'°</div>'
+    + '<div class="vals"><span><b class="c-cos">cos</b> = '+M(valH('cos',v.cos))+'</span><span><b class="c-sin">sin</b> = '+M(valH('sin',v.sin))+'</span><span><b class="c-tan">tan</b> = '+M(valH('tan',v.tan))+'</span></div>'
+    + '<p class="where">'+w+'</p></div>';
+}
+function itemH(key){
+  var p = key.split(':');
+  if(p[0]==='p') return 'Placer '+M(AH(+p[1]));
+  if(p[0]==='e'){ var lvl = Math.abs(+p[2]), c = {sign: lvl===0 ? 0 : (p[2].charAt(0)==='-' ? -1 : 1), lvl:lvl}; return M(eqH(LET[p[1]], c)); }
+  return M(LET[p[0]]+'('+AH(+p[1])+')');
+}
+function itemT(key){
+  var p = key.split(':');
+  if(p[0]==='p') return 'placer '+A(+p[1]);
+  if(p[0]==='e'){ var lvl = Math.abs(+p[2]), c = {sign: lvl===0 ? 0 : (p[2].charAt(0)==='-' ? -1 : 1), lvl:lvl}; return eqT(LET[p[1]], c); }
+  return LET[p[0]]+'('+A(+p[1])+')';
+}
+function renderCap(){
+  var t = st.tab, h = '';
+  if(t==='c') h = readoutH(base(exU()));
+  else if(t==='g'){
+    h = '<div class="legend">'+MX.map(function(n,i){ return '<span><i style="background:var(--m'+i+')"></i>'+n+'</span>'; }).join('')+'<span><i style="border-color:var(--unseen)"></i>pas encore vu</span></div>';
+    if(st.heatB!==null){
+      var key = (st.o.heat==='p' ? 'p' : st.o.heat)+':'+st.heatB, it = Prog.items[key];
+      h += '<p class="detail">'+itemH(key)+' : '+(it && it.n ? it.n+' essai'+(it.n>1?'s':'')+', '+it.k+' juste'+(it.k>1?'s':'')+'<span class="mx h'+it.b+'">'+MX[it.b]+'</span>' : 'pas encore vu')+'</p>';
+    } else h += '<p class="detail note">Touche un point pour voir tes résultats sur cet angle.</p>';
+  }
+  $('cap').innerHTML = h;
+}
+function verdictH(ok, msg, isLast){
+  return '<div class="verdict '+(ok?'ok':'ko')+'"><p><span class="w">'+(ok?'Juste.':'Pas tout à fait.')+'</span> '+msg+'</p><button type="button" class="btn" id="next" data-act="next">'+(isLast ? 'Voir le bilan' : 'Question suivante')+'</button></div>';
+}
+function renderPad(){
+  var t = st.tab, h = '';
+  if('pve'.indexOf(t)>=0){
+    var s = st.ses[t];
+    if(s && s.done){
+      var errs = s.res.filter(function(r){ return !r.ok; }).length;
+      h = '<div class="acts"><button type="button" class="btn" id="newses" data-act="new">Nouvelle série</button>'
+        + (errs ? '<button type="button" class="btn ghost" id="retry" data-act="retry">Rejouer mes '+errs+' erreur'+(errs>1?'s':'')+'</button>' : '')
+        + '<button type="button" class="btn ghost" id="gotog" data-act="tab" data-tab="g">Voir mes progrès</button></div>';
+    } else if(s){
+      var q = s.qs[s.i], a = s.ans, last = s.i===s.qs.length-1;
+      if(a.done){
+        var r = s.res[s.res.length-1];
+        if(t==='p') h = verdictH(r.ok, r.ok ? M(AH(q.u))+' est bien ici.' : M(AH(q.u))+' est le point vert, pas le rouge.', last);
+        else if(t==='v') h = verdictH(r.ok, M(q.f+'('+AH(q.u)+') = '+valH(q.f, values(q.b)[q.f])), last);
+        else h = verdictH(r.ok, r.ok ? 'Solutions : '+goodH(q)+'.' : 'Il fallait : '+goodH(q)+'.', last);
+      } else if(t==='p'){
+        h = '<p class="hint">Touche le point qui correspond à cet angle.</p>';
+      } else if(t==='v'){
+        var mags = q.f==='tan' ? [['0',0],['√3/3',1],['1',2],['√3',3],['non définie','u']] : [['0',0],['1/2',1],['√2/2',2],['√3/2',3],['1',4]];
+        var noSign = a.mag===0 || a.mag==='u';
+        h = '<div class="prow"><span class="lab">Signe</span>'
+          + '<button type="button" class="key" id="sg-p" data-act="sign" data-s="1" aria-pressed="'+(a.sign===1 && !noSign)+'"'+(noSign?' disabled':'')+' aria-label="positif">+</button>'
+          + '<button type="button" class="key" id="sg-m" data-act="sign" data-s="-1" aria-pressed="'+(a.sign===-1 && !noSign)+'"'+(noSign?' disabled':'')+' aria-label="négatif">−</button></div>'
+          + '<div class="prow"><span class="lab">Valeur</span>'+mags.map(function(m, i){ return '<button type="button" class="key'+(m[1]==='u'?' wide':'')+'" id="mg-'+i+'" data-act="mag" data-m="'+m[1]+'" aria-pressed="'+(a.mag===m[1])+'">'+(m[1]==='u' ? m[0] : frS(m[0]))+'</button>'; }).join('')+'</div>'
+          + '<div class="acts"><button type="button" class="btn" id="validate" data-act="validate"'+(canValV(a)?'':' disabled')+'>Valider</button><span class="kbd">Clavier : + ou −, puis 1 à 5, puis Entrée</span></div>';
+      } else {
+        h = '<div class="acts"><button type="button" class="btn" id="validate" data-act="validate"'+(a.sel.length?'':' disabled')+'>Valider'+(a.sel.length ? ' ('+a.sel.length+' point'+(a.sel.length>1?'s':'')+')' : '')+'</button><button type="button" class="btn ghost" id="clear" data-act="clear"'+(a.sel.length?'':' disabled')+'>Effacer</button></div><p class="hint">Touche tous les points qui vérifient l\'équation : il peut y en avoir un ou deux.</p>';
+      }
+    }
+  }
+  $('pad').innerHTML = h;
+}
+var INTRO = {
+  p: '<h2>Placer les angles</h2><p>Touche, sur le cercle, le point qui correspond à l\'angle affiché. Pour le trouver sans tableau, compte les parts : le dénominateur donne la taille d\'une part, le numérateur le nombre de parts (clé 1 de l\'onglet Comprendre).</p><p class="note">Les angles que tu rates reviennent plus souvent dans les séries suivantes. Choisis « Tous » dans les réglages pour t\'entraîner aussi sur les angles négatifs et ceux qui dépassent un tour, comme 13π/6.</p>',
+  v: '<h2>Retrouver cos, sin et tan</h2><p>Choisis le signe, puis la valeur, et valide. La méthode : la <b>famille</b> donne la valeur (π/6, π/4 ou π/3), le <b>quart</b> donne le signe (clés 2 et 3 de l\'onglet Comprendre).</p><p class="note">Passe en mode « De tête » quand tu veux t\'entraîner sans voir le point. Le bouton « Feuille 1, exercice 1 » reprend les six valeurs de ta feuille.</p>',
+  e: '<h2>Résoudre les équations de base</h2><p>Touche tous les points du cercle qui vérifient l\'équation, puis valide. Pour cos, cherche les points qui ont la bonne abscisse ; pour sin, la bonne ordonnée ; pour tan, deux points opposés par rapport au centre.</p><p class="note">Après chaque réponse, tu as les solutions dans [0 ; 2π[ et dans ℝ, comme dans l\'exercice 7 de ta feuille.</p>'
+};
+function renderSide(){
+  var t = st.tab, h = '';
+  if(t==='c') h = COMPRENDRE;
+  else if(t==='g') h = progresH();
+  else {
+    var s = st.ses[t];
+    if(s && s.done) h = summaryH(s);
+    else if(s && s.ans.done){
+      var q = s.qs[s.i], steps = t==='p' ? explainP(q, s.ans.chosen) : t==='v' ? explainV(q) : explainE(q);
+      h = '<article class="card"><h2>Pourquoi</h2><ol class="steps">'+steps.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ol></article>';
+    } else h = '<article class="card">'+INTRO[t]+'</article>';
+  }
+  $('side').innerHTML = h;
+  if(t==='c') syncKeys();
+}
+function summaryH(s){
+  var k = s.res.filter(function(r){ return r.ok; }).length, ms = s.res.length ? s.res.reduce(function(a,r){ return a+r.ms; },0)/s.res.length : 0;
+  var errs = s.res.filter(function(r){ return !r.ok; });
+  var verb = s.mode==='p' ? 'tu as touché' : s.mode==='v' ? 'tu as répondu' : 'tu as choisi';
+  return '<article class="card"><h2>Bilan de la série</h2><p class="score"><b>'+k+'</b> / '+s.res.length+' justes, en '+(ms/1000).toFixed(1).replace('.',',')+' s par question en moyenne.</p>'
+    + (errs.length ? '<h3>Tes erreurs</h3><ul class="errs">'+errs.map(function(r){ return '<li>'+qLabelH(r.q)+' : '+verb+' '+r.g+', il fallait '+goodH(r.q)+'.</li>'; }).join('')+'</ul><p class="note">Ces questions sont passées au niveau « à revoir » : elles reviendront plus souvent.</p>'
+      : '<p>Aucune erreur. Les questions bien réussies montent d\'un niveau et reviendront moins souvent.</p>')
+    + '</article>';
+}
+function progresH(){
+  var cnt = function(name, keys){ return keys.filter(function(k){ var it = Prog.items[k]; return it && it.b>=3; }).length; };
+  var rows = [['Placer', S.map(function(b){ return 'p:'+b; })], ['cos', S.map(function(b){ return 'c:'+b; })], ['sin', S.map(function(b){ return 's:'+b; })], ['tan', S.map(function(b){ return 't:'+b; })], ['Équations', EQ.map(function(q){ return eqKey(q.f,q.code); })]];
+  var bars = rows.map(function(r){ var n = cnt(r[0], r[1]), tot = r[1].length; return '<div class="row"><span>'+r[0]+'</span><span class="bar" aria-hidden="true"><i style="width:'+Math.round(100*n/tot)+'%"></i></span><span class="m">'+n+' / '+tot+'</span></div>'; }).join('');
+  var seenKeys = Object.keys(Prog.items).filter(function(k){ return Prog.items[k].n>0; });
+  var weak = seenKeys.filter(function(k){ var it = Prog.items[k]; return it.b===0 || it.k/it.n < 0.6; }).sort(function(a,b){ var x = Prog.items[a], y = Prog.items[b]; return (x.b-y.b) || ((x.k/x.n)-(y.k/y.n)) || (y.n-x.n); }).slice(0,8);
+  var names = {p:'Placer', v:'Valeurs', e:'Équations'};
+  var hist = Prog.sessions.slice(0,8).map(function(x){ var dt = new Date(x.d); return '<li>'+dt.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+(presetName(x.p) || names[x.m] || '')+' : '+x.k+' / '+x.n+'</li>'; }).join('');
+  var h = '<article class="card"><h2>Où tu en es</h2><p class="note">Nombre de questions au niveau « solide » ou « acquis » (deux ou trois bonnes réponses d\'affilée).</p><div class="bars">'+bars+'</div></article>';
+  h += '<article class="card"><h2>À retravailler en priorité</h2>'+(weak.length ? '<ul class="weak">'+weak.map(function(k){ var it = Prog.items[k]; return '<li>'+itemH(k)+' <span class="mx h'+it.b+'">'+MX[it.b]+'</span> <span class="note">'+it.k+' juste'+(it.k>1?'s':'')+' sur '+it.n+'</span></li>'; }).join('')+'</ul><p class="note">Ces questions reviennent plus souvent dans les séries.</p>' : '<p>Rien à signaler : aucune question ratée à la dernière tentative. Les angles qui te résistent apparaîtront ici.</p>')+'</article>';
+  h += '<article class="card"><h2>Dernières séries</h2>'+(hist ? '<ul class="hist">'+hist+'</ul>' : '<p>Aucune série terminée pour l\'instant.</p>')+'</article>';
+  h += '<article class="card"><h2>Ton bilan</h2><p>Copie ton bilan pour le coller dans tes notes Obsidian, ou pour me l\'envoyer : je verrai où tu bloques.</p><div class="acts"><button type="button" class="btn" id="copy" data-act="copy">Copier mon bilan</button>'
+    + (st.resetAsk ? '<button type="button" class="btn ghost" id="reset-yes" data-act="reset-yes">Oui, tout effacer</button><button type="button" class="btn ghost" id="reset-no" data-act="reset-no">Annuler</button>' : '<button type="button" class="btn ghost" id="reset" data-act="reset">Remettre à zéro</button>')
+    + '</div>'+(st.resetAsk ? '<p class="note">Toute ta progression sera effacée, sur cet appareil et sur ton compte.</p>' : '')+(st.copyMsg ? '<p class="note" role="status">'+st.copyMsg+'</p>' : '')+'<textarea class="bilan" id="bilan" readonly hidden></textarea></article>';
+  return h;
+}
+function bilanText(){
+  var dt = new Date().toLocaleDateString('fr-FR');
+  var line = function(name, keys){ var acq = keys.filter(function(k){ var it = Prog.items[k]; return it && it.b>=3; }).length; var weak = keys.filter(function(k){ var it = Prog.items[k]; return it && it.n && (it.b===0 || it.k/it.n < 0.6); }).map(itemT); return name+' : '+acq+' / '+keys.length+' solides ou acquis.'+(weak.length ? ' À revoir : '+weak.join(', ')+'.' : ''); };
+  var out = ['Cercle trigo par cœur, bilan du '+dt];
+  out.push(line('Placer', S.map(function(b){ return 'p:'+b; })));
+  out.push(line('Valeurs de cos', S.map(function(b){ return 'c:'+b; })));
+  out.push(line('Valeurs de sin', S.map(function(b){ return 's:'+b; })));
+  out.push(line('Valeurs de tan', S.map(function(b){ return 't:'+b; })));
+  out.push(line('Équations', EQ.map(function(q){ return eqKey(q.f,q.code); })));
+  var n = Prog.sessions.length; if(n){ var l = Prog.sessions[0]; out.push('Séries terminées : '+n+' (dernière : '+(presetName(l.p) || {p:'Placer',v:'Valeurs',e:'Équations'}[l.m])+', '+l.k+' / '+l.n+').'); }
+  return out.join('\n');
+}
+
+/* ---------- onglet Comprendre ---------- */
+var COMPRENDRE = ''
++ '<article class="card">'
++ '<h2>Trois clés, et tu n\'as plus besoin du tableau</h2>'
++ '<p class="note">Touche n\'importe quel point du cercle : sa position, son cosinus, son sinus et sa tangente s\'affichent sous le cercle.</p>'
++ '<section class="key-sec"><h3><span class="kn">1</span>Placer un angle : compter des parts</h3>'
++ '<p>Dans un angle comme '+M(frH('5π','6'))+', le <b>dénominateur</b> dit en combien de parts égales on coupe le demi-tour (π = 180°). Le <b>numérateur</b> dit combien de parts on avance, en partant du point de droite et en tournant dans le sens inverse des aiguilles d\'une montre.</p>'
++ '<div class="seg" role="group" aria-label="Taille d\'une part">'
++ [[6,'30°'],[4,'45°'],[3,'60°'],[2,'90°']].map(function(x){ return '<button type="button" class="chip" id="pd-'+x[0]+'" data-act="pd" data-d="'+x[0]+'" aria-pressed="false">'+M(frH('π',x[0]))+' = '+x[1]+'</button>'; }).join('')
++ '</div><div class="stepper"><button type="button" class="btn ghost" id="km" data-act="km">− 1 part</button><button type="button" class="btn ghost" id="kp" data-act="kp">+ 1 part</button><output id="kout" aria-live="polite"></output></div>'
++ '<p class="note">Plus d\'un tour ? On enlève 2π : '+M(frH('13π','6')+' = '+frH('12π','6')+' + '+frH('π','6')+' = 2π + '+frH('π','6'))+', le même point que '+M(frH('π','6'))+'. Un angle négatif se compte dans l\'autre sens : '+M('−'+frH('π','4'))+' arrive au même endroit que '+M(frH('7π','4'))+'.</p></section>'
++ '<section class="key-sec"><h3><span class="kn">2</span>Le premier quart : compter sous la racine</h3>'
++ '<p>Pour 0, π/6, π/4, π/3 et π/2, le sinus vaut '+M(frH('√0','2'))+', '+M(frH('√1','2'))+', '+M(frH('√2','2'))+', '+M(frH('√3','2'))+', '+M(frH('√4','2'))+' : on compte 0, 1, 2, 3, 4 sous la racine. Le cosinus fait le même chemin à l\'envers.</p>'
++ '<div class="tw"><table class="vals"><tr><th>angle</th><th class="m">0</th><th class="m">'+frH('π','6')+'</th><th class="m">'+frH('π','4')+'</th><th class="m">'+frH('π','3')+'</th><th class="m">'+frH('π','2')+'</th></tr>'
++ '<tr><td class="rh">degrés</td><td>0°</td><td>30°</td><td>45°</td><td>60°</td><td>90°</td></tr>'
++ '<tr><td class="rh c-sin">sin</td>'+[0,1,2,3,4].map(function(l){ return '<td class="m">'+valH('sin',{sign:1,lvl:l})+'</td>'; }).join('')+'</tr>'
++ '<tr><td class="rh c-cos">cos</td>'+[4,3,2,1,0].map(function(l){ return '<td class="m">'+valH('cos',{sign:1,lvl:l})+'</td>'; }).join('')+'</tr>'
++ '<tr><td class="rh c-tan">tan</td>'+[0,1,2,3].map(function(l){ return '<td class="m">'+valH('tan',{sign:1,lvl:l})+'</td>'; }).join('')+'<td class="nd">non définie</td></tr></table></div>'
++ '<p>La tangente se déduit : '+M('tan = sin / cos')+'. En '+M(frH('π','2'))+', cos vaut 0 et on ne divise pas par 0.</p></section>'
++ '<section class="key-sec"><h3><span class="kn">3</span>Les autres quarts : la famille donne la valeur, le quart donne le signe</h3>'
++ '<p>Simplifie d\'abord la fraction. Les angles qui ont le même dénominateur ont les mêmes valeurs, au signe près :</p>'
++ '<ul class="fams">'
++ '<li>famille de '+M(frH('π','6'))+' ('+M(frH('5π','6')+', '+frH('7π','6')+', '+frH('11π','6'))+') : '+M('|cos| = '+frH('√3','2'))+' et '+M('|sin| = '+frH('1','2'))+'</li>'
++ '<li>famille de '+M(frH('π','4'))+' ('+M(frH('3π','4')+', '+frH('5π','4')+', '+frH('7π','4'))+') : '+M('|cos| = |sin| = '+frH('√2','2'))+'</li>'
++ '<li>famille de '+M(frH('π','3'))+' ('+M(frH('2π','3')+', '+frH('4π','3')+', '+frH('5π','3'))+') : '+M('|cos| = '+frH('1','2'))+' et '+M('|sin| = '+frH('√3','2'))+'</li></ul>'
++ '<p>Le signe vient de la position du point : <b class="c-cos">cos</b> est l\'abscisse, négative à gauche ; <b class="c-sin">sin</b> est l\'ordonnée, négative en bas.</p>'
++ '<div class="quads" role="img" aria-label="En haut à gauche, cos négatif et sin positif. En haut à droite, les deux positifs. En bas à gauche, les deux négatifs. En bas à droite, cos positif et sin négatif.">'
++ '<div><small>en haut à gauche</small><span class="c-cos">cos −</span> · <span class="c-sin">sin +</span></div><div><small>en haut à droite</small><span class="c-cos">cos +</span> · <span class="c-sin">sin +</span></div>'
++ '<div><small>en bas à gauche</small><span class="c-cos">cos −</span> · <span class="c-sin">sin −</span></div><div><small>en bas à droite</small><span class="c-cos">cos +</span> · <span class="c-sin">sin −</span></div></div>'
++ '<p>Exemple : '+M(frH('5π','6'))+' est dans la famille de '+M(frH('π','6'))+', en haut à gauche. Donc '+M('cos('+frH('5π','6')+') = −'+frH('√3','2'))+' et '+M('sin('+frH('5π','6')+') = '+frH('1','2'))+'.</p></section>'
++ '</article>';
+function syncKeys(){
+  [6,4,3,2].forEach(function(d){ var b = $('pd-'+d); if(b) b.setAttribute('aria-pressed', st.ex.d===d ? 'true' : 'false'); });
+  var o = $('kout'); if(!o) return;
+  var k = st.ex.k, d = st.ex.d, part = 180/d, u = exU();
+  if(k===0){ o.innerHTML = '0 part : le point de départ, '+M('0')+'.'; return; }
+  var raw = nfH(k, d), red = AH(u);
+  o.innerHTML = k+' part'+(k>1?'s':'')+' de '+part+'° = '+(k*part)+'°, donc '+M(raw)+(fracOf(u).den!==d || fracOf(u).num!==k ? ' = '+M(red) : '')+'.';
+}
+
+/* ---------- interactions ---------- */
+function render(){
+  ['c','p','v','e','g'].forEach(function(t){ var b = $('tab-'+t); if(b) b.setAttribute('aria-selected', st.tab===t ? 'true' : 'false'); });
+  if('pve'.indexOf(st.tab)>=0 && !st.ses[st.tab]) startSes(st.tab);
+  renderOpts(); renderQhead(); renderTool(); drawCircle(viewFor()); renderCap(); renderPad(); renderSide();
+}
+function focusNext(){ var n = $('next'); if(n){ try { n.focus({preventScroll:true}); } catch(e){ n.focus(); } } }
+function scrollStage(){ if(window.innerWidth < 900){ var s = $('stage'); var r = s.getBoundingClientRect(); if(r.top < 0 || r.top > window.innerHeight*0.4){ try { s.scrollIntoView({block:'start', behavior: RM ? 'auto' : 'smooth'}); } catch(e){ s.scrollIntoView(); } } } }
+function setTab(t){ st.tab = t; st.resetAsk = false; st.copyMsg = ''; Store.saveOpts(); render(); }
+doc.addEventListener('click', function(e){
+  var b = e.target && e.target.closest ? e.target.closest('[data-act]') : null; if(!b || b.disabled) return;
+  var a = b.getAttribute('data-act'), s;
+  if(a==='tab'){ setTab(b.getAttribute('data-tab')); if(window.innerWidth<900 && b.id==='gotog') window.scrollTo(0,0); return; }
+  if(a==='opt'){ var k = b.getAttribute('data-k'), v = b.getAttribute('data-v'); st.o[k] = v; Store.saveOpts(); if(k==='pSpan') startSes('p'); if(k==='vSpan') startSes('v'); if(k==='heat') st.heatB = null; render(); return; }
+  if(a==='optf'){ var kk = b.getAttribute('data-k'), f = b.getAttribute('data-v'), mode = kk==='vF' ? 'v' : 'e'; var cur = st.ses[mode]; if(cur && cur.preset){ st.o[kk][f] = true; } else { var on = FN.filter(function(x){ return st.o[kk][x]; }); if(st.o[kk][f] && on.length===1) return; st.o[kk][f] = !st.o[kk][f]; } Store.saveOpts(); startSes(mode); render(); return; }
+  if(a==='preset'){ var m = b.getAttribute('data-k'), p = b.getAttribute('data-v'); var c2 = st.ses[m]; if(c2 && c2.preset===p) startSes(m); else startSes(m, p); render(); return; }
+  if(a==='sign'){ s = st.ses.v; if(s && !s.ans.done){ s.ans.sign = +b.getAttribute('data-s'); render(); } return; }
+  if(a==='mag'){ s = st.ses.v; if(s && !s.ans.done){ var mv = b.getAttribute('data-m'); s.ans.mag = mv==='u' ? 'u' : +mv; render(); } return; }
+  if(a==='validate'){ if(st.tab==='v') answerV(); else if(st.tab==='e') answerE(); return; }
+  if(a==='clear'){ s = st.ses.e; if(s && !s.ans.done){ s.ans.sel = []; render(); } return; }
+  if(a==='next'){ nextQ(st.tab); return; }
+  if(a==='new'){ startSes(st.tab); render(); scrollStage(); return; }
+  if(a==='retry'){ s = st.ses[st.tab]; if(s){ var errs = s.res.filter(function(r){ return !r.ok; }).map(function(r){ return r.q; }); if(errs.length){ startSes(st.tab, null, errs); render(); scrollStage(); } } return; }
+  if(a==='pd'){ var d = +b.getAttribute('data-d'), deg = st.ex.k*180/st.ex.d; st.ex.d = d; st.ex.k = Math.max(0, Math.min(2*d-1, Math.round(deg/(180/d)))); render(); return; }
+  if(a==='km'){ st.ex.k = (st.ex.k-1+2*st.ex.d) % (2*st.ex.d); render(); return; }
+  if(a==='kp'){ st.ex.k = (st.ex.k+1) % (2*st.ex.d); render(); return; }
+  if(a==='copy'){ copyBilan(); return; }
+  if(a==='reset'){ st.resetAsk = true; render(); return; }
+  if(a==='reset-no'){ st.resetAsk = false; render(); return; }
+  if(a==='reset-yes'){ Prog = blank(); st.resetAsk = false; st.heatB = null; st.ses = {p:null, v:null, e:null}; Store.touch(); st.copyMsg = 'Progression remise à zéro.'; render(); return; }
+});
+function copyBilan(){
+  var txt = bilanText();
+  var fallback = function(){ var ta = $('bilan'); if(!ta) return; ta.hidden = false; ta.value = txt; ta.focus(); ta.select(); st.copyMsg = ''; var n = doc.createElement('p'); n.className = 'note'; n.textContent = 'Copie automatique impossible ici : le texte est sélectionné, copie-le avec Ctrl+C.'; ta.parentNode.insertBefore(n, ta); };
+  try {
+    navigator.clipboard.writeText(txt).then(function(){ st.copyMsg = 'Bilan copié. Colle-le dans tes notes ou dans notre conversation.'; render(); }, fallback);
+  } catch(e){ fallback(); }
+}
+doc.addEventListener('keydown', function(e){
+  if(e.altKey || e.ctrlKey || e.metaKey) return;
+  var tag = (e.target && e.target.tagName) || '';
+  if(tag==='TEXTAREA' || tag==='INPUT') return;
+  var t = st.tab; if('pve'.indexOf(t)<0) return;
+  var s = st.ses[t]; if(!s || s.done) return;
+  if(e.key==='Enter'){
+    if(tag==='BUTTON') return;
+    if(s.ans.done){ e.preventDefault(); nextQ(t); }
+    else if(t==='v' && canValV(s.ans)){ e.preventDefault(); answerV(); }
+    else if(t==='e' && s.ans.sel.length){ e.preventDefault(); answerE(); }
+    return;
+  }
+  if(t==='v' && !s.ans.done){
+    var q = s.qs[s.i];
+    if(e.key==='+' || e.key==='='){ s.ans.sign = 1; render(); }
+    else if(e.key==='-' || e.key==='−'){ s.ans.sign = -1; render(); }
+    else if(/^[1-5]$/.test(e.key)){ var i = +e.key-1; s.ans.mag = (q.f==='tan' && i===4) ? 'u' : i; render(); }
+  }
+});
+
+/* ---------- démarrage ---------- */
+function start(){
+  Store.loadLocal();
+  var hm = { '#comprendre':'c', '#placer':'p', '#valeurs':'v', '#equations':'e', '#progres':'g' };
+  var fromHash = hm[(location.hash || '').toLowerCase()];
+  var saved = st.o.tab; delete st.o.tab;
+  st.tab = fromHash || (saved && 'cpveg'.indexOf(saved)>=0 ? saved : 'c');
+  buildSVG(); render(); showSave();
+  Store.connect();
+}
+window.__trig = { values:values, solve:solve, principal:principal, A:A, base:base, fracOf:fracOf, S:S, EQ:EQ, realH:realH, nearestB:nearestB, P:P, R:R, st:st, prog:function(){ return Prog; }, bilan:bilanText, render:render };
+start();
+})();
+</script>
+</body>
+</html>
