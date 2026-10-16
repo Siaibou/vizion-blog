@@ -78,6 +78,7 @@ export const semestres = [
               { titre: 'Géométrie et trigonométrie, depuis le tout début', href: '/cours/geometrie-et-trigonometrie.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
               { titre: 'Cercle trigonométrique par coeurs', href: '/cours/cercle_trigo_par_coeur.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
               leCalcul,
+              { titre: 'Fractions et racines, depuis le tout début', href: '/cours/fractions-et-racines-depuis-le-tout-debut.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
             ],
           },
           {
