@@ -1,0 +1,1202 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fractions et racines, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+.hero{position:relative}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.m{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-style:italic;font-size:1.1em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+.vec{position:relative;display:inline-block;padding-top:.45em;line-height:1.1}
+.vec::before{content:"→";position:absolute;top:-.12em;left:0;right:0;text-align:center;font-size:.75em;line-height:1;font-style:normal}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.toc{columns:2 220px;margin:10px 0;padding-left:1.4em}
+.toc li{break-inside:avoid}
+details.check{margin:28px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+details.check[open]>summary{margin-bottom:4px}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:'STIX Two Text','Cambria Math',serif;font-style:italic;font-size:16px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.thick{stroke-width:4}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}
+/* widget */
+.widget .ctrl{max-width:440px;margin:12px auto 0}
+.widget label{font-weight:700;display:block;margin-bottom:4px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.presets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;background:var(--paper);border-radius:8px;padding:10px 14px}
+.readout b{font-weight:600}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+/* ---- ajouts propres au cours de logique ---- */
+td.v,span.v{color:var(--green);font-weight:700}
+td.f,span.f{color:var(--red);font-weight:700}
+table.c tr.hl td{background:var(--soft-r)}
+table.c tr.ok td{background:var(--soft-g)}
+table.c th{white-space:nowrap}
+table.tight{width:auto;margin:0 auto}
+.sym{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.sym b{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.25rem;text-align:center;min-width:1.6em;color:var(--blue)}
+.rule{border-left:5px solid var(--blue);background:var(--card);border-radius:10px;padding:10px 14px;margin:14px 0;border:1px solid var(--line);border-left-width:5px}
+.steps{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.15em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.redac .note{font-size:.9rem;color:var(--muted)}
+/* machine à promesses */
+.toggles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 12px}
+.tog{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:8px 14px;cursor:pointer;min-height:44px;text-align:left}
+.tog b{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
+.tog[aria-pressed="true"]{border-color:var(--green)}
+.tog[aria-pressed="false"]{border-color:var(--red)}
+.tog .val{font-weight:700}
+.tog[aria-pressed="true"] .val{color:var(--green)}
+.tog[aria-pressed="false"] .val{color:var(--red)}
+.verdict{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:1rem}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+/* cartes de Wason */
+.cards{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.card{width:72px;height:100px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-family:'STIX Two Text',serif;font-size:2rem;cursor:pointer;display:grid;place-items:center;position:relative}
+.card[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);box-shadow:0 0 0 3px var(--soft-b)}
+.card[aria-pressed="true"]::after{content:"à retourner";position:absolute;bottom:4px;left:0;right:0;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.62rem;color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.center{text-align:center}
+.fb p{margin:6px 0}
+.fb .good{color:var(--green);font-weight:700}
+.fb .bad{color:var(--red);font-weight:700}
+/* labo */
+.labin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.labin input{flex:1 1 220px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.keys button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;min-width:44px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.keys button:hover{border-color:var(--blue)}
+.keys button.w{font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem}
+.presets2{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.presets2 button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+#lab-out .err{color:var(--red);font-weight:700}
+#lab-out .tm{color:var(--muted)}
+#lab-out .verdict{margin-top:10px}
+.phr{font-style:italic}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+
+/* ---- Feuille 1 : ateliers (même identité que « La logique, depuis le tout début ») ---- */
+.enonce{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0}
+.kit{display:grid;gap:2px;font-size:1.12rem;margin:6px 0 10px}
+.kit p{margin:0}
+.recipe li,.four li{margin:8px 0}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.95rem}
+.note{font-size:.92rem;color:var(--muted)}
+.fbk{border-radius:10px;padding:10px 14px;margin:8px 0}
+.fbk>:first-child{margin-top:0}.fbk>:last-child{margin-bottom:0}
+.fbk.good{background:var(--soft-g)}.fbk.bad{background:var(--soft-r)}.fbk.info{background:var(--soft-b)}.fbk.meh{background:var(--soft-a)}
+
+/* table à remplir */
+.tt-wrap{margin:14px 0}
+table.tt{width:auto;margin:0 auto;border-collapse:collapse}
+table.tt th,table.tt td{padding:0;text-align:center;vertical-align:middle}
+table.tt th{padding:6px 10px;white-space:nowrap;background:var(--card);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.02rem;font-weight:600}
+table.tt .rn{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.78rem;color:var(--muted);font-weight:400;padding:0 8px}
+table.tt td.lock{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;padding:0 12px;height:40px}
+table.tt th.fin{background:var(--soft-b);color:var(--blue)}
+table.tt td.fin{background:var(--soft-b)}
+table.tt .sep{border-left:3px double var(--muted)}
+.cell{display:block;width:100%;min-width:46px;height:40px;border:0;margin:0;padding:0;background:transparent;color:var(--ink);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;font-weight:600;cursor:pointer;border-radius:0}
+.cell:hover{background:var(--soft-b)}
+.cell.e{outline:1px dashed var(--muted);outline-offset:-7px}
+.cell.v{color:var(--green)}.cell.f{color:var(--red)}
+.cell.ok{background:var(--soft-g)}
+.cell.ko{background:var(--soft-r);box-shadow:inset 0 0 0 2px var(--red)}
+.cell.shown{box-shadow:inset 0 0 0 2px var(--amber)}
+.cell.target{box-shadow:inset 0 0 0 3px var(--blue)}
+.cell:focus-visible{outline:3px solid var(--green);outline-offset:-3px;border-radius:0}
+.tt-ctrl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.tt-q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0}
+
+/* questions guidées */
+.mq{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+.mq-ok>:first-child{margin-top:0}.mq-ok>:last-child{margin-bottom:0}
+.seq-end{background:var(--card);border:2px solid var(--green);border-radius:10px;padding:10px 16px;margin:12px 0}
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.drill .mq{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0 6px;margin:0;background:transparent}
+
+/* calcul pas à pas */
+.calc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:18px 0}
+.calc-head{display:flex;flex-wrap:wrap;gap:4px 20px;font-size:.95rem;color:var(--muted)}
+.calc-head b{color:var(--ink);font-weight:600}
+.calc .steps{background:var(--paper);border:0;margin:10px 0}
+.calc-ask{font-weight:700;margin:12px 0 8px}
+.calc-opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer}
+.opt:hover{border-color:var(--blue)}
+.opt.bad{border-color:var(--red);background:var(--soft-r)}
+.opt.meh{border-color:var(--amber);background:var(--soft-a)}
+.opt.hintopt{border-color:var(--blue);box-shadow:0 0 0 3px var(--soft-b)}
+.linkbtn{font:inherit;font-size:.92rem;background:none;border:0;color:var(--blue);text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:6px}
+
+/* simulateur de scénarios */
+.sim-line{background:var(--paper);border-radius:8px;padding:8px 12px;margin:8px 0 12px}
+.sim-list{display:grid;gap:6px}
+.sim-row{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.chip{display:block;text-align:center;border-radius:8px;padding:2px 0;font-family:'STIX Two Text','Cambria Math',serif;font-weight:700}
+.chip.v{background:var(--soft-g);color:var(--green)}.chip.f{background:var(--soft-r);color:var(--red)}
+.sim-row .fm{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem}
+.sim-row .kt{font-size:.93rem;color:var(--muted)}
+.tag{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.75rem;font-weight:700;color:var(--blue);background:var(--soft-b);border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+.sim-cmp{margin-top:14px}
+.cmp-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.pill{font-size:.85rem;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}
+
+/* testeur de seuils (exercice 8) */
+.seuils{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px;margin:10px 0}
+.seuil{border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--paper);font-size:.95rem;line-height:1.35}
+.seuil .res{display:block;font-size:.82rem;font-weight:700}
+.seuil.v{border-color:var(--green);background:var(--soft-g)}.seuil.v .res{color:var(--green)}
+.seuil.f{border-color:var(--red);background:var(--soft-r)}.seuil.f .res{color:var(--red)}
+#t8r .fbk{margin:6px 0}
+
+/* ---- fractions et racines ---- */
+.rt{border-top:1.3px solid currentColor;padding:0 .12em 0 .06em;margin-left:-.04em}
+.q .rt{padding-top:1px}
+.steps .q{font-size:.9em}
+table.sq-t{width:auto;min-width:100%;text-align:center;font-variant-numeric:tabular-nums}
+table.sq-t th,table.sq-t td{text-align:center;padding:6px 8px;font-family:'STIX Two Text','Cambria Math',serif}
+.fx-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.fx-row input{flex:1 1 110px;min-width:0;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.fx-ops{display:flex;gap:4px}
+.fx-ops button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;width:44px;height:44px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.fx-ops button:hover{border-color:var(--blue)}
+.fx-ops button[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);color:var(--blue);font-weight:700}
+.tool-err{color:var(--red);font-weight:700;margin:8px 0}
+.tool-note{font-size:.93rem;color:var(--muted);margin:6px 0}
+.ex-list{display:grid;gap:12px;margin:14px 0}
+.ex-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.ex-item .ex-q{margin:0 0 8px;font-weight:700;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.ex-item .ex-q .mr{font-weight:400;font-size:1.15em;white-space:normal}
+.ex-item .ex-n{color:var(--margin,var(--red));font-family:'STIX Two Text','Cambria Math',serif}
+.ex-in{display:flex;flex-wrap:wrap;gap:8px}
+.ex-in input{flex:1 1 200px;min-width:0;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;padding:6px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px}
+.ex-in button{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;min-height:42px;cursor:pointer}
+.ex-in button:hover{background:var(--soft-b)}
+.ex-fb{margin-top:8px}
+.ex-fb:empty{display:none}
+.ex-fb .verdict p{margin:4px 0}
+.ex-fb .verdict.mid{background:var(--soft-a)}
+.ex-tag{font-size:.75rem;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--soft-b);color:var(--blue)}
+details.hint{margin:6px 0}
+details.hint>summary{color:var(--blue);cursor:pointer;font-size:.95rem;padding:4px 0}
+details.hint>div{background:var(--soft-b);border-radius:8px;padding:8px 12px;margin-top:4px;font-size:.97rem}
+.ex-score{background:var(--soft-g);border-radius:10px;padding:8px 14px;font-weight:700}
+.ex-score:empty{display:none}
+</style>
+
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Remise à niveau : le calcul exact</p>
+<h1>Fractions et racines, depuis le tout début<small>Calculer avec des entiers, des fractions et des racines carrées en même temps, sans calculatrice et sans valeur approchée.</small></h1>
+<p class="lede">En trigonométrie, presque toutes les réponses mélangent les trois : −1 − √3/3, (√2/2)², 1/√3. Une fois la valeur du cosinus trouvée, il reste à la calculer proprement, et c'est souvent là que l'exercice se perd. Ce cours reprend chaque règle en expliquant d'où elle vient, puis montre comment ranger un calcul qui mélange tout.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Crayon et feuille.</b> Refais chaque exemple avant de lire la ligne suivante.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b> Une erreur ici ne coûte rien.</li>
+<li><b>Les deux outils</b> (section 1.7 pour les fractions, section 2.4 pour les racines) détaillent les étapes de n'importe quel calcul que tu leur donnes. Sers-t'en pour vérifier, pas pour remplacer ton calcul.</li>
+<li><b>L'entraînement de la section 5</b> corrige ta réponse : tape-la, et la page te dit si elle est juste et si sa forme est finie.</li>
+<li><b>Rythme conseillé :</b> sections 1 et 2 à une première séance, sections 3 à 5 à une deuxième.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Ce que tu as déjà vu</p>
+<p>Ton cours <a href="https://claude.ai/artifact/FWhPdx31neKMqcv1h6ps8F">Le calcul, depuis le tout début</a> présente les fractions (partie 1.3) et la racine carrée (partie 1.5) en quelques paragraphes. Ce cours va plus loin : il justifie chaque règle, apprend à simplifier une racine, à enlever une racine du dénominateur, et surtout à mélanger les trois sortes de nombres dans un seul calcul.</p>
+</div>
+<h3>Où trouver quoi</h3>
+<ul class="blk">
+<li><a href="#p1"><b>1</b>Les fractions</a></li>
+<li><a href="#p2"><b>2</b>Les racines carrées</a></li>
+<li><a href="#p3"><b>3</b>Mélanger les trois</a></li>
+<li><a href="#p4"><b>4</b>Les pièges</a></li>
+<li><a href="#p5"><b>5</b>Entraînement corrigé</a></li>
+<li><a href="#p6"><b>6</b>Retour à ta feuille</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Les fractions</h2>
+
+<h3>1.1 Ce qu'est une fraction</h3>
+<p>La fraction <span class="mr"><span class="q"><span>a</span><span>b</span></span></span> se lit de deux façons, qui disent la même chose :</p>
+<ul>
+<li><b>des parts</b> : on coupe l'unité en b parts égales, et on en prend a. Dans 3/4, on coupe en 4, on prend 3. C'est exactement la lecture des angles du cercle trigo : dans 5π/6, le dénominateur 6 donne la taille d'une part (un sixième de π), le numérateur 5 dit combien on en prend ;</li>
+<li><b>une division</b> : a/b, c'est le nombre a ÷ b. C'est le nombre qui, multiplié par b, redonne a.</li>
+</ul>
+<p>Le nombre du haut est le <b>numérateur</b> (<i>numerator</i>), celui du bas le <b>dénominateur</b> (<i>denominator</i>). Le dénominateur n'est jamais 0.</p>
+<p>Un entier est une fraction de dénominateur 1 : <span class="mr">5 = 5/1</span>. C'est ce qui permet de mélanger entiers et fractions avec les mêmes règles.</p>
+
+<h3>1.2 La règle d'or : multiplier en haut et en bas</h3>
+<div class="box key">
+<p class="lbl">Fractions égales</p>
+<p class="eq"><span class="q"><span>a</span><span>b</span></span> = <span class="q"><span>a × k</span><span>b × k</span></span> &nbsp;&nbsp; pour tout k non nul</p>
+<p>On peut multiplier (ou diviser) le numérateur et le dénominateur par le même nombre non nul : la fraction ne change pas.</p>
+</div>
+<p>Pourquoi ? Couper chaque part en k morceaux multiplie le nombre de parts par k, et le nombre de parts prises aussi. La quantité totale ne bouge pas : 1/2 d'une pizza, c'est 2/4, c'est 3/6.</p>
+<p>Cette règle sert dans les deux sens, et toutes les autres en découlent :</p>
+<ul>
+<li><b>simplifier</b>, en divisant en haut et en bas : <span class="mr">12/18 = (6 × 2)/(6 × 3) = 2/3</span>. Une fraction est <b>irréductible</b> (<i>in lowest terms</i>) quand on ne peut plus rien simplifier ;</li>
+<li><b>changer de dénominateur</b>, en multipliant : <span class="mr">2/3 = 8/12</span>. On en aura besoin pour additionner.</li>
+</ul>
+
+<h4>Les signes</h4>
+<p class="eq">−<span class="q"><span>a</span><span>b</span></span> = <span class="q"><span>−a</span><span>b</span></span> = <span class="q"><span>a</span><span>−b</span></span></p>
+<p>Les trois écritures valent le même nombre, par la règle des signes de la division. Par convention, on écrit le résultat final avec un dénominateur positif : on écrit −3/4, jamais 3/(−4). Et <span class="mr">(−3)/(−4) = 3/4</span> : on multiplie en haut et en bas par −1.</p>
+
+<h3>1.3 Multiplier</h3>
+<div class="box key">
+<p class="lbl">Produit de deux fractions</p>
+<p class="eq"><span class="q"><span>a</span><span>b</span></span> × <span class="q"><span>c</span><span>d</span></span> = <span class="q"><span>a × c</span><span>b × d</span></span></p>
+</div>
+<p>Pourquoi ? Prends <span class="mr">1/2 × 1/3</span>, « la moitié d'un tiers ». Coupe une tablette de chocolat en 3 bandes, prends une bande, puis coupe-la en 2. Le morceau obtenu est un sixième de la tablette : <span class="mr">1/2 × 1/3 = 1/6</span>. En général, couper en b puis en d donne des parts de taille 1/(b × d), et on en prend a × c.</p>
+<p>Avec un entier, on l'écrit sur 1 : <span class="mr">4 × 2/3 = 4/1 × 2/3 = 8/3</span>. Seul le numérateur est multiplié.</p>
+<div class="box nts">
+<p class="lbl">Simplifier avant de multiplier</p>
+<p>Pour <span class="mr">4/9 × 3/8</span>, inutile de calculer 12/72. Écris les facteurs : <span class="mr">(4 × 3)/(9 × 8) = (4 × 3)/(3 × 3 × 4 × 2)</span>. Le 4 et un 3 se simplifient : il reste <span class="mr">1/(3 × 2) = 1/6</span>. Les nombres restent petits, et les erreurs rares.</p>
+</div>
+
+<h3>1.4 Diviser</h3>
+<div class="box key">
+<p class="lbl">Diviser par une fraction, c'est multiplier par son inverse</p>
+<p class="eq"><span class="q"><span>a</span><span>b</span></span> ÷ <span class="q"><span>c</span><span>d</span></span> = <span class="q"><span>a</span><span>b</span></span> × <span class="q"><span>d</span><span>c</span></span> &nbsp;&nbsp; (c non nul)</p>
+</div>
+<p>L'<b>inverse</b> (<i>reciprocal</i>) de c/d est d/c, la fraction retournée, parce que <span class="mr">c/d × d/c = (c × d)/(d × c) = 1</span>.</p>
+<p>Pourquoi ça marche ? Commence par une question concrète : combien de demi-pizzas dans 3 pizzas ? Six. Donc <span class="mr">3 ÷ 1/2 = 6 = 3 × 2</span>. Diviser par 1/2, c'est multiplier par 2. En général, le résultat de x ÷ (c/d) est le nombre qui, multiplié par c/d, redonne x. Le nombre <span class="mr">x × d/c</span> convient : <span class="mr">x × d/c × c/d = x × 1 = x</span>.</p>
+<p>Une fraction de fractions est une division écrite verticalement. C'est exactement ce qui se passe quand tu calcules une tangente :</p>
+<div class="steps">
+<span class="op"></span><span>tan <span class="q"><span>π</span><span>3</span></span> = <span class="q"><span>sin(π/3)</span><span>cos(π/3)</span></span> = <span class="q"><span>√<span class="rt">3</span>/2</span><span>1/2</span></span></span>
+<span class="op">=</span><span><span class="q"><span>√<span class="rt">3</span></span><span>2</span></span> × <span class="q"><span>2</span><span>1</span></span></span>
+<span class="why">Diviser par 1/2, c'est multiplier par 2/1.</span>
+<span class="op">=</span><span>√<span class="rt">3</span></span>
+<span class="why">Le 2 du haut et le 2 du bas se simplifient.</span>
+</div>
+
+<h3>1.5 Additionner et soustraire</h3>
+<p>Avec le même dénominateur, c'est facile : des sixièmes plus des sixièmes donnent des sixièmes.</p>
+<p class="eq"><span class="q"><span>a</span><span>b</span></span> + <span class="q"><span>c</span><span>b</span></span> = <span class="q"><span>a + c</span><span>b</span></span></p>
+<p>Avec des dénominateurs différents, on ne peut pas additionner directement. 1/2 + 1/3, ce sont des parts de tailles différentes, comme 1 euro + 1 dollar : avant d'additionner, on convertit tout dans la même unité. En Python, c'est l'erreur <code>1 + "2"</code> : il faut d'abord convertir l'un des deux types.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li>Choisis un <b>dénominateur commun</b> (<i>common denominator</i>) : un multiple des deux dénominateurs. Le produit des deux marche toujours ; le plus petit commun multiple (PPCM, <i>least common multiple</i>) donne des nombres plus petits.</li>
+<li>Réécris chaque fraction avec ce dénominateur (règle d'or, section 1.2).</li>
+<li>Additionne les numérateurs, garde le dénominateur.</li>
+<li>Simplifie si possible.</li>
+</ol>
+</div>
+<div class="steps">
+<span class="op"></span><span><span class="q"><span>5</span><span>6</span></span> − <span class="q"><span>1</span><span>4</span></span></span>
+<span class="op">=</span><span><span class="q"><span>10</span><span>12</span></span> − <span class="q"><span>3</span><span>12</span></span></span>
+<span class="why">12 est un multiple de 6 et de 4 : on multiplie la première fraction par 2/2, la seconde par 3/3.</span>
+<span class="op">=</span><span><span class="q"><span>7</span><span>12</span></span></span>
+</div>
+<h4>Un entier plus une fraction</h4>
+<p>On écrit l'entier avec le dénominateur de la fraction : <span class="mr">1 = 3/3</span>, <span class="mr">2 = 8/4</span>.</p>
+<div class="steps">
+<span class="op"></span><span>3 − <span class="q"><span>2</span><span>5</span></span> = <span class="q"><span>15</span><span>5</span></span> − <span class="q"><span>2</span><span>5</span></span> = <span class="q"><span>13</span><span>5</span></span></span>
+<span class="op"></span><span>−1 − <span class="q"><span>1</span><span>3</span></span> = <span class="q"><span>−3</span><span>3</span></span> − <span class="q"><span>1</span><span>3</span></span> = <span class="q"><span>−4</span><span>3</span></span> = −<span class="q"><span>4</span><span>3</span></span></span>
+</div>
+<div class="box warn">
+<p class="lbl">1/2 + 1/3 n'est pas 2/5</p>
+<p>On n'additionne jamais les dénominateurs. Contre-exemple : <span class="mr">1/2 + 1/2</span> vaut 1, alors que la fausse règle donnerait <span class="mr">2/4 = 1/2</span>.</p>
+</div>
+
+<h3>1.6 Le carré d'une fraction</h3>
+<p>Le carré, c'est un produit de la fraction par elle-même, donc la règle 1.3 s'applique :</p>
+<p class="eq">(<span class="q"><span>a</span><span>b</span></span>)² = <span class="q"><span>a</span><span>b</span></span> × <span class="q"><span>a</span><span>b</span></span> = <span class="q"><span>a²</span><span>b²</span></span></p>
+<p>Exemple : <span class="mr">(−1/2)² = (−1/2) × (−1/2) = 1/4</span>. Le signe disparaît, car moins par moins donne plus.</p>
+<div class="box warn">
+<p class="lbl">Les parenthèses comptent</p>
+<p><span class="mr">(−1/2)² = 1/4</span>, mais <span class="mr">−(1/2)² = −1/4</span> : sans parenthèses autour du signe moins, le carré passe avant lui. Python fait pareil : <code>-0.5**2</code> donne <code>-0.25</code>.</p>
+</div>
+
+<h3 id="outil-frac">1.7 L'outil : un calcul de fractions, étape par étape</h3>
+<div class="box widget" id="fx">
+<p>Tape deux fractions (ou des entiers) et choisis l'opération. L'outil écrit toutes les étapes, avec la règle utilisée à chacune. Les nombres négatifs s'écrivent avec un signe moins : <code>-3/4</code>.</p>
+<div class="fx-row">
+<input id="fx-a" type="text" inputmode="text" autocomplete="off" spellcheck="false" value="5/6" aria-label="Première fraction">
+<div class="fx-ops" role="group" aria-label="Opération">
+<button type="button" data-op="+" aria-pressed="false">+</button><button type="button" data-op="-" aria-pressed="true">−</button><button type="button" data-op="*" aria-pressed="false">×</button><button type="button" data-op="/" aria-pressed="false">÷</button>
+</div>
+<input id="fx-b" type="text" inputmode="text" autocomplete="off" spellcheck="false" value="1/4" aria-label="Seconde fraction">
+</div>
+<div class="presets" id="fx-pre">
+<button type="button" data-a="1/2" data-op="+" data-b="1/3">1/2 + 1/3</button>
+<button type="button" data-a="3" data-op="-" data-b="2/5">3 − 2/5</button>
+<button type="button" data-a="-1/2" data-op="+" data-b="1/3">−1/2 + 1/3</button>
+<button type="button" data-a="4/9" data-op="*" data-b="3/8">4/9 × 3/8</button>
+<button type="button" data-a="2/3" data-op="/" data-b="4/5">2/3 ÷ 4/5</button>
+<button type="button" data-a="-1" data-op="-" data-b="1/3">−1 − 1/3</button>
+</div>
+<div id="fx-out" aria-live="polite"></div>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 1)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Combien vaut 2/3 + 1/6 ?</p>
+<div class="mq-c"><button type="button" data-fb="Tu as mis au même dénominateur, mais oublié de multiplier le numérateur : 2/3 = 4/6, pas 2/6.">3/6</button><button type="button" data-fb="Tu as additionné les numérateurs et les dénominateurs. Il faut un dénominateur commun : 2/3 = 4/6.">3/9</button><button type="button">5/6</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2/3 = 4/6, donc 4/6 + 1/6 = 5/6.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Combien vaut (1/2) ÷ (3/4) ?</p>
+<div class="mq-c"><button type="button" data-fb="Tu as retourné la première fraction. On garde 1/2 et on retourne la seconde : 1/2 × 4/3.">6/4</button><button type="button" data-fb="3/8 est le produit 1/2 × 3/4. Diviser, c'est multiplier par l'inverse, 4/3.">3/8</button><button type="button">2/3</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1/2 × 4/3 = 4/6 = 2/3.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Combien vaut 1 − 1/4 ?</p>
+<div class="mq-c"><button type="button">3/4</button><button type="button" data-fb="Écris 1 = 4/4, puis soustrais les numérateurs.">−3/4</button><button type="button" data-fb="On n'enlève pas 1 au numérateur et au dénominateur. Écris 1 = 4/4.">0/3</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 = 4/4, et 4/4 − 1/4 = 3/4.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien vaut (−2/3)² ?</p>
+<div class="mq-c"><button type="button" data-fb="Le carré porte sur le numérateur et sur le dénominateur : 2² = 4 et 3² = 9.">4/3</button><button type="button">4/9</button><button type="button" data-fb="Le carré porte aussi sur le signe moins, puisqu'il est dans la parenthèse : (−2/3) × (−2/3).">−4/9</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">(−2/3) × (−2/3) = 4/9 : moins par moins donne plus.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Les racines carrées</h2>
+
+<h3>2.1 La définition, et pourquoi elle est positive</h3>
+<div class="box key">
+<p class="lbl">Racine carrée (<i>square root</i>)</p>
+<p>Pour a ≥ 0, <span class="mr">√<span class="rt">a</span></span> est <b>le nombre positif ou nul</b> dont le carré vaut a.</p>
+<p class="eq">√<span class="rt">a</span> ≥ 0 &nbsp;&nbsp; et &nbsp;&nbsp; (√<span class="rt">a</span>)² = a</p>
+</div>
+<p>La racine défait le carré, comme une fonction réciproque en programmation défait une autre fonction : <code>decode(encode(x)) == x</code>. Mais il y a un problème : 3 et −3 ont le même carré, 9. Le carré « perd » le signe, et la racine ne peut pas deviner lequel c'était. Les mathématiciens ont donc choisi une convention : √9 désigne la réponse positive, 3. C'est comme <code>math.sqrt(9)</code> en Python, qui renvoie toujours <code>3.0</code>, jamais <code>-3.0</code>.</p>
+<p>Deux conséquences :</p>
+<ul>
+<li>√a n'existe pas dans ℝ pour a &lt; 0, puisqu'aucun carré n'est négatif ;</li>
+<li><span class="mr">√<span class="rt">x²</span> = |x|</span>, et pas x. Par exemple <span class="mr">√<span class="rt">(−5)²</span> = √<span class="rt">25</span> = 5 = |−5|</span>. Tu retrouves la valeur absolue du cours sur les majorants : la racine rend toujours la distance à zéro.</li>
+</ul>
+<h4>Les carrés parfaits à connaître</h4>
+<div class="tw"><table class="sq-t">
+<tr><th>n</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>15</td></tr>
+<tr><th>n²</th><td>1</td><td>4</td><td>9</td><td>16</td><td>25</td><td>36</td><td>49</td><td>64</td><td>81</td><td>100</td><td>121</td><td>144</td><td>169</td><td>225</td></tr>
+</table></div>
+<p>Ce tableau sert à reconnaître les facteurs carrés cachés dans un nombre, à la section 2.4. Les racines des autres entiers, comme √2 ou √3, ne tombent pas juste. On les garde telles quelles, comme on garde 1/3 plutôt que 0,333 : c'est la valeur exacte.</p>
+
+<h3>2.2 Produit et quotient : les règles qui marchent</h3>
+<div class="box key">
+<p class="lbl">Pour a ≥ 0 et b ≥ 0</p>
+<p class="eq">√<span class="rt">a</span> × √<span class="rt">b</span> = √<span class="rt">a × b</span> &nbsp;&nbsp;&nbsp; <span class="q"><span>√<span class="rt">a</span></span><span>√<span class="rt">b</span></span></span> = √<span class="rt"><span class="q"><span>a</span><span>b</span></span></span> &nbsp;(b ≠ 0)</p>
+</div>
+<p>Pourquoi la première ? On utilise la définition : √(ab) est <b>le</b> nombre positif dont le carré vaut ab. Il suffit donc de vérifier que √a × √b est positif, et que son carré vaut ab.</p>
+<ul>
+<li>Positif : c'est un produit de deux nombres positifs.</li>
+<li>Son carré : <span class="mr">(√<span class="rt">a</span> × √<span class="rt">b</span>)² = (√<span class="rt">a</span>)² × (√<span class="rt">b</span>)² = a × b</span>. On a utilisé <span class="mr">(xy)² = x²y²</span>, qui vient de ce qu'on peut réordonner un produit : <span class="mr">xyxy = xxyy</span>.</li>
+</ul>
+<p>Comme il n'y a qu'un seul nombre positif dont le carré vaut ab, c'est forcément √(ab). La règle du quotient se démontre de la même façon.</p>
+<p>Deux cas particuliers reviennent sans arrêt :</p>
+<ul>
+<li><span class="mr">√<span class="rt">3</span> × √<span class="rt">3</span> = 3</span> : c'est la définition elle-même, (√a)² = a ;</li>
+<li><span class="mr">(k√<span class="rt">m</span>)² = k² × m</span>. Par exemple <span class="mr">(2√<span class="rt">3</span>)² = 4 × 3 = 12</span>, et <span class="mr">(√<span class="rt">3</span>/2)² = 3/4</span>.</li>
+</ul>
+
+<h3>2.3 La somme : la règle qui ne marche pas</h3>
+<div class="box warn">
+<p class="lbl">√(a + b) n'est pas √a + √b</p>
+<p>Contre-exemple : <span class="mr">√<span class="rt">9 + 16</span> = √<span class="rt">25</span> = 5</span>, mais <span class="mr">√<span class="rt">9</span> + √<span class="rt">16</span> = 3 + 4 = 7</span>.</p>
+<p>La racine se distribue sur un produit, jamais sur une somme. C'est la même famille d'erreur que <span class="mr">cos(a + b) = cos a + cos b</span>, que tu as faite à l'exercice 2.1 : une fonction n'a, en général, aucune raison de se distribuer sur une somme.</p>
+</div>
+<p>Alors comment additionner des racines ? Comme des objets. Traite √3 comme une unité, au même titre qu'une pomme ou un x en calcul littéral :</p>
+<div class="steps">
+<span class="op"></span><span>2√<span class="rt">3</span> + 5√<span class="rt">3</span> = 7√<span class="rt">3</span></span>
+<span class="why">2 pommes + 5 pommes = 7 pommes. C'est la distributivité : 2√3 + 5√3 = (2 + 5)√3.</span>
+<span class="op"></span><span>√<span class="rt">3</span> − √<span class="rt">3</span>/3 = <span class="q"><span>3√<span class="rt">3</span></span><span>3</span></span> − <span class="q"><span>√<span class="rt">3</span></span><span>3</span></span> = <span class="q"><span>2√<span class="rt">3</span></span><span>3</span></span></span>
+<span class="why">Une pomme moins un tiers de pomme. On a écrit 1 = 3/3.</span>
+<span class="op"></span><span>√<span class="rt">2</span> + √<span class="rt">3</span></span>
+<span class="why">Ne se simplifie pas : des pommes et des poires. C'est déjà le résultat final.</span>
+<span class="op"></span><span>1 + √<span class="rt">2</span></span>
+<span class="why">Ne se simplifie pas non plus : un entier et une racine sont deux sortes différentes.</span>
+</div>
+
+<h3 id="p2-simp">2.4 Simplifier une racine</h3>
+<p>√12 n'est pas une forme finie. On cherche dans 12 un facteur qui est un carré parfait :</p>
+<div class="steps">
+<span class="op"></span><span>√<span class="rt">12</span></span>
+<span class="op">=</span><span>√<span class="rt">4 × 3</span></span>
+<span class="why">4 est un carré parfait qui divise 12.</span>
+<span class="op">=</span><span>√<span class="rt">4</span> × √<span class="rt">3</span></span>
+<span class="why">La règle du produit (2.2).</span>
+<span class="op">=</span><span>2√<span class="rt">3</span></span>
+<span class="why">√4 = 2.</span>
+</div>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li>Cherche le <b>plus grand</b> carré parfait qui divise le nombre sous la racine : essaie 4, 9, 16, 25, 36… avec le tableau de la section 2.1.</li>
+<li>Écris le nombre comme ce carré fois le reste.</li>
+<li>Sors la racine du carré devant : <span class="mr">√<span class="rt">k² × m</span> = k√<span class="rt">m</span></span>.</li>
+</ol>
+</div>
+<p>Si tu ne prends pas le plus grand carré, ce n'est pas faux, mais ce n'est pas fini : <span class="mr">√<span class="rt">72</span> = √<span class="rt">4 × 18</span> = 2√<span class="rt">18</span></span>, et 18 contient encore 9, donc <span class="mr">2√<span class="rt">18</span> = 2 × 3√<span class="rt">2</span> = 6√<span class="rt">2</span></span>. Avec 36 directement : <span class="mr">√<span class="rt">72</span> = √<span class="rt">36 × 2</span> = 6√<span class="rt">2</span></span>.</p>
+<p>Simplifier sert à additionner : <span class="mr">√<span class="rt">12</span> + √<span class="rt">27</span></span> a l'air impossible, mais <span class="mr">2√<span class="rt">3</span> + 3√<span class="rt">3</span> = 5√<span class="rt">3</span></span>. Les deux racines étaient des pommes déguisées.</p>
+
+<div class="box widget" id="rx">
+<p class="lbl">L'outil : simplifier une racine</p>
+<p>Tape un entier positif. L'outil cherche le plus grand carré qui le divise et écrit les étapes.</p>
+<div class="labin">
+<input id="rx-n" type="text" inputmode="numeric" autocomplete="off" value="72" aria-label="Nombre sous la racine">
+</div>
+<div class="presets" id="rx-pre">
+<button type="button" data-n="12">√12</button><button type="button" data-n="18">√18</button><button type="button" data-n="27">√27</button><button type="button" data-n="48">√48</button><button type="button" data-n="50">√50</button><button type="button" data-n="72">√72</button><button type="button" data-n="75">√75</button><button type="button" data-n="200">√200</button><button type="button" data-n="30">√30</button><button type="button" data-n="144">√144</button>
+</div>
+<div id="rx-out" aria-live="polite"></div>
+</div>
+
+<h3 id="p2-ratio">2.5 Enlever la racine du dénominateur</h3>
+<p>Par convention, un résultat final n'a pas de racine au dénominateur. On écrit √3/3 plutôt que 1/√3. Les deux sont égaux, et voici comment passer de l'un à l'autre :</p>
+<div class="steps">
+<span class="op"></span><span><span class="q"><span>1</span><span>√<span class="rt">3</span></span></span></span>
+<span class="op">=</span><span><span class="q"><span>1 × √<span class="rt">3</span></span><span>√<span class="rt">3</span> × √<span class="rt">3</span></span></span></span>
+<span class="why">La règle d'or (1.2) : on multiplie en haut et en bas par √3, qui n'est pas nul.</span>
+<span class="op">=</span><span><span class="q"><span>√<span class="rt">3</span></span><span>3</span></span></span>
+<span class="why">√3 × √3 = 3 : la racine a quitté le dénominateur.</span>
+</div>
+<p>Ce geste s'appelle <b>rendre le dénominateur rationnel</b> (<i>rationalizing the denominator</i>). Il explique deux valeurs de ton cercle trigo :</p>
+<ul>
+<li><span class="mr">tan(π/6) = (1/2) ÷ (√<span class="rt">3</span>/2) = 1/2 × 2/√<span class="rt">3</span> = 1/√<span class="rt">3</span> = √<span class="rt">3</span>/3</span> ;</li>
+<li><span class="mr">cos(π/4) = 1/√<span class="rt">2</span> = √<span class="rt">2</span>/2</span>. Quand tu lis « 1/√2 » dans un livre, c'est le même nombre que ton √2/2.</li>
+</ul>
+<p>Pourquoi cette convention ? Parce qu'elle rend les additions faciles. <span class="mr">1/√<span class="rt">3</span> + √<span class="rt">3</span></span> n'a pas de dénominateur commun visible, alors que <span class="mr">√<span class="rt">3</span>/3 + √<span class="rt">3</span></span>, c'est un tiers de pomme plus une pomme : <span class="mr">√<span class="rt">3</span>/3 + 3√<span class="rt">3</span>/3 = 4√<span class="rt">3</span>/3</span>.</p>
+<p>Le même geste marche avec un coefficient : <span class="mr"><span class="q"><span>6</span><span>√<span class="rt">2</span></span></span> = <span class="q"><span>6√<span class="rt">2</span></span><span>2</span></span> = 3√<span class="rt">2</span></span>.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Combien vaut √50 sous forme simplifiée ?</p>
+<div class="mq-c"><button type="button" data-fb="25 × 2 = 50, et √25 = 5 : c'est 5 qui sort de la racine, pas 25.">25√2</button><button type="button" data-fb="10 n'est pas un carré parfait. Cherche le plus grand carré qui divise 50.">2√10</button><button type="button">5√2</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">50 = 25 × 2, donc √50 = √25 × √2 = 5√2.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Combien vaut 3√2 + √8 ?</p>
+<div class="mq-c"><button type="button">5√2</button><button type="button" data-fb="On n'additionne pas ce qu'il y a sous les racines. Simplifie d'abord √8.">3√10</button><button type="button" data-fb="Simplifie √8 : il contient le carré 4.">On ne peut pas simplifier</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">√8 = √4 × √2 = 2√2, puis 3√2 + 2√2 = 5√2.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Combien vaut (√3/2)² ?</p>
+<div class="mq-c"><button type="button">3/4</button><button type="button" data-fb="(√3)² = 3 : le carré défait la racine.">√3/4</button><button type="button" data-fb="Le carré porte sur le dénominateur aussi : 2² = 4.">3/2</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">(√3)² / 2² = 3/4.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Laquelle de ces écritures est égale à 2/√2 ?</p>
+<div class="mq-c"><button type="button" data-fb="On ne peut pas simplifier 2 avec √2 directement : ce sont deux nombres différents. Multiplie en haut et en bas par √2.">1</button><button type="button">√2</button><button type="button" data-fb="Multiplie en haut et en bas par √2 : 2√2/2.">1/2</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2/√2 = 2√2/2 = √2.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Mélanger les trois</h2>
+
+<h3>3.1 Ranger par familles</h3>
+<p>Une expression comme <span class="mr">2 − √<span class="rt">2</span>/2 + 3√<span class="rt">2</span>/4 − 1/2</span> contient deux sortes de nombres qu'on ne peut pas mélanger :</p>
+<ul>
+<li>la famille des <b>nombres sans racine</b> : 2 et −1/2 ;</li>
+<li>la famille des <b>multiples de √2</b> : −√2/2 et 3√2/4.</li>
+</ul>
+<p>Le secret, c'est d'écrire chaque terme comme « un coefficient fois √2 ». Une fraction qui contient une racine se lit ainsi :</p>
+<p class="eq"><span class="q"><span>√<span class="rt">2</span></span><span>2</span></span> = <span class="q"><span>1</span><span>2</span></span>√<span class="rt">2</span> &nbsp;&nbsp;&nbsp; <span class="q"><span>3√<span class="rt">2</span></span><span>4</span></span> = <span class="q"><span>3</span><span>4</span></span>√<span class="rt">2</span></p>
+<p>« √2 sur 2 », c'est « la moitié de √2 ». Une fois chaque terme écrit comme ça, on calcule chaque famille avec les fractions de la section 1, et seulement les coefficients.</p>
+<div class="box nts">
+<p class="lbl">En programmation</p>
+<p>Un nombre comme <span class="mr">3/2 + (1/4)√<span class="rt">2</span></span> se range dans une paire de deux champs : <code>(rationnel, coef_racine) = (3/2, 1/4)</code>. Additionner deux tels nombres, c'est additionner champ par champ : <code>(a1 + a2, b1 + b2)</code>. On ne verse jamais un champ dans l'autre, comme on n'ajoute pas une longueur à un poids.</p>
+</div>
+
+<h3>3.2 Un exemple guidé</h3>
+<div class="steps">
+<span class="op"></span><span>2 − <span class="q"><span>√<span class="rt">2</span></span><span>2</span></span> + <span class="q"><span>3√<span class="rt">2</span></span><span>4</span></span> − <span class="q"><span>1</span><span>2</span></span></span>
+<span class="op">=</span><span>(2 − <span class="q"><span>1</span><span>2</span></span>) + (−<span class="q"><span>1</span><span>2</span></span> + <span class="q"><span>3</span><span>4</span></span>)√<span class="rt">2</span></span>
+<span class="why">On range : les nombres sans racine d'un côté, les coefficients de √2 de l'autre.</span>
+<span class="op">=</span><span>(<span class="q"><span>4</span><span>2</span></span> − <span class="q"><span>1</span><span>2</span></span>) + (−<span class="q"><span>2</span><span>4</span></span> + <span class="q"><span>3</span><span>4</span></span>)√<span class="rt">2</span></span>
+<span class="why">Dénominateurs communs : 2 = 4/2, et 1/2 = 2/4.</span>
+<span class="op">=</span><span><span class="q"><span>3</span><span>2</span></span> + <span class="q"><span>1</span><span>4</span></span>√<span class="rt">2</span></span>
+<span class="op">=</span><span><span class="q"><span>3</span><span>2</span></span> + <span class="q"><span>√<span class="rt">2</span></span><span>4</span></span></span>
+<span class="why">C'est un résultat correct et fini.</span>
+<span class="op">=</span><span><span class="q"><span>6 + √<span class="rt">2</span></span><span>4</span></span></span>
+<span class="why">Autre forme, en une seule fraction : 3/2 = 6/4. Les deux formes sont acceptées.</span>
+</div>
+<div class="box warn">
+<p class="lbl">On ne simplifie que des facteurs</p>
+<p>Dans <span class="mr">(6 + √<span class="rt">2</span>)/4</span>, on n'a pas le droit de simplifier le 6 avec le 4 : le 6 est un <b>terme</b> (il est additionné), pas un <b>facteur</b> (il ne multiplie pas tout le numérateur). Si on veut simplifier par 2, il faut que 2 divise <b>chaque</b> terme du haut : <span class="mr">(6 + 2√<span class="rt">2</span>)/4 = 2(3 + √<span class="rt">2</span>)/4 = (3 + √<span class="rt">2</span>)/2</span>.</p>
+</div>
+
+<h3>3.3 Les carrés de cosinus et de sinus</h3>
+<p>La notation <span class="mr">cos² x</span> veut dire <span class="mr">(cos x)²</span> : on calcule le cosinus, puis on l'élève au carré. Ce n'est pas <span class="mr">cos(x²)</span>. Pour calculer <span class="mr">cos²(π/6)</span> :</p>
+<div class="steps">
+<span class="op"></span><span>cos²(<span class="q"><span>π</span><span>6</span></span>) = (<span class="q"><span>√<span class="rt">3</span></span><span>2</span></span>)²</span>
+<span class="op">=</span><span><span class="q"><span>(√<span class="rt">3</span>)²</span><span>2²</span></span> = <span class="q"><span>3</span><span>4</span></span></span>
+<span class="why">Le carré d'une fraction (1.6), puis la définition de la racine (2.1).</span>
+</div>
+<p>Avec un signe moins, le carré l'efface : <span class="mr">(−√<span class="rt">2</span>/2)² = 2/4 = 1/2</span>. Ces carrés sont toujours des fractions sans racine, parce que les racines de ton cercle sont √2 et √3, dont les carrés sont 2 et 3. Tu peux vérifier sur n'importe quel angle que <span class="mr">cos² x + sin² x = 1</span> : c'est le théorème de Pythagore dans le cercle de rayon 1.</p>
+
+<h3>3.4 Développer avec des racines</h3>
+<p>La distributivité et les identités remarquables (ton cours de calcul, parties 3 et 4) marchent avec les racines exactement comme avec les lettres :</p>
+<div class="steps">
+<span class="op"></span><span>√<span class="rt">2</span>(1 + √<span class="rt">2</span>) = √<span class="rt">2</span> + √<span class="rt">2</span> × √<span class="rt">2</span> = √<span class="rt">2</span> + 2</span>
+<span class="op"></span><span>(1 + √<span class="rt">3</span>)² = 1² + 2 × 1 × √<span class="rt">3</span> + (√<span class="rt">3</span>)² = 1 + 2√<span class="rt">3</span> + 3 = 4 + 2√<span class="rt">3</span></span>
+<span class="why">Identité (a + b)² = a² + 2ab + b², avec a = 1 et b = √3. Le terme du milieu ne disparaît pas.</span>
+<span class="op"></span><span>(√<span class="rt">5</span> − 1)(√<span class="rt">5</span> + 1) = (√<span class="rt">5</span>)² − 1² = 5 − 1 = 4</span>
+<span class="why">Identité (a − b)(a + b) = a² − b² : les racines disparaissent.</span>
+</div>
+
+<h3>3.5 À quoi ressemble une réponse finie</h3>
+<div class="box key">
+<p class="lbl">La forme finale</p>
+<ul>
+<li>toutes les fractions sont irréductibles, avec un dénominateur positif ;</li>
+<li>aucune racine n'est simplifiable : √12 devient 2√3 ;</li>
+<li>aucune racine au dénominateur : 1/√3 devient √3/3 ;</li>
+<li>chaque famille est regroupée en un seul terme : une partie sans racine, et un seul multiple de chaque racine.</li>
+</ul>
+<p>Deux écritures sont acceptées pour le même nombre : <span class="mr">3/2 + √<span class="rt">2</span>/4</span>, ou <span class="mr">(6 + √<span class="rt">2</span>)/4</span>.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">Combien vaut √3 + √3/2 ?</p>
+<div class="mq-c"><button type="button">3√3/2</button><button type="button" data-fb="On n'additionne pas les dénominateurs, et √3 = 2√3/2.">2√3/3</button><button type="button" data-fb="√3 + √3 = 2√3, mais ici le second terme n'est que la moitié de √3.">2√3</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Une racine plus une demi-racine : (1 + 1/2)√3 = (3/2)√3 = 3√3/2.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien vaut sin²(π/4) ?</p>
+<div class="mq-c"><button type="button" data-fb="(√2)² = 2, et 2² = 4 : il reste 2/4.">√2/4</button><button type="button">1/2</button><button type="button" data-fb="sin²x veut dire (sin x)², pas sin(x²).">sin(π²/16)</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">(√2/2)² = 2/4 = 1/2.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">(4 + √3)/2 est-il égal à 2 + √3 ?</p>
+<div class="mq-c"><button type="button">Non</button><button type="button" data-fb="Le 2 du bas divise tout le numérateur, donc les deux termes : 4/2 + √3/2.">Oui</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Non : (4 + √3)/2 = 4/2 + √3/2 = 2 + √3/2.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Les pièges, et leur contre-exemple</h2>
+<p>Chaque ligne est une « règle » que le cerveau invente quand il va vite. Pour chacune, un contre-exemple suffit à prouver qu'elle est fausse (ton cours de logique : pour démolir un « pour tout », un seul cas suffit). Apprends le contre-exemple : le jour où tu doutes, recalcule-le.</p>
+<div class="tw"><table>
+<tr><th>Règle inventée</th><th>Contre-exemple</th><th>Ce qui est vrai</th></tr>
+<tr><td class="mr">a/b + c/d = (a + c)/(b + d)</td><td class="mr">1/2 + 1/2 = 1, pas 2/4</td><td>dénominateur commun (1.5)</td></tr>
+<tr><td class="mr">(a + b)/a = b</td><td class="mr">(2 + 6)/2 = 4, pas 6</td><td>on ne simplifie que des facteurs (3.2)</td></tr>
+<tr><td class="mr">√(a + b) = √a + √b</td><td class="mr">√(9 + 16) = 5, pas 7</td><td>seulement pour les produits (2.2)</td></tr>
+<tr><td class="mr">(a + b)² = a² + b²</td><td class="mr">(1 + 1)² = 4, pas 2</td><td>a² + 2ab + b²</td></tr>
+<tr><td class="mr">√(x²) = x</td><td class="mr">√((−3)²) = 3, pas −3</td><td>√(x²) = |x| (2.1)</td></tr>
+<tr><td class="mr">−3² = 9</td><td class="mr">−3² = −(3²) = −9</td><td>le carré passe avant le signe moins</td></tr>
+<tr><td class="mr">cos a + cos b = cos(a + b)</td><td class="mr">cos 0 + cos 0 = 2, pas 1</td><td>calculer chaque terme séparément</td></tr>
+<tr><td class="mr">1/√3 est une forme finie</td><td>—</td><td>on écrit √3/3 (2.5)</td></tr>
+</table></div>
+<p>Toutes ces erreurs ont la même racine : appliquer à une <b>somme</b> une règle qui n'est vraie que pour un <b>produit</b>. Quand tu hésites, demande-toi : « est-ce un produit ou une somme ? »</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Entraînement corrigé</h2>
+<p>Calcule sur papier, puis tape ta réponse. La page vérifie la valeur, puis la forme. Écris <code>sqrt(3)</code> ou <code>√3</code> pour une racine, <code>/</code> pour une fraction, et des parenthèses si besoin : <code>(3+sqrt(3))/2</code>, <code>-4sqrt(3)/3</code>.</p>
+<div class="ex-list" id="ex-list"></div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Retour à ta feuille de trigonométrie</h2>
+<p>Tu as maintenant tout ce qu'il faut pour finir l'exercice 2. Les indices sont progressifs : ouvre le suivant seulement si tu bloques.</p>
+<div class="box">
+<p class="lbl">2.2 : tan 2π/3 + tan 3π/4 + tan 5π/6 + tan 7π/3</p>
+<p>Tes quatre valeurs sont justes : <span class="mr">−√<span class="rt">3</span> + (−1) + (−√<span class="rt">3</span>/3) + √<span class="rt">3</span></span>. Il reste à calculer la somme.</p>
+<details class="hint"><summary>Indice 1</summary><div>Range les quatre termes en deux familles (section 3.1) : les nombres sans racine, et les multiples de √3.</div></details>
+<details class="hint"><summary>Indice 2</summary><div>Écris −√3/3 comme (−1/3)√3, puis additionne les coefficients de √3 : −1, −1/3 et +1.</div></details>
+<details class="hint"><summary>Indice 3</summary><div>Deux de ces coefficients s'annulent. La réponse s'écrit avec un entier et un multiple de √3 ; tu peux aussi la mettre en une seule fraction de dénominateur 3.</div></details>
+</div>
+<div class="box">
+<p class="lbl">2.3 : sin 13π/6 + sin 7π/6</p>
+<details class="hint"><summary>Indice</summary><div>Tu connais déjà sin(13π/6). Pour 7π/6 : famille π/6, et le point est sous l'axe horizontal.</div></details>
+</div>
+<div class="box">
+<p class="lbl">2.4 : cos² 4π/3 − sin² 4π/3</p>
+<details class="hint"><summary>Indice 1</summary><div>cos² x veut dire (cos x)² (section 3.3). Trouve d'abord cos(4π/3) et sin(4π/3).</div></details>
+<details class="hint"><summary>Indice 2</summary><div>Les deux carrés sont des fractions sans racine, et les signes moins disparaissent dans les carrés. Il reste une soustraction de deux quarts.</div></details>
+</div>
+<p>Envoie-moi tes trois résultats : je te dirai s'ils sont justes et bien écrits.</p>
+
+<div class="box key">
+<p class="lbl">Bilan : tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>additionner, soustraire, multiplier et diviser deux fractions, et expliquer pourquoi chaque règle marche ;</li>
+<li>écrire un entier comme une fraction de n'importe quel dénominateur ;</li>
+<li>simplifier une racine comme √48 ou √75 ;</li>
+<li>additionner des multiples d'une même racine, et dire quand on ne peut pas ;</li>
+<li>enlever une racine du dénominateur ;</li>
+<li>calculer un carré comme (−√3/2)² ;</li>
+<li>donner le contre-exemple de chaque piège de la section 4.</li>
+</ul>
+</div>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes exercices de trigonométrie (Fonctions élémentaires, feuille 1), dans la continuité de « Le calcul, depuis le tout début ». Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ---------- Questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la règle juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+
+/* ---------- Arithmétique ---------- */
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while (b){ var t = a % b; a = b; b = t; } return a; }
+function lcm(a, b){ return Math.abs(a / gcd(a, b) * b); }
+function M(n){ return String(n).replace('-', '−'); }
+/* une fraction affichée : entier, ou fraction empilée ; signe moins devant */
+function F(n, d, paren){
+  var neg = (n < 0) !== (d < 0), an = Math.abs(n), ad = Math.abs(d), s;
+  if (ad === 1) s = String(an);
+  else s = '<span class="q"><span>' + an + '</span><span>' + ad + '</span></span>';
+  if (!neg || n === 0) return s;
+  return paren ? '(−' + s + ')' : '−' + s;
+}
+
+/* ---------- Outil 1 : fractions étape par étape ---------- */
+function parseFrac(raw){
+  var s = String(raw).replace(/[−–—]/g, '-').replace(/\s+/g, '');
+  var m = s.match(/^(-?)(\d{1,6})(?:\/(-?)(\d{1,6}))?$/);
+  if (!m) return null;
+  var n = parseInt(m[2], 10) * (m[1] ? -1 : 1), d = m[4] ? parseInt(m[4], 10) * (m[3] ? -1 : 1) : 1;
+  if (d === 0) return {err:'le dénominateur ne peut pas être 0'};
+  return {n:n, d:d};
+}
+function fracSteps(A, op, B){
+  var L = [], sym = {'+':'+', '-':'−', '*':'×', '/':'÷'}[op];
+  function line(o, html, why){ L.push('<span class="op">' + o + '</span><span>' + html + '</span>' + (why ? '<span class="why">' + why + '</span>' : '')); }
+  line('', F(A.n, A.d) + ' ' + sym + ' ' + F(B.n, B.d, true));
+  var n, d;
+  // dénominateurs négatifs : on remonte le signe
+  if (A.d < 0 || B.d < 0){
+    A = {n:A.d < 0 ? -A.n : A.n, d:Math.abs(A.d)}; B = {n:B.d < 0 ? -B.n : B.n, d:Math.abs(B.d)};
+    line('=', F(A.n, A.d) + ' ' + sym + ' ' + F(B.n, B.d, true), 'On écrit le signe moins au numérateur : a/(−b) = (−a)/b.');
+  }
+  if (op === '+' || op === '-'){
+    var sg = op === '+' ? 1 : -1;
+    if (A.d === B.d){
+      d = A.d;
+    } else {
+      d = lcm(A.d, B.d);
+      var ka = d / A.d, kb = d / B.d, why;
+      if (A.d === 1 || B.d === 1){
+        var ent = A.d === 1 ? A : B;
+        why = 'On écrit l\'entier ' + M(ent.n) + ' avec le dénominateur ' + d + ' : ' + M(ent.n) + ' = ' + M(ent.n * d) + '/' + d + '.';
+      } else {
+        why = d + ' est le plus petit multiple commun de ' + A.d + ' et ' + B.d + '. On multiplie en haut et en bas';
+        why += (ka > 1 ? ' la première fraction par ' + ka : '') + (ka > 1 && kb > 1 ? ', et' : '') + (kb > 1 ? ' la seconde par ' + kb : '') + ' (règle d\'or, 1.2).';
+      }
+      A = {n:A.n * ka, d:d}; B = {n:B.n * kb, d:d};
+      line('=', F(A.n, d) + ' ' + sym + ' ' + F(B.n, d, true), why);
+    }
+    n = A.n + sg * B.n;
+    if (d !== 1){
+      line('=', '<span class="q"><span>' + M(A.n) + ' ' + sym + ' ' + (B.n < 0 ? '(' + M(B.n) + ')' : B.n) + '</span><span>' + d + '</span></span>', 'Même dénominateur : on calcule les numérateurs, et on garde ' + d + '.');
+    }
+    line('=', F(n, d), '');
+  } else {
+    if (op === '/'){
+      if (B.n === 0) return {err:'on ne peut pas diviser par 0'};
+      var inv = {n:B.d * (B.n < 0 ? -1 : 1), d:Math.abs(B.n)};
+      line('=', F(A.n, A.d) + ' × ' + F(inv.n, inv.d, true), 'Diviser par ' + M(B.n) + (B.d !== 1 ? '/' + B.d : '') + ', c\'est multiplier par son inverse, ' + M(inv.n) + (inv.d !== 1 ? '/' + inv.d : '') + ' (1.4).');
+      B = inv;
+    }
+    n = A.n * B.n; d = A.d * B.d;
+    line('=', '<span class="q"><span>' + M(A.n) + ' × ' + (B.n < 0 ? '(' + M(B.n) + ')' : B.n) + '</span><span>' + A.d + ' × ' + B.d + '</span></span>', 'On multiplie les numérateurs entre eux, et les dénominateurs entre eux (1.3).');
+    line('=', F(n, d), '');
+  }
+  var g = gcd(n, d);
+  if (n === 0){ L.pop(); line('=', '0', 'Le numérateur est nul, donc la fraction vaut 0.'); }
+  else if (g > 1){
+    line('=', F(n / g, d / g), 'On divise en haut et en bas par ' + g + ', leur plus grand diviseur commun : la fraction est irréductible.' + (d / g === 1 ? ' Le dénominateur vaut 1 : c\'est un entier.' : ''));
+  } else if (d !== 1){
+    L.push('<span class="op"></span><span class="why" style="margin-top:4px">' + M(n) + ' et ' + d + ' n\'ont aucun diviseur commun autre que 1 : la fraction est déjà irréductible.</span>');
+  }
+  return {html:'<div class="steps">' + L.join('') + '</div>'};
+}
+var fxOp = '-';
+function fxRun(){
+  var out = $('fx-out'), A = parseFrac($('fx-a').value), B = parseFrac($('fx-b').value);
+  if (!A || !B){ out.innerHTML = '<p class="tool-err">Écris chaque nombre comme un entier (5, −2) ou une fraction d\'entiers (3/4, −1/2).</p>'; return; }
+  if (A.err || B.err){ out.innerHTML = '<p class="tool-err">' + esc(A.err || B.err) + '.</p>'; return; }
+  var r = fracSteps(A, fxOp, B);
+  out.innerHTML = r.err ? '<p class="tool-err">' + esc(r.err) + '.</p>' : r.html;
+}
+function fxSetOp(op){
+  fxOp = op;
+  each(document.querySelectorAll('#fx .fx-ops button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-op') === op ? 'true' : 'false'); });
+}
+if ($('fx')){
+  each(document.querySelectorAll('#fx .fx-ops button'), function(b){ b.addEventListener('click', function(){ fxSetOp(b.getAttribute('data-op')); fxRun(); }); });
+  $('fx-a').addEventListener('input', fxRun); $('fx-b').addEventListener('input', fxRun);
+  each(document.querySelectorAll('#fx-pre button'), function(b){
+    b.addEventListener('click', function(){ $('fx-a').value = b.getAttribute('data-a'); $('fx-b').value = b.getAttribute('data-b'); fxSetOp(b.getAttribute('data-op')); fxRun(); });
+  });
+  fxRun();
+}
+
+/* ---------- Outil 2 : simplifier une racine ---------- */
+function R(x){ return '√<span class="rt">' + x + '</span>'; }
+function rootSplit(n){ var k = Math.floor(Math.sqrt(n)); while (k > 1 && n % (k * k) !== 0) k--; return {k:k, m:n / (k * k)}; }
+function rxRun(){
+  var out = $('rx-out'), raw = $('rx-n').value.replace(/\s+/g, '');
+  if (!/^\d{1,7}$/.test(raw) || +raw === 0){ out.innerHTML = '<p class="tool-err">Écris un entier positif, sans virgule (jusqu\'à 9 999 999).</p>'; return; }
+  var n = +raw, s = rootSplit(n), k = s.k, m = s.m, sq = [], i;
+  for (i = 2; i * i <= n; i++) if (n % (i * i) === 0) sq.push(i * i);
+  var h = '';
+  if (m === 1){
+    h = '<div class="steps"><span class="op"></span><span>' + R(n) + ' = ' + k + '</span><span class="why">' + n + ' est un carré parfait : ' + k + '² = ' + n + '. Sa racine est un entier.</span></div>';
+  } else if (k === 1){
+    var tried = [];
+    for (i = 2; i * i <= n && tried.length < 8; i++) tried.push(i * i);
+    h = '<div class="verdict ok"><p><b>' + R(n) + ' est déjà simplifiée.</b> Aucun carré parfait autre que 1 ne divise ' + n + '.</p>' +
+        (tried.length ? '<p class="tool-note">Essayés : ' + tried.join(', ') + (tried.length === 8 && (tried.length + 2) * (tried.length + 2) <= n ? '…' : '') + '. Aucun ne divise ' + n + '.</p>' : '') + '</div>';
+  } else {
+    h = '<p class="tool-note">Carrés parfaits qui divisent ' + n + ' : ' + sq.join(', ') + '. Le plus grand est <b>' + (k * k) + '</b>.</p>' +
+      '<div class="steps"><span class="op"></span><span>' + R(n) + '</span>' +
+      '<span class="op">=</span><span>' + R((k * k) + ' × ' + m) + '</span><span class="why">' + n + ' = ' + (k * k) + ' × ' + m + ', et ' + (k * k) + ' = ' + k + '² est un carré parfait.</span>' +
+      '<span class="op">=</span><span>' + R(k * k) + ' × ' + R(m) + '</span><span class="why">La règle du produit : √(a × b) = √a × √b.</span>' +
+      '<span class="op">=</span><span>' + k + R(m) + '</span><span class="why">' + R(k * k) + ' = ' + k + '. Il reste ' + R(m) + ', qui ne se simplifie plus.</span></div>';
+    if (sq.length > 1){
+      var small = sq[0], ks = Math.round(Math.sqrt(small)), rest = n / small;
+      h += '<p class="tool-note">Avec ' + small + ' au lieu de ' + (k * k) + ', tu aurais trouvé ' + ks + R(rest) + ' : juste, mais pas fini, car ' + R(rest) + ' se simplifie encore.</p>';
+    }
+  }
+  out.innerHTML = h;
+}
+if ($('rx')){
+  $('rx-n').addEventListener('input', rxRun);
+  each(document.querySelectorAll('#rx-pre button'), function(b){ b.addEventListener('click', function(){ $('rx-n').value = b.getAttribute('data-n'); rxRun(); }); });
+  rxRun();
+}
+
+/* ---------- Lecteur d'expressions (repris du cours « Le calcul ») ---------- */
+function LErr(msg, pos){ this.msg = msg; this.pos = pos; }
+
+  function normalize(s){
+    return String(s).replace(/[−–—]/g, '-').replace(/[×·∙]/g, '*')
+      .replace(/÷/g, '/').replace(/\*\*/g, '^').replace(/(\d),(\d)/g, '$1.$2');
+  }
+  function tokenize(s){
+    var t = [], i = 0, m;
+    while (i < s.length){
+      var c = s.charAt(i), rest = s.slice(i);
+      if (/\s/.test(c)){ i++; continue; }
+      if ((m = rest.match(/^(\d+(\.\d+)?|\.\d+)/))){ t.push({k:'num', v:parseFloat(m[0]), p:i}); i += m[0].length; continue; }
+      if (/^sqrt/i.test(rest)){ t.push({k:'sqrt', p:i}); i += 4; continue; }
+      if (c === '√'){ t.push({k:'sqrt', p:i}); i++; continue; }
+      if (c === '²' || c === '³'){ t.push({k:'sup', v:(c === '²' ? 2 : 3), p:i}); i++; continue; }
+      if (/[a-zA-Z]/.test(c)){ t.push({k:'var', n:c.toLowerCase(), p:i}); i++; continue; }
+      if ('+-*/^'.indexOf(c) >= 0){ t.push({k:'op', v:c, p:i}); i++; continue; }
+      if (c === '(' || c === '['){ t.push({k:'(', p:i}); i++; continue; }
+      if (c === ')' || c === ']'){ t.push({k:')', p:i}); i++; continue; }
+      if (c === '='){ throw new LErr('le signe = n’a rien à faire ici : utilise l’onglet « Une valeur est-elle solution ? » pour une équation', i); }
+      throw new LErr('le symbole « ' + c + ' » n’est pas reconnu', i);
+    }
+    for (var j = 1; j < t.length; j++){
+      if (t[j].k === 'num' && (t[j-1].k === 'var' || t[j-1].k === ')' || t[j-1].k === 'sup' || t[j-1].k === 'num')){
+        throw new LErr(t[j-1].k === 'num' ? 'deux nombres se suivent sans opération entre eux'
+          : 'un nombre ne peut pas suivre directement une lettre ou une parenthèse : écris 2x plutôt que x2, et x^2 ou x² pour un carré', t[j].p);
+      }
+    }
+    return t;
+  }
+  function parse(str){
+    var s = normalize(str), toks = tokenize(s), k = 0;
+    if (!toks.length) throw new LErr('la case est vide', 0);
+    function at(kind, v){ var x = toks[k]; return !!x && x.k === kind && (v === undefined || x.v === v); }
+    function startsAtom(){ var x = toks[k]; return !!x && (x.k === 'num' || x.k === 'var' || x.k === '(' || x.k === 'sqrt'); }
+    function pExpr(){
+      var a = pTerm();
+      while (at('op', '+') || at('op', '-')){ var o = toks[k++].v; a = {t:o, a:a, b:pTerm()}; }
+      return a;
+    }
+    function pTerm(){
+      var a = pUnary();
+      for (;;){
+        if (at('op', '*') || at('op', '/')){ var o = toks[k++].v; a = {t:o, a:a, b:pUnary()}; }
+        else if (startsAtom()){ a = {t:'*', a:a, b:pPow()}; }
+        else break;
+      }
+      return a;
+    }
+    function pUnary(){
+      if (at('op', '-')){ k++; return {t:'neg', a:pUnary()}; }
+      if (at('op', '+')){ k++; return pUnary(); }
+      return pPow();
+    }
+    function pPow(){
+      var a = pPost();
+      if (at('op', '^')){ k++; a = {t:'^', a:a, b:pUnary()}; }
+      return a;
+    }
+    function pPost(){
+      var a = pAtom();
+      while (at('sup')){ a = {t:'^', a:a, b:{t:'num', v:toks[k++].v}}; }
+      return a;
+    }
+    function pAtom(){
+      var x = toks[k];
+      if (!x) throw new LErr('l’expression s’arrête trop tôt : il manque quelque chose à la fin', s.length);
+      if (x.k === 'num'){ k++; return {t:'num', v:x.v}; }
+      if (x.k === 'var'){ k++; return {t:'var', n:x.n}; }
+      if (x.k === '('){
+        k++; var e = pExpr();
+        if (!at(')')) throw new LErr('une parenthèse ouverte n’est pas refermée', toks[k] ? toks[k].p : s.length);
+        k++; return e;
+      }
+      if (x.k === 'sqrt'){ k++; return {t:'sqrt', a:(at('(') ? pAtom() : pPost())}; }
+      if (x.k === ')') throw new LErr('il y a une parenthèse fermante de trop, ou rien entre deux parenthèses', x.p);
+      if (x.k === 'sup') throw new LErr('un exposant doit suivre un nombre, une lettre ou une parenthèse', x.p);
+      throw new LErr('il manque un nombre ou une lettre avant « ' + (x.v || '') + ' »', x.p);
+    }
+    var root = pExpr();
+    if (k < toks.length){
+      var x = toks[k];
+      throw new LErr(x.k === ')' ? 'il y a une parenthèse fermante de trop' : 'il y a un symbole en trop', x.p);
+    }
+    root._src = s;
+    return root;
+  }
+  function ev(n, env){
+    switch (n.t){
+      case 'num': return n.v;
+      case 'var': return env[n.n];
+      case 'neg': return -ev(n.a, env);
+      case '+': return ev(n.a, env) + ev(n.b, env);
+      case '-': return ev(n.a, env) - ev(n.b, env);
+      case '*': return ev(n.a, env) * ev(n.b, env);
+      case '/': var d = ev(n.b, env); if (!isFinite(d) || Math.abs(d) < 1e-12) return NaN; return ev(n.a, env) / d;
+      case '^': return Math.pow(ev(n.a, env), ev(n.b, env));
+      case 'sqrt': var v = ev(n.a, env); return (v < 0) ? NaN : Math.sqrt(v);
+    }
+    return NaN;
+  }
+  function vars(n, acc){
+    if (n.t === 'var'){ if (acc.indexOf(n.n) < 0) acc.push(n.n); }
+    else if (n.t !== 'num'){ vars(n.a, acc); if (n.b) vars(n.b, acc); }
+    return acc;
+  }
+  function fmtNum(v){
+    if (Math.abs(v - Math.round(v)) < 1e-9 * Math.max(1, Math.abs(v))) v = Math.round(v);
+    var str = Number.isInteger(v) ? String(v) : String(parseFloat(v.toPrecision(10)));
+    if (/e/.test(str)) str = v.toPrecision(6);
+    return str.replace('-', '−').replace('.', ',');
+  }
+  function sup(e){
+    if (e.t === 'num' && e.v === 2) return '²';
+    if (e.t === 'num' && e.v === 3) return '³';
+    return '^' + ((e.t === 'num' || e.t === 'var') ? pr(e, 9) : '(' + pr(e, 0) + ')');
+  }
+  function pr(n, p){
+    var r, q;
+    switch (n.t){
+      case 'num': return fmtNum(n.v);
+      case 'var': return n.n;
+      case 'sqrt': return '√(' + pr(n.a, 0) + ')';
+      case '+': q = 1; r = pr(n.a, 1) + ' + ' + pr(n.b, 1.1); break;
+      case '-': q = 1; r = pr(n.a, 1) + ' − ' + pr(n.b, 1.1); break;
+      case '*': q = 2; r = pr(n.a, 2) + ' × ' + pr(n.b, 2.1); break;
+      case '/': q = 2; r = pr(n.a, 2) + (((n.a.t === 'num' || n.a.t === 'var') && (n.b.t === 'num' || n.b.t === 'var')) ? '/' : ' / ') + pr(n.b, 2.1); break;
+      case 'neg': q = 2; r = '−' + pr(n.a, 3); break;
+      case '^': q = 4; r = pr(n.a, 4.1) + sup(n.b); break;
+    }
+    return q < p ? '(' + r + ')' : r;
+  }
+  function close(a, b){ return Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b)); }
+  function envStr(env, vs){ return vs.map(function(v){ return v + ' = ' + fmtNum(env[v]); }).join(', '); }
+  function errHtml(where, e, raw){
+    if (!(e instanceof LErr)) throw e;
+    var s = normalize(raw), near = s.slice(Math.max(0, e.pos - 6), e.pos + 6).trim();
+    return '<p class="err">' + esc(where) + ' : ' + esc(e.msg) + (near ? ' (près de « ' + esc(near) + ' »)' : '') + '.</p>';
+  }
+
+  
+
+/* ---------- Entraînement corrigé ---------- */
+/* forme : remarques sur ce qui n'est pas fini dans une réponse juste */
+function hasRoot(n){ if (!n || n.t === 'num' || n.t === 'var') return false; if (n.t === 'sqrt') return true; return hasRoot(n.a) || hasRoot(n.b); }
+function isInt(v){ return isFinite(v) && Math.abs(v - Math.round(v)) < 1e-9; }
+/* aplatit une somme en termes signés */
+function terms(n, sgn, out){
+  if (n.t === '+'){ terms(n.a, sgn, out); terms(n.b, sgn, out); }
+  else if (n.t === '-'){ terms(n.a, sgn, out); terms(n.b, -sgn, out); }
+  else if (n.t === 'neg') terms(n.a, -sgn, out);
+  else out.push({n:n, s:sgn});
+  return out;
+}
+/* famille d'un terme : '' sans racine, sinon le nombre sous la racine ; coefficient entier si lisible */
+function family(n){
+  var roots = [];
+  (function walk(x){ if (!x || x.t === 'num') return; if (x.t === 'sqrt'){ roots.push(ev(x.a, {})); return; } walk(x.a); walk(x.b); })(n);
+  if (!roots.length) return '';
+  if (roots.length === 1) return 'r' + roots[0];
+  return '?';
+}
+function intCoef(n){
+  if (n.t === 'num') return isInt(n.v) ? Math.round(n.v) : null;
+  if (n.t === 'sqrt') return 1;
+  if (n.t === 'neg') return intCoef(n.a);
+  if (n.t === '*'){
+    if (n.a.t === 'num' && n.b.t === 'sqrt') return isInt(n.a.v) ? Math.round(n.a.v) : null;
+    if (n.b.t === 'num' && n.a.t === 'sqrt') return isInt(n.b.v) ? Math.round(n.b.v) : null;
+  }
+  return null;
+}
+function formIssues(T){
+  var iss = [];
+  function add(s){ if (iss.indexOf(s) < 0) iss.push(s); }
+  (function walk(n){
+    if (!n || n.t === 'num' || n.t === 'var') return;
+    if (n.t === 'sqrt'){
+      var v = ev(n.a, {});
+      if (isInt(v) && v > 0){
+        var s = rootSplit(Math.round(v));
+        if (s.m === 1) add('√' + Math.round(v) + ' est un entier : il vaut ' + s.k + '.');
+        else if (s.k > 1) add('√' + Math.round(v) + ' se simplifie : ' + Math.round(v) + ' contient le carré ' + (s.k * s.k) + ' (section 2.4).');
+      } else if (!isInt(v)) add('Il reste une fraction sous une racine : sépare-la avec √(a/b) = √a/√b, puis enlève la racine du dénominateur.');
+      walk(n.a); return;
+    }
+    if (n.t === '/'){
+      if (hasRoot(n.b)) add('Il reste une racine au dénominateur (section 2.5).');
+      var dv = ev(n.b, {});
+      if (!hasRoot(n.b) && dv < 0) add('Le dénominateur est négatif : écris le signe moins devant la fraction.');
+      if (!hasRoot(n.b) && isInt(dv) && Math.abs(dv) > 1){
+        var tt = terms(n.a, 1, []), g = Math.round(Math.abs(dv)), ok = true;
+        tt.forEach(function(t){ var c = intCoef(t.n); if (c === null) ok = false; else g = gcd(g, c); });
+        if (ok && g > 1) add('La fraction se simplifie encore par ' + g + ' : ' + g + ' divise le dénominateur et chaque terme du numérateur.');
+      }
+      if (n.a.t === '/' || n.b.t === '/') add('Il reste une fraction de fractions : calcule la division (section 1.4).');
+    }
+    if (n.t === '*' && hasRoot(n.a) && hasRoot(n.b)) add('Il reste un produit de racines : calcule-le avec √a × √b = √(ab).');
+    if (n.t === '^') add('Il reste une puissance à calculer.');
+    walk(n.a); walk(n.b);
+  })(T);
+  if (!hasRoot(T)){
+    var simple = function(x){ if (x.t === 'neg') x = x.a; if (x.t === 'num') return isInt(x.v); if (x.t === '/'){ var a = x.a.t === 'neg' ? x.a.a : x.a; return a.t === 'num' && x.b.t === 'num' && isInt(a.v) && isInt(x.b.v); } return false; };
+    if (!simple(T)) add('Il reste un calcul à finir : donne le résultat comme un seul entier ou une seule fraction irréductible.');
+  }
+  var fam = {};
+  terms(T, 1, []).forEach(function(t){ var f = family(t.n); fam[f] = (fam[f] || 0) + 1; });
+  Object.keys(fam).forEach(function(f){
+    if (f === '?' || fam[f] < 2) return;
+    add(f === '' ? 'Il reste plusieurs nombres sans racine à additionner : regroupe-les en un seul (section 3.1).'
+                 : 'Il reste plusieurs multiples de √' + f.slice(1) + ' : regroupe-les en un seul (section 3.1).');
+  });
+  return iss;
+}
+
+var EX = [
+  {q:'[[2|3]] + [[1|4]]', v:'2/3+1/4', a:'[[11|12]]', h:'Dénominateur commun 12.', tag:'fractions'},
+  {q:'[[3|4]] − [[5|6]]', v:'3/4-5/6', a:'−[[1|12]]', h:'Dénominateur commun 12. Le résultat est négatif.', tag:'fractions'},
+  {q:'2 − [[7|3]]', v:'2-7/3', a:'−[[1|3]]', h:'Écris 2 avec le dénominateur 3.', tag:'fractions'},
+  {q:'[[6|5]] × [[10|9]]', v:'6/5*10/9', a:'[[4|3]]', h:'Simplifie avant de multiplier : 6 et 9 ont le facteur 3, 10 et 5 le facteur 5.', tag:'fractions'},
+  {q:'[[3|4]] ÷ [[9|2]]', v:'(3/4)/(9/2)', a:'[[1|6]]', h:'Multiplie par l\'inverse de 9/2.', tag:'fractions'},
+  {q:'−[[2|3]] − [[1|6]]', v:'-2/3-1/6', a:'−[[5|6]]', h:'Dénominateur commun 6. Deux nombres négatifs : le résultat est plus négatif encore.', tag:'fractions'},
+  {q:'√{48}', v:'sqrt(48)', a:'4√{3}', h:'Cherche le plus grand carré qui divise 48 : essaie 16.', tag:'racines'},
+  {q:'√{27} + √{12}', v:'sqrt(27)+sqrt(12)', a:'5√{3}', h:'Simplifie chaque racine : ce sont deux multiples de √3.', tag:'racines'},
+  {q:'√{6} × √{2}', v:'sqrt(6)*sqrt(2)', a:'2√{3}', h:'√6 × √2 = √12, puis simplifie √12.', tag:'racines'},
+  {q:'(3√{2})²', v:'(3sqrt(2))^2', a:'18', h:'(k√m)² = k² × m.', tag:'racines'},
+  {q:'[[6|√{3}]]', v:'6/sqrt(3)', a:'2√{3}', h:'Multiplie en haut et en bas par √3, puis simplifie.', tag:'racines'},
+  {q:'[[√{2}|2]] + [[√{2}|4]]', v:'sqrt(2)/2+sqrt(2)/4', a:'[[3√{2}|4]]', h:'Une moitié de √2 plus un quart de √2 : additionne les coefficients 1/2 et 1/4.', tag:'mélange'},
+  {q:'1 − [[√{3}|2]] + [[1|2]] + √{3}', v:'1-sqrt(3)/2+1/2+sqrt(3)', a:'[[3|2]] + [[√{3}|2]], ou [[3 + √{3}|2]]', h:'Deux familles : 1 et 1/2 d\'un côté ; −1/2 et 1 comme coefficients de √3 de l\'autre.', tag:'mélange'},
+  {q:'(−[[√{3}|2]])² + ([[1|2]])²', v:'(-sqrt(3)/2)^2+(1/2)^2', a:'1', h:'Chaque carré est une fraction sans racine (section 3.3).', tag:'mélange'},
+  {q:'[[1|√{3}]] + √{3}', v:'1/sqrt(3)+sqrt(3)', a:'[[4√{3}|3]]', h:'Enlève d\'abord la racine du dénominateur : 1/√3 = √3/3.', tag:'mélange'},
+  {q:'(1 − √{2})²', v:'(1-sqrt(2))^2', a:'3 − 2√{2}', h:'Identité (a − b)² = a² − 2ab + b², avec a = 1 et b = √2.', tag:'mélange'}
+];
+function mac(s){ return s.replace(/√\{([^}]*)\}/g, '√<span class="rt">$1</span>').replace(/\[\[([^|\]]*)\|([^\]]*)\]\]/g, '<span class="q"><span>$1</span><span>$2</span></span>'); }
+function exCheck(i){
+  var e = EX[i], raw = $('ex-in-' + i).value, out = $('ex-fb-' + i), T, v, want = ev(parse(e.v), {});
+  if (!raw.trim()){ out.innerHTML = '<p class="tool-err">Écris ta réponse dans la case.</p>'; return; }
+  try { T = parse(raw); } catch (err){ out.innerHTML = errHtml('Ta réponse', err, raw); return; }
+  if (vars(T, []).length){ out.innerHTML = '<p class="tool-err">Ta réponse contient une lettre : écris seulement des nombres, des fractions et des racines (sqrt).</p>'; return; }
+  v = ev(T, {});
+  var read = '<p class="tool-note">Je lis : <span class="mw">' + esc(pr(T, 0)) + '</span></p>';
+  if (!isFinite(v)){ out.innerHTML = '<div class="verdict ko"><p>Ta réponse n\'est pas un nombre réel (division par 0, ou racine d\'un nombre négatif).</p></div>' + read; return; }
+  if (!close(v, want)){
+    out.innerHTML = '<div class="verdict ko"><p><b>Pas égal.</b> Ta réponse vaut environ ' + fmtNum(v) + ', le calcul demandé environ ' + fmtNum(want) + '.</p>' +
+      '<details class="hint"><summary>Un indice</summary><div>' + mac(e.h) + '</div></details></div>' + read;
+    $('ex-item-' + i).setAttribute('data-ok', '0');
+  } else {
+    var iss = formIssues(T);
+    if (iss.length){
+      out.innerHTML = '<div class="verdict mid"><p><b>La valeur est juste, mais la forme n\'est pas finie.</b></p><ul>' + iss.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul></div>' + read;
+      $('ex-item-' + i).setAttribute('data-ok', '0');
+    } else {
+      out.innerHTML = '<div class="verdict ok"><p><b>Juste.</b> Forme attendue : <span class="mr">' + mac(e.a) + '</span>.</p></div>';
+      $('ex-item-' + i).setAttribute('data-ok', '1');
+    }
+  }
+  var n = document.querySelectorAll('.ex-item[data-ok="1"]').length;
+  $('ex-score').textContent = n ? n + ' sur ' + EX.length + ' réussis.' : '';
+}
+if ($('ex-list')){
+  var h = '';
+  EX.forEach(function(e, i){
+    h += '<div class="ex-item" id="ex-item-' + i + '"><p class="ex-q"><span class="ex-n">' + (i + 1) + '.</span><span class="mr">' + mac(e.q) + '</span><span class="ex-tag">' + e.tag + '</span></p>' +
+      '<div class="ex-in"><input id="ex-in-' + i + '" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ta réponse à l\'exercice ' + (i + 1) + '"><button type="button" data-i="' + i + '">Vérifier</button></div>' +
+      '<div class="ex-fb" id="ex-fb-' + i + '" aria-live="polite"></div></div>';
+  });
+  $('ex-list').innerHTML = h + '<p class="ex-score" id="ex-score" aria-live="polite"></p>';
+  each(document.querySelectorAll('#ex-list .ex-in button'), function(b){ b.addEventListener('click', function(){ exCheck(+b.getAttribute('data-i')); }); });
+  EX.forEach(function(e, i){ $('ex-in-' + i).addEventListener('keydown', function(ev2){ if (ev2.key === 'Enter'){ ev2.preventDefault(); exCheck(i); } }); });
+}
+
+window.__rac = {fracSteps: fracSteps, rootSplit: rootSplit, parse: parse, ev: ev, formIssues: formIssues, EX: EX, exCheck: exCheck};
+})();
+</script>
+
+</body></html>
