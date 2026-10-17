@@ -88,6 +88,7 @@ export const semestres = [
               "Ce cours a pour objet l'étude à la fois pratique et théorique des suites numériques. Après avoir introduit des propriétés essentielles de la relation d'ordre usuelle sur les réels, on démontre des résultats théoriques sur les suites (comme l'existence de limites sous certaines conditions). Concrètement, certaines familles de suites (notamment récurrentes) sont étudiées dans le détail.",
             contenus: [
               { titre: 'La logique, depuis le tout début', href: '/cours/la-logique.html', meta: 'Chapitre 0 · ' + COURS_CLAUDE },
+              { titre: 'Feuille 1 de logique, pas à pas', href: '/cours/feuille-1-2-de-logique-pas-a-pas.html', meta: 'Exercices · rédigés avec Claude' },
               { titre: 'Majorants et bornes, depuis le tout début', href: '/cours/majorants-et-bornes.html', meta: 'Chapitre 1 · ' + COURS_CLAUDE },
               leCalcul,
             ],
