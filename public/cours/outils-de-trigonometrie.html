@@ -1,0 +1,1454 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Outils de trigonométrie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+.hero{position:relative}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.m{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-style:italic;font-size:1.1em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+.vec{position:relative;display:inline-block;padding-top:.45em;line-height:1.1}
+.vec::before{content:"→";position:absolute;top:-.12em;left:0;right:0;text-align:center;font-size:.75em;line-height:1;font-style:normal}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;white-space:nowrap}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.toc{columns:2 220px;margin:10px 0;padding-left:1.4em}
+.toc li{break-inside:avoid}
+details.check{margin:28px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+details.check[open]>summary{margin-bottom:4px}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.mt{font-family:'STIX Two Text','Cambria Math',serif;font-style:italic;font-size:16px}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--muted);stroke-width:1.2;fill:none}
+.thick{stroke-width:4}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+.fsb{fill:var(--soft-b)}.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}
+/* widget */
+.widget .ctrl{max-width:440px;margin:12px auto 0}
+.widget label{font-weight:700;display:block;margin-bottom:4px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.presets button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;background:var(--paper);border-radius:8px;padding:10px 14px}
+.readout b{font-weight:600}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+/* ---- ajouts propres au cours de logique ---- */
+td.v,span.v{color:var(--green);font-weight:700}
+td.f,span.f{color:var(--red);font-weight:700}
+table.c tr.hl td{background:var(--soft-r)}
+table.c tr.ok td{background:var(--soft-g)}
+table.c th{white-space:nowrap}
+table.tight{width:auto;margin:0 auto}
+.sym{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.sym b{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.25rem;text-align:center;min-width:1.6em;color:var(--blue)}
+.rule{border-left:5px solid var(--blue);background:var(--card);border-radius:10px;padding:10px 14px;margin:14px 0;border:1px solid var(--line);border-left-width:5px}
+.steps{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.15em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.redac .note{font-size:.9rem;color:var(--muted)}
+/* machine à promesses */
+.toggles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 12px}
+.tog{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;padding:8px 14px;cursor:pointer;min-height:44px;text-align:left}
+.tog b{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
+.tog[aria-pressed="true"]{border-color:var(--green)}
+.tog[aria-pressed="false"]{border-color:var(--red)}
+.tog .val{font-weight:700}
+.tog[aria-pressed="true"] .val{color:var(--green)}
+.tog[aria-pressed="false"] .val{color:var(--red)}
+.verdict{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:1rem}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+/* cartes de Wason */
+.cards{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.card{width:72px;height:100px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-family:'STIX Two Text',serif;font-size:2rem;cursor:pointer;display:grid;place-items:center;position:relative}
+.card[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);box-shadow:0 0 0 3px var(--soft-b)}
+.card[aria-pressed="true"]::after{content:"à retourner";position:absolute;bottom:4px;left:0;right:0;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.62rem;color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.center{text-align:center}
+.fb p{margin:6px 0}
+.fb .good{color:var(--green);font-weight:700}
+.fb .bad{color:var(--red);font-weight:700}
+/* labo */
+.labin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.labin input{flex:1 1 220px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.keys button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;min-width:44px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.keys button:hover{border-color:var(--blue)}
+.keys button.w{font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem}
+.presets2{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.presets2 button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+#lab-out .err{color:var(--red);font-weight:700}
+#lab-out .tm{color:var(--muted)}
+#lab-out .verdict{margin-top:10px}
+.phr{font-style:italic}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+
+/* ---- Feuille 1 : ateliers (même identité que « La logique, depuis le tout début ») ---- */
+.enonce{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0}
+.kit{display:grid;gap:2px;font-size:1.12rem;margin:6px 0 10px}
+.kit p{margin:0}
+.recipe li,.four li{margin:8px 0}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.95rem}
+.note{font-size:.92rem;color:var(--muted)}
+.fbk{border-radius:10px;padding:10px 14px;margin:8px 0}
+.fbk>:first-child{margin-top:0}.fbk>:last-child{margin-bottom:0}
+.fbk.good{background:var(--soft-g)}.fbk.bad{background:var(--soft-r)}.fbk.info{background:var(--soft-b)}.fbk.meh{background:var(--soft-a)}
+
+/* table à remplir */
+.tt-wrap{margin:14px 0}
+table.tt{width:auto;margin:0 auto;border-collapse:collapse}
+table.tt th,table.tt td{padding:0;text-align:center;vertical-align:middle}
+table.tt th{padding:6px 10px;white-space:nowrap;background:var(--card);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.02rem;font-weight:600}
+table.tt .rn{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.78rem;color:var(--muted);font-weight:400;padding:0 8px}
+table.tt td.lock{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;padding:0 12px;height:40px}
+table.tt th.fin{background:var(--soft-b);color:var(--blue)}
+table.tt td.fin{background:var(--soft-b)}
+table.tt .sep{border-left:3px double var(--muted)}
+.cell{display:block;width:100%;min-width:46px;height:40px;border:0;margin:0;padding:0;background:transparent;color:var(--ink);font-family:'STIX Two Text','Cambria Math',serif;font-size:1.12rem;font-weight:600;cursor:pointer;border-radius:0}
+.cell:hover{background:var(--soft-b)}
+.cell.e{outline:1px dashed var(--muted);outline-offset:-7px}
+.cell.v{color:var(--green)}.cell.f{color:var(--red)}
+.cell.ok{background:var(--soft-g)}
+.cell.ko{background:var(--soft-r);box-shadow:inset 0 0 0 2px var(--red)}
+.cell.shown{box-shadow:inset 0 0 0 2px var(--amber)}
+.cell.target{box-shadow:inset 0 0 0 3px var(--blue)}
+.cell:focus-visible{outline:3px solid var(--green);outline-offset:-3px;border-radius:0}
+.tt-ctrl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.tt-q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0}
+
+/* questions guidées */
+.mq{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+.mq-ok>:first-child{margin-top:0}.mq-ok>:last-child{margin-bottom:0}
+.seq-end{background:var(--card);border:2px solid var(--green);border-radius:10px;padding:10px 16px;margin:12px 0}
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.drill .mq{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0 6px;margin:0;background:transparent}
+
+/* calcul pas à pas */
+.calc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:18px 0}
+.calc-head{display:flex;flex-wrap:wrap;gap:4px 20px;font-size:.95rem;color:var(--muted)}
+.calc-head b{color:var(--ink);font-weight:600}
+.calc .steps{background:var(--paper);border:0;margin:10px 0}
+.calc-ask{font-weight:700;margin:12px 0 8px}
+.calc-opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer}
+.opt:hover{border-color:var(--blue)}
+.opt.bad{border-color:var(--red);background:var(--soft-r)}
+.opt.meh{border-color:var(--amber);background:var(--soft-a)}
+.opt.hintopt{border-color:var(--blue);box-shadow:0 0 0 3px var(--soft-b)}
+.linkbtn{font:inherit;font-size:.92rem;background:none;border:0;color:var(--blue);text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:6px}
+
+/* simulateur de scénarios */
+.sim-line{background:var(--paper);border-radius:8px;padding:8px 12px;margin:8px 0 12px}
+.sim-list{display:grid;gap:6px}
+.sim-row{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.chip{display:block;text-align:center;border-radius:8px;padding:2px 0;font-family:'STIX Two Text','Cambria Math',serif;font-weight:700}
+.chip.v{background:var(--soft-g);color:var(--green)}.chip.f{background:var(--soft-r);color:var(--red)}
+.sim-row .fm{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem}
+.sim-row .kt{font-size:.93rem;color:var(--muted)}
+.tag{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.75rem;font-weight:700;color:var(--blue);background:var(--soft-b);border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+.sim-cmp{margin-top:14px}
+.cmp-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.pill{font-size:.85rem;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}
+
+/* testeur de seuils (exercice 8) */
+.seuils{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px;margin:10px 0}
+.seuil{border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--paper);font-size:.95rem;line-height:1.35}
+.seuil .res{display:block;font-size:.82rem;font-weight:700}
+.seuil.v{border-color:var(--green);background:var(--soft-g)}.seuil.v .res{color:var(--green)}
+.seuil.f{border-color:var(--red);background:var(--soft-r)}.seuil.f .res{color:var(--red)}
+#t8r .fbk{margin:6px 0}
+
+/* ---- Outils de trigonométrie ---- */
+.tag{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 8px;margin:0 4px 0 0;vertical-align:.14em;white-space:nowrap}
+.tag-c{background:var(--soft-r);color:var(--red)}
+.tag-p{background:var(--soft-b);color:var(--blue)}
+.use{font-size:.98rem;color:var(--muted);margin:2px 0 14px}
+.use b{color:var(--ink)}
+.rt{border-top:1.3px solid currentColor;padding:0 .12em 0 .06em;margin-left:-.04em}
+.q .rt{padding-top:1px}
+.steps .q{font-size:.9em}
+.eq .q{font-size:.8em}
+table.tools td:nth-child(3){white-space:nowrap}
+@media (max-width:560px){
+  table.tools tr:first-child{display:none}
+  table.tools,table.tools tbody,table.tools tr,table.tools td{display:block;width:auto}
+  table.tools{background:transparent}
+  table.tools tr{border:1px solid var(--line);border-radius:8px;margin:8px 0;padding:6px 12px;background:var(--card)}
+  table.tools td{border:0;padding:2px 0}
+  table.tools td:nth-child(2)::before{content:"Outil : ";color:var(--muted)}
+  table.tools td:nth-child(3)::before{content:"Feuille n°1 : ";color:var(--muted)}
+}
+ol.corr{padding-left:1.4em;margin:6px 0}
+ol.corr li{margin:8px 0}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;align-items:start;margin:16px 0}
+.pair>*{min-width:0;margin:0}
+.pair figure{margin:0}
+table.prop{width:auto;margin:8px auto 2px;border-collapse:collapse;background:transparent;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.15rem}
+table.prop td{border:0;padding:3px 16px;text-align:center}
+table.prop tr:first-child td{border-bottom:2px solid var(--ink)}
+table.prop td:first-child{border-right:2px solid var(--ink)}
+.pair .box .eq{font-size:1.15rem;margin:10px 0 0}
+.sols{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:8px 14px;margin:12px 0}
+.sols p{margin:4px 0}
+.ineq{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin:18px 0}
+.ineq-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 14px 10px;min-width:0}
+.ineq-item h3{margin:12px 0 4px;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.3rem}
+.ineq-item figure{border:0;padding:0;margin:6px 0;background:transparent}
+.ineq-item .sols{background:var(--paper)}
+.steps.sm-steps{font-size:1.02rem;margin:8px 0;background:var(--paper)}
+.figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:18px 0}
+.figgrid figure{margin:0}
+.figgrid figcaption{text-align:left}
+.two-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.two-cases .steps{margin:8px 0}
+.eq.form{font-size:1.12rem;margin:6px 0;padding:0}
+table.assoc td.l{text-align:left;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.95rem;white-space:normal}
+table.assoc td .tag{vertical-align:.2em}
+table.ktab td{min-width:6.5em}
+/* schémas */
+svg .pt{fill:var(--ink)}
+svg .ptb{fill:var(--blue)}
+svg .ptr{fill:var(--red)}
+svg .ptg,svg .ptc{fill:var(--green)}
+svg .pto{fill:var(--card);stroke:var(--green);stroke-width:2.5}
+svg .pto2{fill:var(--card);stroke:var(--muted);stroke-width:2}
+svg .arc{stroke:var(--green);stroke-width:7;fill:none;stroke-linecap:round;opacity:.7}
+svg .lv{stroke:var(--blue);stroke-width:1.6;stroke-dasharray:6 4;fill:none}
+svg .thin{stroke-width:1.5}
+svg text.sub{font-size:13px}
+svg text.ta{fill:var(--amber)}
+svg .fsg{fill:var(--soft-g)}
+/* explorateur */
+.ax-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:640px){.ax-grid{grid-template-columns:minmax(0,1fr)}}
+.ax-fig svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto}
+.ax-btns{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.ax-btns button{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.05rem;padding:5px 12px;min-height:40px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.ax-btns button:hover{border-color:var(--red)}
+.ax-btns button[aria-pressed="true"]{border-color:var(--red);background:var(--soft-r);color:var(--red);font-weight:600}
+.widget .ax-lab{display:block;font-weight:700;margin:0}
+#ax-x{width:100%;accent-color:var(--blue);height:32px;margin:2px 0 10px}
+.ax-why{font-size:.95rem;color:var(--muted);margin:10px 0 0}
+#ax-out{font-size:1.05rem}
+#ax-out .b{color:var(--blue)}#ax-out .r{color:var(--red)}
+/* calculateur de mesure principale */
+#mp-out .steps{background:var(--paper)}
+#mp-out .verdict{margin-top:10px}
+.mp-err{color:var(--red);font-weight:700;margin:8px 0}
+</style>
+
+<div id="haut"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fm"/></marker>
+<marker id="ahb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fb"/></marker>
+</defs></svg>
+
+<header class="hero">
+<p class="kicker">Fonctions élémentaires : tes notes de la vidéo, remises au propre</p>
+<h1>Outils de trigonométrie<small>Toutes les méthodes de tes notes, dans leur ordre, avec un schéma pour chacune. Chaque calcul a été vérifié.</small></h1>
+<p class="lede">Tes vingt-quatre pages de notes contiennent onze outils. Ils sont presque tous justes. Cette page les range comme une boîte à outils : pour chacun, quand s'en servir, la méthode pas à pas, l'exemple de la vidéo et le schéma. Ce que j'ai corrigé est marqué <span class="tag tag-c">Correction</span>, ce que j'ai ajouté est marqué <span class="tag tag-p">Complément</span>.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Quel outil pour quel exercice ?</h2>
+<p>Face à un exercice, la première question est toujours la même : quel est son type ? Ce tableau fait le lien entre les types d'exercices, les outils de cette page et ta feuille n°1 de trigonométrie.</p>
+<div class="tw"><table class="tools">
+<tr><th>L'exercice demande de…</th><th>Outil</th><th>Feuille n°1</th></tr>
+<tr><td>convertir des degrés en radians, ou l'inverse</td><td><a href="#p1">1. Radians et degrés</a></td><td>—</td></tr>
+<tr><td>ramener un angle comme 13π/6 ou −415π/11 sur un seul tour</td><td><a href="#p2">2. La mesure principale</a></td><td>ex. 1</td></tr>
+<tr><td>dire si deux mesures donnent le même point</td><td><a href="#p3">3. Même point ou point opposé</a></td><td>—</td></tr>
+<tr><td>donner la valeur exacte d'un cosinus ou d'un sinus</td><td><a href="#p4">4. Lire sur le cercle</a></td><td>ex. 1 et 2</td></tr>
+<tr><td>résoudre cos x = c ou sin x = c</td><td><a href="#p5">5. Résoudre une équation</a></td><td>ex. 7</td></tr>
+<tr><td>résoudre cos x ≤ c, sin x &gt; c…</td><td><a href="#p6">6. Résoudre une inéquation</a></td><td>ex. 9 et 10</td></tr>
+<tr><td>simplifier cos(π − x), sin(x + π/2)…</td><td><a href="#p7">7. Les angles associés</a></td><td>ex. 4 et 6</td></tr>
+<tr><td>résoudre cos A = cos B, sin A = sin B ou cos a = sin b</td><td><a href="#p8">8. Les trois types d'équations</a></td><td>ex. 8</td></tr>
+<tr><td>trouver cos x quand on connaît sin x</td><td><a href="#p9">9. Du sinus au cosinus</a></td><td>—</td></tr>
+<tr><td>calculer cos(π/12), cos(π/8), développer cos(a + b)</td><td><a href="#p10">10. Addition et duplication</a></td><td>ex. 3, 4, 5 et 7.4</td></tr>
+<tr><td>résoudre une équation qui mélange cos x et sin x</td><td><a href="#p11">11. L'équation finale</a></td><td>—</td></tr>
+</table></div>
+
+<div class="box warn" id="corrections">
+<p class="lbl">Ce que j'ai corrigé dans tes notes</p>
+<ol class="corr">
+<li><a href="#p2">Outil 2</a> : le quotient −415/22 vaut environ <b>−18,86</b>, pas 18. En arrondissant à l'entier le plus proche, −19, le calcul se fait en une seule étape.</li>
+<li><a href="#p3">Outil 3</a> : « 57 n'est pas divisible par 3 » est faux, puisque 57 = 3 × 19. Ta conclusion est juste, mais pour une autre raison.</li>
+<li><a href="#p4">Outil 4</a> : sur ton grand cercle, l'angle noté « 2π/2 », entre π/2 et 3π/4, est <b>2π/3</b>. 2π/2 vaut π, le point de gauche.</li>
+<li><a href="#p6">Outil 6</a> : tu écris la division sous le membre de droite sans l'appliquer au membre de gauche (« −2 sin(x) &lt; −1 »). Sur une copie, cette ligne serait fausse : une étape par ligne.</li>
+<li><a href="#p8">Outil 8</a> : dans « 4x = 3π/2 », il manque « + k2π ». Et attention au total sur [0 ; 2π[ : π apparaît dans les deux familles de solutions, donc l'équation a 3 solutions, et non 1 + 3 = 4.</li>
+<li><a href="#p9">Outils 9</a> et <a href="#p10">10</a> : trois résultats à finir de simplifier, avec ton cours sur les racines : −√(8/9) = −2√2/3 ; √2 × √3 = √6 ; √((√2 + 2)/4) = √(2 + √2)/2.</li>
+<li><a href="#p11">Outil 11</a>, <b>le plus important</b> : élever au carré ajoute de fausses solutions. π et 3π/2 vérifient l'équation au carré, mais pas cos x + sin x = 1.</li>
+</ol>
+</div>
+<div class="box nts">
+<p class="lbl">Ce que j'ai ajouté</p>
+<p>L'écriture « k ∈ ℤ » des solutions sur ℝ, l'angle associé π − x (tu t'en sers sans l'avoir noté), la formule cos(2a) = 1 − 2 sin²(a), un raccourci pour trouver les bons k dans un intervalle, et une seconde méthode, sans piège, pour l'équation finale. Deux outils interactifs complètent la page : un calculateur de mesure principale (outil 2) et un explorateur d'angles associés (outil 7).</p>
+</div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Radians et degrés</h2>
+<p class="use"><b>Quand :</b> un énoncé donne un angle en degrés, ou tu veux te représenter un angle en radians.</p>
+<p>Un tour complet mesure 2π radians, ou 360°. Donc <b>π rad = 180°</b> : c'est la seule égalité à retenir. Le reste est un tableau de proportionnalité, comme dans tes notes, résolu par un produit en croix.</p>
+<div class="pair">
+<div class="box">
+<p class="lbl">π/7 rad en degrés</p>
+<table class="prop"><tr><td>π</td><td>π/7</td></tr><tr><td>180</td><td>?</td></tr></table>
+<p class="eq">? = <span class="q"><span>180 × π/7</span><span>π</span></span> = <span class="q"><span>180</span><span>7</span></span> ≈ 25,7°</p>
+</div>
+<div class="box">
+<p class="lbl">50° en radians</p>
+<table class="prop"><tr><td>π</td><td>?</td></tr><tr><td>180</td><td>50</td></tr></table>
+<p class="eq">? = <span class="q"><span>50 × π</span><span>180</span></span> = <span class="q"><span>5π</span><span>18</span></span> ≈ 0,87 rad</p>
+</div>
+</div>
+<p>En exercice, garde la <b>forme exacte</b> 5π/18 : on simplifie 50/180 comme n'importe quelle fraction, ici en divisant en haut et en bas par 10. La valeur approchée sert seulement à se représenter l'angle.</p>
+
+<h3>Lire une fraction de π</h3>
+<p>Ta règle, en une phrase : <b>π est le demi-tour, le dénominateur dit en combien de parts égales on le coupe, le numérateur dit combien de parts on prend.</b> Pour π/4, on coupe le demi-tour en 4 ; 3π/4, ce sont 3 de ces parts.</p>
+<figure><svg viewBox="0 0 440 262" role="img" aria-label="Deux cercles. À gauche, le demi-cercle du haut est coupé en 4 parts égales et on en prend 3 : 3π sur 4. À droite, il est coupé en 6 et on en prend 5 : 5π sur 6.">
+<line x1="16" y1="125" x2="204" y2="125" class="sm"/>
+<line x1="110" y1="219" x2="110" y2="31" class="sm"/>
+<circle cx="110" cy="125" r="80" class="st"/>
+<path d="M190,125 A80,80 0 0 0 53.4,68.4" class="arc"/>
+<line x1="183" y1="125" x2="197" y2="125" class="st"/>
+<line x1="161.6" y1="73.4" x2="171.5" y2="63.5" class="st"/>
+<line x1="110" y1="52" x2="110" y2="38" class="st"/>
+<line x1="58.4" y1="73.4" x2="48.5" y2="63.5" class="st"/>
+<line x1="37" y1="125" x2="23" y2="125" class="st"/>
+<circle cx="53.4" cy="68.4" r="5" class="ptb"/>
+<text x="43.5" y="63.5" text-anchor="end" class="mt tb halo">3π/4</text>
+<text x="202" y="130" text-anchor="start" class="mt tm halo">0</text>
+<text x="18" y="130" text-anchor="end" class="mt tm halo">π</text>
+<text x="110" y="237" text-anchor="middle" class="s tm" style="font-size:13px">demi-tour coupé en 4</text>
+<text x="110" y="254" text-anchor="middle" class="s tm" style="font-size:13px">une part = π/4</text>
+<line x1="236" y1="125" x2="424" y2="125" class="sm"/>
+<line x1="330" y1="219" x2="330" y2="31" class="sm"/>
+<circle cx="330" cy="125" r="80" class="st"/>
+<path d="M410,125 A80,80 0 0 0 260.7,85" class="arc"/>
+<line x1="403" y1="125" x2="417" y2="125" class="st"/>
+<line x1="393.2" y1="88.5" x2="405.3" y2="81.5" class="st"/>
+<line x1="366.5" y1="61.8" x2="373.5" y2="49.7" class="st"/>
+<line x1="330" y1="52" x2="330" y2="38" class="st"/>
+<line x1="293.5" y1="61.8" x2="286.5" y2="49.7" class="st"/>
+<line x1="266.8" y1="88.5" x2="254.7" y2="81.5" class="st"/>
+<line x1="257" y1="125" x2="243" y2="125" class="st"/>
+<circle cx="260.7" cy="85" r="5" class="ptb"/>
+<text x="248.6" y="83" text-anchor="end" class="mt tb halo">5π/6</text>
+<text x="422" y="130" text-anchor="start" class="mt tm halo">0</text>
+<text x="238" y="130" text-anchor="end" class="mt tm halo">π</text>
+<text x="330" y="237" text-anchor="middle" class="s tm" style="font-size:13px">demi-tour coupé en 6</text>
+<text x="330" y="254" text-anchor="middle" class="s tm" style="font-size:13px">une part = π/6</text>
+</svg><figcaption>Le dénominateur dit en combien de parts on coupe le demi-tour π ; le numérateur dit combien de parts on prend.</figcaption></figure>
+<p>On tourne dans le sens inverse des aiguilles d'une montre, le <b>sens trigonométrique</b> (<i>counterclockwise</i>), en partant du point de droite. Tes quarts de tour :</p>
+<div class="tw"><table class="c tight">
+<tr><th>Quarts de tour</th><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+<tr><th>Angle</th><td>π/2</td><td>2π/2 = π</td><td>3π/2</td><td>4π/2 = 2π</td></tr>
+<tr><th>On arrive…</th><td>en haut</td><td>à gauche</td><td>en bas</td><td>au départ</td></tr>
+</table></div>
+<p>Un angle négatif tourne dans l'autre sens : −π/2 arrive en bas, au même point que 3π/2.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>La mesure principale</h2>
+<p class="use"><b>Quand :</b> un angle fait plusieurs tours, comme 13π/6 ou −415π/11, et tu veux savoir où il tombe sur le cercle.</p>
+<p>Ajouter un tour complet ne change pas le point : x et x + 2π, x + 4π, x − 2π… tombent tous au même endroit. Parmi toutes ces mesures, la <b>mesure principale</b> (<i>principal value</i>) est celle qui se trouve dans <b>]−π ; π]</b>. C'est la convention la plus courante en France ; vérifie que ton cours prend le même intervalle.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li><b>Compte les tours</b> : divise l'angle par 2π.</li>
+<li><b>Arrondis à l'entier le plus proche</b> : c'est le nombre de tours k à enlever (il peut être négatif).</li>
+<li><b>Enlève ces tours</b> : calcule x − k × 2π, en écrivant 2kπ avec le même dénominateur que x.</li>
+<li><b>Contrôle</b> : le coefficient de π doit être dans ]−1 ; 1]. Sinon, ajoute ou enlève encore un tour.</li>
+</ol>
+</div>
+<h3>L'exemple de la vidéo : −415π/11</h3>
+<div class="steps">
+<span class="op"></span><span><span class="q"><span>−415π/11</span><span>2π</span></span> = <span class="q"><span>−415</span><span>22</span></span> ≈ −18,86</span>
+<span class="why">Étape 1 : l'angle contient environ −18,86 tours.</span>
+<span class="op"></span><span>k = −19</span>
+<span class="why">Étape 2 : l'entier le plus proche de −18,86 est −19. On va donc ajouter 19 tours, soit 38π.</span>
+<span class="op"></span><span><span class="q"><span>−415π</span><span>11</span></span> + 38π = <span class="q"><span>−415π</span><span>11</span></span> + <span class="q"><span>418π</span><span>11</span></span> = <span class="q"><span>3π</span><span>11</span></span></span>
+<span class="why">Étape 3 : 38π = 418π/11, pour avoir le même dénominateur.</span>
+<span class="op"></span><span><span class="q"><span>3</span><span>11</span></span> ≈ 0,27 ∈ ]−1 ; 1]</span>
+<span class="why">Étape 4 : contrôle réussi. La mesure principale est 3π/11.</span>
+</div>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Pourquoi tu as eu besoin de deux étapes</p>
+<p>Dans tes notes, la division donne « ≈ 18 ». La vraie valeur est −18,86 : il manquait le signe moins, et 18,86 a été tronqué au lieu d'être arrondi. En ajoutant 18 tours, tu es tombé sur −19π/11 ≈ −1,73π, encore hors de ]−π ; π]. Tu as donc ajouté un tour de plus, et ton résultat final, 3π/11, est juste. Avec l'arrondi à −19, on y arrive en une seule étape.</p>
+</div>
+<figure><svg viewBox="0 0 450 205" role="img" aria-label="Droite graduée des coefficients de π. Le point 23π/4, soit 5,75, recule de 2 en 2 : 15π/4, 7π/4, puis −π/4, qui tombe dans la fenêtre de −1 exclu à 1 inclus.">
+<rect x="75.9" y="93" width="91.8" height="34" rx="4" class="fsg"/>
+<text x="121.8" y="146" text-anchor="middle" class="s tg" style="font-weight:700">la fenêtre ]−1 ; 1]</text>
+<line x1="22" y1="110" x2="430" y2="110" class="sm" marker-end="url(#ah)"/>
+<line x1="30" y1="105" x2="30" y2="115" class="sm"/>
+<text x="30" y="130" text-anchor="middle" class="s tm">−2</text>
+<line x1="75.9" y1="105" x2="75.9" y2="115" class="sm"/>
+<text x="75.9" y="130" text-anchor="middle" class="s tm">−1</text>
+<line x1="121.8" y1="105" x2="121.8" y2="115" class="sm"/>
+<text x="121.8" y="130" text-anchor="middle" class="s tm">0</text>
+<line x1="167.6" y1="105" x2="167.6" y2="115" class="sm"/>
+<text x="167.6" y="130" text-anchor="middle" class="s tm">1</text>
+<line x1="213.5" y1="105" x2="213.5" y2="115" class="sm"/>
+<text x="213.5" y="130" text-anchor="middle" class="s tm">2</text>
+<line x1="259.4" y1="105" x2="259.4" y2="115" class="sm"/>
+<text x="259.4" y="130" text-anchor="middle" class="s tm">3</text>
+<line x1="305.3" y1="105" x2="305.3" y2="115" class="sm"/>
+<text x="305.3" y="130" text-anchor="middle" class="s tm">4</text>
+<line x1="351.2" y1="105" x2="351.2" y2="115" class="sm"/>
+<text x="351.2" y="130" text-anchor="middle" class="s tm">5</text>
+<line x1="397.1" y1="105" x2="397.1" y2="115" class="sm"/>
+<text x="397.1" y="130" text-anchor="middle" class="s tm">6</text>
+<text x="75.9" y="118" text-anchor="middle" class="mt tg" style="font-size:24px">]</text>
+<text x="167.6" y="118" text-anchor="middle" class="mt tg" style="font-size:24px">]</text>
+<path d="M385.6,100 Q339.7,48 297.8,98" class="sb" marker-end="url(#ahb)"/>
+<text x="339.7" y="66" text-anchor="middle" class="s tb">− 2π</text>
+<path d="M293.8,100 Q247.9,48 206.1,98" class="sb" marker-end="url(#ahb)"/>
+<text x="247.9" y="66" text-anchor="middle" class="s tb">− 2π</text>
+<path d="M202.1,100 Q156.2,48 114.3,98" class="sb" marker-end="url(#ahb)"/>
+<text x="156.2" y="66" text-anchor="middle" class="s tb">− 2π</text>
+<circle cx="385.6" cy="110" r="5" class="ptb"/>
+<text x="385.6" y="166" text-anchor="middle" class="mt tb halo" style="font-size:15px">23π/4</text>
+<circle cx="293.8" cy="110" r="5" class="ptb"/>
+<text x="293.8" y="166" text-anchor="middle" class="mt tb halo" style="font-size:15px">15π/4</text>
+<circle cx="202.1" cy="110" r="5" class="ptb"/>
+<text x="202.1" y="166" text-anchor="middle" class="mt tb halo" style="font-size:15px">7π/4</text>
+<circle cx="110.3" cy="110" r="5" class="ptg"/>
+<text x="110.3" y="166" text-anchor="middle" class="mt tg halo" style="font-size:15px">−π/4</text>
+<text x="225" y="192" text-anchor="middle" class="s tm">coefficient de π</text>
+</svg><figcaption>Chaque saut enlève un tour (2π), c'est-à-dire 2 au coefficient de π. On s'arrête quand le coefficient tombe dans ]−1 ; 1] : 23π/4 a pour mesure principale −π/4.</figcaption></figure>
+
+<div class="box widget" id="mp">
+<p class="lbl">Outil : calcule une mesure principale, étape par étape</p>
+<p>Tape un angle de la forme <code>aπ/b</code> : par exemple <code>-415π/11</code>, <code>23pi/4</code> ou <code>3π</code>. L'outil applique les quatre étapes de la méthode. Fais d'abord le calcul à la main, puis vérifie.</p>
+<div class="labin"><input id="mp-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="-415π/11" aria-label="Angle à ramener"></div>
+<div class="presets" id="mp-pre">
+<button type="button" data-v="-415π/11">−415π/11</button><button type="button" data-v="23π/4">23π/4</button><button type="button" data-v="13π/6">13π/6</button><button type="button" data-v="-7π/4">−7π/4</button><button type="button" data-v="3π">3π</button><button type="button" data-v="100π/3">100π/3</button>
+</div>
+<div id="mp-out" aria-live="polite"></div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Même point, ou point opposé ?</h2>
+<p class="use"><b>Quand :</b> on te donne deux mesures, a et b, et on demande si elles désignent le même point du cercle.</p>
+<div class="box key">
+<p class="lbl">La règle</p>
+<p>a et b donnent le <b>même point</b> si leur différence est un nombre entier de tours :</p>
+<p class="eq">b − a = k × 2π, &nbsp;avec k ∈ ℤ</p>
+<p>En pratique, calcule b − a, divise par 2π, et regarde si le résultat est un entier. Si b − a est un <b>multiple impair de π</b> (π, 3π, 19π…), les deux points sont <b>diamétralement opposés</b> : un nombre entier de tours, plus un demi-tour.</p>
+</div>
+<div class="tw"><table>
+<tr><th>a</th><th>b</th><th>b − a</th><th>÷ 2π</th><th>Conclusion</th></tr>
+<tr><td class="mr">45π/3</td><td class="mr">102π/3</td><td class="mr">57π/3 = 19π</td><td class="mr">9,5</td><td>pas un entier ; 19π = 9 tours + π : <b>points opposés</b></td></tr>
+<tr><td class="mr">45π/3</td><td class="mr">105π/3</td><td class="mr">60π/3 = 20π</td><td class="mr">10</td><td>10 tours entiers : <b>même point</b></td></tr>
+<tr><td class="mr">−253π</td><td class="mr">816π</td><td class="mr">1069π</td><td class="mr">534,5</td><td>1069π = 1068π + π = 534 tours + π : <b>points opposés</b></td></tr>
+</table></div>
+<figure><svg viewBox="0 0 440 240" role="img" aria-label="À gauche, 15π et 35π tombent au même point, à gauche du cercle. À droite, 15π est à gauche et 34π à droite : les deux points sont diamétralement opposés.">
+<line x1="24" y1="105" x2="196" y2="105" class="sm"/>
+<line x1="110" y1="191" x2="110" y2="19" class="sm"/>
+<circle cx="110" cy="105" r="72" class="st"/>
+<circle cx="38" cy="105" r="6" class="ptb"/>
+<text x="50" y="93" text-anchor="start" class="mt tb halo" style="font-size:15px">15π et 35π</text>
+<text x="110" y="211" text-anchor="middle" class="s tg" style="font-size:13px">différence 20π = 10 tours</text>
+<text x="110" y="229" text-anchor="middle" class="s tg" style="font-size:13px">même point</text>
+<line x1="244" y1="105" x2="416" y2="105" class="sm"/>
+<line x1="330" y1="191" x2="330" y2="19" class="sm"/>
+<circle cx="330" cy="105" r="72" class="st"/>
+<line x1="258" y1="105" x2="402" y2="105" class="sr"/>
+<circle cx="258" cy="105" r="6" class="ptb"/>
+<circle cx="402" cy="105" r="6" class="ptr"/>
+<text x="270" y="93" text-anchor="start" class="mt tb halo" style="font-size:15px">15π</text>
+<text x="390" y="93" text-anchor="end" class="mt tr halo" style="font-size:15px">34π</text>
+<text x="330" y="211" text-anchor="middle" class="s tr" style="font-size:13px">différence 19π = 9 tours + π</text>
+<text x="330" y="229" text-anchor="middle" class="s tr" style="font-size:13px">points opposés</text>
+</svg><figcaption>Avec 45π/3 = 15π, 105π/3 = 35π et 102π/3 = 34π. Une différence d'un nombre entier de tours (multiple de 2π) : même point. Un nombre entier de tours plus un demi-tour (multiple impair de π) : points opposés.</figcaption></figure>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> La justification du premier exemple</p>
+<p>Tu as écrit « 57 n'est pas divisible par 3 ». C'est faux : 57 = 3 × 19, donc 57π/3 = 19π. Ta conclusion reste juste, mais pour une autre raison : 19π ÷ 2π = 9,5 n'est pas un entier. Et 19π = 18π + π, soit 9 tours et un demi-tour : les deux points sont même opposés, exactement comme dans ton dernier exemple.</p>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Lire le cosinus et le sinus sur le cercle</h2>
+<p class="use"><b>Quand :</b> on te demande la valeur exacte de cos x ou de sin x pour un angle de la table.</p>
+<div class="box key">
+<p class="lbl">La règle</p>
+<p>Le point du cercle associé à x a pour coordonnées <b>(cos x ; sin x)</b> : le <b>cosinus</b> se lit sur l'axe horizontal (les abscisses), le <b>sinus</b> sur l'axe vertical (les ordonnées).</p>
+</div>
+<figure><svg viewBox="0 0 410 400" role="img" aria-label="Cercle trigonométrique. Les points π/6, π/4 et π/3 sont projetés sur les deux axes : leurs cosinus 1/2, racine de 2 sur 2, racine de 3 sur 2 se lisent sur l'axe horizontal, leurs sinus sur l'axe vertical. Les points 5π/6 et 4π/3 montrent des valeurs négatives." style="max-width:400px">
+<line x1="29" y1="200" x2="381" y2="200" class="sm"/>
+<line x1="205" y1="376" x2="205" y2="24" class="sm"/>
+<circle cx="205" cy="200" r="150" class="st"/>
+<line x1="334.9" y1="125" x2="334.9" y2="200" class="sb dash thin"/>
+<line x1="334.9" y1="125" x2="205" y2="125" class="sb dash thin"/>
+<line x1="311.1" y1="93.9" x2="311.1" y2="200" class="sb dash thin"/>
+<line x1="311.1" y1="93.9" x2="205" y2="93.9" class="sb dash thin"/>
+<line x1="280" y1="70.1" x2="280" y2="200" class="sb dash thin"/>
+<line x1="280" y1="70.1" x2="205" y2="70.1" class="sb dash thin"/>
+<line x1="75.1" y1="125" x2="75.1" y2="200" class="sr dash thin"/>
+<line x1="75.1" y1="125" x2="205" y2="125" class="sr dash thin"/>
+<line x1="130" y1="329.9" x2="130" y2="200" class="sr dash thin"/>
+<line x1="130" y1="329.9" x2="205" y2="329.9" class="sr dash thin"/>
+<circle cx="334.9" cy="125" r="4.5" class="ptb"/>
+<text x="343.6" y="125" text-anchor="start" class="mt tb halo" style="font-size:15px">π/6</text>
+<circle cx="311.1" cy="93.9" r="4.5" class="ptb"/>
+<text x="318.1" y="91.9" text-anchor="start" class="mt tb halo" style="font-size:15px">π/4</text>
+<circle cx="280" cy="70.1" r="4.5" class="ptb"/>
+<text x="285" y="66.4" text-anchor="start" class="mt tb halo" style="font-size:15px">π/3</text>
+<circle cx="75.1" cy="125" r="4.5" class="ptr"/>
+<text x="66.4" y="125" text-anchor="end" class="mt tr halo" style="font-size:15px">5π/6</text>
+<circle cx="130" cy="329.9" r="4.5" class="ptr"/>
+<text x="125" y="343.6" text-anchor="end" class="mt tr halo" style="font-size:15px">4π/3</text>
+<text x="363" y="192" text-anchor="start" class="mt tm" style="font-size:15px">0</text>
+<text x="213" y="40" text-anchor="start" class="mt tm" style="font-size:15px">π/2</text>
+<text x="47" y="192" text-anchor="end" class="mt tm" style="font-size:15px">π</text>
+<text x="213" y="372" text-anchor="start" class="mt tm" style="font-size:15px">3π/2</text>
+<text x="280" y="218" text-anchor="middle" class="s tb halo" style="font-size:13px">1/2</text>
+<text x="311.1" y="233" text-anchor="middle" class="s tb halo" style="font-size:13px">√2/2</text>
+<text x="334.9" y="218" text-anchor="middle" class="s tb halo" style="font-size:13px">√3/2</text>
+<text x="75.1" y="218" text-anchor="middle" class="s tr halo" style="font-size:13px">−√3/2</text>
+<text x="130" y="218" text-anchor="middle" class="s tr halo" style="font-size:13px">−1/2</text>
+<text x="199" y="129" text-anchor="end" class="s tb halo" style="font-size:13px">1/2</text>
+<text x="199" y="97.9" text-anchor="end" class="s tb halo" style="font-size:13px">√2/2</text>
+<text x="199" y="74.1" text-anchor="end" class="s tb halo" style="font-size:13px">√3/2</text>
+<text x="199" y="333.9" text-anchor="end" class="s tr halo" style="font-size:13px">−√3/2</text>
+<text x="373" y="220" text-anchor="middle" class="s tm" style="font-size:12px">cos</text>
+<text x="227" y="24" text-anchor="middle" class="s tm" style="font-size:12px">sin</text>
+</svg><figcaption>Le cosinus se lit sur l'axe horizontal, le sinus sur l'axe vertical. Les trois familles π/6, π/4, π/3 donnent les valeurs ; le quart de tour où se trouve le point donne les signes (5π/6 : cosinus négatif ; 4π/3 : les deux négatifs).</figcaption></figure>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Une étiquette de ton dessin</p>
+<p>Sur ton grand cercle, l'angle noté « 2π/2 », entre π/2 et 3π/4, est <b>2π/3</b>. 2π/2 se simplifie en π : c'est le point de gauche.</p>
+</div>
+<h3>Deux propriétés qui découlent du dessin</h3>
+<ul>
+<li><b>−1 ≤ cos x ≤ 1 et −1 ≤ sin x ≤ 1</b> : le point reste sur un cercle de rayon 1, il ne peut pas sortir du carré [−1 ; 1] × [−1 ; 1]. Une équation comme cos x = 2 n'a donc aucune solution.</li>
+<li><b>cos²x + sin²x = 1</b> : c'est le théorème de Pythagore dans le triangle ci-dessous. On s'en servira à l'outil 9.</li>
+</ul>
+<div class="pair">
+<figure><svg viewBox="0 0 300 300" role="img" aria-label="Triangle rectangle formé par le centre, le point M et sa projection : côtés cos x et sin x, hypoténuse 1." style="max-width:300px">
+<line x1="20" y1="150" x2="280" y2="150" class="sm"/>
+<line x1="150" y1="280" x2="150" y2="20" class="sm"/>
+<circle cx="150" cy="150" r="110" class="st"/>
+<path d="M150,150 L199.9,150 L199.9,52 Z" class="fsb"/>
+<line x1="150" y1="150" x2="199.9" y2="150" class="sb thick"/>
+<line x1="199.9" y1="150" x2="199.9" y2="52" class="sr thick"/>
+<line x1="150" y1="150" x2="199.9" y2="52" class="st"/>
+<path d="M199.9,150 h-10 v-10 h10" class="sm"/>
+<circle cx="199.9" cy="52" r="5" class="pt"/>
+<text x="207.9" y="46" text-anchor="start" class="mt">M</text>
+<text x="174.9" y="170" text-anchor="middle" class="mt tb">cos x</text>
+<text x="207.9" y="106" text-anchor="start" class="mt tr halo">sin x</text>
+<text x="162.9" y="99" text-anchor="end" class="mt halo">1</text>
+<path d="M170,150 A20,20 0 0 0 159.1,132.2" class="sm"/>
+<text x="179.8" y="138.7" text-anchor="middle" class="mt tm">x</text>
+</svg><figcaption>Dans le triangle rectangle, Pythagore donne cos²x + sin²x = 1², puisque l'hypoténuse est le rayon, égal à 1.</figcaption></figure>
+<figure><svg viewBox="0 0 320 280" role="img" aria-label="Les points π/7 et 6π/7 sont symétriques par rapport à l'axe vertical : même hauteur b, abscisses a et moins a." style="max-width:320px">
+<line x1="35" y1="140" x2="285" y2="140" class="sm"/>
+<line x1="160" y1="265" x2="160" y2="15" class="sm"/>
+<circle cx="160" cy="140" r="105" class="st"/>
+<line x1="160" y1="94.4" x2="254.6" y2="94.4" class="sm dash"/>
+<line x1="160" y1="94.4" x2="65.4" y2="94.4" class="sm dash"/>
+<line x1="254.6" y1="94.4" x2="254.6" y2="140" class="sb dash thin"/>
+<line x1="65.4" y1="94.4" x2="65.4" y2="140" class="sr dash thin"/>
+<circle cx="254.6" cy="94.4" r="5" class="ptb"/>
+<circle cx="65.4" cy="94.4" r="5" class="ptr"/>
+<text x="263.6" y="95.1" text-anchor="start" class="mt tb halo" style="font-size:15px">π/7</text>
+<text x="56.4" y="95.1" text-anchor="end" class="mt tr halo" style="font-size:15px">6π/7</text>
+<text x="254.6" y="160" text-anchor="middle" class="mt tb">a</text>
+<text x="65.4" y="160" text-anchor="middle" class="mt tr">−a</text>
+<text x="152" y="88.4" text-anchor="end" class="mt">b</text>
+</svg><figcaption>6π/7 = π − π/7 : le point est le symétrique de π/7 par rapport à l'axe vertical. Même sinus b, cosinus opposé −a.</figcaption></figure>
+</div>
+<h3>Un angle hors de la table : π/7</h3>
+<p>Personne ne connaît cos(π/7) par cœur. La vidéo l'appelle simplement a, et sin(π/7) = b. On peut pourtant en déduire d'autres valeurs : 6π/7 = π − π/7 est le symétrique de π/7 par rapport à l'axe vertical. Il est à la même hauteur, mais de l'autre côté :</p>
+<p class="eq">cos(<span class="q"><span>6π</span><span>7</span></span>) = −a &nbsp;&nbsp;&nbsp; sin(<span class="q"><span>6π</span><span>7</span></span>) = b</p>
+<p>C'est déjà le raisonnement des angles associés, que tu retrouveras à l'outil 7. Pour apprendre la table elle-même, ton jeu <a href="https://claude.ai/artifact/7hQN3pcmRSroezL6eTbvhv">Cercle trigo par cœur</a> est fait pour ça.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Résoudre une équation</h2>
+<p class="use"><b>Quand :</b> l'équation se ramène à cos x = c ou sin x = c, avec c une valeur de la table.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li><b>Fais un croquis du cercle trigonométrique.</b> Tes notes disent : « tout le temps le faire ». Elles ont raison.</li>
+<li><b>Isole</b> le cosinus ou le sinus, comme l'inconnue d'une équation du premier degré.</li>
+<li><b>Trace la droite</b> : pour cos x = c, la droite verticale d'abscisse c ; pour sin x = c, la droite horizontale d'ordonnée c.</li>
+<li><b>Lis les points d'intersection</b> avec le cercle : il y en a deux, un seul, ou aucun.</li>
+<li><b>Écris S</b> dans l'intervalle demandé, puis sur ℝ en ajoutant 2kπ à chaque solution.</li>
+</ol>
+</div>
+
+<h3>Exemple 1 : cos x = −1/2</h3>
+<figure><svg viewBox="0 0 330 300" role="img" aria-label="La droite verticale d'abscisse moins un demi coupe le cercle en deux points : 2 pi sur 3 en haut, moins 2 pi sur 3 en bas." style="max-width:330px">
+<line x1="45" y1="145" x2="285" y2="145" class="sm"/>
+<line x1="165" y1="265" x2="165" y2="25" class="sm"/>
+<circle cx="165" cy="145" r="100" class="st"/>
+<line x1="115" y1="19" x2="115" y2="271" class="lv"/>
+<circle cx="115" cy="58.4" r="6" class="ptg"/>
+<circle cx="115" cy="231.6" r="6" class="ptg"/>
+<text x="109" y="53" text-anchor="end" class="mt tg halo" style="font-size:16px">2π/3</text>
+<text x="109" y="238.5" text-anchor="end" class="mt tg halo" style="font-size:16px">−2π/3</text>
+<text x="109" y="255.5" text-anchor="end" class="mt tg halo sub" style="font-size:13px">ou 4π/3</text>
+<text x="109" y="137" text-anchor="end" class="s tb halo" style="font-size:13px">−1/2</text>
+</svg><figcaption>La droite verticale x = −1/2 coupe le cercle en 2π/3 et en −2π/3, qu'on peut aussi écrire 4π/3.</figcaption></figure>
+<p>La droite coupe le cercle en 2π/3 et en −2π/3. Pour écrire −2π/3 dans [0 ; 2π[, on ajoute un tour :</p>
+<p class="eq"><span class="q"><span>−2π</span><span>3</span></span> + 2π = <span class="q"><span>−2π</span><span>3</span></span> + <span class="q"><span>6π</span><span>3</span></span> = <span class="q"><span>4π</span><span>3</span></span></p>
+<div class="sols">
+<p><b>Sur ]−π ; π] :</b> S = {−2π/3 ; 2π/3}</p>
+<p><b>Sur [0 ; 2π[ :</b> S = {2π/3 ; 4π/3}</p>
+<p><b>Sur ℝ :</b> S = {2π/3 + 2kπ ; k ∈ ℤ} ∪ {−2π/3 + 2kπ ; k ∈ ℤ}</p>
+</div>
+<p class="note">Tes notes s'arrêtent à la conversion en 4π/3 : les trois ensembles de solutions sont <span class="tag tag-p">Complément</span>.</p>
+
+<h3>Exemple 2 : 2 sin x + √3 = 0</h3>
+<div class="steps">
+<span class="op"></span><span>2 sin x + √3 = 0</span>
+<span class="op">⇔</span><span>2 sin x = −√3</span>
+<span class="op">⇔</span><span>sin x = −<span class="q"><span>√3</span><span>2</span></span></span>
+<span class="why">On isole le sinus.</span>
+</div>
+<figure><svg viewBox="0 0 330 300" role="img" aria-label="La droite horizontale d'ordonnée moins racine de 3 sur 2 coupe le cercle en deux points, en bas : moins pi sur 3 et moins 2 pi sur 3." style="max-width:330px">
+<line x1="45" y1="145" x2="285" y2="145" class="sm"/>
+<line x1="165" y1="265" x2="165" y2="25" class="sm"/>
+<circle cx="165" cy="145" r="100" class="st"/>
+<line x1="39" y1="231.6" x2="291" y2="231.6" class="lv"/>
+<circle cx="215" cy="231.6" r="6" class="ptg"/>
+<circle cx="115" cy="231.6" r="6" class="ptg"/>
+<text x="221" y="238.5" text-anchor="start" class="mt tg halo" style="font-size:16px">−π/3</text>
+<text x="221" y="255.5" text-anchor="start" class="mt tg halo sub" style="font-size:13px">ou 5π/3</text>
+<text x="109" y="238.5" text-anchor="end" class="mt tg halo" style="font-size:16px">−2π/3</text>
+<text x="109" y="255.5" text-anchor="end" class="mt tg halo sub" style="font-size:13px">ou 4π/3</text>
+<text x="171" y="224.6" text-anchor="start" class="s tb halo" style="font-size:13px">−√3/2</text>
+</svg><figcaption>La droite horizontale y = −√3/2 coupe le cercle en −π/3 et −2π/3 (soit 5π/3 et 4π/3 sur [0 ; 2π[).</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = {−2π/3 ; −π/3}</p>
+<p><b>Sur [0 ; 2π[ :</b> S = {4π/3 ; 5π/3}, car −π/3 + 6π/3 = 5π/3 et −2π/3 + 6π/3 = 4π/3</p>
+<p><b>Sur ℝ :</b> S = {−π/3 + 2kπ ; k ∈ ℤ} ∪ {−2π/3 + 2kπ ; k ∈ ℤ}</p>
+</div>
+
+<h3>Exemple 3 : 2 cos x + 2 = 0</h3>
+<div class="steps">
+<span class="op"></span><span>2 cos x + 2 = 0 ⇔ 2 cos x = −2 ⇔ cos x = −1</span>
+</div>
+<figure><svg viewBox="0 0 300 290" role="img" aria-label="La droite verticale d'abscisse −1 touche le cercle en un seul point, à gauche : l'angle π." style="max-width:300px">
+<line x1="30" y1="145" x2="270" y2="145" class="sm"/>
+<line x1="150" y1="265" x2="150" y2="25" class="sm"/>
+<circle cx="150" cy="145" r="100" class="st"/>
+<line x1="50" y1="19" x2="50" y2="271" class="lv"/>
+<circle cx="50" cy="145" r="6" class="ptg"/>
+<text x="40" y="135" text-anchor="end" class="mt tg halo" style="font-size:15px">π ou −π</text>
+<text x="56" y="165" text-anchor="start" class="s tb halo" style="font-size:13px">−1</text>
+</svg><figcaption>La droite x = −1 est tangente au cercle : un seul point, π (ou −π, selon l'intervalle).</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = {−π}</p>
+<p><b>Sur [0 ; 2π[ :</b> S = {π}</p>
+<p><b>Sur ℝ :</b> S = {π + 2kπ ; k ∈ ℤ}</p>
+</div>
+
+<div class="box key">
+<p class="lbl"><span class="tag tag-p">Complément</span> Écrire les solutions sur ℝ</p>
+<p>Tes notes écrivent « π + k × 2π ». Sur une copie, écris l'ensemble en entier : <b>S = {π + 2kπ ; k ∈ ℤ}</b>. Le « k ∈ ℤ » est obligatoire : k est un nombre de tours, et il peut être négatif.</p>
+</div>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-p">Complément</span> Lis bien les crochets de l'énoncé</p>
+<p>La vidéo résout sur [−π ; π[ et [0 ; 2π[. Ta feuille demande souvent [0, 2π] et [−π, π], <b>fermés des deux côtés</b>. Les extrémités changent alors la réponse. Pour cos x = −1 :</p>
+<div class="tw"><table class="c tight">
+<tr><th>Intervalle</th><td>[−π ; π[</td><td>]−π ; π]</td><td>[−π ; π]</td><td>[0 ; 2π]</td></tr>
+<tr><th>Solutions</th><td>{−π}</td><td>{π}</td><td>{−π ; π}</td><td>{π}</td></tr>
+</table></div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Résoudre une inéquation</h2>
+<p class="use"><b>Quand :</b> l'inégalité se ramène à cos x ≤ c, sin x &gt; c, etc.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li><b>Isole</b> le cosinus ou le sinus. Si tu <b>divises par un nombre négatif</b>, le sens de l'inégalité change (dans tes notes : « je switch mon inégalité »).</li>
+<li><b>Croquis et droite</b>, comme pour une équation.</li>
+<li><b>Colorie l'arc des solutions</b> : à gauche de la droite pour cos x ≤ c, à droite pour cos x ≥ c, en dessous pour sin x ≤ c, au-dessus pour sin x ≥ c.</li>
+<li><b>Les extrémités</b> sont incluses (point plein) avec ≤ ou ≥, exclues (point vide) avec &lt; ou &gt;.</li>
+<li><b>Écris l'intervalle</b> en parcourant l'arc dans le sens trigonométrique, depuis le début de l'intervalle demandé. Si l'arc passe par ce point de départ (−π ou 0), il se coupe en deux morceaux : on écrit une réunion ∪.</li>
+</ol>
+</div>
+
+<div class="ineq">
+<div class="ineq-item">
+<h3>cos x ≤ 1/2</h3>
+<figure class="fig-in"><svg viewBox="0 0 320 285" role="img" aria-label="Arc solution à gauche de la droite x égale un demi, de pi sur 3 à 5 pi sur 3 en passant par pi, extrémités pleines." style="max-width:320px">
+<line x1="50" y1="140" x2="270" y2="140" class="sm"/>
+<line x1="160" y1="250" x2="160" y2="30" class="sm"/>
+<circle cx="160" cy="140" r="92" class="st"/>
+<path d="M206,60.3 A92,92 0 1 0 206,219.7" class="arc"/>
+<line x1="206" y1="28" x2="206" y2="252" class="lv"/>
+<text x="212" y="158" text-anchor="start" class="s tb halo" style="font-size:13px">1/2</text>
+<circle cx="206" cy="60.3" r="6" class="ptc"/>
+<circle cx="206" cy="219.7" r="6" class="ptc"/>
+<text x="212" y="54.9" text-anchor="start" class="mt halo" style="font-size:15px">π/3</text>
+<text x="212" y="226.6" text-anchor="start" class="mt halo" style="font-size:15px">−π/3</text>
+<text x="212" y="243.6" text-anchor="start" class="mt halo sub" style="font-size:13px">ou 5π/3</text>
+</svg><figcaption><b>cos x ≤ 1/2</b> : l'arc à gauche de la droite, extrémités incluses.</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = [−π ; −π/3] ∪ [π/3 ; π[</p>
+<p><b>Sur [0 ; 2π[ :</b> S = [π/3 ; 5π/3]</p>
+</div>
+<p class="note">Sur [−π ; π[, l'arc passe par −π, le début de l'intervalle : deux morceaux. Sur [0 ; 2π[, il ne passe pas par 0 : un seul.</p>
+</div>
+
+<div class="ineq-item">
+<h3>2 cos x + √2 &gt; 0</h3>
+<div class="steps sm-steps">
+<span class="op"></span><span>2 cos x &gt; −√2 ⇔ cos x &gt; −<span class="q"><span>√2</span><span>2</span></span></span>
+</div>
+<figure class="fig-in"><svg viewBox="0 0 320 285" role="img" aria-label="Arc solution à droite de la droite x égale moins racine de 2 sur 2, de moins 3 pi sur 4 à 3 pi sur 4 en passant par 0, extrémités vides." style="max-width:320px">
+<line x1="50" y1="140" x2="270" y2="140" class="sm"/>
+<line x1="160" y1="250" x2="160" y2="30" class="sm"/>
+<circle cx="160" cy="140" r="92" class="st"/>
+<path d="M94.9,205.1 A92,92 0 1 0 94.9,74.9" class="arc"/>
+<line x1="94.9" y1="28" x2="94.9" y2="252" class="lv"/>
+<text x="88.9" y="158" text-anchor="end" class="s tb halo" style="font-size:13px">−√2/2</text>
+<circle cx="94.9" cy="205.1" r="6" class="pto"/>
+<circle cx="94.9" cy="74.9" r="6" class="pto"/>
+<text x="86.5" y="71.5" text-anchor="end" class="mt halo" style="font-size:15px">3π/4</text>
+<text x="86.5" y="210" text-anchor="end" class="mt halo" style="font-size:15px">−3π/4</text>
+<text x="86.5" y="227" text-anchor="end" class="mt halo sub" style="font-size:13px">ou 5π/4</text>
+</svg><figcaption><b>cos x > −√2/2</b> : l'arc à droite de la droite, extrémités exclues.</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = ]−3π/4 ; 3π/4[</p>
+<p><b>Sur [0 ; 2π[ :</b> S = [0 ; 3π/4[ ∪ ]5π/4 ; 2π[</p>
+</div>
+</div>
+
+<div class="ineq-item">
+<h3>−2 sin x + 1 &gt; 0</h3>
+<div class="steps sm-steps">
+<span class="op"></span><span>−2 sin x + 1 &gt; 0</span>
+<span class="op">⇔</span><span>−2 sin x &gt; −1</span>
+<span class="why">On soustrait 1 : le sens ne change pas.</span>
+<span class="op">⇔</span><span>sin x &lt; <span class="q"><span>−1</span><span>−2</span></span> = <span class="q"><span>1</span><span>2</span></span></span>
+<span class="why">On divise par −2, négatif : le sens change.</span>
+</div>
+<figure class="fig-in"><svg viewBox="0 0 320 285" role="img" aria-label="Arc solution sous la droite y égale un demi, de 5 pi sur 6 à pi sur 6 en passant par le bas du cercle, extrémités vides." style="max-width:320px">
+<line x1="50" y1="140" x2="270" y2="140" class="sm"/>
+<line x1="160" y1="250" x2="160" y2="30" class="sm"/>
+<circle cx="160" cy="140" r="92" class="st"/>
+<path d="M80.3,94 A92,92 0 1 0 239.7,94" class="arc"/>
+<line x1="48" y1="94" x2="272" y2="94" class="lv"/>
+<text x="166" y="87" text-anchor="start" class="s tb halo" style="font-size:13px">1/2</text>
+<circle cx="80.3" cy="94" r="6" class="pto"/>
+<circle cx="239.7" cy="94" r="6" class="pto"/>
+<text x="250.1" y="93" text-anchor="start" class="mt halo" style="font-size:15px">π/6</text>
+<text x="69.9" y="93" text-anchor="end" class="mt halo" style="font-size:15px">5π/6</text>
+</svg><figcaption><b>sin x < 1/2</b> : l'arc sous la droite, extrémités exclues.</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = [−π ; π/6[ ∪ ]5π/6 ; π[</p>
+<p><b>Sur [0 ; 2π[ :</b> S = [0 ; π/6[ ∪ ]5π/6 ; 2π[</p>
+</div>
+</div>
+
+<div class="ineq-item">
+<h3>√3 + 2 sin x &gt; 0</h3>
+<div class="steps sm-steps">
+<span class="op"></span><span>2 sin x &gt; −√3 ⇔ sin x &gt; −<span class="q"><span>√3</span><span>2</span></span></span>
+<span class="why">On divise par 2, positif : le sens ne change pas.</span>
+</div>
+<figure class="fig-in"><svg viewBox="0 0 320 285" role="img" aria-label="Arc solution au-dessus de la droite y égale moins racine de 3 sur 2, de moins pi sur 3 à 4 pi sur 3 en passant par le haut, extrémités vides." style="max-width:320px">
+<line x1="50" y1="140" x2="270" y2="140" class="sm"/>
+<line x1="160" y1="250" x2="160" y2="30" class="sm"/>
+<circle cx="160" cy="140" r="92" class="st"/>
+<path d="M206,219.7 A92,92 0 1 0 114,219.7" class="arc"/>
+<line x1="48" y1="219.7" x2="272" y2="219.7" class="lv"/>
+<text x="166" y="235.7" text-anchor="start" class="s tb halo" style="font-size:13px">−√3/2</text>
+<circle cx="206" cy="219.7" r="6" class="pto"/>
+<circle cx="114" cy="219.7" r="6" class="pto"/>
+<text x="212" y="226.6" text-anchor="start" class="mt halo" style="font-size:15px">−π/3</text>
+<text x="212" y="243.6" text-anchor="start" class="mt halo sub" style="font-size:13px">ou 5π/3</text>
+<text x="108" y="226.6" text-anchor="end" class="mt halo" style="font-size:15px">−2π/3</text>
+<text x="108" y="243.6" text-anchor="end" class="mt halo sub" style="font-size:13px">ou 4π/3</text>
+</svg><figcaption><b>sin x > −√3/2</b> : l'arc au-dessus de la droite, extrémités exclues.</figcaption></figure>
+<div class="sols">
+<p><b>Sur [−π ; π[ :</b> S = [−π ; −2π/3[ ∪ ]−π/3 ; π[</p>
+<p><b>Sur [0 ; 2π[ :</b> S = [0 ; 4π/3[ ∪ ]5π/3 ; 2π[</p>
+</div>
+</div>
+</div>
+
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Une étape par ligne</p>
+<p>Dans tes notes, tu écris la division sous le membre de droite, sur la même ligne : « −2 sin(x) &lt; −1 », avec −2 en dessous. Lue seule, la ligne « −2 sin x &lt; −1 » est fausse, puisque −2 sin x &gt; −1. Même chose pour « 2 sin(x) &gt; −√3/2 ». Sur une copie, écris chaque étape sur sa propre ligne : d'abord −2 sin x &gt; −1, puis, en divisant par −2, sin x &lt; 1/2. Tes ensembles de solutions sont tous justes.</p>
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Les angles associés (tes « angles cousins »)</h2>
+<p class="use"><b>Quand :</b> une expression contient cos(π − x), sin(x + π/2), cos(−x)… et il faut la simplifier, ou se ramener à un angle de la table.</p>
+<p>Le nom officiel est <b>angles associés</b> (<i>related angles</i>). Ta vidéo donne le meilleur conseil possible : <b>pas besoin de les apprendre par cœur</b>. On fait un croquis et on les déduit.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li>Place x au hasard dans le premier quart de tour.</li>
+<li>Place l'angle associé : −x, π − x, x + π…</li>
+<li>Compare les projections sur les deux axes : même valeur, ou valeur opposée ?</li>
+</ol>
+</div>
+
+<div class="box widget" id="ax">
+<p class="lbl">Explorateur : fais la méthode en direct</p>
+<p>Déplace x, choisis un angle associé, et regarde les projections : bleu pour x, rouge pour l'angle associé.</p>
+<div class="ax-grid">
+<div class="ax-fig"><svg id="ax-svg" viewBox="0 0 320 320" role="img" aria-label="Cercle trigonométrique avec l'angle x en bleu et l'angle associé choisi en rouge, et leurs projections sur les deux axes"></svg></div>
+<div class="ax-side">
+<div class="ax-btns" role="group" aria-label="Angle associé">
+<button type="button" data-k="neg" aria-pressed="false">−x</button>
+<button type="button" data-k="pimx" aria-pressed="true">π − x</button>
+<button type="button" data-k="pipx" aria-pressed="false">x + π</button>
+<button type="button" data-k="hmx" aria-pressed="false">π/2 − x</button>
+<button type="button" data-k="hpx" aria-pressed="false">x + π/2</button>
+<button type="button" data-k="tpx" aria-pressed="false">x + 2π</button>
+</div>
+<label for="ax-x" class="ax-lab">x = <span id="ax-xv">36°</span></label>
+<input type="range" id="ax-x" min="0" max="360" step="1" value="36">
+<div class="readout" id="ax-out"></div>
+<p class="ax-why" id="ax-why"></p>
+</div>
+</div>
+</div>
+
+<div class="tw"><table class="c assoc">
+<tr><th>Angle</th><th>cos</th><th>sin</th><th>Ce qu'on voit sur le croquis</th></tr>
+<tr><td>−x</td><td>cos x</td><td>−sin x</td><td class="l">symétrie par rapport à l'axe horizontal</td></tr>
+<tr><td>π − x <span class="tag tag-p">Complément</span></td><td>−cos x</td><td>sin x</td><td class="l">symétrie par rapport à l'axe vertical</td></tr>
+<tr><td>x + π</td><td>−cos x</td><td>−sin x</td><td class="l">point opposé, symétrie par rapport au centre</td></tr>
+<tr><td>π/2 − x</td><td>sin x</td><td>cos x</td><td class="l">symétrie par rapport à la diagonale</td></tr>
+<tr><td>x + π/2</td><td>−sin x</td><td>cos x</td><td class="l">un quart de tour de plus</td></tr>
+<tr><td>x + 2π</td><td>cos x</td><td>sin x</td><td class="l">un tour de plus : même point</td></tr>
+</table></div>
+<p class="note">π − x ne figure pas dans tes notes, mais tu t'en sers deux fois : pour cos(6π/7) à l'outil 4, et dans sin A = sin B à l'outil 8.</p>
+
+<h3>L'exemple de la vidéo : simplifier une expression</h3>
+<p class="eq">A = 2 cos(x + <span class="q"><span>π</span><span>2</span></span>) − sin(<span class="q"><span>π</span><span>2</span></span> − x) + sin(−x) + 3 cos(x + π) − cos(−x)</p>
+<p>On remplace chaque terme grâce au tableau, puis on regroupe les sinus d'un côté et les cosinus de l'autre, comme des termes semblables :</p>
+<div class="steps">
+<span class="op">A =</span><span>2(−sin x) − cos x + (−sin x) + 3(−cos x) − cos x</span>
+<span class="why">cos(x + π/2) = −sin x ; sin(π/2 − x) = cos x ; sin(−x) = −sin x ; cos(x + π) = −cos x ; cos(−x) = cos x.</span>
+<span class="op">=</span><span>(−2 − 1) sin x + (−1 − 3 − 1) cos x</span>
+<span class="op">=</span><span>−3 sin x − 5 cos x</span>
+</div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Les trois types d'équations</h2>
+<p class="use"><b>Quand :</b> les deux membres de l'équation sont des cosinus ou des sinus d'expressions en x, comme cos(2x) = cos(x + π).</p>
+<div class="figgrid"><figure><svg viewBox="0 0 220 220" role="img" aria-label="Les angles a et moins a sont symétriques par rapport à l'axe horizontal : même abscisse." style="max-width:220px">
+<line x1="14" y1="110" x2="206" y2="110" class="sm"/>
+<line x1="110" y1="206" x2="110" y2="14" class="sm"/>
+<circle cx="110" cy="110" r="80" class="st"/>
+<line x1="175.1" y1="63.5" x2="175.1" y2="156.5" class="sb dash"/>
+<circle cx="175.1" cy="63.5" r="5" class="ptb"/>
+<circle cx="175.1" cy="156.5" r="5" class="ptr"/>
+<text x="181.6" y="63.9" text-anchor="start" class="mt tb halo" style="font-size:16px">a</text>
+<text x="181.6" y="166.1" text-anchor="start" class="mt tr halo" style="font-size:16px">−a</text>
+</svg><figcaption><b>cos A = cos B</b> : même abscisse. A = B ou A = −B, à 2kπ près.</figcaption></figure><figure><svg viewBox="0 0 220 220" role="img" aria-label="Les angles a et pi moins a sont symétriques par rapport à l'axe vertical : même ordonnée." style="max-width:220px">
+<line x1="14" y1="110" x2="206" y2="110" class="sm"/>
+<line x1="110" y1="206" x2="110" y2="14" class="sm"/>
+<circle cx="110" cy="110" r="80" class="st"/>
+<line x1="175.1" y1="63.5" x2="44.9" y2="63.5" class="sb dash"/>
+<circle cx="175.1" cy="63.5" r="5" class="ptb"/>
+<circle cx="44.9" cy="63.5" r="5" class="ptr"/>
+<text x="181.6" y="63.9" text-anchor="start" class="mt tb halo" style="font-size:16px">a</text>
+<text x="38.4" y="63.9" text-anchor="end" class="mt tr halo" style="font-size:16px">π − a</text>
+</svg><figcaption><b>sin A = sin B</b> : même ordonnée. A = B ou A = π − B, à 2kπ près.</figcaption></figure><figure><svg viewBox="0 0 220 220" role="img" aria-label="Les angles b et pi sur 2 moins b sont symétriques par rapport à la diagonale : le sinus de l'un est le cosinus de l'autre." style="max-width:220px">
+<line x1="14" y1="110" x2="206" y2="110" class="sm"/>
+<line x1="110" y1="206" x2="110" y2="14" class="sm"/>
+<circle cx="110" cy="110" r="80" class="st"/>
+<line x1="40.9" y1="179.1" x2="179.1" y2="40.9" class="sm dash"/>
+<line x1="175.1" y1="63.5" x2="110" y2="63.5" class="sb dash thin"/>
+<line x1="156.5" y1="44.9" x2="156.5" y2="110" class="sr dash thin"/>
+<circle cx="175.1" cy="63.5" r="5" class="ptb"/>
+<circle cx="156.5" cy="44.9" r="5" class="ptr"/>
+<text x="181.6" y="63.9" text-anchor="start" class="mt tb halo" style="font-size:16px">b</text>
+<text x="161.1" y="43.4" text-anchor="start" class="mt tr halo" style="font-size:16px">π/2 − b</text>
+</svg><figcaption><b>cos a = sin b</b> : sin b = cos(π/2 − b), symétrie par rapport à la diagonale.</figcaption></figure></div>
+
+<h3>Type 1 : cos A = cos B</h3>
+<div class="box key">
+<p class="eq" style="margin:4px 0">cos A = cos B &nbsp;⇔&nbsp; A = B + 2kπ &nbsp;ou&nbsp; A = −B + 2kπ, &nbsp;k ∈ ℤ</p>
+<p>Deux angles ont le même cosinus s'ils sont au même point, ou symétriques par rapport à l'axe horizontal (même abscisse).</p>
+</div>
+<p><b>Exemple : cos(2x) = cos(x + π).</b> On écrit les deux cas, et on résout chacun comme une équation du premier degré :</p>
+<div class="two-cases">
+<div class="steps">
+<span class="op"></span><span>2x = x + π + 2kπ</span>
+<span class="op">⇔</span><span>2x − x = π + 2kπ</span>
+<span class="op">⇔</span><span>x = π + 2kπ</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>2x = −(x + π) + 2kπ</span>
+<span class="op">⇔</span><span>3x = −π + 2kπ</span>
+<span class="op">⇔</span><span>x = −<span class="q"><span>π</span><span>3</span></span> + <span class="q"><span>2kπ</span><span>3</span></span></span>
+<span class="why">On divise tout par 3, y compris 2kπ.</span>
+</div>
+</div>
+<p>Toutes les solutions sur ℝ : S = {π + 2kπ ; k ∈ ℤ} ∪ {−π/3 + 2kπ/3 ; k ∈ ℤ}.</p>
+
+<h3 id="p8-int">Les solutions dans un intervalle</h3>
+<p>Ta méthode : prendre chaque famille de solutions, et remplacer k par des entiers, en partant de 0, jusqu'à sortir de l'intervalle des deux côtés. Sur [0 ; 2π[ :</p>
+<div class="tw"><table class="c tight ktab">
+<tr><th>k</th><th>π + 2kπ</th><th>−π/3 + 2kπ/3</th></tr>
+<tr><td>−1</td><td class="f">−π, non</td><td class="f">−π, non</td></tr>
+<tr><td>0</td><td class="v">π, oui</td><td class="f">−π/3, non</td></tr>
+<tr><td>1</td><td class="f">3π, non</td><td class="v">π/3, oui</td></tr>
+<tr><td>2</td><td>—</td><td class="v">π, oui</td></tr>
+<tr><td>3</td><td>—</td><td class="v">5π/3, oui</td></tr>
+<tr><td>4</td><td>—</td><td class="f">7π/3, non</td></tr>
+</table></div>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-p">Complément</span> Attention au total : π apparaît deux fois</p>
+<p>π est dans les deux colonnes (k = 0 à gauche, k = 2 à droite). Un ensemble ne contient pas deux fois le même élément : <b>S = {π/3 ; π ; 5π/3}</b>, trois solutions, et non 1 + 3 = 4. On peut vérifier π dans l'équation : cos(2π) = 1 et cos(π + π) = cos(2π) = 1.</p>
+</div>
+<p><b>Pourquoi s'arrêter ?</b> Dans chaque famille, x augmente quand k augmente. Dès qu'une valeur dépasse 2π, toutes les suivantes aussi ; dès qu'une valeur est sous 0, toutes les précédentes aussi. Écris-le en une phrase sur ta copie : c'est ce qui prouve que tu n'as oublié aucune solution.</p>
+<div class="box nts">
+<p class="lbl"><span class="tag tag-p">Complément</span> Le raccourci : une inéquation sur k</p>
+<p>Au lieu d'essayer les k un par un, on écrit que x est dans l'intervalle, et on isole k :</p>
+<div class="steps" style="margin:8px 0">
+<span class="op"></span><span>0 ≤ −<span class="q"><span>π</span><span>3</span></span> + <span class="q"><span>2kπ</span><span>3</span></span> &lt; 2π</span>
+<span class="op">⇔</span><span>0 ≤ −1 + 2k &lt; 6</span>
+<span class="why">On multiplie tout par 3/π, positif : le sens ne change pas.</span>
+<span class="op">⇔</span><span><span class="q"><span>1</span><span>2</span></span> ≤ k &lt; <span class="q"><span>7</span><span>2</span></span></span>
+<span class="why">k est un entier, donc k ∈ {1 ; 2 ; 3} : trois solutions, π/3, π et 5π/3.</span>
+</div>
+</div>
+
+<h3>Type 2 : sin A = sin B</h3>
+<div class="box key">
+<p class="eq" style="margin:4px 0">sin A = sin B &nbsp;⇔&nbsp; A = B + 2kπ &nbsp;ou&nbsp; A = π − B + 2kπ, &nbsp;k ∈ ℤ</p>
+<p>Deux angles ont le même sinus s'ils sont au même point, ou symétriques par rapport à l'axe vertical (même ordonnée).</p>
+</div>
+<p><b>Exemple : sin(3x + π/2) = sin(x − π).</b></p>
+<div class="two-cases">
+<div class="steps">
+<span class="op"></span><span>3x + <span class="q"><span>π</span><span>2</span></span> = x − π + 2kπ</span>
+<span class="op">⇔</span><span>2x = −π − <span class="q"><span>π</span><span>2</span></span> + 2kπ = −<span class="q"><span>3π</span><span>2</span></span> + 2kπ</span>
+<span class="op">⇔</span><span>x = −<span class="q"><span>3π</span><span>4</span></span> + kπ</span>
+<span class="why">On divise tout par 2 : 2kπ devient kπ.</span>
+</div>
+<div class="steps">
+<span class="op"></span><span>3x + <span class="q"><span>π</span><span>2</span></span> = π − (x − π) + 2kπ</span>
+<span class="op">⇔</span><span>4x = 2π − <span class="q"><span>π</span><span>2</span></span> + 2kπ = <span class="q"><span>3π</span><span>2</span></span> + 2kπ</span>
+<span class="op">⇔</span><span>x = <span class="q"><span>3π</span><span>8</span></span> + <span class="q"><span>kπ</span><span>2</span></span></span>
+<span class="why">On divise tout par 4.</span>
+</div>
+</div>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Le « + 2kπ » qui disparaît</p>
+<p>Dans tes notes, une ligne dit « 4x = 3π/2 », sans « + k2π ». La ligne suivante le remet, donc ton résultat est juste. Mais sur une copie, chaque ligne doit être vraie : sans 2kπ, « 4x = 3π/2 » n'a qu'une solution.</p>
+</div>
+
+<h3>Type 3 : cos a = sin b</h3>
+<p>On transforme l'un en l'autre pour revenir au type 1 ou au type 2. Le conseil de la vidéo : <b>transformer le sinus en cosinus</b>, avec l'angle associé π/2 − x de l'outil 7 :</p>
+<div class="steps">
+<span class="op"></span><span>cos a = sin b</span>
+<span class="op">⇔</span><span>cos a = cos(<span class="q"><span>π</span><span>2</span></span> − b)</span>
+<span class="why">Car sin b = cos(π/2 − b).</span>
+<span class="op">⇔</span><span>a = <span class="q"><span>π</span><span>2</span></span> − b + 2kπ &nbsp;ou&nbsp; a = −<span class="q"><span>π</span><span>2</span></span> + b + 2kπ</span>
+<span class="why">C'est le type 1, avec B = π/2 − b. Le second cas vient de −(π/2 − b) = −π/2 + b.</span>
+</div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Du sinus au cosinus</h2>
+<p class="use"><b>Quand :</b> on te donne sin x (ou cos x) et l'intervalle où se trouve x, et on demande l'autre.</p>
+<div class="box key">
+<p class="lbl">La méthode</p>
+<ol>
+<li>Remplace la valeur connue dans <b>sin²x + cos²x = 1</b>, et calcule cos²x.</li>
+<li>Prends la racine : il y a deux candidats, √(…) et −√(…).</li>
+<li>Le <b>croquis de l'intervalle</b> donne le signe, et donc le bon candidat.</li>
+</ol>
+</div>
+<p><b>Exemple : sin x = 1/3, avec x ∈ [π/2 ; π].</b></p>
+<div class="steps">
+<span class="op"></span><span>(<span class="q"><span>1</span><span>3</span></span>)² + cos²x = 1</span>
+<span class="op">⇔</span><span>cos²x = 1 − <span class="q"><span>1</span><span>9</span></span> = <span class="q"><span>8</span><span>9</span></span></span>
+<span class="op">⇔</span><span>cos x = √<span class="rt">8/9</span> &nbsp;ou&nbsp; cos x = −√<span class="rt">8/9</span></span>
+<span class="why">Deux candidats. Sur [π/2 ; π], le point est à gauche de l'axe vertical : le cosinus est négatif.</span>
+<span class="op"></span><span>cos x = −√<span class="rt">8/9</span> = −<span class="q"><span>√8</span><span>3</span></span> = −<span class="q"><span>2√2</span><span>3</span></span></span>
+<span class="why">√(a/b) = √a/√b, puis √8 = √4 × √2 = 2√2.</span>
+</div>
+<figure><svg viewBox="0 0 300 280" role="img" aria-label="La droite horizontale d'ordonnée un tiers coupe le cercle en deux points. Seul celui de gauche est dans l'arc de pi sur 2 à pi, où le cosinus est négatif." style="max-width:300px">
+<line x1="30" y1="140" x2="270" y2="140" class="sm"/>
+<line x1="150" y1="260" x2="150" y2="20" class="sm"/>
+<circle cx="150" cy="140" r="100" class="st"/>
+<path d="M150,40 A100,100 0 0 0 50,140" class="arc"/>
+<line x1="32" y1="106.7" x2="268" y2="106.7" class="lv"/>
+<circle cx="244.3" cy="106.7" r="5" class="pto2"/>
+<circle cx="55.7" cy="106.7" r="6" class="ptg"/>
+<line x1="55.7" y1="106.7" x2="55.7" y2="140" class="sg dash thin"/>
+<text x="63.7" y="160" text-anchor="start" class="s tg halo" style="font-size:13px">cos x < 0</text>
+<text x="156" y="99.7" text-anchor="start" class="s tb halo" style="font-size:13px">1/3</text>
+<text x="158" y="32" text-anchor="start" class="mt tm halo" style="font-size:14px">π/2</text>
+<text x="34" y="145" text-anchor="end" class="mt tm halo" style="font-size:14px">π</text>
+<text x="236.3" y="126.7" text-anchor="end" class="s tm halo" style="font-size:12px">hors de [π/2 ; π]</text>
+</svg><figcaption>sin x = 1/3 donne deux points. L'intervalle [π/2 ; π] garde celui de gauche, où le cosinus est négatif.</figcaption></figure>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Finis le calcul</p>
+<p>Tes notes s'arrêtent à −√(8/9). Ce n'est pas une forme finie : il reste une fraction sous la racine. La forme attendue est −2√2/3. Ton cours <a href="https://claude.ai/artifact/67x1rsnNRPF5BqmhdPheid">Fractions et racines</a> explique les deux règles utilisées (sections 2.2 et 2.4).</p>
+</div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Formules d'addition et de duplication</h2>
+<p class="use"><b>Quand :</b> l'angle n'est pas dans la table mais s'écrit comme une somme, une différence ou un double d'angles connus, ou il faut développer cos(a + b).</p>
+<div class="box key">
+<p class="lbl">Les formules d'addition</p>
+<p class="eq form">cos(a + b) = cos a cos b − sin a sin b</p>
+<p class="eq form">cos(a − b) = cos a cos b + sin a sin b</p>
+<p class="eq form">sin(a + b) = sin a cos b + cos a sin b</p>
+<p class="eq form">sin(a − b) = sin a cos b − cos a sin b</p>
+<p>Pour s'en souvenir : le cosinus garde le même type de produit (cos cos, puis sin sin) et change le signe ; le sinus mélange (sin cos, puis cos sin) et garde le signe.</p>
+</div>
+<h3>Les formules de duplication</h3>
+<p>Elles se déduisent des formules d'addition, avec b = a. C'est ce que fait la vidéo :</p>
+<div class="steps">
+<span class="op"></span><span>cos(2a) = cos(a + a) = cos a cos a − sin a sin a</span>
+<span class="op">=</span><span>cos²a − sin²a</span>
+<span class="op">=</span><span>cos²a − (1 − cos²a) = <b>2cos²a − 1</b></span>
+<span class="why">On remplace sin²a par 1 − cos²a, grâce à cos²a + sin²a = 1.</span>
+<span class="op">=</span><span><b>1 − 2sin²a</b></span>
+<span class="why"><span class="tag tag-p">Complément</span> En remplaçant plutôt cos²a par 1 − sin²a. Cette forme sert pour sin(π/8).</span>
+<span class="op"></span><span>sin(2a) = sin(a + a) = sin a cos a + cos a sin a = <b>2 sin a cos a</b></span>
+</div>
+
+<h3>Application 1 : cos(π/12)</h3>
+<p>π/12 n'est pas dans la table, mais c'est la différence de deux angles connus : π/3 − π/4 = 4π/12 − 3π/12 = π/12.</p>
+<div class="steps">
+<span class="op"></span><span>cos(<span class="q"><span>π</span><span>12</span></span>) = cos(<span class="q"><span>π</span><span>3</span></span> − <span class="q"><span>π</span><span>4</span></span>)</span>
+<span class="op">=</span><span>cos <span class="q"><span>π</span><span>3</span></span> cos <span class="q"><span>π</span><span>4</span></span> + sin <span class="q"><span>π</span><span>3</span></span> sin <span class="q"><span>π</span><span>4</span></span></span>
+<span class="why">La formule de cos(a − b).</span>
+<span class="op">=</span><span><span class="q"><span>1</span><span>2</span></span> × <span class="q"><span>√2</span><span>2</span></span> + <span class="q"><span>√3</span><span>2</span></span> × <span class="q"><span>√2</span><span>2</span></span></span>
+<span class="op">=</span><span><span class="q"><span>√2 + √6</span><span>4</span></span> ≈ 0,966</span>
+<span class="why">√3 × √2 = √6 : la règle du produit des racines.</span>
+</div>
+
+<h3>Application 2 : cos(π/8)</h3>
+<p>π/8 est la moitié de π/4 : on utilise cos(2a) = 2cos²a − 1 avec a = π/8, puisque 2 × π/8 = π/4, un angle connu.</p>
+<div class="steps">
+<span class="op"></span><span>cos(<span class="q"><span>π</span><span>4</span></span>) = 2cos²(<span class="q"><span>π</span><span>8</span></span>) − 1</span>
+<span class="op">⇔</span><span><span class="q"><span>√2</span><span>2</span></span> + 1 = 2cos²(<span class="q"><span>π</span><span>8</span></span>)</span>
+<span class="op">⇔</span><span>cos²(<span class="q"><span>π</span><span>8</span></span>) = <span class="q"><span>√2 + 2</span><span>4</span></span></span>
+<span class="why">On divise par 2 : (√2/2 + 1)/2 = (√2 + 2)/4.</span>
+<span class="op"></span><span>cos(<span class="q"><span>π</span><span>8</span></span>) = √<span class="rt">(2 + √2)/4</span> &nbsp;ou&nbsp; −√<span class="rt">(2 + √2)/4</span></span>
+<span class="why">Deux candidats. π/8 est dans le premier quart de tour : son cosinus est positif.</span>
+<span class="op"></span><span>cos(<span class="q"><span>π</span><span>8</span></span>) = <span class="q"><span>√<span class="rt">2 + √2</span></span><span>2</span></span> ≈ 0,924</span>
+<span class="why">√((2 + √2)/4) = √(2 + √2)/√4. Sous la racine, 2 + √2 est une somme : on ne la coupe pas en deux.</span>
+</div>
+<div class="box nts">
+<p class="lbl">À toi : la fin de ton exercice 3</p>
+<ul>
+<li><b>sin(π/8)</b> : même méthode, avec cos(2a) = 1 − 2sin²a. Contrôle : environ 0,383.</li>
+<li><b>sin(π/12)</b> : avec la formule de sin(a − b). Contrôle : environ 0,259.</li>
+<li><b>cos(5π/12) et sin(5π/12)</b> : écris 5π/12 comme une somme de deux angles de la table. Contrôle : environ 0,259 et 0,966.</li>
+</ul>
+<p>Les valeurs approchées servent seulement à vérifier ton résultat exact à la calculatrice.</p>
+</div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="p11">
+<h2><span class="num">11</span>L'équation finale : cos x + sin x = 1</h2>
+<p class="use"><b>Quand :</b> l'équation mélange cos x et sin x, et aucun des trois types ne s'applique directement.</p>
+<h3>La méthode de la vidéo : tout mettre au carré</h3>
+<div class="steps">
+<span class="op"></span><span>(cos x + sin x)² = 1²</span>
+<span class="op"></span><span>cos²x + 2 cos x sin x + sin²x = 1</span>
+<span class="why">L'identité remarquable (a + b)² = a² + 2ab + b².</span>
+<span class="op"></span><span>1 + sin(2x) = 1</span>
+<span class="why">cos²x + sin²x = 1 et 2 sin x cos x = sin(2x).</span>
+<span class="op"></span><span>sin(2x) = 0</span>
+<span class="op"></span><span>2x = 2kπ &nbsp;ou&nbsp; 2x = π + 2kπ</span>
+<span class="op"></span><span>x = kπ &nbsp;ou&nbsp; x = <span class="q"><span>π</span><span>2</span></span> + kπ</span>
+</div>
+<div class="box warn">
+<p class="lbl"><span class="tag tag-c">Correction</span> Le carré ajoute de fausses solutions</p>
+<p>Vérifie les solutions trouvées sur [0 ; 2π[, dans l'équation de départ :</p>
+<div class="tw"><table class="c tight">
+<tr><th>x</th><td>0</td><td>π/2</td><td>π</td><td>3π/2</td></tr>
+<tr><th>cos x + sin x</th><td>1 + 0 = 1</td><td>0 + 1 = 1</td><td>−1 + 0 = −1</td><td>0 − 1 = −1</td></tr>
+<tr><th>Solution ?</th><td class="v">oui</td><td class="v">oui</td><td class="f">non</td><td class="f">non</td></tr>
+</table></div>
+<p>π et 3π/2 vérifient l'équation au carré, mais pas cos x + sin x = 1. La raison est logique : si A = B, alors A² = B², mais la réciproque est fausse. A² = B² veut dire <b>A = B ou A = −B</b>. Le carré a ajouté les solutions de cos x + sin x = −1. Le passage au carré, la première ligne du calcul, est une implication ⇒, pas une équivalence ⇔ (ton cours de logique, partie 5).</p>
+<p><b>Les vraies solutions :</b> S = {2kπ ; k ∈ ℤ} ∪ {π/2 + 2kπ ; k ∈ ℤ}.</p>
+<p><b>La règle :</b> après avoir élevé au carré, on vérifie chaque solution dans l'équation de départ, et on retire celles qui ne marchent pas. Soit la vidéo l'a fait et ça manque dans tes notes, soit elle l'a sauté. Sur ta copie, cette vérification est obligatoire.</p>
+</div>
+<figure><svg viewBox="0 0 320 300" role="img" aria-label="Le point (cos x ; sin x) doit être sur la droite X plus Y égale 1, qui coupe le cercle en 0 et pi sur 2. Le carré ajoute la droite X plus Y égale moins 1, qui coupe le cercle en pi et 3 pi sur 2." style="max-width:320px">
+<line x1="38" y1="150" x2="282" y2="150" class="sm"/>
+<line x1="160" y1="272" x2="160" y2="28" class="sm"/>
+<circle cx="160" cy="150" r="100" class="st"/>
+<line x1="118" y1="8" x2="302" y2="192" class="sg"/>
+<line x1="18" y1="108" x2="202" y2="292" class="sr dash"/>
+<circle cx="260" cy="150" r="6" class="ptg"/>
+<circle cx="160" cy="50" r="6" class="ptg"/>
+<circle cx="60" cy="150" r="6" class="ptr"/>
+<circle cx="160" cy="250" r="6" class="ptr"/>
+<text x="272" y="155" text-anchor="start" class="mt tg halo" style="font-size:16px">0</text>
+<text x="150" y="42" text-anchor="end" class="mt tg halo" style="font-size:16px">π/2</text>
+<text x="48" y="155" text-anchor="end" class="mt tr halo" style="font-size:16px">π</text>
+<text x="160" y="271" text-anchor="middle" class="mt tr halo" style="font-size:16px">3π/2</text>
+<text x="255" y="88" text-anchor="start" class="s tg halo" style="font-size:13px">X + Y = 1</text>
+<text x="195" y="279" text-anchor="start" class="s tr halo" style="font-size:13px">X + Y = −1</text>
+</svg><figcaption>cos x + sin x = 1 : le point du cercle est sur la droite verte, qui le coupe en 0 et π/2. Élever au carré ajoute la droite rouge pointillée (X + Y = −1) et ses deux points, π et 3π/2, qui ne sont pas solutions.</figcaption></figure>
+<h3><span class="tag tag-p">Complément</span> Une seconde méthode, sans piège</h3>
+<p>Avec la formule de cos(a − b) et b = π/4 :</p>
+<div class="steps">
+<span class="op"></span><span>√2 cos(x − <span class="q"><span>π</span><span>4</span></span>) = √2 (cos x cos <span class="q"><span>π</span><span>4</span></span> + sin x sin <span class="q"><span>π</span><span>4</span></span>)</span>
+<span class="op">=</span><span>√2 × <span class="q"><span>√2</span><span>2</span></span> (cos x + sin x) = cos x + sin x</span>
+<span class="why">√2 × √2/2 = 2/2 = 1.</span>
+</div>
+<p>L'équation devient donc une équation de type 1, où chaque étape est une équivalence :</p>
+<div class="steps">
+<span class="op"></span><span>cos x + sin x = 1</span>
+<span class="op">⇔</span><span>cos(x − <span class="q"><span>π</span><span>4</span></span>) = <span class="q"><span>1</span><span>√2</span></span> = <span class="q"><span>√2</span><span>2</span></span> = cos <span class="q"><span>π</span><span>4</span></span></span>
+<span class="op">⇔</span><span>x − <span class="q"><span>π</span><span>4</span></span> = <span class="q"><span>π</span><span>4</span></span> + 2kπ &nbsp;ou&nbsp; x − <span class="q"><span>π</span><span>4</span></span> = −<span class="q"><span>π</span><span>4</span></span> + 2kπ</span>
+<span class="op">⇔</span><span>x = <span class="q"><span>π</span><span>2</span></span> + 2kπ &nbsp;ou&nbsp; x = 2kπ</span>
+</div>
+<p>Même résultat, et aucune vérification n'est nécessaire, puisqu'on n'a jamais quitté les ⇔.</p>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="p12">
+<h2><span class="num">12</span>Quel outil ? Vérifie-toi</h2>
+<p>Pour chaque exercice, choisis l'outil à sortir en premier. Le but n'est pas de résoudre, mais de reconnaître le type d'exercice : c'est la moitié du travail en examen.</p>
+<div class="drill">
+<div class="mq" data-a="1">
+<p class="mq-q">Résoudre cos(3x) = cos(x) dans ℝ.</p>
+<div class="mq-c"><button type="button" data-fb="Il n'y a rien à développer : les deux membres ont déjà la même forme, cos de quelque chose.">Formule d'addition</button><button type="button">Type 1 : cos A = cos B</button><button type="button" data-fb="Les deux membres sont des cosinus d'expressions en x : c'est une équation de la forme cos A = cos B.">Inéquation avec le croquis</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">A = 3x, B = x : A = B + 2kπ ou A = −B + 2kπ.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Sachant que cos x = 3/5 et x ∈ [−π/2 ; 0], trouver sin x.</p>
+<div class="mq-c"><button type="button" data-fb="3/5 n'est pas une valeur de la table : aucun angle associé ne donnera sin x directement.">Les angles associés</button><button type="button" data-fb="Il n'y a pas d'équation à résoudre : on connaît cos x et on cherche sin x.">Résoudre une équation avec le croquis</button><button type="button">sin²x + cos²x = 1, puis le signe</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">sin²x = 1 − 9/25 = 16/25, et sur [−π/2 ; 0] le sinus est négatif : sin x = −4/5.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Résoudre sin x ≥ 1/2 dans [0 ; 2π[.</p>
+<div class="mq-c"><button type="button" data-fb="Un signe ≥ : ce n'est pas une équation, la réponse sera un intervalle.">Type 2 : sin A = sin B</button><button type="button">Inéquation : croquis, droite, arc</button><button type="button" data-fb="Le sinus est déjà isolé, et 1/2 est dans la table : pas besoin de Pythagore.">sin²x + cos²x = 1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Droite horizontale y = 1/2, arc au-dessus, extrémités incluses : [π/6 ; 5π/6].</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Simplifier sin(π − x) + cos(π/2 − x).</p>
+<div class="mq-c"><button type="button">Les angles associés</button><button type="button" data-fb="On pourrait, mais c'est bien plus long : π − x et π/2 − x sont des angles associés, qui se lisent sur un croquis.">Formules d'addition</button><button type="button" data-fb="Il n'y a pas de signe = à résoudre : on simplifie une expression.">Type 3 : cos a = sin b</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">sin(π − x) = sin x et cos(π/2 − x) = sin x : l'expression vaut 2 sin x.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Les mesures 7π/4 et −π/4 désignent-elles le même point ?</p>
+<div class="mq-c"><button type="button" data-fb="Deux angles peuvent avoir le même cosinus sans être au même point, comme x et −x. Il faudrait aussi comparer les sinus : la différence est plus rapide.">Calculer le cosinus des deux</button><button type="button" data-fb="Pas besoin de degrés : la différence en radians suffit.">Convertir en degrés</button><button type="button">Calculer la différence et la diviser par 2π</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">7π/4 − (−π/4) = 8π/4 = 2π, un tour entier : même point.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Résoudre cos x = sin(2x) dans ℝ.</p>
+<div class="mq-c"><button type="button" data-fb="Le carré ajouterait de fausses solutions (outil 11). On préfère se ramener à cos A = cos B, où chaque étape est une équivalence.">Tout mettre au carré</button><button type="button" data-fb="Les deux membres ne sont pas de la même fonction : un cosinus d'un côté, un sinus de l'autre.">Type 1 : cos A = cos B</button><button type="button">Type 3 : transformer le sinus en cosinus</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">sin(2x) = cos(π/2 − 2x), donc cos x = cos(π/2 − 2x) : type 1.</div>
+</div>
+</div>
+
+<div class="box key">
+<p class="lbl">Bilan : avant le prochain TD, tu dois pouvoir…</p>
+<ul>
+<li>calculer la mesure principale d'un angle comme −415π/11, en arrondissant le nombre de tours ;</li>
+<li>dire si deux mesures donnent le même point, ou des points opposés ;</li>
+<li>résoudre une équation et une inéquation avec le croquis, et écrire S sur un intervalle et sur ℝ, avec k ∈ ℤ ;</li>
+<li>retrouver n'importe quel angle associé en dix secondes avec un croquis ;</li>
+<li>reconnaître les trois types d'équations, et trouver les solutions dans un intervalle sans en oublier ni en compter deux fois ;</li>
+<li>passer du sinus au cosinus avec Pythagore et le signe ;</li>
+<li>redémontrer cos(2a) et sin(2a) à partir des formules d'addition ;</li>
+<li>expliquer pourquoi on vérifie toujours les solutions après avoir élevé au carré.</li>
+</ul>
+</div>
+</section>
+</main>
+
+<footer>Page préparée à partir de tes notes sur une vidéo de trigonométrie, recalculées et complétées. Fonctions élémentaires, Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function num(v, d){ var s = v.toFixed(d === undefined ? 2 : d); if (/^-?0\.0+$/.test(s)) s = s.replace('-', ''); return s.replace('-', '−').replace('.', ','); }
+
+/* ---------- Questions « Quel outil ? » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis le tableau du début de la page.'; }
+    });
+  });
+});
+
+/* ---------- Outil 2 : mesure principale ---------- */
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while (b){ var t = a % b; a = b; b = t; } return a; }
+function ceilDiv(a, b){ return -Math.floor(-a / b); } // b > 0, entiers
+/* n·π/d affiché proprement, fraction empilée */
+function fpi(n, d, opts){
+  opts = opts || {};
+  if (n === 0) return '0';
+  var neg = n < 0, a = Math.abs(n), top = (a === 1 ? '' : a) + 'π', s;
+  s = d === 1 ? top : '<span class="q"><span>' + top + '</span><span>' + d + '</span></span>';
+  return (neg ? '−' : (opts.plus ? '+ ' : '')) + s;
+}
+function parseAngle(raw){
+  var s = String(raw).replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(/pi/gi, 'π');
+  var m = s.match(/^([+-]?)(\d{0,7})(π?)(?:\/(\d{1,7}))?$/);
+  if (!m || (!m[2] && !m[3])) return {err:'Écris l\'angle sous la forme aπ/b, par exemple -415π/11, 23pi/4 ou 3π.'};
+  if (!m[3]) return {err:'Écris l\'angle avec π, par exemple 23π/4 (ou 23pi/4).'};
+  var p = (m[2] ? parseInt(m[2], 10) : 1) * (m[1] === '-' ? -1 : 1), q = m[4] ? parseInt(m[4], 10) : 1;
+  if (q === 0) return {err:'Le dénominateur ne peut pas être 0.'};
+  return {p:p, q:q};
+}
+function mpSteps(p, q){
+  var L = [];
+  function line(op, html, why){ L.push('<span class="op">' + op + '</span><span>' + html + '</span>' + (why ? '<span class="why">' + why + '</span>' : '')); }
+  var t = p / (2 * q);
+  var K = ceilDiv(p - q, 2 * q);            // le seul entier qui ramène dans ]−1 ; 1]
+  var r = p - 2 * K * q, g = gcd(r, q), rn = r / g, rd = q / g;
+  var tie = ((p - q) % (2 * q) === 0);
+  var tStr = Number.isInteger(t) ? num(t, 0) : '≈ ' + num(t);
+  line('', fpi(p, q) + ' ÷ 2π = <span class="q"><span>' + (p < 0 ? '−' : '') + Math.abs(p) + '</span><span>' + (2 * q) + '</span></span> ' + (Number.isInteger(t) ? '= ' + num(t, 0) : tStr),
+       'Étape 1 : l\'angle contient ' + (Number.isInteger(t) ? 'exactement ' + num(t, 0) : 'environ ' + num(t)) + ' tours.');
+  var kwhy;
+  if (tie) kwhy = 'Étape 2 : ' + num(t, 1) + ' est à égale distance de ' + K + ' et de ' + (K + 1) + '. On prend k = ' + M(K) + ', car l\'autre choix donnerait −π, exclu de ]−π ; π].';
+  else kwhy = 'Étape 2 : l\'entier le plus proche de ' + (Number.isInteger(t) ? num(t, 0) : num(t)) + ' est ' + M(K) + '.';
+  line('', 'k = ' + M(K), kwhy);
+  if (K === 0){
+    L.push('<span class="op"></span><span class="why" style="margin-top:2px">k = 0 : l\'angle est déjà dans ]−π ; π]. Il n\'y a aucun tour à enlever.</span>');
+  } else {
+    var turns = 2 * Math.abs(K);
+    var big = 2 * Math.abs(K) * q;
+    var sign = K > 0 ? '−' : '+';
+    var w3 = K > 0 ? 'Étape 3 : on enlève ' + K + ' tour' + (K > 1 ? 's' : '') + ', soit ' + turns + 'π'
+                   : 'Étape 3 : on ajoute ' + (-K) + ' tour' + (-K > 1 ? 's' : '') + ', soit ' + turns + 'π';
+    w3 += q === 1 ? '.' : ', écrit avec le dénominateur ' + q + ' : ' + turns + 'π = ' + big + 'π/' + q + '.';
+    var mid = q === 1 ? '' : ' = ' + fpi(p, q) + ' ' + sign + ' ' + fpi(big, q);
+    line('', fpi(p, q) + ' ' + sign + ' ' + turns + 'π' + mid + ' = ' + fpi(r, q), w3);
+    if (g > 1 && r !== 0) line('=', fpi(rn, rd), 'On simplifie la fraction par ' + g + '.');
+  }
+  var c = rn / rd;
+  line('', '<span class="q"><span>' + M(rn) + '</span><span>' + rd + '</span></span> ' + (Number.isInteger(c) ? '= ' + num(c, 0) : '≈ ' + num(c)) + ' ∈ ]−1 ; 1]',
+       'Étape 4 : le coefficient de π est bien dans ]−1 ; 1].');
+  return '<div class="steps">' + L.join('') + '</div><div class="verdict ok"><p><b>Mesure principale : <span class="mr">' + fpi(rn, rd) + '</span></b></p></div>';
+}
+function M(n){ return String(n).replace('-', '−'); }
+function mpRun(){
+  var out = $('mp-out'), a = parseAngle($('mp-in').value);
+  if (a.err){ out.innerHTML = '<p class="mp-err">' + esc(a.err) + '</p>'; return; }
+  out.innerHTML = mpSteps(a.p, a.q);
+}
+if ($('mp')){
+  $('mp-in').addEventListener('input', mpRun);
+  each(document.querySelectorAll('#mp-pre button'), function(b){ b.addEventListener('click', function(){ $('mp-in').value = b.getAttribute('data-v'); mpRun(); }); });
+  mpRun();
+}
+
+/* ---------- Outil 7 : explorateur d'angles associés ---------- */
+var AX = {
+  neg:  {lab:'−x',      f:function(x){ return -x; },             c:'cos x',  s:'−sin x', why:'Symétrie par rapport à l\'axe horizontal : même abscisse, ordonnée opposée.'},
+  pimx: {lab:'π − x',   f:function(x){ return Math.PI - x; },     c:'−cos x', s:'sin x',  why:'Symétrie par rapport à l\'axe vertical : même hauteur, abscisse opposée.'},
+  pipx: {lab:'x + π',   f:function(x){ return x + Math.PI; },     c:'−cos x', s:'−sin x', why:'Point diamétralement opposé : les deux coordonnées changent de signe.'},
+  hmx:  {lab:'π/2 − x', f:function(x){ return Math.PI / 2 - x; }, c:'sin x',  s:'cos x',  why:'Symétrie par rapport à la diagonale : le cosinus et le sinus s\'échangent.'},
+  hpx:  {lab:'x + π/2', f:function(x){ return x + Math.PI / 2; }, c:'−sin x', s:'cos x',  why:'Un quart de tour de plus : les coordonnées s\'échangent, et le nouveau cosinus prend un signe moins.'},
+  tpx:  {lab:'x + 2π',  f:function(x){ return x + 2 * Math.PI; }, c:'cos x',  s:'sin x',  why:'Un tour complet de plus : on revient exactement au même point.'}
+};
+var axK = 'pimx';
+function axDraw(){
+  var svg = $('ax-svg'); if (!svg) return;
+  var deg = +$('ax-x').value, x = deg * Math.PI / 180, A = AX[axK], y = A.f(x);
+  var cx = 160, cy = 160, R = 112;
+  function Pt(t, r){ r = r === undefined ? R : r; return [cx + r * Math.cos(t), cy - r * Math.sin(t)]; }
+  function F(v){ return Math.round(v * 10) / 10; }
+  var s = [];
+  s.push('<line x1="' + (cx - R - 22) + '" y1="' + cy + '" x2="' + (cx + R + 22) + '" y2="' + cy + '" class="sm"/>');
+  s.push('<line x1="' + cx + '" y1="' + (cy + R + 22) + '" x2="' + cx + '" y2="' + (cy - R - 22) + '" class="sm"/>');
+  s.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" class="st"/>');
+  if (axK === 'hmx'){ var d = R * 1.1 / Math.SQRT2; s.push('<line x1="' + F(cx - d) + '" y1="' + F(cy + d) + '" x2="' + F(cx + d) + '" y2="' + F(cy - d) + '" class="sm dash"/>'); }
+  if (axK === 'neg') s.push('<line x1="' + (cx - R - 22) + '" y1="' + cy + '" x2="' + (cx + R + 22) + '" y2="' + cy + '" class="sr thin dash"/>');
+  if (axK === 'pimx') s.push('<line x1="' + cx + '" y1="' + (cy + R + 22) + '" x2="' + cx + '" y2="' + (cy - R - 22) + '" class="sr thin dash"/>');
+  var M1 = Pt(x), M2 = Pt(y);
+  if (axK === 'pipx') s.push('<line x1="' + F(M1[0]) + '" y1="' + F(M1[1]) + '" x2="' + F(M2[0]) + '" y2="' + F(M2[1]) + '" class="sr thin dash"/>');
+  if (axK === 'hpx' || axK === 'tpx'){
+    var r2 = 34, t1 = x, t2 = axK === 'hpx' ? x + Math.PI / 2 : x + 2 * Math.PI - 0.35;
+    var a1 = Pt(t1, r2), a2 = Pt(t2, r2), large = (t2 - t1) > Math.PI ? 1 : 0;
+    s.push('<path d="M' + F(a1[0]) + ',' + F(a1[1]) + ' A' + r2 + ',' + r2 + ' 0 ' + large + ' 0 ' + F(a2[0]) + ',' + F(a2[1]) + '" class="sr thin" marker-end="url(#ah)"/>');
+  }
+  // projections : x en bleu, l'angle associé en rouge
+  function proj(P, cls){
+    s.push('<line x1="' + F(P[0]) + '" y1="' + F(P[1]) + '" x2="' + F(P[0]) + '" y2="' + cy + '" class="' + cls + ' thin dash"/>');
+    s.push('<line x1="' + F(P[0]) + '" y1="' + F(P[1]) + '" x2="' + cx + '" y2="' + F(P[1]) + '" class="' + cls + ' thin dash"/>');
+    s.push('<line x1="' + F(P[0]) + '" y1="' + (cy - 6) + '" x2="' + F(P[0]) + '" y2="' + (cy + 6) + '" class="' + cls + '"/>');
+    s.push('<line x1="' + (cx - 6) + '" y1="' + F(P[1]) + '" x2="' + (cx + 6) + '" y2="' + F(P[1]) + '" class="' + cls + '"/>');
+  }
+  proj(M1, 'sb');
+  if (axK !== 'tpx') proj(M2, 'sr');
+  s.push('<circle cx="' + F(M1[0]) + '" cy="' + F(M1[1]) + '" r="6" class="ptb"/>');
+  if (axK !== 'tpx') s.push('<circle cx="' + F(M2[0]) + '" cy="' + F(M2[1]) + '" r="6" class="ptr"/>');
+  function lab(t, txt, cls, extra){
+    var P = Pt(t, R + 18), c = Math.cos(t), anchor = Math.abs(c) < 0.3 ? 'middle' : (c > 0 ? 'start' : 'end');
+    s.push('<text x="' + F(P[0]) + '" y="' + F(P[1] + 5 + (extra || 0)) + '" text-anchor="' + anchor + '" class="mt ' + cls + ' halo">' + txt + '</text>');
+  }
+  lab(x, 'x', 'tb', axK === 'tpx' ? -9 : 0);
+  lab(y, axK === 'tpx' ? 'x + 2π' : A.lab, 'tr', axK === 'tpx' ? 11 : 0);
+  svg.innerHTML = s.join('');
+  $('ax-xv').textContent = deg + '°, soit ' + num(x, 2) + ' rad';
+  var cX = Math.cos(x), sX = Math.sin(x), cY = Math.cos(y), sY = Math.sin(y);
+  $('ax-out').innerHTML =
+    '<b class="r">cos(' + A.lab + ')</b><span>= ' + A.c + ' ≈ ' + num(cY) + '</span>' +
+    '<b class="r">sin(' + A.lab + ')</b><span>= ' + A.s + ' ≈ ' + num(sY) + '</span>' +
+    '<b class="b">pour x</b><span>cos x ≈ ' + num(cX) + ' ; sin x ≈ ' + num(sX) + '</span>';
+  $('ax-why').textContent = A.why;
+}
+if ($('ax')){
+  $('ax-x').addEventListener('input', axDraw);
+  each(document.querySelectorAll('#ax .ax-btns button'), function(b){
+    b.addEventListener('click', function(){
+      axK = b.getAttribute('data-k');
+      each(document.querySelectorAll('#ax .ax-btns button'), function(o){ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      axDraw();
+    });
+  });
+  axDraw();
+}
+
+window.__outils = {mpSteps: mpSteps, parseAngle: parseAngle, AX: AX};
+})();
+</script>
+
+</body></html>
