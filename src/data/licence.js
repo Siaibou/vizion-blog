@@ -77,8 +77,6 @@ export const semestres = [
             contenus: [
               { titre: 'Géométrie et trigonométrie, depuis le tout début', href: '/cours/geometrie-et-trigonometrie.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
               { titre: 'Cercle trigonométrique par coeurs', href: '/cours/cercle_trigo_par_coeur.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
-              leCalcul,
-              { titre: 'Fractions et racines, depuis le tout début', href: '/cours/fractions-et-racines-depuis-le-tout-debut.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
               { titre: 'Outils de trigonométrie', href: '/cours/outils-de-trigonometrie.html', meta: 'Cours interactif' },
             ],
           },
@@ -91,7 +89,15 @@ export const semestres = [
               { titre: 'La logique, depuis le tout début', href: '/cours/la-logique.html', meta: 'Chapitre 0 · ' + COURS_CLAUDE },
               { titre: 'Feuille 1 de logique, pas à pas', href: '/cours/feuille-1-2-de-logique-pas-a-pas.html', meta: 'Exercices · rédigés avec Claude' },
               { titre: 'Majorants et bornes, depuis le tout début', href: '/cours/majorants-et-bornes.html', meta: 'Chapitre 1 · ' + COURS_CLAUDE },
+            ],
+          },
+          {
+            id: 'autres',
+            nom: 'Autres',
+            description: 'Remises à niveau et ressources de mathématiques communes, non rattachées à un cours en particulier.',
+            contenus: [
               leCalcul,
+              { titre: 'Fractions et racines, depuis le tout début', href: '/cours/fractions-et-racines-depuis-le-tout-debut.html', meta: 'Remise à niveau · ' + COURS_CLAUDE },
             ],
           },
         ],
