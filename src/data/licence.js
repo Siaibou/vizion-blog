@@ -37,6 +37,7 @@ export const semestres = [
             contenus: [
               { titre: 'Le binaire, depuis le tout début', href: '/cours/le-binaire.html', meta: COURS_CLAUDE },
               { titre: 'Les portes logiques, depuis le tout début', href: '/cours/les-portes-logiques.html', meta: COURS_CLAUDE },
+              { titre: 'Boole et Karnaugh, depuis le tout début', href: '/cours/boole-et-karnaugh-depuis-le-tout-debut.html', meta: COURS_CLAUDE },
             ],
           },
           {
