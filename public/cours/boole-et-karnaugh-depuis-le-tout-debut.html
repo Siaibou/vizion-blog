@@ -1,0 +1,1764 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Boole et Karnaugh, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Cahier à grands carreaux : même identité que les cours de maths (papier ligné, marge rouge, Atkinson + STIX),
+   avec une police à chasse fixe pour les bits, et les couleurs de fils de Logisim (vert vif = 1, vert sombre = 0). */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  --w1:#1fbf4a; --w0:#0f5a2c; --wz:#2f6fe0; --wx:#d33a2c; --w-off:#c9d2e3;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  --w1:#4ee37a; --w0:#2f7a4a; --wz:#7ea6ff; --wx:#ff7b6e; --w-off:#3a4462;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:780px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:780px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.mr{font-family:var(--serif);font-size:1.1em}
+.eq{font-family:var(--serif);font-size:1.25rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.5}
+code,.bits{font-family:var(--mono);font-size:.86em}
+code{background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.bits{white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+sub{font-size:.7em}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}.c-m{color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;white-space:nowrap}
+table.c td.bits{font-size:.95rem}
+table.tight{width:auto;margin:0 auto}
+table.c tr.hl td{background:var(--soft-a)}
+table.c td.v,td.one{color:var(--green);font-weight:700}
+td.zero{color:var(--muted)}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:var(--serif)}
+.blk a:hover{border-color:var(--blue)}
+details.check{margin:22px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+.check ol{padding-left:1.3em}
+.check li{margin:12px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem;overflow-x:auto}
+.steps{font-family:var(--serif);font-size:1.08rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:var(--sans);font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.05em;font-family:var(--sans);font-weight:700}
+.steps .bits{font-size:.92em}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.9rem}
+.note{font-size:.92rem;color:var(--muted)}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:780px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+/* questions guidées */
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.mq{border-top:1px solid var(--line);padding:10px 0 6px}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+
+/* boutons et champs communs aux laboratoires */
+.lab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:18px 0}
+.lab>.lbl{color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0}
+.row>*{min-width:0}
+.fld{display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:var(--muted);font-weight:700}
+.fld input,.fld select{font-family:var(--mono);font-size:1.05rem;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px;min-width:0;width:100%}
+.fld select{font-family:var(--sans)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.92rem;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:38px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--soft-b);color:var(--blue);font-weight:700}
+.out{margin-top:10px}
+.msg{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:.98rem}
+.msg>:first-child{margin-top:0}.msg>:last-child{margin-bottom:0}
+.msg.ok{background:var(--soft-g)}.msg.ko{background:var(--soft-r)}.msg.info{background:var(--soft-b)}.msg.meh{background:var(--soft-a)}
+.pill{display:inline-block;font-size:.82rem;font-weight:700;border-radius:999px;padding:1px 10px;white-space:nowrap}
+.pill.v{background:var(--soft-g);color:var(--green)}.pill.f{background:var(--soft-r);color:var(--red)}.pill.n{background:var(--soft-b);color:var(--blue)}
+/* ---- circuits ---- */
+.circ,.lab-c{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:16px 0}
+.circ-fig{overflow-x:auto;padding:4px 0}
+.circ-fig svg{display:block;margin:0 auto}
+.circ-fig svg .gate,.gal svg .gate{fill:var(--card);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.circ-fig svg .gate-l,.gal svg .gate-l{fill:none;stroke:var(--ink);stroke-width:2}
+svg .w{fill:none;stroke-width:3;stroke-linejoin:round}
+svg .w1{stroke:var(--w1)}
+svg .w0{stroke:var(--w0)}
+svg .jn.on{fill:var(--w1)} svg .jn.off{fill:var(--w0)}
+svg .ipin{cursor:pointer}
+svg .ipin:focus{outline:none}
+svg .ipin:focus-visible .ibox{stroke:var(--blue);stroke-width:3}
+svg .ibox{stroke-width:2}
+svg .ibox.on{fill:var(--soft-g);stroke:var(--w1)}
+svg .ibox.off{fill:var(--card);stroke:var(--w0)}
+svg .ipin:hover .ibox{stroke:var(--blue)}
+svg .opin{stroke-width:2.5}
+svg .opin.on{fill:var(--soft-g);stroke:var(--w1)}
+svg .opin.off{fill:var(--card);stroke:var(--w0)}
+svg .pv{font-family:var(--mono);font-size:14px;font-weight:700;fill:var(--ink)}
+svg .pn{font-family:var(--sans);font-size:14px;font-weight:700;fill:var(--blue)}
+svg .iec{font-family:var(--sans);font-size:13px;font-weight:700;fill:var(--ink)}
+svg .wl{font-family:var(--serif);font-size:13px;fill:var(--amber);paint-order:stroke;stroke:var(--card);stroke-width:4px}
+svg .cst{font-family:var(--mono);font-size:13px;font-weight:700;fill:var(--ink)}
+.ov{border-top:1.5px solid currentColor;padding-top:1px}
+.ov:has(.ov){padding-top:4px}
+.ov:has(.ov .ov){padding-top:7px}
+table.tt th.sub{font-weight:400;color:var(--muted)}
+table.tt th.outc,table.tt td.outc{background:var(--soft-b)}
+table.tt th{font-family:var(--serif);font-size:1.02rem}
+table.tt td{font-family:var(--mono);padding:4px 12px}
+table.tt tr.hl td{background:var(--soft-a)}
+
+/* ---- portes : galerie et banc d'essai ---- */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
+.gcard svg{display:block;margin:0 auto}
+.gname{font-weight:700;margin:4px 0 0}
+.gname .en{color:var(--muted);font-weight:400}
+.gexpr{font-family:var(--serif);font-size:1.1rem;margin:2px 0}
+.symtog{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.pg-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:center;margin-top:10px}
+@media (max-width:620px){.pg-grid{grid-template-columns:minmax(0,1fr)}}
+.pg-info p{margin:4px 0;font-size:.96rem}
+.pg-info .gname{font-size:1.15rem}
+#pg .seg button{min-width:3.4em}
+
+/* ---- lampe ---- */
+.lamp-fig svg{display:block;width:100%;max-width:420px;height:auto;margin:6px auto}
+.lamp-fig .cw{fill:none;stroke:var(--muted);stroke-width:3;stroke-linejoin:round}
+.lamp-fig .cw.on{stroke:var(--amber)}
+.lamp-fig .sw{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round}
+.lamp-fig .sw.on{stroke:var(--green)}
+.lamp-fig .term{fill:var(--ink)}
+.lamp-fig .bat{stroke:var(--ink);stroke-width:3}
+.lamp-fig .bulb{fill:var(--card);stroke:var(--ink);stroke-width:2.5}
+.lamp-fig .bulb.on{fill:var(--amber);stroke:var(--amber)}
+.lamp-fig .fil{stroke:var(--ink);stroke-width:1.5}
+.lamp-fig .swl{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+
+/* ---- laboratoire ---- */
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.presets button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+.presets button:hover{background:var(--soft-b)}
+.chk{font-size:.93rem;display:flex;gap:8px;align-items:center;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--blue)}
+.syntax{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:.95rem}
+.syntax code{white-space:nowrap}
+
+/* ---- Logisim ---- */
+.lg svg{display:block;width:100%;max-width:700px;height:auto;margin:0 auto}
+.lg .frame{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+.lg .bar{fill:var(--soft-b)}
+.lg .pane{fill:var(--paper);stroke:var(--line)}
+.lg .grid{fill:url(#dots)}
+.lg text{font-family:var(--sans);font-size:11px;fill:var(--ink)}
+.lg text.m{fill:var(--muted)}
+.lg .ico{fill:none;stroke:var(--ink);stroke-width:1.5}
+.lg .num circle{fill:var(--margin)}
+.lg .num text{fill:#fff;font-weight:700;font-size:11px}
+.lg .gate{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+ol.lg-leg li{margin:6px 0}
+.lg-leg b.n{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--margin);color:#fff;font-size:.8rem;margin-right:6px}
+.swatch{display:inline-block;width:28px;height:5px;border-radius:3px;vertical-align:middle}
+
+/* ---- exercices ---- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px 14px;margin:18px 0}
+.ex h3{margin-top:14px}
+.ex .circ{border:0;padding:0;margin:8px 0}
+.hints p{display:none;background:var(--soft-b);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:.96rem}
+.hints p.shown{display:block}
+.hints .btn{margin-top:6px}
+/* ---- couleurs des regroupements et de l'afficheur ---- */
+:root{--k0:#2350c4;--k1:#17835a;--k2:#c26a00;--k3:#b5179e;--k4:#0e8fa3;--k5:#7a4fd6;--led:#e0352b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--k0:#8aa9ff;--k1:#5fd39b;--k2:#f2b64a;--k3:#f07bd8;--k4:#4fd1e3;--k5:#b49cff;--led:#ff5a4f}}
+:root[data-theme="dark"]{--k0:#8aa9ff;--k1:#5fd39b;--k2:#f2b64a;--k3:#f07bd8;--k4:#4fd1e3;--k5:#b49cff;--led:#ff5a4f}
+
+/* ---- tableaux de Karnaugh ---- */
+.kmap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:16px 0}
+.kfig{overflow-x:auto}
+.kfig svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.kmap-svg .kc{fill:var(--card);stroke:var(--muted);stroke-width:1.2}
+.kmap-svg .kc.v1{fill:var(--soft-g)}
+.kmap-svg .kc.vx{fill:var(--soft-a)}
+.kmap-svg .kc.ed{cursor:pointer}
+.kmap-svg .kc.ed:hover{stroke:var(--blue);stroke-width:2.5}
+.kmap-svg .kc:focus{outline:none}
+.kmap-svg .kc:focus-visible{stroke:var(--blue);stroke-width:3}
+.kmap-svg .kdiag{stroke:var(--muted);stroke-width:1.2}
+.kmap-svg .kvar{font-family:var(--serif);font-size:17px;font-style:italic;fill:var(--blue);font-weight:600}
+.kmap-svg .khead{font-family:var(--mono);font-size:14px;fill:var(--ink)}
+.kmap-svg .kval{font-family:var(--mono);font-size:21px;font-weight:700;fill:var(--muted);pointer-events:none}
+.kmap-svg .kval.v1{fill:var(--green)}
+.kmap-svg .kval.vx{fill:var(--amber)}
+.kmap-svg .kidx{font-family:var(--mono);font-size:10px;fill:var(--muted);pointer-events:none}
+.kmap-svg .kidx.big{font-size:15px;fill:var(--ink)}
+.kmap-svg .kg{fill-opacity:.12;stroke-width:3;pointer-events:none}
+.kmap-svg .kg.bad{stroke-dasharray:7 5;fill-opacity:.05}
+.kmap-svg .k0{fill:var(--k0);stroke:var(--k0)} .kmap-svg .k1{fill:var(--k1);stroke:var(--k1)} .kmap-svg .k2{fill:var(--k2);stroke:var(--k2)}
+.kmap-svg .k3{fill:var(--k3);stroke:var(--k3)} .kmap-svg .k4{fill:var(--k4);stroke:var(--k4)} .kmap-svg .k5{fill:var(--k5);stroke:var(--k5)}
+.klegend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin:6px 0 2px;font-family:var(--serif);font-size:1.08rem}
+.kchip{display:inline-flex;align-items:center;gap:6px}
+.kchip i{display:inline-block;width:16px;height:16px;border-radius:5px;border:3px solid}
+.kchip i.k0{border-color:var(--k0)} .kchip i.k1{border-color:var(--k1)} .kchip i.k2{border-color:var(--k2)}
+.kchip i.k3{border-color:var(--k3)} .kchip i.k4{border-color:var(--k4)} .kchip i.k5{border-color:var(--k5)}
+.kchip i.bad{border-style:dashed}
+.kres{text-align:center;font-family:var(--serif);font-size:1.15rem;margin:4px 0 0}
+.kpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.kpair .kmap{margin:0}
+.kcap{font-size:.9rem;color:var(--muted);text-align:center;margin:4px 0 0}
+
+/* ---- atelier ---- */
+.at-grid{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:14px;align-items:start;margin:8px 0}
+@media (max-width:640px){.at-grid{grid-template-columns:minmax(0,1fr)}}
+.at-tt td,.at-tt th{padding:2px 9px}
+.at-tt .kv{font-family:var(--mono);font-weight:700;font-size:1rem;width:2.2em;min-height:30px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--muted);cursor:pointer}
+.at-tt .kv.v1{color:var(--green);border-color:var(--green);background:var(--soft-g)}
+.at-tt .kv.vx{color:var(--amber);border-color:var(--amber);background:var(--soft-a)}
+.at-tt .kv:disabled{cursor:default}
+.at-canon{margin:8px 0;background:var(--paper);border-radius:10px;padding:4px 12px}
+.at-canon summary{cursor:pointer;font-weight:700;padding:6px 0;color:var(--blue)}
+.canon-e{font-family:var(--serif);font-size:1.08rem;overflow-wrap:anywhere;line-height:1.9}
+.at-msgs{margin:6px 0;font-size:.96rem}
+.at-msgs li{margin:4px 0}
+.linkbtn{font:inherit;font-size:.95rem;background:none;border:0;color:var(--blue);text-decoration:underline;cursor:pointer;padding:4px 0}
+
+/* ---- vérificateur de calcul ---- */
+#st-in{width:100%;font-family:var(--mono);font-size:1rem;line-height:1.6;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical;min-height:9em}
+.st-list{padding-left:1.6em}
+.st-list li{margin:10px 0}
+.st-e{font-family:var(--serif);font-size:1.12rem}
+.st-c{display:block;font-size:.88rem;color:var(--blue)}
+.st-v{display:block;margin-top:2px}
+
+/* ---- afficheur 7 segments ---- */
+.seg7-grid{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.seg7-grid{grid-template-columns:minmax(0,1fr)}}
+.seg7-fig svg{display:block;margin:0 auto;width:150px;height:auto}
+.seg7-svg .sg{fill:var(--w-off);stroke:none}
+.seg7-svg .sg.on{fill:var(--led)}
+.seg7-svg .sg.x{fill:var(--w-off);opacity:.5}
+.seg7-svg .sg.sel{stroke:var(--blue);stroke-width:3}
+.seg7-svg .sgl{font-family:var(--sans);font-size:15px;font-weight:700;fill:var(--muted)}
+.seg7-svg .sgl.sel{fill:var(--blue)}
+.sbit{display:inline-flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:4px 10px;min-width:46px;cursor:pointer;font:inherit}
+.sbit .sn{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--blue)}
+.sbit .sb{font-family:var(--mono);font-size:1.3rem;font-weight:700}
+.sbit[aria-pressed="true"]{border-color:var(--w1);background:var(--soft-g)}
+.seg7-v{text-align:center;font-size:.95rem;margin:6px 0}
+.seg7-tab td,.seg7-tab th{padding:2px 7px;font-size:.9rem}
+.seg7-tab .selc{background:var(--soft-b)}
+td.xx{color:var(--amber);font-weight:700}
+#seg7-sel button{min-width:2.4em;font-family:var(--serif);font-style:italic;font-size:1.02rem}
+.graytab td,.graytab th{padding:4px 12px}
+.at-grid.solo{grid-template-columns:minmax(0,1fr)}
+#st-in{white-space:pre;overflow-x:auto}
+table.laws td.mr{white-space:nowrap}
+</style>
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Architecture des ordinateurs, séance du 12 octobre</p>
+<h1>Boole et Karnaugh, depuis le tout début<small>Les lois de l'algèbre de Boole, les formes canoniques et les tableaux de Karnaugh : comment passer d'une table de vérité au plus petit circuit possible.</small></h1>
+<p class="lede">Dans la page sur les portes logiques, tu as vu que deux circuits très différents peuvent calculer la même fonction. Cette page répond à la question suivante : comment trouver le plus petit ? Deux outils : le calcul, avec les lois de l'algèbre de Boole, et une méthode visuelle, les tableaux de Karnaugh. On finit par le TP : piloter un afficheur 7 segments.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Lis dans l'ordre.</b> Les sections 2 et 3 (le calcul) préparent la section 5 (Karnaugh), qui en est un raccourci visuel.</li>
+<li><b>Fais chaque simplification sur ta feuille</b>, puis vérifie-la dans les laboratoires : le vérificateur de calcul (section 3.3) et l'atelier de Karnaugh (section 5.9).</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b></li>
+<li><b>Rythme conseillé :</b> sections 1 à 4 avant la séance, la section 5 juste après, les sections 6 à 8 avant le TP, puis les exercices.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Ce que tu sais déjà</p>
+<p>La moitié des lois de cette page sont dans la partie 7 de ton cours <a href="https://claude.ai/artifact/8rbBRGhSPXVDngfF5HKouW">La logique, depuis le tout début</a> : commutativité, associativité, distributivité, De Morgan. Ici, on les écrit avec les notations de l'architecture (· pour ET, + pour OU, une barre pour NON) et 0 et 1 à la place de F et V. Les notations sont expliquées dans ta page <a href="https://claude.ai/artifact/Qu6Qq1xDuxR2SzvBEoh2Bv">Les portes logiques, depuis le tout début</a>.</p>
+</div>
+<h3>Les mots, et où ils sont expliqués</h3>
+<ul class="blk">
+<li><a href="#p1"><b>•</b>Pourquoi simplifier</a></li>
+<li><a href="#p2"><b>•</b>Les lois de Boole</a></li>
+<li><a href="#p3"><b>•</b>Simplifier par le calcul</a></li>
+<li><a href="#p3-lab"><b>•</b>Le vérificateur de calcul</a></li>
+<li><a href="#p4"><b>•</b>Mintermes, formes canoniques</a></li>
+<li><a href="#p5"><b>•</b>Tableaux de Karnaugh</a></li>
+<li><a href="#p5-gray"><b>•</b>Le code de Gray</a></li>
+<li><a href="#p5-x"><b>•</b>Cases indifférentes (X)</a></li>
+<li><a href="#p5-lab"><b>•</b>L'atelier de Karnaugh</a></li>
+<li><a href="#p6"><b>•</b>Plusieurs sorties</a></li>
+<li><a href="#p7"><b>•</b>L'afficheur 7 segments</a></li>
+<li><a href="#p8"><b>•</b>Vérifier dans Logisim</a></li>
+<li><a href="#p9"><b>•</b>Exercices</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Pourquoi simplifier</h2>
+<p>Voici deux circuits branchés sur les mêmes entrées. Le premier a été écrit directement à partir d'une table de vérité, le second est sa version simplifiée. Change les entrées : les deux sorties restent toujours égales.</p>
+<div class="circ" data-expr="S1 = a.b.c + a.b.c' + a.b'.c ; S2 = a.(b + c)" data-init="101" data-verdict data-nosub></div>
+<p>Même fonction, mais 6 portes d'un côté et 2 de l'autre (dans toute cette page, on compte toutes les portes, NON compris). Un circuit plus petit utilise moins de transistors : il coûte moins cher, consomme moins et chauffe moins. Il est souvent plus rapide aussi : chaque porte met un peu de temps à réagir (c'est le <b>temps de propagation</b>, <i>propagation delay</i>), et ce qui compte pour la vitesse, c'est le nombre de portes que le signal traverse <b>à la suite</b>, pas le nombre total.</p>
+<div class="box nts">
+<p class="lbl">Trois mots de vocabulaire</p>
+<p>Un <b>produit</b> (ou <b>terme</b>) est un ET de lettres, barrées ou non : a·<span class="ov">b</span>·c. Une <b>somme de produits</b> (<i>sum of products</i>) est un OU de produits : a·b + <span class="ov">a</span>·c. Chaque lettre d'un produit, barrée ou non, s'appelle un <b>littéral</b> (<i>literal</i>) ; dans cette page, on dit simplement « lettre ». S1 est une somme de 3 produits de 3 lettres.</p>
+</div>
+<p>Pour passer de S1 à S2, on a deux outils :</p>
+<ul>
+<li><b>le calcul</b>, avec les lois de l'algèbre de Boole (sections 2 et 3). Il marche toujours, mais on ne sait jamais très bien quelle loi appliquer, ni si on a fini ;</li>
+<li><b>les tableaux de Karnaugh</b> (section 5), une méthode visuelle qui donne la plus petite somme de produits, pour 4 entrées au plus, à condition de bien choisir ses groupes (section 5.4).</li>
+</ul>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Les lois de l'algèbre de Boole</h2>
+
+<h3>2.1 Le cadre</h3>
+<p>L'algèbre de Boole calcule avec deux valeurs, 0 et 1, et trois opérations : NON (la barre), ET (·) et OU (+). Elle ressemble au calcul ordinaire, avec une différence de taille :</p>
+<ul>
+<li>le ET se comporte exactement comme la multiplication : 0·0 = 0, 0·1 = 0, 1·1 = 1 ;</li>
+<li>le OU ressemble à l'addition, sauf que <b>1 + 1 = 1</b>. Un OU ne « déborde » jamais.</li>
+</ul>
+<p>Une façon de s'en souvenir quand on programme : sur 0 et 1, <b>a·b, c'est min(a, b)</b>, et <b>a + b, c'est max(a, b)</b>. Le maximum de 1 et 1 vaut 1.</p>
+
+<h3>2.2 Les lois</h3>
+<p>Chaque loi est vraie pour toutes les valeurs des lettres. Elles vont par deux : la version de droite s'obtient en échangeant + et ·, et 0 et 1 (section 2.5).</p>
+<div class="tw"><table class="laws">
+<tr><th>nom</th><th>avec +</th><th>avec ·</th></tr>
+<tr><td>élément neutre</td><td class="mr">a + 0 = a</td><td class="mr">a·1 = a</td></tr>
+<tr><td>élément absorbant</td><td class="mr">a + 1 = 1</td><td class="mr">a·0 = 0</td></tr>
+<tr><td>idempotence</td><td class="mr">a + a = a</td><td class="mr">a·a = a</td></tr>
+<tr><td>complément</td><td class="mr">a + <span class="ov">a</span> = 1</td><td class="mr">a·<span class="ov">a</span> = 0</td></tr>
+<tr><td>double négation</td><td class="mr" colspan="2"><span class="ov"><span class="ov">a</span></span> = a</td></tr>
+<tr><td>commutativité</td><td class="mr">a + b = b + a</td><td class="mr">a·b = b·a</td></tr>
+<tr><td>associativité</td><td class="mr">(a + b) + c = a + (b + c)</td><td class="mr">(a·b)·c = a·(b·c)</td></tr>
+<tr><td>distributivité</td><td class="mr">a + b·c = (a + b)·(a + c)</td><td class="mr">a·(b + c) = a·b + a·c</td></tr>
+<tr><td>absorption</td><td class="mr">a + a·b = a</td><td class="mr">a·(a + b) = a</td></tr>
+<tr><td>absorption du complément</td><td class="mr">a + <span class="ov">a</span>·b = a + b</td><td class="mr">a·(<span class="ov">a</span> + b) = a·b</td></tr>
+<tr><td>De Morgan</td><td class="mr"><span class="ov">a + b</span> = <span class="ov">a</span>·<span class="ov">b</span></td><td class="mr"><span class="ov">a·b</span> = <span class="ov">a</span> + <span class="ov">b</span></td></tr>
+</table></div>
+<p>Ce qu'elles veulent dire, avec des conditions de programme (<code>a</code>, <code>b</code> des booléens) :</p>
+<ul>
+<li><b>a + 1 = 1</b> : <code>a or True</code> vaut toujours <code>True</code>. <b>a·0 = 0</b> : <code>a and False</code> vaut toujours <code>False</code>.</li>
+<li><b>a + a = a</b> : écrire deux fois la même condition ne change rien. Il n'y a ni coefficients ni puissances en algèbre de Boole : pas de « 2a », pas de « a² ».</li>
+<li><b>a + <span class="ov">a</span> = 1</b> : « il pleut ou il ne pleut pas », toujours vrai. <b>a·<span class="ov">a</span> = 0</b> : « il pleut et il ne pleut pas », toujours faux.</li>
+<li><b>Absorption, a + a·b = a</b> : <code>if admin or (admin and verifie):</code> se simplifie en <code>if admin:</code>. Si <code>admin</code> est vrai, tout est vrai ; s'il est faux, la parenthèse est fausse aussi.</li>
+<li><b>a + <span class="ov">a</span>·b = a + b</b> : <code>if a or (not a and b):</code>, c'est <code>if a or b:</code>. Quand on arrive au deuxième morceau, on sait déjà que a est faux : vérifier « not a » ne sert à rien.</li>
+</ul>
+<div class="box warn">
+<p class="lbl">La distributivité qui surprend</p>
+<p>a·(b + c) = a·b + a·c ressemble au calcul de collège. Mais l'autre, <b>a + b·c = (a + b)·(a + c)</b>, n'a pas d'équivalent en calcul ordinaire : 2 + 3 × 4 = 14, alors que (2 + 3) × (2 + 4) = 30. En algèbre de Boole, elle est pourtant vraie (section 2.3).</p>
+</div>
+
+<h3>2.3 Démontrer une loi</h3>
+<p>Comme une lettre ne vaut que 0 ou 1, on a trois méthodes, toutes rigoureuses.</p>
+<h4>Méthode 1 : essayer les deux valeurs</h4>
+<p>Pour une loi à une seule lettre, deux cas suffisent. <b>a + 1 = 1</b> : si a = 0, 0 + 1 = 1 ; si a = 1, 1 + 1 = 1. Les deux cas donnent 1, la loi est démontrée. C'est la disjonction de cas de ton cours de logique (partie 9.7) : un raisonnement complet, parce qu'il n'existe pas d'autre valeur.</p>
+<h4>Méthode 2 : la table de vérité</h4>
+<p>Avec deux lettres, il y a 4 lignes ; avec trois, 8. Si les deux côtés ont la même colonne, la loi est vraie. Pour l'absorption a + a·b = a :</p>
+<div class="tw"><table class="c tight tt">
+<tr><th>a</th><th>b</th><th class="sub">a·b</th><th class="outc">a + a·b</th><th class="outc">a</th></tr>
+<tr><td>0</td><td>0</td><td class="zero">0</td><td class="outc zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>0</td><td>1</td><td class="zero">0</td><td class="outc zero">0</td><td class="outc zero">0</td></tr>
+<tr><td>1</td><td>0</td><td class="zero">0</td><td class="outc one">1</td><td class="outc one">1</td></tr>
+<tr><td>1</td><td>1</td><td class="one">1</td><td class="outc one">1</td><td class="outc one">1</td></tr>
+</table></div>
+<h4>Méthode 3 : le calcul, avec des lois déjà démontrées</h4>
+<div class="steps">
+<span class="op"></span><span>a + a·b</span>
+<span class="op">=</span><span>a·1 + a·b</span>
+<span class="why">élément neutre : a = a·1</span>
+<span class="op">=</span><span>a·(1 + b)</span>
+<span class="why">distributivité, lue de droite à gauche : on met a en facteur</span>
+<span class="op">=</span><span>a·1</span>
+<span class="why">élément absorbant : 1 + b = 1</span>
+<span class="op">=</span><span>a</span>
+</div>
+<p>Et la distributivité surprenante, en développant le côté droit :</p>
+<div class="steps">
+<span class="op"></span><span>(a + b)·(a + c)</span>
+<span class="op">=</span><span>a·a + a·c + b·a + b·c</span>
+<span class="why">on développe, comme (x + y)(z + t) au collège</span>
+<span class="op">=</span><span>a + a·c + a·b + b·c</span>
+<span class="why">idempotence : a·a = a ; commutativité : b·a = a·b</span>
+<span class="op">=</span><span>a·(1 + c + b) + b·c</span>
+<span class="why">on met a en facteur dans les trois premiers termes</span>
+<span class="op">=</span><span>a + b·c</span>
+<span class="why">1 + c + b = 1, puis a·1 = a</span>
+</div>
+<p>Enfin, <b>a + <span class="ov">a</span>·b = a + b</b> sort de cette distributivité : a + <span class="ov">a</span>·b = (a + <span class="ov">a</span>)·(a + b) = 1·(a + b) = a + b.</p>
+
+<h3>2.4 Les pièges du calcul ordinaire</h3>
+<ul>
+<li><b>On ne peut pas « simplifier des deux côtés ».</b> En calcul ordinaire, de 2 + x = 2 + y on tire x = y. En algèbre de Boole, a + b = a + c ne permet pas de conclure b = c. Contre-exemple : a = 1, b = 0, c = 1 donne 1 + 0 = 1 + 1, alors que b ≠ c. Même chose pour a·b = a·c, avec a = 0. Il n'y a ni soustraction, ni division.</li>
+<li><b>Pas de coefficients ni de puissances</b> : a + a = a et a·a = a.</li>
+<li><b>Une barre longue n'est pas deux barres courtes</b> : <span class="ov">a·b</span> = <span class="ov">a</span> + <span class="ov">b</span> (De Morgan), et non <span class="ov">a</span>·<span class="ov">b</span>. Quand on coupe la barre, le signe change.</li>
+</ul>
+
+<h3>2.5 La dualité</h3>
+<p>Prends une loi vraie. Mets d'abord des parenthèses autour de chaque produit, pour garder l'ordre des opérations. Puis échange partout + et ·, et échange 0 et 1 : tu obtiens une autre loi vraie. Par exemple, a + 0 = a devient a·1 = a. Et a + a·b = a s'écrit d'abord a + (a·b) = a, qui devient a·(a + b) = a. Sans les parenthèses, on aurait obtenu a·a + b = a, qui est faux.</p>
+<p>C'est le <b>principe de dualité</b> : il explique pourquoi le tableau de la section 2.2 a deux colonnes, et il divise par deux le nombre de lois à retenir.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut a + 1 ?</p>
+<div class="mq-c"><button type="button" data-fb="Essaie a = 0 puis a = 1.">a</button><button type="button" data-fb="En algèbre de Boole, + est un OU.">a + 1, on ne peut pas simplifier</button><button type="button">1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">« a ou vrai » est toujours vrai : élément absorbant.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Que vaut a·<span class="ov">a</span> ?</p>
+<div class="mq-c"><button type="button">0</button><button type="button" data-fb="a et non a ne peuvent pas valoir 1 en même temps.">1</button><button type="button" data-fb="Il n'y a pas de puissances : et ici, ce sont a et son contraire.">a²</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Loi du complément : une chose et son contraire ne sont jamais vraies ensemble.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Que vaut a + <span class="ov">a</span>·b ?</p>
+<div class="mq-c"><button type="button" data-fb="Pour a = 0 et b = 1, l'expression vaut 1.">a</button><button type="button">a + b</button><button type="button" data-fb="Pour a = 1, l'expression vaut 1 quel que soit b.">b</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Si a vaut 1, tout vaut 1. Sinon, <span class="ov">a</span> = 1 et il reste b. Donc a + b.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">On sait que a + b = a + c. Peut-on en déduire que b = c ?</p>
+<div class="mq-c"><button type="button" data-fb="Essaie a = 1 : les deux côtés valent 1, quels que soient b et c.">oui, comme en calcul ordinaire</button><button type="button">non</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Avec a = 1, b = 0 et c = 1, l'égalité est vraie et pourtant b ≠ c.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Simplifier par le calcul</h2>
+<h3>3.1 La stratégie</h3>
+<p>Simplifier une expression, c'est comme remanier du code (<i>refactoring</i>) : on enlève les conditions en double, sans changer ce que fait le programme. Voici les réflexes, dans l'ordre :</p>
+<ol>
+<li><b>Une barre couvre un groupe ?</b> Applique De Morgan pour la faire descendre sur les lettres.</li>
+<li><b>Cherche deux termes qui ne diffèrent que par une lettre</b>, barrée dans l'un et pas dans l'autre : x·y + x·<span class="ov">y</span> = x·(y + <span class="ov">y</span>) = x. C'est la règle la plus utile de toutes, et c'est elle que Karnaugh rend visible.</li>
+<li><b>Absorption</b> : un produit qui contient toutes les lettres d'un autre terme de la somme disparaît. a + a·b·c = a.</li>
+<li><b>x + <span class="ov">x</span>·y = x + y</b> : quand une lettre est seule dans la somme, on efface son contraire dans les autres produits. Ça marche aussi dans l'autre sens : <span class="ov">x</span> + x·y = <span class="ov">x</span> + y.</li>
+<li><b>Mets en facteur</b> ce qui est commun, à la fin, pour économiser des portes.</li>
+</ol>
+
+<h3>3.2 Trois exemples</h3>
+<h4>Exemple 1 : le circuit de la section 1</h4>
+<div class="steps">
+<span class="op"></span><span>a·b·c + a·b·<span class="ov">c</span> + a·<span class="ov">b</span>·c</span>
+<span class="op">=</span><span>a·b·(c + <span class="ov">c</span>) + a·<span class="ov">b</span>·c</span>
+<span class="why">les deux premiers termes ne diffèrent que par c : on met a·b en facteur</span>
+<span class="op">=</span><span>a·b + a·<span class="ov">b</span>·c</span>
+<span class="why">complément : c + <span class="ov">c</span> = 1, puis a·b·1 = a·b</span>
+<span class="op">=</span><span>a·(b + <span class="ov">b</span>·c)</span>
+<span class="why">on met a en facteur</span>
+<span class="op">=</span><span>a·(b + c)</span>
+<span class="why">absorption du complément : b + <span class="ov">b</span>·c = b + c</span>
+</div>
+<h4>Exemple 2 : un produit de sommes</h4>
+<div class="steps">
+<span class="op"></span><span>(a + b)·(a + <span class="ov">b</span>)</span>
+<span class="op">=</span><span>a + b·<span class="ov">b</span></span>
+<span class="why">distributivité surprenante, lue de droite à gauche : (a + x)·(a + y) = a + x·y</span>
+<span class="op">=</span><span>a + 0 = a</span>
+<span class="why">complément, puis élément neutre</span>
+</div>
+<h4>Exemple 3 : avec De Morgan</h4>
+<div class="steps">
+<span class="op"></span><span><span class="ov"><span class="ov">a</span>·b</span> + a·c</span>
+<span class="op">=</span><span><span class="ov"><span class="ov">a</span></span> + <span class="ov">b</span> + a·c</span>
+<span class="why">De Morgan : la barre longue se coupe, et le · devient +</span>
+<span class="op">=</span><span>a + <span class="ov">b</span> + a·c</span>
+<span class="why">double négation</span>
+<span class="op">=</span><span>a + <span class="ov">b</span></span>
+<span class="why">absorption : a + a·c = a</span>
+</div>
+
+<h3 id="p3-lab">3.3 Le vérificateur de calcul</h3>
+<p>Écris ta simplification, une étape par ligne. La page compare chaque ligne avec la précédente : si une étape change la fonction, elle te dit laquelle, avec un contre-exemple. Elle compte aussi les portes. L'exemple 1 est déjà tapé.</p>
+<p class="note">Écriture : <code>!a</code> ou <code>a'</code> pour NON, <code>a.b</code> ou <code>ab</code> pour ET, <code>a + b</code> pour OU, <code>a ^ b</code> pour XOR, <code>!(a.b)</code> pour une barre sur un groupe.</p>
+<div class="lab" id="steps"></div>
+<div class="box img">
+<p class="lbl">La limite du calcul</p>
+<p>En vérifiant les étapes une par une, on ne sait jamais si une autre loi permettrait d'aller plus loin. Le bouton « Comparer avec le minimum » le sait, parce que la page essaie toutes les possibilités. Sur ta feuille, le jour de l'évaluation, c'est Karnaugh qui répondra à cette question.</p>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Les formes canoniques : de la table à l'expression</h2>
+<p>Dans le TP, on te donnera une spécification (« la sortie vaut 1 quand… »). Tu en feras une table de vérité, puis une expression, puis un circuit. Pour l'étape « table → expression », il faut une méthode qui marche à tous les coups : les formes canoniques.</p>
+
+<h3>4.1 Le minterme : un détecteur de ligne</h3>
+<p>Un <b>minterme</b> (<i>minterm</i>) est un ET qui contient toutes les lettres, chacune barrée ou non, et qui vaut 1 sur <b>une seule ligne</b> de la table. Pense à un digicode qui ne s'ouvre que pour un seul code.</p>
+<div class="box key">
+<p class="lbl">La règle</p>
+<p>Pour la ligne voulue : une lettre qui vaut 1 s'écrit telle quelle, une lettre qui vaut 0 s'écrit barrée.</p>
+<p>Ligne a = 1, b = 0, c = 1 → minterme a·<span class="ov">b</span>·c. Il vaut 1 seulement si a = 1, <span class="ov">b</span> = 1 (donc b = 0) et c = 1.</p>
+</div>
+<p>On numérote les mintermes avec le numéro de leur ligne, lu en binaire : la ligne 101 est la ligne 5, et son minterme se note <b>m5</b>.</p>
+
+<h3>4.2 La somme de produits canonique</h3>
+<div class="box key">
+<p class="lbl">Première forme canonique</p>
+<p>On écrit le minterme de chaque ligne où la sortie vaut 1, et on les relie par des +. C'est la <b>somme de produits canonique</b> (<i>canonical sum of products</i>), qu'on appelle aussi forme normale disjonctive canonique. C'est une somme de produits particulière : chaque produit contient toutes les lettres.</p>
+</div>
+<p>Exemple, le vote à la majorité de la page sur les portes (S = 1 si au moins deux entrées valent 1) :</p>
+<div class="tw"><table class="c tight tt">
+<tr><th class="sub">n°</th><th>a</th><th>b</th><th>c</th><th class="outc">S</th><th class="sub">minterme</th></tr>
+<tr><td class="zero">0</td><td>0</td><td>0</td><td>0</td><td class="outc zero">0</td><td></td></tr>
+<tr><td class="zero">1</td><td>0</td><td>0</td><td>1</td><td class="outc zero">0</td><td></td></tr>
+<tr><td class="zero">2</td><td>0</td><td>1</td><td>0</td><td class="outc zero">0</td><td></td></tr>
+<tr><td class="zero">3</td><td>0</td><td>1</td><td>1</td><td class="outc one">1</td><td class="mr"><span class="ov">a</span>·b·c</td></tr>
+<tr><td class="zero">4</td><td>1</td><td>0</td><td>0</td><td class="outc zero">0</td><td></td></tr>
+<tr><td class="zero">5</td><td>1</td><td>0</td><td>1</td><td class="outc one">1</td><td class="mr">a·<span class="ov">b</span>·c</td></tr>
+<tr><td class="zero">6</td><td>1</td><td>1</td><td>0</td><td class="outc one">1</td><td class="mr">a·b·<span class="ov">c</span></td></tr>
+<tr><td class="zero">7</td><td>1</td><td>1</td><td>1</td><td class="outc one">1</td><td class="mr">a·b·c</td></tr>
+</table></div>
+<p class="eq">S = <span class="ov">a</span>·b·c + a·<span class="ov">b</span>·c + a·b·<span class="ov">c</span> + a·b·c</p>
+<p>On l'abrège en <b>S = Σm(3, 5, 6, 7)</b> : « la somme des mintermes 3, 5, 6 et 7 ». <b>Pourquoi ça marche :</b> sur une ligne à 1, son minterme vaut 1, donc le OU vaut 1. Sur une ligne à 0, aucun minterme de la liste ne vaut 1, donc le OU vaut 0. En Python, c'est le test <code>(a, b, c) in {(0,1,1), (1,0,1), (1,1,0), (1,1,1)}</code>.</p>
+
+<h3>4.3 Le produit de sommes canonique</h3>
+<p>On peut aussi partir des 0. Un <b>maxterme</b> (<i>maxterm</i>) est un OU qui contient toutes les lettres, et qui vaut 0 sur une seule ligne. La règle est inversée : <b>une lettre qui vaut 0 s'écrit telle quelle, une lettre qui vaut 1 s'écrit barrée</b>. Pour la ligne a = 0, b = 1, c = 0 : (a + <span class="ov">b</span> + c), qui ne vaut 0 que si a = 0, b = 1 et c = 0.</p>
+<div class="box key">
+<p class="lbl">Deuxième forme canonique</p>
+<p>On écrit le maxterme de chaque ligne où la sortie vaut 0, et on les relie par des ·. C'est le <b>produit de sommes canonique</b> (<i>canonical product of sums</i>), ou forme normale conjonctive canonique.</p>
+</div>
+<p>Pour la majorité, les lignes à 0 sont 0, 1, 2 et 4 :</p>
+<p class="eq">S = (a + b + c)·(a + b + <span class="ov">c</span>)·(a + <span class="ov">b</span> + c)·(<span class="ov">a</span> + b + c) = ΠM(0, 1, 2, 4)</p>
+<p>Le symbole Π (la lettre grecque pi majuscule) veut dire « produit », comme Σ veut dire « somme » : ΠM(0, 1, 2, 4) se lit « le produit des maxtermes 0, 1, 2 et 4 », où M0 est le maxterme de la ligne 0.</p>
+<p><b>Pourquoi ça marche :</b> sur une ligne à 0, son maxterme vaut 0, donc le ET vaut 0. Sur une ligne à 1, tous les maxtermes valent 1, donc le ET vaut 1.</p>
+
+<h3>4.4 Laquelle choisir ?</h3>
+<p>Prends la forme qui a le moins de termes : la somme de produits s'il y a peu de 1, le produit de sommes s'il y a peu de 0. Mais les deux formes canoniques sont longues : ce sont des traductions mécaniques de la table, presque jamais les plus courtes. La majorité s'écrit en fait a·b + a·c + b·c, avec 3 termes de 2 lettres au lieu de 4 termes de 3 lettres. Pour passer de l'une à l'autre, on simplifie, par le calcul ou avec Karnaugh.</p>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Quel est le minterme de la ligne a = 1, b = 1, c = 0 ?</p>
+<div class="mq-c"><button type="button" data-fb="C'est la règle des maxtermes, et un maxterme est un OU.">(<span class="ov">a</span> + <span class="ov">b</span> + c)</button><button type="button">a·b·<span class="ov">c</span></button><button type="button" data-fb="Une lettre qui vaut 1 s'écrit telle quelle.">a·b·c</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">c vaut 0, donc c est barré. C'est m6.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Une fonction de 3 entrées vaut 1 sur 5 lignes. Combien de termes a sa somme de produits canonique ?</p>
+<div class="mq-c"><button type="button" data-fb="3, c'est le nombre de lignes à 0 : ce serait le nombre de termes du produit de sommes. Pour la somme de produits, on écrit un minterme par ligne à 1.">3</button><button type="button" data-fb="8 est le nombre total de lignes. On n'écrit un minterme que pour les lignes à 1.">8</button><button type="button">5</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">5 mintermes. Le produit de sommes en aurait 3 : ici, il serait plus court.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Que vaut le maxterme (a + <span class="ov">b</span> + c) sur la ligne a = 0, b = 1, c = 0 ?</p>
+<div class="mq-c"><button type="button">0</button><button type="button" data-fb="0 + 0 + 0 : aucun morceau du OU ne vaut 1.">1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0 + <span class="ov">1</span> + 0 = 0 + 0 + 0 = 0. C'est sa seule ligne à 0.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Les tableaux de Karnaugh</h2>
+
+<h3>5.1 L'idée</h3>
+<p>Reprends la règle la plus utile du calcul : deux mintermes qui ne diffèrent que par une lettre fusionnent, et cette lettre disparaît.</p>
+<p class="eq">a·b·c + a·b·<span class="ov">c</span> = a·b·(c + <span class="ov">c</span>) = a·b</p>
+<p>Dans une table de vérité, ces paires sont dispersées et difficiles à repérer. Le <b>tableau de Karnaugh</b> (<i>Karnaugh map</i>), présenté en 1953 par le physicien Maurice Karnaugh, des laboratoires Bell, à partir d'un diagramme proposé un an plus tôt par Edward Veitch, range les cases de la table dans une grille où <b>deux cases voisines diffèrent toujours d'une seule lettre</b>. Les fusions deviennent alors visibles : ce sont des 1 côte à côte.</p>
+
+<h3 id="p5-gray">5.2 Le code de Gray</h3>
+<p>Pour que deux colonnes voisines diffèrent d'un seul bit, on ne peut pas les ranger dans l'ordre binaire habituel :</p>
+<div class="tw"><table class="c tight graytab">
+<tr><th>ordre binaire</th><td class="bits">00</td><td class="bits">01</td><td class="bits">10</td><td class="bits">11</td></tr>
+<tr><th>bits qui changent</th><td></td><td>1</td><td class="xx">2</td><td>1</td></tr>
+<tr><th>ordre de Gray</th><td class="bits">00</td><td class="bits">01</td><td class="bits">11</td><td class="bits">10</td></tr>
+<tr><th>bits qui changent</th><td></td><td>1</td><td>1</td><td>1</td></tr>
+</table></div>
+<p>Entre 01 et 10, deux bits changent : ces cases ne pourraient pas fusionner. On utilise donc l'<b>ordre de Gray</b> (<i>Gray code</i>) : <b>00, 01, 11, 10</b>. Pour le retenir : on compte normalement, puis on échange les deux derniers.</p>
+<p>Et entre la dernière colonne, 10, et la première, 00, un seul bit change aussi : <b>les bords opposés du tableau sont voisins</b>. Comme dans Pac-Man, où l'on sort à droite de l'écran pour réapparaître à gauche. Mathématiquement, un tableau de 4 × 4 se comporte comme s'il était enroulé sur un tore, la forme d'un donut.</p>
+
+<h3>5.3 Les trois grilles</h3>
+<p>Les lignes portent une ou deux lettres, les colonnes les autres. Dans chaque case, le petit numéro est celui de la ligne de la table de vérité (le numéro du minterme).</p>
+<div class="kpair">
+<div class="kmap" data-vars="ab" data-empty data-idx></div>
+<div class="kmap" data-vars="abc" data-empty data-idx></div>
+</div>
+<div class="kmap" data-vars="abcd" data-empty data-idx></div>
+<div class="box warn">
+<p class="lbl">Le piège du recopiage</p>
+<p>Dans la grille à 3 lettres, la première ligne contient m0, m1, m3, m2 : les deux dernières colonnes sont dans l'ordre 3 puis 2. Dans la grille à 4 lettres, c'est pareil pour les lignes : la troisième ligne contient m12, m13, m15, m14, et la quatrième m8, m9, m11, m10. Quand tu recopies une table de vérité dans un tableau, suis les numéros, jamais l'ordre de la table.</p>
+</div>
+
+<h3>5.4 Les règles des regroupements</h3>
+<div class="box key">
+<p class="lbl">Pour obtenir la plus petite somme de produits</p>
+<ol>
+<li>On entoure uniquement des <b>1</b> (et des X, section 5.7).</li>
+<li>Chaque groupe est un <b>rectangle</b> (ou un carré) de <b>1, 2, 4, 8 ou 16 cases</b> : une puissance de 2. Jamais 3, ni 6, ni de forme en L, ni de diagonale.</li>
+<li>Un groupe peut <b>traverser les bords</b> (Pac-Man), et les quatre coins d'une grille 4 × 4 peuvent former un groupe.</li>
+<li>Chaque groupe doit être <b>le plus grand possible</b>.</li>
+<li>Il faut <b>le moins de groupes possible</b>, en couvrant chaque 1 au moins une fois. Les groupes ont le droit de se chevaucher.</li>
+</ol>
+</div>
+<div class="box img">
+<p class="lbl">Dans quel ordre choisir les groupes</p>
+<p>Commencer par le plus gros groupe visible ne marche pas toujours (on en verra un piège en section 5.8). Procède plutôt ainsi :</p>
+<ol>
+<li>Repère les 1 qui n'entrent que dans <b>un seul</b> groupe le plus grand possible. Ce groupe est obligatoire : entoure-le.</li>
+<li>Couvre les 1 qui restent avec le moins de groupes possible, chacun le plus grand possible.</li>
+<li>Pour finir, enlève les groupes inutiles : ceux dont tous les 1 sont déjà couverts par d'autres.</li>
+</ol>
+<p>Un groupe qu'on ne peut plus agrandir s'appelle un <b>impliquant premier</b> (<i>prime implicant</i>), et un groupe obligatoire un <b>impliquant premier essentiel</b>. Tu croiseras ces mots dans les livres.</p>
+</div>
+
+<h3>5.5 Lire un groupe</h3>
+<p>Chaque groupe donne un terme. Pour chaque lettre, regarde ses valeurs dans le groupe :</p>
+<ul>
+<li>elle vaut <b>toujours 1</b> : elle reste, telle quelle ;</li>
+<li>elle vaut <b>toujours 0</b> : elle reste, barrée ;</li>
+<li>elle <b>change</b> à l'intérieur du groupe : elle disparaît.</li>
+</ul>
+<p>Plus le groupe est grand, plus il y a de lettres qui changent. Dans une grille à 4 lettres : un groupe de 1 case garde 4 lettres, de 2 cases 3 lettres, de 4 cases 2 lettres, de 8 cases 1 lettre. Un groupe de 16 cases donne la constante 1. C'est pour ça qu'on veut des groupes aussi grands que possible.</p>
+
+<div class="box nts">
+<p class="lbl">Et si on entoure les 0 ?</p>
+<p>On peut aussi entourer les 0, avec les mêmes règles. Chaque groupe de 0 donne alors une <b>somme</b>, lue avec la règle inversée des maxtermes : une lettre qui vaut toujours 0 reste telle quelle, une lettre qui vaut toujours 1 reste barrée. Le ET de ces sommes est le plus petit <b>produit de sommes</b>. Pour la majorité, les groupes m0-m1, m0-m2 et m0-m4 donnent S = (a + b)·(a + c)·(b + c). C'est utile quand il y a peu de 0.</p>
+</div>
+
+<h3>5.6 Quatre exemples</h3>
+<h4>Exemple 1 : la majorité</h4>
+<div class="kmap" data-vars="abc" data-on="3,5,6,7" data-sol data-idx></div>
+<p>Trois groupes de 2 cases. Le groupe m3, m7 (la colonne bc = 11) : a change, b et c valent 1, ce qui donne b·c. Le groupe m5, m7 : a = 1 et c = 1 restent, b change, ce qui donne a·c. Le groupe m6, m7 donne a·b. On retrouve S = a·b + a·c + b·c. Le 1 de m7 est entouré trois fois : c'est permis.</p>
+<h4>Exemple 2 : un groupe qui traverse le bord</h4>
+<div class="kmap" data-vars="abc" data-on="0,2,4,6" data-sol data-idx></div>
+<p>Les colonnes 00 et 10 sont voisines par le bord. Les quatre cases forment un seul groupe : a change, b change, c vaut toujours 0. Résultat : S = <span class="ov">c</span>. Quatre mintermes de 3 lettres deviennent une seule lettre.</p>
+<h4>Exemple 3 : une grille à 4 lettres</h4>
+<div class="kmap" data-vars="abcd" data-on="0,1,2,5,8,9,10" data-sol data-idx></div>
+<p>Trois groupes. Les quatre coins (m0, m2, m8, m10) donnent <span class="ov">b</span>·<span class="ov">d</span>. Le carré m0, m1, m8, m9, qui traverse le bord du haut et du bas, donne <span class="ov">b</span>·<span class="ov">c</span>. Il reste m5, qu'on ne peut associer qu'à m1 : <span class="ov">a</span>·<span class="ov">c</span>·d. Sept mintermes de 4 lettres (28 lettres) deviennent 7 lettres.</p>
+<h4>Exemple 4 : les quatre coins</h4>
+<div class="kmap" data-vars="abcd" data-on="0,2,8,10" data-sol data-idx></div>
+<p>Les coins sont voisins deux à deux par les bords : ils forment un groupe de 4. b et d valent toujours 0, a et c changent : S = <span class="ov">b</span>·<span class="ov">d</span>.</p>
+
+<h3 id="p5-x">5.7 Les cases indifférentes</h3>
+<p>Parfois, certaines combinaisons d'entrées <b>n'arrivent jamais</b>. Par exemple, un chiffre de 0 à 9 codé sur 4 bits n'utilise jamais les combinaisons 10 à 15 (section 7). La sortie sur ces lignes n'a aucune importance : on note <b>X</b>, une case indifférente (<i>don't care</i>).</p>
+<div class="box key">
+<p class="lbl">La règle des X</p>
+<p>Un X compte comme un 1 s'il permet d'agrandir un groupe, et on l'ignore sinon. On ne fait jamais de groupe qui ne contient que des X.</p>
+</div>
+<p>Exemple : S = Σm(0, 4, 5, 6), avec des cases indifférentes en m2 et m7.</p>
+<div class="kmap" data-vars="abc" data-on="0,4,5,6" data-dc="2,7" data-sol data-idx></div>
+<p>Grâce aux X, la ligne a = 1 forme un groupe de 4 (a), et les colonnes 00 et 10 aussi (<span class="ov">c</span>). Résultat : S = a + <span class="ov">c</span>. Sans les X, il faudrait a·<span class="ov">b</span> + a·<span class="ov">c</span> + <span class="ov">b</span>·<span class="ov">c</span> : 3 termes et 6 lettres au lieu de 2 lettres.</p>
+
+<h3>5.8 Les erreurs classiques</h3>
+<ul>
+<li><b>Colonnes dans l'ordre 00, 01, 10, 11</b> au lieu de l'ordre de Gray : les voisins ne sont plus les bons.</li>
+<li><b>Groupes de 3 ou de 6</b>, ou en forme de L : ils ne correspondent à aucun terme.</li>
+<li><b>Oublier les bords</b> : les colonnes de gauche et de droite sont voisines, les lignes du haut et du bas aussi.</li>
+<li><b>Groupes trop petits</b> : deux groupes de 2 côte à côte formant un carré doivent devenir un groupe de 4.</li>
+<li><b>Garder un groupe inutile.</b> Exemple : S = Σm(1, 3, 6, 7).</li>
+</ul>
+<div class="kmap" data-vars="abc" data-on="1,3,6,7" data-terms="a.b; !a.c; b.c" data-dashed="2" data-idx></div>
+<p>Les groupes a·b et <span class="ov">a</span>·c couvrent déjà tous les 1. Le groupe b·c, en pointillés, ne couvre que des 1 déjà pris : il est inutile, et S = a·b + <span class="ov">a</span>·c. En algèbre, c'est le <b>théorème du consensus</b> : a·b + <span class="ov">a</span>·c + b·c = a·b + <span class="ov">a</span>·c.</p>
+<p><b>Le piège du gros groupe central.</b> Voici S = Σm(1, 5, 6, 7, 11, 12, 13, 15). Le carré central b·d, en pointillés, saute aux yeux : c'est le plus gros groupe possible. Mais chacun de ses quatre 1 est déjà couvert par un groupe obligatoire de 2 cases, nécessaire pour un autre 1 (m1, m6, m11 et m12 n'ont chacun qu'un seul voisin à 1). Le carré est donc inutile : S = <span class="ov">a</span>·<span class="ov">c</span>·d + <span class="ov">a</span>·b·c + a·b·<span class="ov">c</span> + a·c·d, 4 groupes et non 5. C'est pour ça qu'on commence par les groupes obligatoires (section 5.4).</p>
+<div class="kmap" data-vars="abcd" data-on="1,5,6,7,11,12,13,15" data-terms="!a.!c.d; !a.b.c; a.b.!c; a.c.d; b.d" data-dashed="4" data-idx></div>
+<details class="check"><summary>La preuve du consensus par le calcul</summary>
+<div class="steps">
+<span class="op"></span><span>a·b + <span class="ov">a</span>·c + b·c</span>
+<span class="op">=</span><span>a·b + <span class="ov">a</span>·c + b·c·(a + <span class="ov">a</span>)</span>
+<span class="why">complément : a + <span class="ov">a</span> = 1</span>
+<span class="op">=</span><span>a·b + <span class="ov">a</span>·c + a·b·c + <span class="ov">a</span>·b·c</span>
+<span class="why">distributivité</span>
+<span class="op">=</span><span>a·b + <span class="ov">a</span>·c</span>
+<span class="why">absorption : a·b + a·b·c = a·b, et <span class="ov">a</span>·c + <span class="ov">a</span>·b·c = <span class="ov">a</span>·c</span>
+</div>
+</details>
+
+<h3 id="p5-lab">5.9 L'atelier de Karnaugh</h3>
+<p>Remplis la table ou le tableau (ou choisis un exemple), fais tes groupes sur ta feuille, puis tape l'expression que tu en tires. L'atelier dessine tes groupes en couleur et te dit si l'un d'eux contient un 0, peut être agrandi ou est inutile. « Montrer une solution » dessine une solution minimale, et peut dessiner son circuit.</p>
+<div class="lab" id="atelier"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 5)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Dans quel ordre écrit-on les colonnes d'un tableau de Karnaugh quand elles portent deux lettres (comme bc) ?</p>
+<div class="mq-c"><button type="button" data-fb="Entre 01 et 10, deux bits changent : ces cases ne seraient pas voisines au sens de Karnaugh.">00, 01, 10, 11</button><button type="button" data-fb="Entre 00 et 11, deux bits changent.">00, 11, 01, 10</button><button type="button">00, 01, 11, 10</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">L'ordre de Gray : un seul bit change d'une colonne à la suivante, y compris de la dernière à la première.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Dans une grille à 4 lettres, un groupe de 4 cases donne un terme de…</p>
+<div class="mq-c"><button type="button" data-fb="4 cases = 2², donc 2 lettres changent et disparaissent.">4 lettres</button><button type="button">2 lettres</button><button type="button" data-fb="Une seule lettre resterait pour un groupe de 8 cases.">1 lettre</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">4 cases = 2², donc 2 lettres disparaissent : il en reste 4 − 2 = 2.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Peut-on faire un groupe de 3 cases alignées ?</p>
+<div class="mq-c"><button type="button">non</button><button type="button" data-fb="3 n'est pas une puissance de 2 : aucun terme ne correspond à 3 cases.">oui, s'il n'y a que des 1</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">On fait deux groupes de 2 qui se chevauchent sur la case du milieu.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Une case X se trouve à côté d'un groupe. On…</p>
+<div class="mq-c"><button type="button" data-fb="Un X n'a pas l'obligation d'être couvert.">doit l'inclure</button><button type="button">l'inclut seulement si le groupe devient plus grand</button><button type="button" data-fb="Un X peut servir à agrandir un groupe : c'est tout son intérêt.">n'a pas le droit de l'inclure</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Le X est un joker : on le prend s'il aide, on l'ignore sinon.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Les circuits à plusieurs sorties</h2>
+<p>Un circuit a souvent plusieurs sorties qui dépendent des mêmes entrées. On fait alors un tableau de Karnaugh par sortie. Exemple, l'additionneur complet de la page sur les portes, avec a, b et la retenue entrante c :</p>
+<div class="kpair">
+<div><div class="kmap" data-vars="abc" data-on="3,5,6,7" data-sol data-name="R"></div><p class="kcap">la retenue R</p></div>
+<div><div class="kmap" data-vars="abc" data-on="1,2,4,7" data-sol></div><p class="kcap">le chiffre S</p></div>
+</div>
+<p>Pour R, c'est la majorité : R = a·b + a·c + b·c. Pour S, aucun 1 n'a de voisin à 1 : Karnaugh ne simplifie rien, et S reste une somme de 4 mintermes. Ce motif en <b>damier</b> est la signature du XOR : S = a ⊕ b ⊕ c, avec 2 portes XOR au lieu de 8 portes (4 ET, un OU et 3 NON). En entourant les 1, Karnaugh donne une somme de produits, et un damier ne se simplifie pas non plus en entourant les 0. Quand tu vois un damier, pense XOR.</p>
+<h3>Partager des portes entre les sorties</h3>
+<p>Le plus petit circuit pour chaque sortie séparément n'est pas toujours le plus petit circuit au total. Dans l'additionneur complet, on peut écrire R = a·b + c·(a ⊕ b) : la porte a ⊕ b sert alors aux deux sorties.</p>
+<div class="circ" data-expr="S = (a ^ b) ^ c ; R = a.b + c.(a ^ b)" data-init="110" data-nosub></div>
+<p class="note">Le dessin automatique recopie la porte a ⊕ b pour chaque sortie ; dans un vrai circuit, une seule porte alimente les deux. On a alors 5 portes en tout, contre 6 avec R = a·b + a·c + b·c et S = a ⊕ b ⊕ c.</p>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>L'afficheur 7 segments</h2>
+<h3>7.1 Le problème du TP</h3>
+<p>Un afficheur 7 segments est fait de 7 petites barres lumineuses, nommées <b>a</b> à <b>g</b> : a en haut, puis b, c, d, e, f en tournant dans le sens des aiguilles d'une montre, et g au milieu. En allumant les bonnes barres, on dessine les chiffres de 0 à 9.</p>
+<p>L'entrée est un chiffre de 0 à 9 écrit en binaire sur 4 bits : c'est le code <b>BCD</b> (<i>binary-coded decimal</i>, décimal codé en binaire). Comme les lettres a à g sont déjà prises par les segments, on appelle les entrées <b>w, x, y, z</b> : w est le bit de poids 8, z celui de poids 1. Le circuit à fabriquer, le <b>décodeur</b>, a donc 4 entrées et 7 sorties : une fonction et un tableau de Karnaugh par segment.</p>
+<p>Les combinaisons 1010 à 1111 (10 à 15) ne sont pas des chiffres : en BCD, elles n'arrivent jamais. Pour chaque segment, ce sont des cases indifférentes, et c'est là que les X vont beaucoup aider.</p>
+<div class="box warn">
+<p class="lbl">Une convention à vérifier</p>
+<p>Le 6, le 7 et le 9 peuvent se dessiner de deux façons. Ici, le 6 a sa barre du haut (a), le 7 n'a pas de barre en haut à gauche (f), et le 9 a sa barre du bas (d). Si ta prof utilise d'autres formes, les tables des segments a, d et f changent : vérifie au début du TP.</p>
+</div>
+<h3>7.2 Le décodeur</h3>
+<p>Clique sur les bits w, x, y, z pour choisir le chiffre, et sur une lettre pour étudier un segment. Le tableau de Karnaugh du segment s'affiche en dessous : tu peux y vérifier tes regroupements.</p>
+<div class="lab" id="seg7"></div>
+<h3>7.3 Le segment a, pas à pas</h3>
+<p>Le segment a (en haut) est allumé pour 0, 2, 3, 5, 6, 7, 8 et 9, éteint pour 1 et 4, et indifférent de 10 à 15.</p>
+<div class="kmap" data-vars="wxyz" data-on="0,2,3,5,6,7,8,9" data-dc="10,11,12,13,14,15" data-sol data-idx data-name="a"></div>
+<ul>
+<li><b>w</b> : les deux dernières lignes (w = 1), soit 8 cases, avec m8 et m9 à 1 et six X.</li>
+<li><b>y</b> : les deux dernières colonnes (y = 1), 8 cases.</li>
+<li><b>x·z</b> : le carré central m5, m7, m13, m15.</li>
+<li><b><span class="ov">x</span>·<span class="ov">z</span></b> : les quatre coins m0, m2, m8, m10.</li>
+</ul>
+<p class="eq">a = w + y + x·z + <span class="ov">x</span>·<span class="ov">z</span></p>
+<p>4 termes et 6 lettres. Sans les X, il faudrait 4 termes et 11 lettres : les combinaisons impossibles ont presque divisé le circuit par deux. Remarque aussi que <span class="ov">x</span>·<span class="ov">z</span> + x·z vaut 1 quand x = z : c'est un XNOR. On aurait pu écrire a = w + y + <span class="ov">x ⊕ z</span>.</p>
+<h3>7.4 Les autres segments</h3>
+<p>Les six autres segments sont dans les exercices de la section 9, avec un vérificateur : b, c, e et g d'abord, puis d et f, les plus longs. Fais-les sur ta feuille avant le TP. En reliant les 7 sorties, garde en tête la section 6 : un même terme peut servir à plusieurs segments. Par exemple, <span class="ov">x</span>·<span class="ov">z</span> sert aussi pour e.</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Vérifier une simplification dans Logisim</h2>
+<p>Le TP demande de simplifier une fonction et de vérifier l'équivalence dans Logisim. Trois façons de faire.</p>
+<h3>8.1 Comparer les tables</h3>
+<p>Construis les deux circuits sur les mêmes entrées, puis ouvre <i>Project › Analyze Circuit</i>. L'onglet <i>Table</i> donne la table de vérité de chaque sortie. Les deux colonnes doivent être identiques.</p>
+<h3>8.2 L'astuce du XOR</h3>
+<p>Branche les deux sorties sur une porte XOR. Le XOR vaut 1 quand ses entrées sont différentes : si les deux circuits sont équivalents, sa sortie reste à 0 pour toutes les combinaisons d'entrées. Voici le circuit de la section 1 et sa version simplifiée, comparés par un XOR. Teste les 8 combinaisons : E ne passe jamais à 1.</p>
+<div class="circ" data-expr="E = (a.b.c + a.b.c' + a.b'.c) ^ (a.(b + c))" data-init="111" data-nosub></div>
+<div class="box warn">
+<p class="lbl">Attention aux cases indifférentes</p>
+<p>Pour l'afficheur, ta forme simplifiée et la forme canonique ne donnent pas la même chose sur les lignes 10 à 15 : c'est normal, puisque ces lignes sont indifférentes. En comparant les tables, ne regarde que les lignes 0 à 9. Avec l'astuce du XOR, E doit valoir 0 sur ces lignes-là seulement. Dans l'onglet <i>Table</i> de la fenêtre d'analyse, tu peux aussi mettre ces sorties à x (indifférent) : un clic sur une sortie la fait passer de 0 à 1, puis à x.</p>
+</div>
+<h3>8.3 L'onglet <i>Minimized</i></h3>
+<p>Dans la fenêtre d'analyse combinatoire, l'onglet <i>Minimized</i> affiche le tableau de Karnaugh d'une sortie (pour 4 entrées au plus dans Logisim 2.7) et une expression minimale, en somme de produits ou en produit de sommes au choix. Le bouton <i>Build Circuit</i> construit un circuit à partir des expressions de l'onglet <i>Expression</i> : pour qu'il construise la version minimale, clique d'abord sur <i>Set As Expression</i> dans l'onglet <i>Minimized</i>. Sers-t'en pour vérifier tes tableaux, pas pour les faire : à l'évaluation, tu n'auras que ta feuille.</p>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Exercices</h2>
+<p>Ces exercices ne viennent pas de ta feuille : le vérificateur te dit si ta réponse est juste, et si elle est minimale. Toute expression qui a la bonne table est acceptée. Pour les calculs, tu peux poser tes étapes dans le vérificateur de la section 3.3.</p>
+
+<h3>9.1 Simplifier par le calcul</h3>
+<div class="ex">
+<p><b>1.</b> S = a·b + a·<span class="ov">b</span></p>
+<div class="xck" data-id="e1" data-target="a.b + a.!b" data-min data-show></div>
+</div>
+<div class="ex">
+<p><b>2.</b> S = a + a·b + a·b·c</p>
+<div class="xck" data-id="e2" data-target="a + a.b + a.b.c" data-vars="abc" data-min data-show></div>
+</div>
+<div class="ex">
+<p><b>3.</b> S = (a + b)·(<span class="ov">a</span> + b)</p>
+<div class="xck" data-id="e3" data-target="(a + b).(!a + b)" data-min data-show></div>
+<div class="hints"><p>C'est le même type de calcul que l'exemple 2 de la section 3.2, avec une autre lettre en commun.</p></div>
+</div>
+<div class="ex">
+<p><b>4.</b> S = <span class="ov"><span class="ov">a</span>·<span class="ov">b</span></span></p>
+<div class="xck" data-id="e4" data-target="!(!a.!b)" data-min data-show></div>
+<div class="hints"><p>De Morgan : coupe la barre longue, et change le · en +.</p></div>
+</div>
+<div class="ex">
+<p><b>5.</b> S = a·<span class="ov">b</span>·c + a·b·c + <span class="ov">a</span>·b·c</p>
+<div class="xck" data-id="e5" data-target="a.!b.c + a.b.c + !a.b.c" data-min data-show></div>
+<div class="hints"><p>Le terme a·b·c peut servir deux fois (idempotence : a·b·c = a·b·c + a·b·c).</p><p>Associe-le une fois avec a·<span class="ov">b</span>·c, une fois avec <span class="ov">a</span>·b·c.</p></div>
+</div>
+<div class="ex">
+<p><b>6.</b> S = a·<span class="ov">b</span> + b·c + a·c</p>
+<div class="xck" data-id="e6" data-target="a.!b + b.c + a.c" data-min data-show></div>
+<div class="hints"><p>Relis le théorème du consensus, à la fin de la section 5.8. Ici, la lettre qui apparaît barrée dans un terme et non barrée dans un autre est b.</p></div>
+</div>
+
+<h3>9.2 Formes canoniques</h3>
+<div class="ex">
+<p><b>7.</b> Écris la somme de produits canonique de S = Σm(1, 6), avec les entrées a, b, c.</p>
+<div class="xck" data-id="e7" data-vars="abc" data-on="1,6" data-canon></div>
+</div>
+<div class="ex">
+<p><b>8.</b> Écris la somme de produits canonique de S = a ⊕ b.</p>
+<div class="xck" data-id="e8" data-target="a ^ b" data-canon></div>
+</div>
+
+<h3>9.3 Tableaux de Karnaugh</h3>
+<div class="ex">
+<p><b>9.</b> S = Σm(0, 1, 2, 3, 6, 7), avec a, b, c.</p>
+<details class="check"><summary>Voir le tableau rempli</summary><div class="kmap" data-vars="abc" data-on="0,1,2,3,6,7" data-idx></div></details>
+<div class="xck" data-id="e9" data-vars="abc" data-on="0,1,2,3,6,7" data-min></div>
+</div>
+<div class="ex">
+<p><b>10.</b> S = Σm(1, 3, 5, 7, 8, 10, 12, 14), avec a, b, c, d.</p>
+<details class="check"><summary>Voir le tableau rempli</summary><div class="kmap" data-vars="abcd" data-on="1,3,5,7,8,10,12,14" data-idx></div></details>
+<div class="xck" data-id="e10" data-vars="abcd" data-on="1,3,5,7,8,10,12,14" data-min></div>
+<div class="hints"><p>Deux groupes de 4 suffisent. L'un d'eux traverse le bord gauche et le bord droit.</p></div>
+</div>
+<div class="ex">
+<p><b>11.</b> Le détecteur de nombres premiers : S vaut 1 si le nombre abcd, écrit en binaire sur 4 bits, est premier (2, 3, 5, 7, 11 ou 13).</p>
+<details class="check"><summary>Voir le tableau rempli</summary><div class="kmap" data-vars="abcd" data-on="2,3,5,7,11,13" data-idx></div></details>
+<div class="xck" data-id="e11" data-vars="abcd" data-on="2,3,5,7,11,13" data-min></div>
+<div class="hints"><p>Aucun groupe de 4 n'est possible : cherche des groupes de 2.</p><p>Il faut 4 groupes. Le 1 de m13 n'a qu'un seul voisin à 1.</p><p>Il y a deux solutions minimales (m7 peut aller avec m3 ou avec m5) : les deux sont acceptées.</p></div>
+</div>
+
+<h3>9.4 L'afficheur 7 segments</h3>
+<p>Entrées w, x, y, z ; cases indifférentes de 10 à 15. Utilise le tableau de la section 7.2.</p>
+<div class="ex"><p><b>12.</b> Le segment b (en haut à droite).</p><div class="xck" data-id="e12" data-vars="wxyz" data-on="0,1,2,3,4,7,8,9" data-dc="10,11,12,13,14,15" data-name="b" data-min></div></div>
+<div class="ex"><p><b>13.</b> Le segment c (en bas à droite). Il n'est éteint que pour le 2.</p><div class="xck" data-id="e13" data-vars="wxyz" data-on="0,1,3,4,5,6,7,8,9" data-dc="10,11,12,13,14,15" data-name="c" data-min></div><div class="hints"><p>Avec les X, seule la case m2 vaut 0. Cherche les plus grands groupes qui l'évitent : trois groupes de 8.</p></div></div>
+<div class="ex"><p><b>14.</b> Le segment e (en bas à gauche).</p><div class="xck" data-id="e14" data-vars="wxyz" data-on="0,2,6,8" data-dc="10,11,12,13,14,15" data-name="e" data-min></div></div>
+<div class="ex"><p><b>15.</b> Le segment g (au milieu).</p><div class="xck" data-id="e15" data-vars="wxyz" data-on="2,3,4,5,6,8,9" data-dc="10,11,12,13,14,15" data-name="g" data-min></div><div class="hints"><p>Il y a deux solutions minimales différentes : les deux sont acceptées.</p></div></div>
+<div class="ex"><p><b>16.</b> Le segment d (en bas). C'est le plus long : 5 groupes.</p><div class="xck" data-id="e16" data-vars="wxyz" data-on="0,2,3,5,6,8,9" data-dc="10,11,12,13,14,15" data-name="d" data-min></div><div class="hints"><p>Le 1 de m5 n'a aucun voisin à 1, ni même à X sauf m13 : son groupe est obligatoire, et il a 3 lettres.</p></div></div>
+<div class="ex"><p><b>17.</b> Le segment f (en haut à gauche).</p><div class="xck" data-id="e17" data-vars="wxyz" data-on="0,4,5,6,8,9" data-dc="10,11,12,13,14,15" data-name="f" data-min></div></div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Bilan</h2>
+<div class="box key">
+<p class="lbl">Avant le TP, tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>écrire les lois de l'algèbre de Boole, et en démontrer une par la table ou par les deux valeurs ;</li>
+<li>simplifier une expression par le calcul, en nommant la loi utilisée à chaque ligne ;</li>
+<li>écrire la somme de produits canonique et le produit de sommes canonique d'une table ;</li>
+<li>dessiner un tableau de Karnaugh à 2, 3 ou 4 lettres, avec l'ordre de Gray et les bons numéros de cases ;</li>
+<li>faire les regroupements (puissances de 2, bords, le plus grand possible, le moins possible), en commençant par les groupes obligatoires, et lire chaque groupe ;</li>
+<li>utiliser les cases indifférentes ;</li>
+<li>trouver les équations des segments d'un afficheur 7 segments ;</li>
+<li>vérifier une simplification dans Logisim.</li>
+</ul>
+</div>
+<p>La suite du programme, le 19 octobre : les multiplexeurs et l'additionneur. Tu as déjà croisé les deux : le multiplexeur dans la section 4.3 de la page sur les portes, l'additionneur complet dans la section 6 de cette page.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir du plan de séances d'Architecture des ordinateurs de ta prof, Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+var SETTINGS = {iec:false};
+var REDRAW = [];
+
+/* ---------- questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la section juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+
+/* ======================================================================
+   Expressions booléennes : analyse
+   ====================================================================== */
+function PErr(msg, pos){ this.msg = msg; this.pos = pos; }
+var WORDS = [['xnor','FN'],['nand','FN'],['nor','FN'],['xor','XOR'],['and','AND'],['not','NOT'],['non','NOT'],['or','OR'],['et','AND'],['ou','OR']];
+function tokenize(s){
+  var t = [], i = 0, m;
+  while (i < s.length){
+    var c = s.charAt(i);
+    if (/\s/.test(c)){ i++; continue; }
+    var low = s.slice(i).toLowerCase(), hit = null;
+    for (var w = 0; w < WORDS.length; w++){
+      var word = WORDS[w][0];
+      if (low.indexOf(word) === 0 && !/[a-zà-ÿ]/i.test(low.charAt(word.length))){ hit = WORDS[w]; break; }
+    }
+    if (hit){ t.push({t:hit[1], v:hit[0], p:i}); i += hit[0].length; continue; }
+    if ('!~¬'.indexOf(c) >= 0){ t.push({t:'NOT', p:i}); i++; continue; }
+    if ("'’′".indexOf(c) >= 0){ t.push({t:'POST', p:i}); i++; continue; }
+    if ('.·*&∧×⋅'.indexOf(c) >= 0){ t.push({t:'AND', p:i}); i++; continue; }
+    if ('+|∨'.indexOf(c) >= 0){ t.push({t:'OR', p:i}); i++; continue; }
+    if ('^⊕'.indexOf(c) >= 0){ t.push({t:'XOR', p:i}); i++; continue; }
+    if (c === '(' || c === ')' || c === ','){ t.push({t:c, p:i}); i++; continue; }
+    if (c === '0' || c === '1'){ t.push({t:'CONST', v:+c, p:i}); i++; continue; }
+    if (/[a-dA-Dw-zW-Z]/.test(c)){ t.push({t:'VAR', v:c.toLowerCase(), p:i}); i++; continue; }
+    if (/[a-zA-Z]/.test(c)) throw new PErr('« ' + c + ' » n\'est pas une entrée connue : utilise a, b, c, d (ou w, x, y, z)', i);
+    throw new PErr('symbole inconnu « ' + c + ' »', i);
+  }
+  return t;
+}
+function parseExpr(s){
+  var T = tokenize(s), k = 0;
+  if (!T.length) throw new PErr('l\'expression est vide', 0);
+  var at = function(x){ return k < T.length && T[k].t === x; };
+  var here = function(){ return k < T.length ? T[k].p : s.length; };
+  var startsUnary = function(){ return k < T.length && (T[k].t === 'VAR' || T[k].t === 'CONST' || T[k].t === '(' || T[k].t === 'NOT' || T[k].t === 'FN'); };
+  function chain(op, sub, test){
+    var first = sub(), args = [first];
+    while (test()){ if (at(op)) k++; args.push(sub()); }
+    return args.length === 1 ? first : {t:op.toLowerCase(), args:args};
+  }
+  function pOr(){ return chain('OR', pXor, function(){ return at('OR'); }); }
+  function pXor(){ return chain('XOR', pAnd, function(){ return at('XOR'); }); }
+  function pAnd(){ return chain('AND', pUnary, function(){ return at('AND') || startsUnary(); }); }
+  function pUnary(){ if (at('NOT')){ k++; return {t:'not', args:[pUnary()]}; } return pPost(); }
+  function pPost(){ var a = pAtom(); while (at('POST')){ k++; a = {t:'not', args:[a]}; } return a; }
+  function pAtom(){
+    var tk = T[k];
+    if (!tk) throw new PErr('l\'expression s\'arrête trop tôt', s.length);
+    if (tk.t === 'VAR'){ k++; return {t:'var', n:tk.v}; }
+    if (tk.t === 'CONST'){ k++; return {t:'const', v:tk.v}; }
+    if (tk.t === '('){ k++; var e = pOr(); if (!at(')')) throw new PErr('une parenthèse n\'est pas refermée', here()); k++; return e; }
+    if (tk.t === 'FN'){
+      k++;
+      if (!at('(')) throw new PErr(tk.v + ' s\'écrit comme une fonction : ' + tk.v + '(a, b)', here());
+      k++; var args = [pOr()];
+      while (at(',')){ k++; args.push(pOr()); }
+      if (!at(')')) throw new PErr('il manque « ) » après les arguments de ' + tk.v, here());
+      k++;
+      if (args.length < 2 && tk.v !== 'nand' && tk.v !== 'nor') throw new PErr(tk.v + ' demande au moins deux arguments', tk.p);
+      return {t:tk.v, args:args};
+    }
+    throw new PErr('j\'attendais une entrée (a, b, c, d, w, x, y, z), 0, 1 ou « ( »', tk.p);
+  }
+  var root = pOr();
+  if (k < T.length) throw new PErr('symbole en trop', T[k].p);
+  return root;
+}
+function parseProgram(src){
+  var parts = src.split(/[;\n]/).map(function(x){ return x.trim(); }).filter(function(x){ return x; });
+  if (!parts.length) throw new PErr('écris une expression', 0);
+  return parts.map(function(p, i){
+    var m = p.match(/^([A-Za-z][A-Za-z0-9]*)\s*=\s*(.*)$/);
+    var name = m ? m[1] : (parts.length > 1 ? 'S' + (i + 1) : 'S');
+    var e;
+    try { e = parseExpr(m ? m[2] : p); }
+    catch (err){ if (err instanceof PErr) err.msg = (parts.length > 1 ? 'sortie ' + name + ' : ' : '') + err.msg; throw err; }
+    return {name:name, ast:e};
+  });
+}
+function isLeaf(n){ return n.t === 'var' || n.t === 'const'; }
+function evalN(n, env){
+  switch (n.t){
+    case 'var': return env[n.n] ? 1 : 0;
+    case 'const': return n.v;
+    case 'not': return evalN(n.args[0], env) ? 0 : 1;
+  }
+  var v = n.args.map(function(x){ return evalN(x, env); });
+  var all = v.every(function(x){ return x; }), any = v.some(function(x){ return x; });
+  var odd = v.reduce(function(s, x){ return s ^ x; }, 0);
+  switch (n.t){
+    case 'and': return all ? 1 : 0;
+    case 'or': return any ? 1 : 0;
+    case 'xor': return odd;
+    case 'nand': return all ? 0 : 1;
+    case 'nor': return any ? 0 : 1;
+    case 'xnor': return odd ? 0 : 1;
+  }
+}
+function varsOf(list){
+  var acc = [];
+  (function walk(n){ if (n.t === 'var'){ if (acc.indexOf(n.n) < 0) acc.push(n.n); } else if (n.args) n.args.forEach(walk); })({args:list.map(function(o){ return o.ast; })});
+  return acc.sort();
+}
+var PREC = {or:1, xor:2, and:3};
+function disp(n, parent){
+  if (n.t === 'var') return n.n;
+  if (n.t === 'const') return String(n.v);
+  if (n.t === 'not') return '<span class="ov">' + disp(n.args[0], null) + '</span>';
+  if (n.t === 'nand' || n.t === 'nor' || n.t === 'xnor'){
+    var sym = n.t === 'nand' ? '·' : (n.t === 'nor' ? ' + ' : ' ⊕ ');
+    return '<span class="ov">' + n.args.map(function(x){ return disp(x, n.t === 'nand' ? 'and' : (n.t === 'nor' ? 'or' : 'xor')); }).join(sym) + '</span>';
+  }
+  var s = n.args.map(function(x){ return disp(x, n.t); }).join(n.t === 'and' ? '·' : (n.t === 'or' ? ' + ' : ' ⊕ '));
+  return (parent && PREC[parent] && PREC[n.t] < PREC[parent]) || (parent && parent !== n.t && PREC[parent] === PREC[n.t]) ? '(' + s + ')' : s;
+}
+function key(n){ return n.t === 'var' ? n.n : n.t === 'const' ? String(n.v) : n.t + '(' + n.args.map(key).join(',') + ')'; }
+function gatesOf(n, acc, seen){
+  if (isLeaf(n)) return acc;
+  n.args.forEach(function(x){ gatesOf(x, acc, seen); });
+  var k = key(n);
+  if (!seen[k]){ seen[k] = 1; acc.push(n); }
+  return acc;
+}
+
+/* ======================================================================
+   Dessin des circuits
+   ====================================================================== */
+var ROW = 30, PIN = 20, COLW = 104, GW = 46, BUB = 8;
+var INVERT = {not:1, nand:1, nor:1, xnor:1};
+var IECL = {not:'1', and:'&', or:'≥1', xor:'=1', nand:'&', nor:'≥1', xnor:'=1'};
+function f1(x){ return Math.round(x * 10) / 10; }
+function bodyH(n){ var k = n.args.length; return n.t === 'not' ? 26 : Math.max(36, (k - 1) * PIN + 20); }
+function backX(n, gx, py, top, h){
+  if (SETTINGS.iec || n.t === 'not' || n.t === 'and' || n.t === 'nand') return gx;
+  var t = (py - top) / h, Wo = GW - (INVERT[n.t] ? BUB : 0) - ((n.t === 'xor' || n.t === 'xnor') ? 7 : 0);
+  return gx + 0.5 * Wo * t * (1 - t);
+}
+function shape(n, gx, top, h, val){
+  var b = INVERT[n.t] ? BUB : 0, W = GW, s = '', y2 = top + h, cy = top + h / 2;
+  if (SETTINGS.iec){
+    var w = 38;
+    s += '<rect class="gate" x="' + gx + '" y="' + top + '" width="' + w + '" height="' + h + '" rx="2"/>';
+    s += '<text class="iec" x="' + (gx + w / 2) + '" y="' + (top + 15) + '" text-anchor="middle">' + IECL[n.t] + '</text>';
+    if (b) s += '<circle class="gate" cx="' + (gx + w + 4) + '" cy="' + cy + '" r="4"/>';
+    return {s:s, out:gx + w + (b ? 8 : 0)};
+  }
+  if (n.t === 'not'){
+    s += '<path class="gate" d="M' + gx + ',' + top + ' L' + (gx + 30) + ',' + cy + ' L' + gx + ',' + y2 + ' Z"/>';
+    s += '<circle class="gate" cx="' + (gx + 34) + '" cy="' + cy + '" r="4"/>';
+    return {s:s, out:gx + 38};
+  }
+  var Wb = W - b;
+  if (n.t === 'and' || n.t === 'nand'){
+    var r = Math.min(h / 2, Wb * 0.55), flat = Wb - r;
+    s += '<path class="gate" d="M' + gx + ',' + top + ' H' + f1(gx + flat) + ' A' + f1(r) + ',' + f1(h / 2) + ' 0 0 1 ' + f1(gx + flat) + ',' + y2 + ' H' + gx + ' Z"/>';
+  } else {
+    var off = (n.t === 'xor' || n.t === 'xnor') ? 7 : 0, x0 = gx + off, Wo = Wb - off;
+    s += '<path class="gate" d="M' + x0 + ',' + top + ' Q' + f1(x0 + 0.25 * Wo) + ',' + cy + ' ' + x0 + ',' + y2 + ' Q' + f1(x0 + 0.62 * Wo) + ',' + y2 + ' ' + f1(x0 + Wo) + ',' + cy + ' Q' + f1(x0 + 0.62 * Wo) + ',' + top + ' ' + x0 + ',' + top + ' Z"/>';
+    if (off) s += '<path class="gate-l" d="M' + gx + ',' + top + ' Q' + f1(gx + 0.25 * Wo) + ',' + cy + ' ' + gx + ',' + y2 + '"/>';
+  }
+  if (b) s += '<circle class="gate" cx="' + (gx + Wb + 4) + '" cy="' + cy + '" r="4"/>';
+  return {s:s, out:gx + W};
+}
+function wireCls(v){ return v ? 'w w1' : 'w w0'; }
+
+function draw(outputs, env, opt){
+  opt = opt || {};
+  var vars = varsOf(outputs), nv = vars.length;
+  var railX = {}, i;
+  vars.forEach(function(v, j){ railX[v] = 24 + j * 32; });
+  var x0 = 24 + nv * 32 + 8;
+  function height(n){ return isLeaf(n) ? 0 : 1 + Math.max.apply(null, n.args.map(height)); }
+  var H = 0; outputs.forEach(function(o){ H = Math.max(H, height(o.ast)); });
+  var gateX = function(col){ return x0 + (col - 1) * COLW + 46; };
+  var xOut = x0 + H * COLW + 46;
+  var slot = 0, nodes = [];
+  function place(n){
+    if (isLeaf(n)){ n._y = slot * ROW; slot++; return; }
+    n.args.forEach(place);
+    var ys = n.args.map(function(c){ return c._y; });
+    n._y = ys.reduce(function(a, b){ return a + b; }, 0) / ys.length;
+    n._h = height(n);
+    nodes.push(n);
+  }
+  outputs.forEach(function(o, oi){ if (oi) slot += 0.6; place(o.ast); });
+  var maxY = (slot - 1) * ROW;
+  var svgW = xOut + 70, top = -64, svgH = maxY + 30 - top;
+  var parts = [], junctions = [], railBottom = {};
+  vars.forEach(function(v){ railBottom[v] = -26; });
+  var labels = [];
+  function wire(src, val, pins){ // src {x,y}, pins: [{x,y,bend}]
+    pins.forEach(function(p){
+      var d;
+      if (Math.abs(src.y - p.y) < 0.5) d = 'M' + f1(src.x) + ',' + f1(src.y) + ' H' + f1(p.x);
+      else d = 'M' + f1(src.x) + ',' + f1(src.y) + ' H' + f1(p.bend) + ' V' + f1(p.y) + ' H' + f1(p.x);
+      parts.push('<path class="' + wireCls(val) + '" d="' + d + '"/>');
+    });
+  }
+  function srcOf(c){
+    if (c.t === 'var'){ junctions.push({x:railX[c.n], y:c._y, v:env[c.n] ? 1 : 0}); railBottom[c.n] = Math.max(railBottom[c.n], c._y); return {x:railX[c.n], y:c._y}; }
+    if (c.t === 'const'){ parts.push('<text class="cst" x="' + (x0 - 6) + '" y="' + (c._y + 4) + '" text-anchor="end">' + c.v + '</text>'); return {x:x0 - 2, y:c._y}; }
+    return {x:c._out, y:c._y};
+  }
+  // gates, by increasing height so that child outputs are known
+  nodes.sort(function(a, b){ return a._h - b._h; });
+  var gateSvg = [];
+  nodes.forEach(function(n){
+    var gx = gateX(n._h), h = bodyH(n), topY = n._y - h / 2, k = n.args.length;
+    var sh = shape(n, gx, topY, h, 0);
+    n._out = sh.out;
+    gateSvg.push(sh.s);
+    n.args.forEach(function(c, j){
+      var py = k === 1 ? n._y : n._y + (j - (k - 1) / 2) * PIN;
+      var src = srcOf(c), cv = evalN(c, env);
+      var down = src.y < py;
+      var bend = gx - 12 - 8 * (down ? (k - 1 - j) : j);
+      wire(src, cv, [{x:backX(n, gx, py, topY, h), y:py, bend:bend}]);
+    });
+    if (opt.labels) labels.push('<text class="wl" x="' + f1(n._out + 4) + '" y="' + f1(n._y - 6) + '">' + svgDisp(n) + '</text>');
+  });
+  // outputs
+  outputs.forEach(function(o){
+    var n = o.ast, src = srcOf(n), v = evalN(n, env);
+    parts.push('<path class="' + wireCls(v) + '" d="M' + f1(src.x) + ',' + f1(src.y) + ' H' + (xOut + 10) + '"/>');
+    parts.push('<circle class="opin ' + (v ? 'on' : 'off') + '" cx="' + (xOut + 22) + '" cy="' + f1(n._y) + '" r="12"/><text class="pv" x="' + (xOut + 22) + '" y="' + f1(n._y + 5) + '" text-anchor="middle">' + v + '</text>');
+    parts.push('<text class="pn" x="' + (xOut + 40) + '" y="' + f1(n._y + 5) + '">' + esc(o.name) + '</text>');
+  });
+  // rails and input pins
+  var rails = [];
+  vars.forEach(function(v){
+    var x = railX[v], val = env[v] ? 1 : 0;
+    rails.push('<path class="' + wireCls(val) + '" d="M' + x + ',-26 V' + f1(railBottom[v]) + '"/>');
+    rails.push('<g class="ipin" data-v="' + v + '" tabindex="0" role="button" aria-label="entrée ' + v + ', vaut ' + val + '"><rect class="ibox ' + (val ? 'on' : 'off') + '" x="' + (x - 12) + '" y="-50" width="24" height="24" rx="3"/><text class="pv" x="' + x + '" y="-33" text-anchor="middle">' + val + '</text></g>');
+    rails.push('<text class="pn" x="' + x + '" y="-56" text-anchor="middle">' + v + '</text>');
+  });
+  var jn = junctions.map(function(j){ return '<circle class="jn ' + (j.v ? 'on' : 'off') + '" cx="' + j.x + '" cy="' + f1(j.y) + '" r="3.6"/>'; });
+  var svg = '<svg viewBox="0 ' + top + ' ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH + '" style="max-width:100%;height:auto;min-width:' + Math.min(svgW, 300) + 'px" role="img" aria-label="Circuit logique">'
+    + rails.join('') + parts.join('') + jn.join('') + gateSvg.join('') + labels.join('') + '</svg>';
+  return svg;
+}
+function svgDisp(n){
+  // plain-text label for SVG: overline rendered with a tspan
+  var h = disp(n, null);
+  return h.replace(/<span class="ov">/g, '<tspan style="text-decoration:overline">').replace(/<\/span>/g, '</tspan>');
+}
+
+/* ---------- table de vérité ---------- */
+function tableHTML(outputs, env, opt){
+  opt = opt || {};
+  var vars = varsOf(outputs), cols = [], seen = {};
+  if (!opt.noSub) outputs.forEach(function(o){ gatesOf(o.ast, cols, seen); });
+  var outKeys = outputs.map(function(o){ return key(o.ast); });
+  cols = cols.filter(function(c){ return outKeys.indexOf(key(c)) < 0; });
+  var h = '<div class="tw"><table class="c tight tt"><tr>';
+  vars.forEach(function(v){ h += '<th>' + v + '</th>'; });
+  cols.forEach(function(c){ h += '<th class="sub">' + disp(c, null) + '</th>'; });
+  outputs.forEach(function(o){ h += '<th class="outc">' + esc(o.name) + (isLeaf(o.ast) || opt.hideExpr ? '' : ' = ' + disp(o.ast, null)) + '</th>'; });
+  h += '</tr>';
+  var n = Math.pow(2, vars.length);
+  for (var r = 0; r < n; r++){
+    var e = {}, cur = true;
+    vars.forEach(function(v, j){ e[v] = (r >> (vars.length - 1 - j)) & 1; if (env && (env[v] ? 1 : 0) !== e[v]) cur = false; });
+    h += '<tr' + (env && cur ? ' class="hl"' : '') + '>';
+    vars.forEach(function(v){ h += '<td>' + e[v] + '</td>'; });
+    cols.forEach(function(c){ var x = evalN(c, e); h += '<td class="' + (x ? 'one' : 'zero') + '">' + x + '</td>'; });
+    outputs.forEach(function(o){ var x = evalN(o.ast, e); h += '<td class="outc ' + (x ? 'one' : 'zero') + '">' + x + '</td>'; });
+    h += '</tr>';
+  }
+  return h + '</table></div>';
+}
+function sameTable(o1, o2){
+  var vars = varsOf([o1, o2]), n = Math.pow(2, vars.length);
+  for (var r = 0; r < n; r++){
+    var e = {};
+    vars.forEach(function(v, j){ e[v] = (r >> (vars.length - 1 - j)) & 1; });
+    if (evalN(o1.ast, e) !== evalN(o2.ast, e)) return e;
+  }
+  return null;
+}
+function countGates(list){ var seen = {}, acc = []; list.forEach(function(o){ gatesOf(o.ast, acc, seen); }); return acc.length; }
+function tooBig(outputs){
+  var g = 0, d = 0;
+  function walk(n, dep){ if (isLeaf(n)) return; g++; d = Math.max(d, dep); n.args.forEach(function(x){ walk(x, dep + 1); }); }
+  outputs.forEach(function(o){ walk(o.ast, 1); });
+  return g > 16 || d > 7;
+}
+
+/* ---------- un circuit vivant ---------- */
+function Circuit(root, outputs, opt){
+  opt = opt || {};
+  var env = {}, vars = varsOf(outputs);
+  (opt.init || '').split('').forEach(function(ch, i){ if (vars[i]) env[vars[i]] = ch === '1' ? 1 : 0; });
+  vars.forEach(function(v){ if (env[v] === undefined) env[v] = 0; });
+  function render(){
+    var h = '';
+    if (tooBig(outputs)) h += '<div class="msg meh">Circuit trop grand pour le dessin : la table de vérité est quand même calculée.</div>';
+    else h += '<div class="circ-fig">' + draw(outputs, env, {labels:opt.labels && opt.labels()}) + '</div>';
+    if (opt.verdict){
+      var diff = sameTable(outputs[0], outputs[1]);
+      h += diff ? '<div class="msg ko"><b>Pas équivalentes :</b> pour ' + Object.keys(diff).map(function(v){ return v + ' = ' + diff[v]; }).join(', ') + ', ' + esc(outputs[0].name) + ' et ' + esc(outputs[1].name) + ' diffèrent.</div>'
+                : '<div class="msg ok"><b>Équivalentes :</b> les deux sorties ont la même colonne dans la table. Les deux circuits calculent la même fonction.</div>';
+    }
+    if (!opt.noTable) h += tableHTML(outputs, env, {hideExpr:opt.hideExpr, noSub:opt.noSub});
+    root.innerHTML = h;
+    each(root.querySelectorAll('.ipin'), function(g){
+      var tog = function(){ var v = g.getAttribute('data-v'); env[v] = env[v] ? 0 : 1; render(); var again = root.querySelector('.ipin[data-v="' + v + '"]'); if (again && opt.keepFocus !== false) again.focus({preventScroll:true}); };
+      g.addEventListener('click', tog);
+      g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tog(); } });
+    });
+  }
+  render();
+  REDRAW.push(render);
+  return {render:render, env:env};
+}
+each(document.querySelectorAll('.circ[data-expr]'), function(el){
+  var outs;
+  try { outs = parseProgram(el.getAttribute('data-expr')); } catch (e){ el.textContent = 'Erreur : ' + (e.msg || e); return; }
+  Circuit(el, outs, {init:el.getAttribute('data-init') || '', noTable:el.hasAttribute('data-notable'), hideExpr:el.hasAttribute('data-hide'), noSub:el.hasAttribute('data-nosub') || el.hasAttribute('data-hide'), verdict:el.hasAttribute('data-verdict')});
+});
+
+/* ---------- choix des symboles ---------- */
+each(document.querySelectorAll('.symtog'), function(box){
+  box.innerHTML = '<span class="note" style="margin:0">Symboles :</span><span class="seg" role="group" aria-label="Famille de symboles"><button type="button" data-s="us" aria-pressed="true">américains (Logisim)</button><button type="button" data-s="iec" aria-pressed="false">européens (CEI)</button></span>';
+});
+each(document.querySelectorAll('.symtog button'), function(b){
+  b.addEventListener('click', function(){
+    SETTINGS.iec = b.getAttribute('data-s') === 'iec';
+    each(document.querySelectorAll('.symtog button'), function(x){ x.setAttribute('aria-pressed', (x.getAttribute('data-s') === 'iec') === SETTINGS.iec ? 'true' : 'false'); });
+    REDRAW.forEach(function(f){ f(); });
+  });
+});
+
+/* ======================================================================
+   Fonctions données par une table (0, 1, ou 2 = case indifférente X)
+   ====================================================================== */
+function mtEnv(vars, i){ var e = {}; vars.forEach(function(v, j){ e[v] = (i >> (vars.length - 1 - j)) & 1; }); return e; }
+function tableOf(ast, vars){ var f = []; for (var i = 0; i < (1 << vars.length); i++) f.push(evalN(ast, mtEnv(vars, i))); return f; }
+function fromLists(n, on, dc){ var f = []; for (var i = 0; i < (1 << n); i++) f.push(on.indexOf(i) >= 0 ? 1 : (dc.indexOf(i) >= 0 ? 2 : 0)); return f; }
+function listNum(s){ return (s || '').split(/[\s,]+/).filter(function(x){ return x !== ''; }).map(Number); }
+function covers(term, i, n){ for (var j = 0; j < n; j++){ var bit = (i >> (n - 1 - j)) & 1; if (term[j] !== -1 && term[j] !== bit) return false; } return true; }
+function termCells(term, n){ var c = []; for (var i = 0; i < (1 << n); i++) if (covers(term, i, n)) c.push(i); return c; }
+function nLits(term){ var k = 0; term.forEach(function(x){ if (x !== -1) k++; }); return k; }
+function primeImps(f, n){
+  var all = [], total = Math.pow(3, n);
+  for (var k = 0; k < total; k++){
+    var t = [], x = k;
+    for (var j = 0; j < n; j++){ t.push([0, 1, -1][x % 3]); x = Math.floor(x / 3); }
+    var cl = termCells(t, n);
+    if (cl.every(function(i){ return f[i] !== 0; }) && cl.some(function(i){ return f[i] === 1; })) all.push({t:t, cells:cl});
+  }
+  return all.filter(function(a){
+    return !all.some(function(b){ return b.cells.length > a.cells.length && a.cells.every(function(i){ return b.cells.indexOf(i) >= 0; }); });
+  });
+}
+function combos(n, k, cb){ var a = []; (function rec(s){ if (a.length === k){ cb(a); return; } for (var i = s; i < n; i++){ a.push(i); rec(i + 1); a.pop(); } })(0); }
+function sortTerms(terms){
+  return terms.slice().sort(function(p, q){
+    var d = nLits(p) - nLits(q); if (d) return d;
+    for (var j = 0; j < p.length; j++){ var a = p[j] === -1 ? 9 : p[j], b = q[j] === -1 ? 9 : q[j]; if (a !== b) return (a === 9 ? 1 : (b === 9 ? -1 : b - a)); }
+    return 0;
+  });
+}
+function minimize(f, n){
+  var ones = [], i;
+  for (i = 0; i < f.length; i++) if (f[i] === 1) ones.push(i);
+  if (!ones.length) return {terms:[], cost:[0, 0], primes:[]};
+  var P = primeImps(f, n), chosen = [];
+  ones.forEach(function(o){
+    var cv = P.filter(function(p){ return p.cells.indexOf(o) >= 0; });
+    if (cv.length === 1 && chosen.indexOf(cv[0]) < 0) chosen.push(cv[0]);
+  });
+  var covered = {};
+  chosen.forEach(function(p){ p.cells.forEach(function(c){ covered[c] = 1; }); });
+  var rest = ones.filter(function(o){ return !covered[o]; });
+  var cand = P.filter(function(p){ return chosen.indexOf(p) < 0 && p.cells.some(function(c){ return rest.indexOf(c) >= 0; }); });
+  var best = rest.length ? null : [];
+  for (var k = 1; k <= cand.length && !best; k++){
+    var bl = null, bi = null;
+    combos(cand.length, k, function(idx){
+      var cov = {};
+      idx.forEach(function(p){ cand[p].cells.forEach(function(c){ cov[c] = 1; }); });
+      if (!rest.every(function(o){ return cov[o]; })) return;
+      var l = idx.reduce(function(s, p){ return s + nLits(cand[p].t); }, 0);
+      if (bl === null || l < bl){ bl = l; bi = idx.slice(); }
+    });
+    if (bi) best = bi.map(function(p){ return cand[p]; });
+  }
+  var terms = sortTerms(chosen.concat(best).map(function(p){ return p.t; }));
+  return {terms:terms, cost:[terms.length, terms.reduce(function(s, t){ return s + nLits(t); }, 0)], primes:P};
+}
+function termHTML(t, vars){
+  var parts = [];
+  t.forEach(function(x, j){ if (x === 1) parts.push(vars[j]); else if (x === 0) parts.push('<span class="ov">' + vars[j] + '</span>'); });
+  return parts.length ? parts.join('·') : '1';
+}
+function termSrc(t, vars){
+  var parts = [];
+  t.forEach(function(x, j){ if (x === 1) parts.push(vars[j]); else if (x === 0) parts.push('!' + vars[j]); });
+  return parts.length ? parts.join('.') : '1';
+}
+function sopHTML(terms, vars){ return terms.length ? terms.map(function(t){ return termHTML(t, vars); }).join(' + ') : '0'; }
+function sopSrc(terms, vars){ return terms.length ? terms.map(function(t){ return termSrc(t, vars); }).join(' + ') : '0'; }
+function sopTerms(ast, vars){
+  function lit(nd){ if (nd.t === 'var') return [nd.n, 1]; if (nd.t === 'not' && nd.args[0].t === 'var') return [nd.args[0].n, 0]; return null; }
+  function term(nd){
+    var t = vars.map(function(){ return -1; });
+    if (nd.t === 'const') return nd.v === 1 ? t : 'empty';
+    var parts = nd.t === 'and' ? nd.args : [nd];
+    for (var i = 0; i < parts.length; i++){
+      var L = lit(parts[i]); if (!L) return null;
+      var j = vars.indexOf(L[0]); if (j < 0) return null;
+      if (t[j] !== -1 && t[j] !== L[1]) return 'empty';
+      t[j] = L[1];
+    }
+    return t;
+  }
+  var ts = ast.t === 'or' ? ast.args : [ast], out = [];
+  for (var i = 0; i < ts.length; i++){ var x = term(ts[i]); if (x === null) return null; if (x !== 'empty') out.push(x); }
+  return out;
+}
+function costOf(terms){ return [terms.length, terms.reduce(function(s, t){ return s + nLits(t); }, 0)]; }
+function costTxt(c){ return c[0] + ' terme' + (c[0] > 1 ? 's' : '') + ' et ' + c[1] + ' lettre' + (c[1] > 1 ? 's' : ''); }
+function bitsOf(i, n){ var s = ''; for (var j = n - 1; j >= 0; j--) s += (i >> j) & 1; return s; }
+function cellName(i, vars){ return 'm' + i + ' (' + vars.map(function(v, j){ return v + ' = ' + ((i >> (vars.length - 1 - j)) & 1); }).join(', ') + ')'; }
+
+/* ======================================================================
+   Dessin d'un tableau de Karnaugh
+   ====================================================================== */
+var GRAY = {1:[0, 1], 2:[0, 1, 3, 2]};
+function kl(n){ return n === 2 ? {rv:1, cv:1} : (n === 3 ? {rv:1, cv:2} : {rv:2, cv:2}); }
+function cellAt(n, r, c){ var L = kl(n); return (GRAY[L.rv][r] << L.cv) | GRAY[L.cv][c]; }
+function matchCode(term, from, count, code){ for (var j = 0; j < count; j++){ var bit = (code >> (count - 1 - j)) & 1, t = term[from + j]; if (t !== -1 && t !== bit) return false; } return true; }
+function runs(pos, len){
+  if (pos.length === len) return [{a:0, b:len - 1}];
+  var segs = [], s = pos[0], p = pos[0];
+  for (var i = 1; i < pos.length; i++){ if (pos[i] === p + 1) p = pos[i]; else { segs.push({a:s, b:p}); s = p = pos[i]; } }
+  segs.push({a:s, b:p});
+  if (segs.length === 2 && segs[0].a === 0 && segs[1].b === len - 1){ segs[0].oa = true; segs[1].ob = true; }
+  return segs;
+}
+var VAL = ['0', '1', 'X'];
+function kmapSVG(vars, f, opt){
+  opt = opt || {};
+  var n = vars.length, L = kl(n), R = 1 << L.rv, Cn = 1 << L.cv, C = 56, X0 = 76, Y0 = 66;
+  var W = X0 + Cn * C + 18, H = Y0 + R * C + 18, s = [];
+  var rowV = vars.slice(0, L.rv).join(''), colV = vars.slice(L.rv).join('');
+  s.push('<svg class="kmap-svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Tableau de Karnaugh à ' + n + ' entrées">');
+  s.push('<line class="kdiag" x1="' + (X0 - 46) + '" y1="' + (Y0 - 46) + '" x2="' + X0 + '" y2="' + Y0 + '"/>');
+  s.push('<text class="kvar" x="' + (X0 - 38) + '" y="' + (Y0 - 4) + '">' + rowV + '</text>');
+  s.push('<text class="kvar" x="' + (X0 - 4) + '" y="' + (Y0 - 34) + '" text-anchor="end">' + colV + '</text>');
+  var c, r;
+  for (c = 0; c < Cn; c++) s.push('<text class="khead" x="' + (X0 + c * C + C / 2) + '" y="' + (Y0 - 14) + '" text-anchor="middle">' + bitsOf(GRAY[L.cv][c], L.cv) + '</text>');
+  for (r = 0; r < R; r++) s.push('<text class="khead" x="' + (X0 - 16) + '" y="' + (Y0 + r * C + C / 2 + 5) + '" text-anchor="end">' + bitsOf(GRAY[L.rv][r], L.rv) + '</text>');
+  for (r = 0; r < R; r++) for (c = 0; c < Cn; c++){
+    var i = cellAt(n, r, c), v = f ? f[i] : null;
+    s.push('<rect class="kc' + (opt.editable ? ' ed' : '') + (v === 1 ? ' v1' : (v === 2 ? ' vx' : '')) + (opt.hl === i ? ' hl' : '') + '" data-i="' + i + '" x="' + (X0 + c * C) + '" y="' + (Y0 + r * C) + '" width="' + C + '" height="' + C + '"' + (opt.editable ? ' tabindex="0" role="button" aria-label="case m' + i + ', vaut ' + (v === null ? '' : VAL[v]) + '"' : '') + '/>');
+  }
+  (opt.groups || []).forEach(function(g, gi){
+    var t = g.term, inset = 5 + (gi % 4) * 4;
+    var rp = [], cp = [];
+    for (r = 0; r < R; r++) if (matchCode(t, 0, L.rv, GRAY[L.rv][r])) rp.push(r);
+    for (c = 0; c < Cn; c++) if (matchCode(t, L.rv, L.cv, GRAY[L.cv][c])) cp.push(c);
+    if (!rp.length || !cp.length) return;
+    runs(rp, R).forEach(function(rs){
+      runs(cp, Cn).forEach(function(cs){
+        var x1 = cs.oa ? X0 - 9 : X0 + cs.a * C + inset, x2 = cs.ob ? X0 + Cn * C + 9 : X0 + (cs.b + 1) * C - inset;
+        var y1 = rs.oa ? Y0 - 9 : Y0 + rs.a * C + inset, y2 = rs.ob ? Y0 + R * C + 9 : Y0 + (rs.b + 1) * C - inset;
+        s.push('<rect class="kg k' + (g.color % 6) + (g.bad ? ' bad' : '') + '" x="' + x1 + '" y="' + y1 + '" width="' + (x2 - x1) + '" height="' + (y2 - y1) + '" rx="15"/>');
+      });
+    });
+  });
+  for (r = 0; r < R; r++) for (c = 0; c < Cn; c++){
+    var ii = cellAt(n, r, c), vv = f ? f[ii] : null, cx = X0 + c * C + C / 2, cy = Y0 + r * C + C / 2;
+    if (opt.idx) s.push('<text class="kidx' + (vv === null ? ' big' : '') + '" x="' + (vv === null ? cx : X0 + c * C + 5) + '" y="' + (vv === null ? cy + 6 : Y0 + r * C + 13) + '"' + (vv === null ? ' text-anchor="middle"' : '') + '>' + (vv === null ? 'm' + ii : ii) + '</text>');
+    if (vv !== null) s.push('<text class="kval' + (vv === 1 ? ' v1' : (vv === 2 ? ' vx' : '')) + '" x="' + cx + '" y="' + (cy + 7) + '" text-anchor="middle">' + VAL[vv] + '</text>');
+  }
+  s.push('</svg>');
+  return s.join('');
+}
+function legendHTML(groups, vars){
+  if (!groups.length) return '';
+  return '<div class="klegend">' + groups.map(function(g, gi){ return '<span class="kchip"><i class="k' + (g.color % 6) + (g.bad ? ' bad' : '') + '"></i><span>' + termHTML(g.term, vars) + '</span></span>'; }).join('') + '</div>';
+}
+
+/* ---------- tableaux statiques ---------- */
+each(document.querySelectorAll('.kmap'), function(el){
+  var vars = el.getAttribute('data-vars').split(''), n = vars.length;
+  var f = el.hasAttribute('data-empty') ? null : fromLists(n, listNum(el.getAttribute('data-on')), listNum(el.getAttribute('data-dc')));
+  var groups = [], name = el.getAttribute('data-name') || 'S';
+  if (el.hasAttribute('data-sol')){ minimize(f, n).terms.forEach(function(t, i){ groups.push({term:t, color:i}); }); }
+  if (el.getAttribute('data-terms')){
+    var dashed = listNum(el.getAttribute('data-dashed'));
+    el.getAttribute('data-terms').split(';').forEach(function(src, i){ var tt = sopTerms(parseExpr(src), vars); if (tt && tt.length) groups.push({term:tt[0], color:i, bad:dashed.indexOf(i) >= 0}); });
+  }
+  var h = '<div class="kfig">' + kmapSVG(vars, f, {idx:el.hasAttribute('data-idx'), groups:groups}) + '</div>';
+  if (groups.length && !el.hasAttribute('data-nolegend')) h += legendHTML(groups, vars) + (el.hasAttribute('data-sol') ? '<p class="kres">' + name + ' = ' + sopHTML(groups.map(function(g){ return g.term; }), vars) + '</p>' : '');
+  el.innerHTML = h;
+});
+
+/* ======================================================================
+   L'atelier : table de vérité + tableau de Karnaugh + vérification
+   ====================================================================== */
+function Atelier(root, cfg){
+  var vars = cfg.vars.slice(), f = cfg.f.slice(), groups = [], editable = cfg.editable !== false, name = cfg.name || 'S';
+  var uid = root.id;
+  var top = '';
+  if (cfg.sizeSel) top += '<span class="seg" role="group" aria-label="Nombre d\'entrées">' + [2, 3, 4].map(function(k){ return '<button type="button" data-n="' + k + '" aria-pressed="' + (k === vars.length) + '">' + k + ' entrées</button>'; }).join('') + '</span>';
+  if (editable) top += '<button type="button" class="btn ghost at-clear">Tout à 0</button>';
+  var pre = (cfg.presets || []).map(function(p, i){ return '<button type="button" data-p="' + i + '">' + p.label + '</button>'; }).join('');
+  root.innerHTML = (cfg.title ? '<p class="lbl">' + cfg.title + '</p>' : '')
+    + (top ? '<div class="row">' + top + '</div>' : '')
+    + (pre ? '<div class="presets">' + pre + '</div>' : '')
+    + (editable ? '<p class="note at-help">Clique sur une case du tableau ou de la colonne ' + name + ' : 0 devient 1, 1 devient X (case indifférente), X redevient 0.</p>' : '')
+    + '<div class="at-grid' + (cfg.noTable ? ' solo' : '') + '"><div class="at-table"' + (cfg.noTable ? ' hidden' : '') + '></div><div class="at-map"></div></div>'
+    + '<details class="at-canon"' + (cfg.canonOpen ? ' open' : '') + '><summary>Formes canoniques de cette table</summary><div class="at-canon-b"></div></details>'
+    + '<div class="row at-check"><label class="fld" style="flex:1 1 240px">ta simplification de ' + name + '<input id="' + uid + '-in" type="text" autocomplete="off" spellcheck="false" placeholder="par exemple ' + vars[0] + '.' + vars[1] + ' + !' + vars[0] + (vars[2] ? '.' + vars[2] : '') + '"></label><button type="button" class="btn at-go">Vérifier</button><button type="button" class="btn ghost at-sol">Montrer une solution</button></div>'
+    + '<div class="at-out" aria-live="polite"></div><div class="at-circ"></div>';
+  var tbl = root.querySelector('.at-table'), map = root.querySelector('.at-map'), canon = root.querySelector('.at-canon-b'), out = root.querySelector('.at-out'), circ = root.querySelector('.at-circ'), inp = $(uid + '-in');
+  function cycle(i){ if (!editable) return; f[i] = (f[i] + 1) % 3; groups = []; out.innerHTML = ''; circ.innerHTML = ''; render(); }
+  function renderTable(){
+    var n = vars.length, h = '<div class="tw"><table class="c tight tt at-tt"><tr>' + vars.map(function(v){ return '<th>' + v + '</th>'; }).join('') + '<th class="outc">' + esc(name) + '</th><th class="sub">n°</th></tr>';
+    for (var i = 0; i < (1 << n); i++){
+      h += '<tr>' + bitsOf(i, n).split('').map(function(b){ return '<td>' + b + '</td>'; }).join('')
+        + '<td class="outc"><button type="button" class="kv' + (f[i] === 1 ? ' v1' : (f[i] === 2 ? ' vx' : '')) + '" data-i="' + i + '"' + (editable ? '' : ' disabled') + ' aria-label="ligne ' + i + ', ' + name + ' vaut ' + VAL[f[i]] + '">' + VAL[f[i]] + '</button></td><td class="zero">' + i + '</td></tr>';
+    }
+    tbl.innerHTML = h + '</table></div>';
+    each(tbl.querySelectorAll('.kv'), function(b){ b.addEventListener('click', function(){ cycle(+b.getAttribute('data-i')); }); });
+  }
+  function renderMap(){
+    map.innerHTML = '<div class="kfig">' + kmapSVG(vars, f, {idx:true, groups:groups, editable:editable}) + '</div>' + legendHTML(groups, vars);
+    each(map.querySelectorAll('rect.kc'), function(rc){
+      rc.addEventListener('click', function(){ cycle(+rc.getAttribute('data-i')); });
+      rc.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); var i = +rc.getAttribute('data-i'); cycle(i); var again = map.querySelector('rect.kc[data-i="' + i + '"]'); if (again) again.focus({preventScroll:true}); } });
+    });
+  }
+  function renderCanon(){
+    var n = vars.length, on = [], off = [], dc = [];
+    f.forEach(function(v, i){ (v === 1 ? on : (v === 0 ? off : dc)).push(i); });
+    var mint = on.map(function(i){ return vars.map(function(v, j){ return ((i >> (n - 1 - j)) & 1) ? v : '<span class="ov">' + v + '</span>'; }).join('·'); });
+    var maxt = off.map(function(i){ return '(' + vars.map(function(v, j){ return ((i >> (n - 1 - j)) & 1) ? '<span class="ov">' + v + '</span>' : v; }).join(' + ') + ')'; });
+    var h = '<p><b>Liste des 1 :</b> ' + name + ' = Σm(' + on.join(', ') + ')' + (dc.length ? ' ; cases indifférentes (X) : ' + dc.join(', ') : '') + '</p>';
+    h += '<p><b>Somme de produits canonique</b> (un minterme par ligne à 1) :</p><p class="canon-e">' + name + ' = ' + (mint.length ? mint.join(' + ') : '0') + '</p>';
+    h += '<p><b>Produit de sommes canonique</b> (un maxterme par ligne à 0) :</p><p class="canon-e">' + name + ' = ' + (maxt.length ? maxt.join('·') : '1') + '</p>';
+    if (dc.length) h += '<p class="note">Les cases X n\'apparaissent dans aucune des deux formes : on a le droit de les prendre ou non.</p>';
+    canon.innerHTML = h;
+  }
+  function render(){ renderTable(); renderMap(); renderCanon(); }
+  function check(){
+    var ast;
+    circ.innerHTML = '';
+    try { ast = parseExpr(inp.value); }
+    catch (e){ if (!(e instanceof PErr)) throw e; out.innerHTML = '<div class="msg ko">Je n\'ai pas compris : ' + esc(e.msg) + '.</div>'; return; }
+    var used = varsOf([{ast:ast}]).filter(function(v){ return vars.indexOf(v) < 0; });
+    if (used.length){ out.innerHTML = '<div class="msg ko">Ici, les entrées sont ' + vars.join(', ') + ' : « ' + used.join(', ') + ' » n\'en fait pas partie.</div>'; return; }
+    var n = vars.length, g = tableOf(ast, vars), wrong = [];
+    for (var i = 0; i < g.length; i++) if (f[i] !== 2 && g[i] !== f[i]) wrong.push(i);
+    var terms = sopTerms(ast, vars), msgs = [];
+    groups = [];
+    var M = minimize(f, n);
+    if (terms){
+      terms.forEach(function(t, k){
+        var cl = termCells(t, n), zeros = cl.filter(function(c){ return f[c] === 0; });
+        var grp = {term:t, color:k, bad:zeros.length > 0};
+        groups.push(grp);
+        var lab = '<b>' + termHTML(t, vars) + '</b>';
+        if (zeros.length){ msgs.push(lab + ' couvre une case à 0 (m' + zeros.join(', m') + ') : un groupe ne doit contenir que des 1 et des X.'); return; }
+        var big = M.primes.filter(function(p){ return p.cells.length > cl.length && cl.every(function(c){ return p.cells.indexOf(c) >= 0; }); });
+        if (big.length){ big.sort(function(p, q){ return q.cells.length - p.cells.length; }); msgs.push(lab + ' peut être agrandi en ' + termHTML(big[0].t, vars) + ' (' + big[0].cells.length + ' cases au lieu de ' + cl.length + ') : moins de lettres pour les mêmes 1.'); }
+        var others = {};
+        terms.forEach(function(u, kk){ if (kk !== k) termCells(u, n).forEach(function(c){ others[c] = 1; }); });
+        var mine = cl.filter(function(c){ return f[c] === 1; });
+        if (mine.length && mine.every(function(c){ return others[c]; })) msgs.push(lab + ' est inutile : tous ses 1 sont déjà couverts par les autres groupes.');
+        if (!mine.length) msgs.push(lab + ' ne couvre que des X : il ne sert à rien.');
+      });
+      var cov = {};
+      terms.forEach(function(t){ termCells(t, n).forEach(function(c){ cov[c] = 1; }); });
+      var miss = []; f.forEach(function(v, i){ if (v === 1 && !cov[i]) miss.push(i); });
+      if (miss.length) msgs.unshift('Ces 1 ne sont couverts par aucun groupe : m' + miss.join(', m') + '.');
+    }
+    var h = '';
+    if (wrong.length){
+      h += '<div class="msg ko"><p><b>Pas encore :</b> ton expression ne donne pas la bonne valeur sur ' + wrong.length + ' case' + (wrong.length > 1 ? 's' : '') + ', par exemple ' + cellName(wrong[0], vars) + ' : elle vaut ' + g[wrong[0]] + ' au lieu de ' + f[wrong[0]] + '.</p></div>';
+    } else if (terms){
+      var c1 = costOf(terms), cm = M.cost, minimal = c1[0] === cm[0] && c1[1] === cm[1];
+      h += '<div class="msg ' + (minimal && !msgs.length ? 'ok' : 'meh') + '"><p><b>Juste :</b> ton expression donne la bonne valeur sur toutes les cases' + (f.indexOf(2) >= 0 ? ' qui ne sont pas indifférentes' : '') + '. ' + (minimal ? 'Et elle est minimale : ' + costTxt(c1) + ', impossible de faire plus court en somme de produits.' : 'Elle utilise ' + costTxt(c1) + ' ; le minimum est ' + costTxt(cm) + '.') + '</p></div>';
+    } else {
+      h += '<div class="msg ok"><p><b>Juste :</b> même valeur sur toutes les cases' + (f.indexOf(2) >= 0 ? ' qui ne sont pas indifférentes' : '') + '. Ce n\'est pas une somme de produits, donc je ne peux pas dessiner de groupes. La plus petite somme de produits a ' + costTxt(M.cost) + '.</p></div>';
+    }
+    if (msgs.length) h += '<ul class="at-msgs">' + msgs.map(function(m){ return '<li>' + m + '</li>'; }).join('') + '</ul>';
+    out.innerHTML = h;
+    renderMap();
+  }
+  function solution(){
+    var M = minimize(f, vars.length);
+    groups = M.terms.map(function(t, i){ return {term:t, color:i}; });
+    renderMap();
+    out.innerHTML = '<div class="msg info"><p><b>Une solution minimale :</b> ' + name + ' = ' + sopHTML(M.terms, vars) + ' (' + costTxt(M.cost) + ').' + (M.terms.length ? ' Chaque couleur du tableau est un groupe, et chaque groupe donne un terme.' : '') + '</p>' + (M.terms.length && M.cost[1] ? '<p><button type="button" class="linkbtn at-draw">Dessiner le circuit de cette solution</button></p>' : '') + '</div>';
+    var d = out.querySelector('.at-draw');
+    if (d) d.addEventListener('click', function(){
+      var div = document.createElement('div'); circ.innerHTML = ''; circ.appendChild(div);
+      Circuit(div, [{name:name, ast:parseExpr(sopSrc(M.terms, vars))}], {noTable:true, init:''});
+    });
+  }
+  root.querySelector('.at-go').addEventListener('click', check);
+  root.querySelector('.at-sol').addEventListener('click', solution);
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); check(); } });
+  var clr = root.querySelector('.at-clear');
+  if (clr) clr.addEventListener('click', function(){ f = f.map(function(){ return 0; }); groups = []; out.innerHTML = ''; circ.innerHTML = ''; render(); });
+  each(root.querySelectorAll('[data-n]'), function(b){
+    b.addEventListener('click', function(){
+      var k = +b.getAttribute('data-n');
+      vars = ['a', 'b', 'c', 'd'].slice(0, k); f = []; for (var i = 0; i < (1 << k); i++) f.push(0);
+      each(root.querySelectorAll('[data-n]'), function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      groups = []; out.innerHTML = ''; circ.innerHTML = ''; inp.value = ''; render();
+    });
+  });
+  each(root.querySelectorAll('[data-p]'), function(b){
+    b.addEventListener('click', function(){
+      var p = cfg.presets[+b.getAttribute('data-p')];
+      load(p.vars.split(''), fromLists(p.vars.length, p.on, p.dc || []));
+      each(root.querySelectorAll('[data-n]'), function(x){ x.setAttribute('aria-pressed', +x.getAttribute('data-n') === vars.length ? 'true' : 'false'); });
+    });
+  });
+  function load(v, ff, nm){ vars = v.slice(); f = ff.slice(); if (nm) name = nm; groups = []; out.innerHTML = ''; circ.innerHTML = ''; inp.value = ''; var lb = root.querySelector('.at-check .fld'); if (lb && lb.firstChild) lb.firstChild.nodeValue = 'ta simplification de ' + name; render(); }
+  render();
+  return {load:load};
+}
+var ATELIER = null;
+(function(){
+  var root = $('atelier'); if (!root) return;
+  ATELIER = Atelier(root, {title:'L\'atelier de Karnaugh', vars:['a', 'b', 'c'], f:fromLists(3, [3, 5, 6, 7], []), sizeSel:true, canonOpen:false, presets:[
+    {label:'majorité', vars:'abc', on:[3, 5, 6, 7]},
+    {label:'Σm(0, 2, 4, 6)', vars:'abc', on:[0, 2, 4, 6]},
+    {label:'les coins', vars:'abcd', on:[0, 2, 8, 10]},
+    {label:'Σm(0, 1, 2, 5, 8, 9, 10)', vars:'abcd', on:[0, 1, 2, 5, 8, 9, 10]},
+    {label:'consensus', vars:'abc', on:[1, 3, 6, 7]},
+    {label:'damier', vars:'abc', on:[1, 2, 4, 7]},
+    {label:'avec des X', vars:'abcd', on:[1, 3, 7, 11, 15], dc:[0, 2, 5]},
+    {label:'le carré piège', vars:'abcd', on:[1, 5, 6, 7, 11, 12, 13, 15]}
+  ]});
+})();
+
+/* ======================================================================
+   Le vérificateur de calcul
+   ====================================================================== */
+(function(){
+  var root = $('steps'); if (!root) return;
+  var ex = ['a.b.c + a.b.c\' + a.b\'.c', 'a.b.(c + c\') + a.b\'.c     # mise en facteur de a·b', 'a.b + a.b\'.c     # c + c\' = 1, puis x·1 = x', 'a.(b + b\'.c)     # mise en facteur de a', 'a.(b + c)     # x + x\'·y = x + y'];
+  root.innerHTML = '<p class="lbl">Le vérificateur de calcul</p><p class="note">Une expression par ligne. Tout ce qui suit un # est un commentaire : écris-y la loi utilisée.</p>'
+    + '<textarea id="st-in" rows="6" wrap="off" spellcheck="false" autocomplete="off" aria-label="Une étape de calcul par ligne">' + ex.join('\n') + '</textarea>'
+    + '<div class="row"><button type="button" class="btn" id="st-go">Vérifier chaque étape</button><button type="button" class="btn ghost" id="st-min">Comparer avec le minimum</button><button type="button" class="btn ghost" id="st-clear">Effacer</button></div><div id="st-out" aria-live="polite"></div>';
+  var ta = $('st-in'), out = $('st-out'), last = null;
+  function run(){
+    var lines = ta.value.split('\n'), items = [];
+    for (var i = 0; i < lines.length; i++){
+      var raw = lines[i], hash = raw.indexOf('#'), src = (hash >= 0 ? raw.slice(0, hash) : raw).trim(), com = hash >= 0 ? raw.slice(hash + 1).trim() : '';
+      if (!src) continue;
+      try { items.push({src:src, com:com, ast:parseExpr(src), line:i + 1}); }
+      catch (e){ if (!(e instanceof PErr)) throw e; out.innerHTML = '<div class="msg ko">Ligne ' + (i + 1) + ' : je n\'ai pas compris (' + esc(e.msg) + ').</div>'; last = null; return; }
+    }
+    if (!items.length){ out.innerHTML = '<div class="msg info">Écris au moins une expression.</div>'; last = null; return; }
+    var vars = varsOf(items);
+    if (vars.length > 4){ out.innerHTML = '<div class="msg ko">4 entrées au maximum.</div>'; return; }
+    var h = '<ol class="st-list">', allOk = true;
+    items.forEach(function(it, k){
+      it.f = tableOf(it.ast, vars);
+      var verdict = '';
+      if (k === 0) verdict = '<span class="pill n">départ</span>';
+      else {
+        var prev = items[k - 1].f, bad = -1;
+        for (var r = 0; r < it.f.length; r++) if (it.f[r] !== prev[r]){ bad = r; break; }
+        if (bad < 0) verdict = '<span class="pill v">équivalente à la ligne précédente</span>';
+        else { allOk = false; verdict = '<span class="pill f">pas équivalente</span> <span class="note">pour ' + vars.map(function(v, j){ return v + ' = ' + ((bad >> (vars.length - 1 - j)) & 1); }).join(', ') + ', elle vaut ' + it.f[bad] + ' alors que la ligne précédente vaut ' + prev[bad] + '.</span>'; }
+      }
+      h += '<li><span class="st-e">' + disp(it.ast, null) + '</span> <span class="note">(' + countGates([{ast:it.ast}]) + ' porte' + (countGates([{ast:it.ast}]) > 1 ? 's' : '') + ')</span>' + (it.com ? '<span class="st-c">' + esc(it.com) + '</span>' : '') + '<span class="st-v">' + verdict + '</span></li>';
+    });
+    h += '</ol>';
+    var g0 = countGates([{ast:items[0].ast}]), g1 = countGates([{ast:items[items.length - 1].ast}]);
+    if (items.length > 1) h += allOk ? '<div class="msg ok">Toutes les étapes sont justes. Tu passes de ' + g0 + ' à ' + g1 + ' portes.</div>' : '<div class="msg ko">Une étape au moins change la fonction : reprends la première ligne marquée « pas équivalente ».</div>';
+    out.innerHTML = h;
+    last = {vars:vars, f:items[items.length - 1].f};
+  }
+  $('st-go').addEventListener('click', run);
+  $('st-clear').addEventListener('click', function(){ ta.value = ''; out.innerHTML = ''; last = null; ta.focus(); });
+  $('st-min').addEventListener('click', function(){
+    run(); if (!last) return;
+    var M = minimize(last.f, last.vars.length);
+    out.insertAdjacentHTML('beforeend', '<div class="msg info"><p>La plus petite somme de produits de cette fonction a ' + costTxt(M.cost) + '.</p><details><summary>Voir une forme minimale</summary><p class="canon-e">' + sopHTML(M.terms, last.vars) + '</p></details><p class="note">Une forme factorisée, comme a·(b + c), peut demander encore moins de portes qu\'une somme de produits.</p></div>');
+  });
+  run();
+})();
+
+/* ======================================================================
+   L'afficheur 7 segments
+   ====================================================================== */
+var SEG = {a:[0, 2, 3, 5, 6, 7, 8, 9], b:[0, 1, 2, 3, 4, 7, 8, 9], c:[0, 1, 3, 4, 5, 6, 7, 8, 9], d:[0, 2, 3, 5, 6, 8, 9], e:[0, 2, 6, 8], f:[0, 4, 5, 6, 8, 9], g:[2, 3, 4, 5, 6, 8, 9]};
+var SEGN = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+function segF(s){ var r = []; for (var i = 0; i < 16; i++) r.push(i > 9 ? 2 : (SEG[s].indexOf(i) >= 0 ? 1 : 0)); return r; }
+function hseg(x1, x2, y){ return (x1) + ',' + y + ' ' + (x1 + 8) + ',' + (y - 8) + ' ' + (x2 - 8) + ',' + (y - 8) + ' ' + x2 + ',' + y + ' ' + (x2 - 8) + ',' + (y + 8) + ' ' + (x1 + 8) + ',' + (y + 8); }
+function vseg(x, y1, y2){ return x + ',' + y1 + ' ' + (x + 8) + ',' + (y1 + 8) + ' ' + (x + 8) + ',' + (y2 - 8) + ' ' + x + ',' + y2 + ' ' + (x - 8) + ',' + (y2 - 8) + ' ' + (x - 8) + ',' + (y1 + 8); }
+var SEGP = {a:hseg(22, 98, 16), g:hseg(22, 98, 106), d:hseg(22, 98, 196), f:vseg(14, 24, 98), b:vseg(106, 24, 98), e:vseg(14, 114, 188), c:vseg(106, 114, 188)};
+var SEGL = {a:[60, -4, 'middle'], b:[124, 64, 'start'], c:[124, 154, 'start'], d:[60, 222, 'middle'], e:[-4, 154, 'end'], f:[-4, 64, 'end'], g:[60, 100, 'middle']};
+function digitSVG(v, sel, names){
+  var s = '<svg class="seg7-svg" viewBox="-30 -18 180 252" width="180" height="252" role="img" aria-label="Afficheur 7 segments">';
+  SEGN.forEach(function(k){
+    var on = v <= 9 && SEG[k].indexOf(v) >= 0;
+    s += '<polygon class="sg' + (on ? ' on' : '') + (v > 9 ? ' x' : '') + (sel === k ? ' sel' : '') + '" points="' + SEGP[k] + '"/>';
+    if (names) s += '<text class="sgl' + (sel === k ? ' sel' : '') + '" x="' + SEGL[k][0] + '" y="' + (SEGL[k][1] + (k === 'g' ? -14 : 0) + 4) + '" text-anchor="' + SEGL[k][2] + '">' + k + '</text>';
+  });
+  return s + '</svg>';
+}
+(function(){
+  var root = $('seg7'); if (!root) return;
+  var v = 5, sel = 'a';
+  root.innerHTML = '<p class="lbl">Le décodeur 7 segments</p><div class="seg7-grid"><div class="seg7-left"><div class="seg7-fig"></div><div class="row" style="justify-content:center" role="group" aria-label="Entrées w x y z"></div><p class="seg7-v" aria-live="polite"></p></div><div class="seg7-right"><div class="tw seg7-t"></div></div></div>'
+    + '<div class="row"><span class="note" style="margin:0">Segment étudié :</span><span class="seg" id="seg7-sel" role="group" aria-label="Segment">' + SEGN.map(function(k){ return '<button type="button" data-s="' + k + '" aria-pressed="' + (k === sel) + '">' + k + '</button>'; }).join('') + '</span></div>'
+    + '<div class="lab" id="k7"></div>';
+  var fig = root.querySelector('.seg7-fig'), bits = root.querySelector('.seg7-left .row'), tv = root.querySelector('.seg7-v'), tt = root.querySelector('.seg7-t');
+  ['w', 'x', 'y', 'z'].forEach(function(n, j){ bits.insertAdjacentHTML('beforeend', '<button type="button" class="sbit" data-j="' + j + '" aria-label="entrée ' + n + ' (poids ' + (8 >> j) + ')"><span class="sn">' + n + '</span><span class="sb"></span></button>'); });
+  var K = Atelier($('k7'), {title:'', vars:['w', 'x', 'y', 'z'], f:segF(sel), editable:false, name:sel, noTable:true});
+  function render(){
+    fig.innerHTML = digitSVG(v, sel, true);
+    each(bits.querySelectorAll('.sbit'), function(b){ var on = (v >> (3 - +b.getAttribute('data-j'))) & 1; b.querySelector('.sb').textContent = on; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    tv.innerHTML = '<span class="bits">' + bitsOf(v, 4) + '</span> = ' + v + (v > 9 ? ' : ce n\'est pas un chiffre. En BCD, cette combinaison n\'arrive jamais : pour chaque segment, c\'est une case indifférente (X).' : ' : l\'afficheur montre le chiffre ' + v + '.');
+    var h = '<table class="c tight tt seg7-tab"><tr><th>w</th><th>x</th><th>y</th><th>z</th><th class="sub">chiffre</th>' + SEGN.map(function(k){ return '<th class="' + (k === sel ? 'selc' : '') + '">' + k + '</th>'; }).join('') + '</tr>';
+    for (var i = 0; i < 16; i++){
+      h += '<tr' + (i === v ? ' class="hl"' : '') + '>' + bitsOf(i, 4).split('').map(function(b){ return '<td>' + b + '</td>'; }).join('') + '<td class="zero">' + (i > 9 ? '—' : i) + '</td>'
+        + SEGN.map(function(k){ var x = i > 9 ? 'X' : (SEG[k].indexOf(i) >= 0 ? '1' : '0'); return '<td class="' + (x === '1' ? 'one' : (x === 'X' ? 'xx' : 'zero')) + (k === sel ? ' selc' : '') + '">' + x + '</td>'; }).join('') + '</tr>';
+    }
+    tt.innerHTML = h + '</table>';
+  }
+  each(bits.querySelectorAll('.sbit'), function(b){ b.addEventListener('click', function(){ v ^= (8 >> +b.getAttribute('data-j')); render(); }); });
+  each(root.querySelectorAll('#seg7-sel button'), function(b){
+    b.addEventListener('click', function(){
+      sel = b.getAttribute('data-s');
+      each(root.querySelectorAll('#seg7-sel button'), function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      K.load(['w', 'x', 'y', 'z'], segF(sel), sel); render();
+    });
+  });
+  render();
+})();
+
+/* ======================================================================
+   Exercices auto-corrigés
+   ====================================================================== */
+each(document.querySelectorAll('.xck'), function(box){
+  var id = box.getAttribute('data-id'), vars, f;
+  if (box.getAttribute('data-target')){
+    var tast = parseExpr(box.getAttribute('data-target'));
+    vars = box.getAttribute('data-vars') ? box.getAttribute('data-vars').split('') : varsOf([{ast:tast}]);
+    f = tableOf(tast, vars);
+  } else {
+    vars = box.getAttribute('data-vars').split('');
+    f = fromLists(vars.length, listNum(box.getAttribute('data-on')), listNum(box.getAttribute('data-dc')));
+  }
+  var name = box.getAttribute('data-name') || 'S';
+  box.insertAdjacentHTML('beforeend', '<div class="row"><label class="fld" style="flex:1 1 240px">ta réponse : ' + esc(name) + ' =<input id="' + id + '" type="text" autocomplete="off" spellcheck="false"></label><button type="button" class="btn ghost">Vérifier</button></div><div class="xr" aria-live="polite"></div>');
+  var inp = $(id), r = box.querySelector('.xr');
+  function check(){
+    var mine;
+    try { mine = parseExpr(inp.value); }
+    catch (e){ if (!(e instanceof PErr)) throw e; r.innerHTML = '<div class="msg ko">Je n\'ai pas compris : ' + esc(e.msg) + '.</div>'; return; }
+    var extra = varsOf([{ast:mine}]).filter(function(v){ return vars.indexOf(v) < 0; });
+    if (extra.length){ r.innerHTML = '<div class="msg ko">Les entrées de cet exercice sont ' + vars.join(', ') + ' (pas ' + extra.join(', ') + ').</div>'; return; }
+    var g = tableOf(mine, vars), bad = -1;
+    for (var i = 0; i < g.length; i++) if (f[i] !== 2 && g[i] !== f[i]){ bad = i; break; }
+    if (bad >= 0){ r.innerHTML = '<div class="msg ko"><b>Pas encore.</b> Pour ' + vars.map(function(v, j){ return v + ' = ' + ((bad >> (vars.length - 1 - j)) & 1); }).join(', ') + ', ton expression donne ' + g[bad] + ' alors qu\'il faut ' + f[bad] + '.</div>'; return; }
+    var M = minimize(f, vars.length), terms = sopTerms(mine, vars), msg = '<b>Juste :</b> ton expression a la bonne table de vérité' + (f.indexOf(2) >= 0 ? ' (sur les cases qui ne sont pas indifférentes)' : '') + '.', cls = 'ok';
+    if (box.hasAttribute('data-canon')){
+      if (!terms || terms.some(function(t){ return nLits(t) < vars.length; })){ msg += ' Mais ce n\'est pas la forme canonique : chaque terme doit contenir toutes les lettres, une seule fois.'; cls = 'meh'; }
+      else msg += ' C\'est bien la forme canonique.';
+    } else if (box.hasAttribute('data-min')){
+      if (terms){
+        var c1 = costOf(terms);
+        if (c1[0] === M.cost[0] && c1[1] === M.cost[1]) msg += ' Et elle est minimale (' + costTxt(c1) + ').';
+        else { msg += ' Tu peux encore simplifier : ' + costTxt(c1) + ', alors que le minimum est ' + costTxt(M.cost) + '.'; cls = 'meh'; }
+      } else {
+        var gm = countGates([{ast:mine}]), gs = countGates([{ast:parseExpr(sopSrc(M.terms, vars))}]);
+        msg += ' Ta forme n\'est pas une somme de produits. Elle utilise ' + gm + ' porte' + (gm > 1 ? 's' : '') + ' ; la plus petite somme de produits en utilise ' + gs + '.';
+        if (gm > gs) cls = 'meh';
+      }
+    }
+    if (box.hasAttribute('data-show') && cls === 'ok') msg += ' Forme minimale de référence : ' + esc(name) + ' = ' + sopHTML(M.terms, vars) + '.';
+    r.innerHTML = '<div class="msg ' + cls + '">' + msg + '</div>';
+  }
+  box.querySelector('button').addEventListener('click', check);
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); check(); } });
+});
+each(document.querySelectorAll('.hints'), function(hs){
+  var ps = hs.querySelectorAll('p'), n = 0;
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn ghost';
+  function lab(){ b.textContent = n < ps.length ? 'Indice ' + (n + 1) + ' sur ' + ps.length : 'Tous les indices sont affichés'; b.disabled = n >= ps.length; }
+  b.addEventListener('click', function(){ if (n < ps.length){ ps[n].classList.add('shown'); n++; lab(); } });
+  lab();
+  hs.appendChild(b);
+});
+window.__k = {minimize:minimize, fromLists:fromLists, sopSrc:sopSrc, primeImps:primeImps};
+})();
+</script>
+
+</body></html>
