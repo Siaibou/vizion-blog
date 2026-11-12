@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Siaibou en onze traditions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600&amp;text=%E4%B8%81%E4%B8%89%E4%BA%A5%E5%85%AD%E5%86%B2%E5%8D%88%E5%90%88%E5%A4%A7%E5%AD%90%E5%B7%B3%E6%98%A5%E6%9C%AA%E7%94%B2%E7%99%B8%E7%AB%8B%E9%9B%AA&amp;display=swap" rel="stylesheet">
+<style>
+/* Même identité que tes pages de cours : cahier ligné, marge rouge, une section numérotée par tradition. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.14);
+  --f-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-display:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --f-sym:'Apple Symbols','Segoe UI Symbol','Noto Sans Symbols','Noto Sans Symbols 2','DejaVu Sans',sans-serif;
+  --f-cjk:'Noto Serif SC','Songti SC','STSong','SimSun',serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.17);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.17);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;
+  color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+img,svg{max-width:100%}
+.hero{padding:44px 16px 20px 30px;max-width:780px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.08rem;margin:0;max-width:62ch}
+main{max-width:780px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--f-display)}
+h3{font-size:1.18rem;margin:30px 0 6px}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.calc{font-size:.93rem;line-height:1.55}
+.calc p{margin:6px 0}
+.num-t{font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b);font-weight:700}
+td.c,th.c{text-align:center}
+.mono{font-variant-numeric:tabular-nums;white-space:nowrap}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+
+/* résultat principal de chaque tradition */
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:16px 0;border:2px solid var(--red);border-radius:12px;padding:10px;background:var(--card)}
+.res>div{padding:6px 8px;border-radius:8px;background:var(--paper);min-width:0}
+.rl{display:block;font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.rv{display:block;font-family:var(--f-display);font-size:1.32rem;font-weight:600;line-height:1.2;margin-top:2px}
+.rd{display:block;font-size:.88rem;color:var(--muted);margin-top:2px}
+.origin{font-size:.92rem;color:var(--muted);margin:14px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
+.origin b{color:var(--ink)}
+.tag{font-family:var(--f-body);font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 9px;margin-right:6px;white-space:nowrap;vertical-align:.1em}
+.tag-old{background:var(--soft-g);color:var(--green)}
+.tag-mix{background:var(--soft-a);color:var(--amber)}
+.tag-new{background:var(--soft-r);color:var(--red)}
+
+/* carte des résultats */
+.sum{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.sum li{margin:0}
+.sum a{display:grid;grid-template-columns:1.7em 1fr;gap:0 8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;text-decoration:none;color:var(--ink);height:100%}
+.sum a:hover{border-color:var(--blue)}
+.sum b{grid-row:span 2;color:var(--margin);font-family:var(--f-display);font-size:1.15rem;line-height:1.3}
+.sum span{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.sum strong{font-family:var(--f-display);font-weight:600;font-size:1.06rem;line-height:1.3}
+
+/* matrice des entrées */
+table.mx th,table.mx td{text-align:center;padding:6px 6px}
+table.mx td:first-child,table.mx th:first-child{text-align:left}
+.dot{color:var(--green);font-size:1.1rem;line-height:1}
+.half{color:var(--amber);font-size:1.1rem;line-height:1}
+.nil{color:var(--line);font-size:1.1rem}
+
+/* roue du thème */
+figure{margin:20px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;height:auto;margin:0 auto}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:10px;text-align:center}
+svg.wheel{max-width:470px}
+svg text{font-family:var(--f-body);fill:var(--ink)}
+.sm{stroke:var(--muted);stroke-width:1;fill:none}
+path.sm{stroke-width:.8}
+.st{stroke:var(--ink);stroke-width:1.4;fill:none}
+.axis{stroke-width:2.2}
+.fsr{fill:var(--soft-r)}.fsg{fill:var(--soft-g)}.fsb{fill:var(--soft-b)}.fsa{fill:var(--soft-a)}
+svg text.sg-lbl{font-size:12px;font-weight:700;fill:var(--muted);letter-spacing:.04em}
+svg text.hn{font-size:10.5px;fill:var(--muted)}
+svg text.axl{font-size:13px;font-weight:700;fill:var(--margin)}
+svg text.pg{font-family:var(--f-sym);font-size:19px}
+svg text.pg-l{font-size:22px}
+svg text.dg{font-size:10px;fill:var(--muted);font-variant-numeric:tabular-nums}
+.asp{stroke-width:1.5;fill:none}
+.asp.sq,.asp.op{stroke:var(--red)}
+.asp.tr{stroke:var(--blue)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:.85rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+.legend .k1{border-color:var(--red)}.legend .k2{border-color:var(--blue)}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.sw.r{background:var(--soft-r)}.sw.g{background:var(--soft-g)}.sw.a{background:var(--soft-a)}.sw.b{background:var(--soft-b)}
+.gl{font-family:var(--f-sym);font-size:1.15rem;display:inline-block;width:1.3em;text-align:center}
+small.pos{display:block;color:var(--muted);font-size:.84rem;font-variant-numeric:tabular-nums;padding-left:1.55em}
+
+/* piliers chinois */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.pil{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 4px 10px;text-align:center;min-width:0}
+.pil.me{border:2px solid var(--blue)}
+.pil .ph{font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.pil .cj{font-family:var(--f-cjk);font-size:2rem;line-height:1.25;font-weight:600;letter-spacing:.05em;writing-mode:horizontal-tb}
+.pil .py{font-size:.85rem;font-weight:700}
+.pil .pe{font-size:.8rem;color:var(--muted);line-height:1.35}
+.cjk{font-family:var(--f-cjk)}
+.pips{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;align-items:center;font-size:.95rem;margin:10px 0}
+.pips .pp{display:flex;gap:4px}
+.pips .pp i{width:14px;height:14px;border-radius:3px;background:var(--blue);display:inline-block}
+.pips .pp i.o{background:transparent;border:1.5px dashed var(--muted)}
+
+/* frise des dasha */
+.gantt{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 12px 8px}
+.g-row{display:grid;grid-template-columns:5.6em 1fr;gap:8px;align-items:center;margin:4px 0}
+.g-lab{font-size:.88rem;font-weight:700;line-height:1.15}
+.g-lab small{display:block;font-weight:400;color:var(--muted);font-size:.76rem;font-variant-numeric:tabular-nums}
+.g-track{position:relative;height:18px;border-radius:4px;background:var(--paper)}
+.g-bar{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--soft-b);border:1px solid var(--blue)}
+.g-bar.now{background:var(--blue)}
+.g-now{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dashed var(--margin)}
+.g-axis{display:grid;grid-template-columns:5.6em 1fr;gap:8px;margin-top:6px}
+.g-ticks{position:relative;height:16px;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.g-ticks span{position:absolute;transform:translateX(-50%)}
+tr.cur td{background:var(--soft-b);font-weight:700}
+
+/* numérologie */
+.letters{display:flex;flex-wrap:wrap;gap:14px 22px;margin:12px 0}
+.word{display:flex;gap:3px;align-items:flex-end}
+.lt{display:grid;grid-template-rows:auto auto;text-align:center;min-width:1.75em;border:1px solid var(--line);border-radius:6px;background:var(--card);padding:2px 0}
+.lt b{font-family:var(--f-display);font-size:1.15rem;line-height:1.2}
+.lt span{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lt.v{background:var(--soft-b);border-color:var(--blue)}
+.lt.v span{color:var(--blue);font-weight:700}
+.word .eqn{font-size:.9rem;color:var(--muted);margin-left:6px;align-self:center;white-space:nowrap}
+.incl{display:grid;grid-template-columns:repeat(3,3.2em);gap:4px;margin:8px 0}
+.incl div{border:1px solid var(--line);border-radius:6px;background:var(--card);text-align:center;padding:3px 0;line-height:1.2}
+.incl div b{display:block;font-family:var(--f-display);font-size:1.1rem}
+.incl div span{font-size:.75rem;color:var(--muted)}
+.incl div.miss{background:var(--soft-r);border-color:var(--red)}
+.incl div.miss span{color:var(--red);font-weight:700}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
+.nums>div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.nums h4{margin:0 0 4px;font-size:1rem;display:flex;align-items:baseline;gap:10px}
+.nums h4 .big{font-family:var(--f-display);font-size:2rem;color:var(--margin);line-height:1}
+.nums p{margin:4px 0;font-size:.95rem}
+
+/* maya */
+.mayas{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
+.mcard{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;flex:1 1 260px}
+.mcard .mt{font-size:.92rem;line-height:1.45}
+.mcard .mt b{font-family:var(--f-display);font-size:1.15rem}
+svg.maya{flex:none}
+.mdot,.mbar{fill:var(--ink)}
+
+/* arbre de vie */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.two{grid-template-columns:minmax(0,1fr)}}
+svg.tree{max-width:290px}
+.path{stroke:var(--line);stroke-width:3}
+.path-hl{stroke:var(--green);stroke-width:6;stroke-linecap:round}
+.seph{fill:var(--card);stroke:var(--muted);stroke-width:1.3}
+.seph-hl{fill:var(--soft-g);stroke:var(--green);stroke-width:3}
+svg text.sn{font-size:10.5px;font-weight:700}
+svg text.sn-hl{fill:var(--green)}
+svg text.sf{font-size:8.5px;fill:var(--muted)}
+svg text.hb{font-size:14px;font-weight:700;fill:var(--green)}
+
+/* almuten */
+.bars{display:grid;grid-template-columns:auto 1fr auto;gap:5px 10px;align-items:center;margin:12px 0;font-size:.93rem}
+.bars .bt{height:14px;border-radius:4px;background:var(--paper);border:1px solid var(--line);position:relative;overflow:hidden}
+.bars .bt i{position:absolute;left:0;top:0;bottom:0;background:var(--soft-b);border-right:2px solid var(--blue)}
+.bars .bt.win i{background:var(--blue)}
+.bars .sc{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;min-width:1.6em}
+.bars .pl{white-space:nowrap}
+.bars .pl small{color:var(--muted)}
+
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:780px;margin:0 auto;padding:0 16px 70px 30px;color:var(--muted);font-size:.88rem}
+footer ul{padding-left:1.1em}
+footer li{margin:3px 0}
+@media (min-width:720px){footer{padding-left:64px}}
+</style>
+</head>
+<body>
+
+<header class="hero" id="haut">
+<p class="kicker">Onze traditions, une seule naissance</p>
+<h1>Siaibou en onze traditions<small>Mardi 16 décembre 2003, 10 h 29, Lagny-sur-Marne. Tout ce qui se calcule a été calculé, rien n'est recopié d'un générateur en ligne.</small></h1>
+<p class="lede">Chaque tradition a sa section : le résultat, la lecture que la tradition en fait, la méthode de calcul et l'origine du système. Les positions des planètes viennent des éphémérides suisses (Swiss Ephemeris). Les tables des systèmes populaires (arbres, armes, dieux égyptiens) ont été vérifiées sur plusieurs sources, parce qu'elles varient d'un site à l'autre.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Tes données et la carte des résultats</h2>
+<div class="tw"><table>
+<tr><th>Donnée</th><th>Valeur utilisée</th></tr>
+<tr><td>Nom, prénom</td><td>CAMARA Siaibou</td></tr>
+<tr><td>Naissance</td><td>Mardi 16 décembre 2003 à 10 h 29, heure légale française (UTC+1, pas d'heure d'été en décembre), soit <span class="mono">09 h 29 UTC</span></td></tr>
+<tr><td>Lieu</td><td>Lagny-sur-Marne (77400) : <span class="mono">48°52' N, 2°42' E</span></td></tr>
+<tr><td>Heure solaire vraie</td><td><span class="mono">9 h 44</span> (le Soleil passe au méridien de Lagny vers 12 h 45, heure légale)</td></tr>
+<tr><td>Classe sociale</td><td>Classe populaire. Aucune des onze méthodes ne s'en sert dans sa version publiée ; la seule exception annoncée est discutée en <a href="#p10">section 10</a>.</td></tr>
+</table></div>
+
+<ul class="sum">
+<li><a href="#p1"><b>1</b><span>Occidentale</span><strong>Soleil Sagittaire, Ascendant Capricorne, Lune Vierge</strong></a></li>
+<li><a href="#p2"><b>2</b><span>Chinoise</span><strong>Chèvre d'Eau, Yin, compagnon secret : le Cheval</strong></a></li>
+<li><a href="#p3"><b>3</b><span>Védique</span><strong>Lagna Sagittaire, Lune en Purva Phalguni, dasha de Mars</strong></a></li>
+<li><a href="#p4"><b>4</b><span>Égyptienne</span><strong>Osiris</strong></a></li>
+<li><a href="#p5"><b>5</b><span>Numérologie</span><strong>Chemin de vie 6, expression 5, intime 4, réalisation 1</strong></a></li>
+<li><a href="#p6"><b>6</b><span>Celtique</span><strong>Le Figuier</strong></a></li>
+<li><a href="#p7"><b>7</b><span>Roue de médecine</span><strong>Le Wapiti, clan de l'Oiseau-Tonnerre, Ouest</strong></a></li>
+<li><a href="#p8"><b>8</b><span>Maya</span><strong>13 Manik' ; Kin 37, Terre Rouge Spectrale</strong></a></li>
+<li><a href="#p9"><b>9</b><span>Kabbalistique</span><strong>Nanaël, Netzach, 25e sentier</strong></a></li>
+<li><a href="#p10"><b>10</b><span>Arabe</span><strong>L'Arc</strong></a></li>
+<li><a href="#p11"><b>11</b><span>Alchimique</span><strong>Le Plomb (Saturne)</strong></a></li>
+<li><a href="#p12"><b>12</b><span>Synthèse</span><strong>Ce qui revient, ce qui se contredit</strong></a></li>
+</ul>
+
+<h3>Quelles données chaque tradition utilise vraiment</h3>
+<div class="tw"><table class="mx">
+<tr><th>Tradition</th><th>Date</th><th>Heure</th><th>Lieu</th><th>Nom</th></tr>
+<tr><td>1. Occidentale</td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>2. Chinoise</td><td><span class="dot">●</span></td><td><span class="half">◐</span></td><td><span class="half">◐</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>3. Védique</td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>4. Égyptienne</td><td><span class="dot">●</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>5. Numérologie</td><td><span class="dot">●</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td><td><span class="dot">●</span></td></tr>
+<tr><td>6. Celtique</td><td><span class="dot">●</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>7. Roue de médecine</td><td><span class="dot">●</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>8. Maya</td><td><span class="dot">●</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>9. Kabbalistique</td><td><span class="dot">●</span></td><td><span class="half">◐</span></td><td><span class="nil">·</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>10. Arabe</td><td><span class="dot">●</span></td><td><span class="half">◐</span></td><td><span class="half">◐</span></td><td><span class="nil">·</span></td></tr>
+<tr><td>11. Alchimique</td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="dot">●</span></td><td><span class="nil">·</span></td></tr>
+</table></div>
+<p class="small muted"><span class="dot">●</span> donnée indispensable au résultat principal ; <span class="half">◐</span> donnée utilisée pour un résultat secondaire (pilier de l'heure, ange de l'heure, Part de Fortune). Sept traditions sur onze ne regardent que la date. Ton nom ne sert qu'à la numérologie.</p>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Astrologie occidentale</h2>
+<div class="res">
+<div><span class="rl">Signe solaire</span><span class="rv">Sagittaire</span><span class="rd">23°59', maison 11</span></div>
+<div><span class="rl">Ascendant</span><span class="rv">Capricorne</span><span class="rd">20°31'</span></div>
+<div><span class="rl">Signe lunaire</span><span class="rv">Vierge</span><span class="rd">19°46', maison 8</span></div>
+<div><span class="rl">Maître du thème</span><span class="rv">Saturne</span><span class="rd">maître du Capricorne</span></div>
+</div>
+
+<figure>
+<svg viewBox="-34 -34 468 468" role="img" aria-labelledby="wheel-t wheel-d" class="wheel">
+<title id="wheel-t">Thème natal du 16 décembre 2003, 10 h 29, Lagny-sur-Marne</title>
+<desc id="wheel-d">Roue zodiacale tropicale avec l'Ascendant à gauche, les douze maisons Placidus, les planètes et les principaux aspects.</desc>
+<path d="M132.7,379.8 A192,192 0 0 0 231.6,389.4 L227.0,361.8 A164,164 0 0 1 142.5,353.6 Z" class="fsr sm"/>
+<text x="182.8" y="377.2" class="sg-lbl" text-anchor="middle" dominant-baseline="central">BÉL</text>
+<path d="M231.6,389.4 A192,192 0 0 0 322.1,348.2 L304.3,326.6 A164,164 0 0 1 227.0,361.8 Z" class="fsg sm"/>
+<text x="273.7" y="362.0" class="sg-lbl" text-anchor="middle" dominant-baseline="central">TAU</text>
+<path d="M322.1,348.2 A192,192 0 0 0 379.8,267.3 L353.6,257.5 A164,164 0 0 1 304.3,326.6 Z" class="fsa sm"/>
+<text x="344.9" y="303.4" class="sg-lbl" text-anchor="middle" dominant-baseline="central">GÉM</text>
+<path d="M379.8,267.3 A192,192 0 0 0 389.4,168.4 L361.8,173.0 A164,164 0 0 1 353.6,257.5 Z" class="fsb sm"/>
+<text x="377.2" y="217.2" class="sg-lbl" text-anchor="middle" dominant-baseline="central">CAN</text>
+<path d="M389.4,168.4 A192,192 0 0 0 348.2,77.9 L326.6,95.7 A164,164 0 0 1 361.8,173.0 Z" class="fsr sm"/>
+<text x="362.0" y="126.3" class="sg-lbl" text-anchor="middle" dominant-baseline="central">LIO</text>
+<path d="M348.2,77.9 A192,192 0 0 0 267.3,20.2 L257.5,46.4 A164,164 0 0 1 326.6,95.7 Z" class="fsg sm"/>
+<text x="303.4" y="55.1" class="sg-lbl" text-anchor="middle" dominant-baseline="central">VIE</text>
+<path d="M267.3,20.2 A192,192 0 0 0 168.4,10.6 L173.0,38.2 A164,164 0 0 1 257.5,46.4 Z" class="fsa sm"/>
+<text x="217.2" y="22.8" class="sg-lbl" text-anchor="middle" dominant-baseline="central">BAL</text>
+<path d="M168.4,10.6 A192,192 0 0 0 77.9,51.8 L95.7,73.4 A164,164 0 0 1 173.0,38.2 Z" class="fsb sm"/>
+<text x="126.3" y="38.0" class="sg-lbl" text-anchor="middle" dominant-baseline="central">SCO</text>
+<path d="M77.9,51.8 A192,192 0 0 0 20.2,132.7 L46.4,142.5 A164,164 0 0 1 95.7,73.4 Z" class="fsr sm"/>
+<text x="55.1" y="96.6" class="sg-lbl" text-anchor="middle" dominant-baseline="central">SAG</text>
+<path d="M20.2,132.7 A192,192 0 0 0 10.6,231.6 L38.2,227.0 A164,164 0 0 1 46.4,142.5 Z" class="fsg sm"/>
+<text x="22.8" y="182.8" class="sg-lbl" text-anchor="middle" dominant-baseline="central">CAP</text>
+<path d="M10.6,231.6 A192,192 0 0 0 51.8,322.1 L73.4,304.3 A164,164 0 0 1 38.2,227.0 Z" class="fsa sm"/>
+<text x="38.0" y="273.7" class="sg-lbl" text-anchor="middle" dominant-baseline="central">VER</text>
+<path d="M51.8,322.1 A192,192 0 0 0 132.7,379.8 L142.5,353.6 A164,164 0 0 1 73.4,304.3 Z" class="fsb sm"/>
+<text x="96.6" y="344.9" class="sg-lbl" text-anchor="middle" dominant-baseline="central">POI</text>
+<line x1="142.5" y1="353.6" x2="144.2" y2="348.9" class="sm"/>
+<line x1="170.0" y1="361.2" x2="170.9" y2="356.3" class="sm"/>
+<line x1="198.5" y1="364.0" x2="198.5" y2="359.0" class="sm"/>
+<line x1="227.0" y1="361.8" x2="226.2" y2="356.8" class="sm"/>
+<line x1="254.7" y1="354.6" x2="253.0" y2="349.9" class="sm"/>
+<line x1="280.7" y1="342.8" x2="278.2" y2="338.4" class="sm"/>
+<line x1="304.3" y1="326.6" x2="301.1" y2="322.7" class="sm"/>
+<line x1="324.7" y1="306.6" x2="320.9" y2="303.3" class="sm"/>
+<line x1="341.3" y1="283.3" x2="337.0" y2="280.8" class="sm"/>
+<line x1="353.6" y1="257.5" x2="348.9" y2="255.8" class="sm"/>
+<line x1="361.2" y1="230.0" x2="356.3" y2="229.1" class="sm"/>
+<line x1="364.0" y1="201.5" x2="359.0" y2="201.5" class="sm"/>
+<line x1="361.8" y1="173.0" x2="356.8" y2="173.8" class="sm"/>
+<line x1="354.6" y1="145.3" x2="349.9" y2="147.0" class="sm"/>
+<line x1="342.8" y1="119.3" x2="338.4" y2="121.8" class="sm"/>
+<line x1="326.6" y1="95.7" x2="322.7" y2="98.9" class="sm"/>
+<line x1="306.6" y1="75.3" x2="303.3" y2="79.1" class="sm"/>
+<line x1="283.3" y1="58.7" x2="280.8" y2="63.0" class="sm"/>
+<line x1="257.5" y1="46.4" x2="255.8" y2="51.1" class="sm"/>
+<line x1="230.0" y1="38.8" x2="229.1" y2="43.7" class="sm"/>
+<line x1="201.5" y1="36.0" x2="201.5" y2="41.0" class="sm"/>
+<line x1="173.0" y1="38.2" x2="173.8" y2="43.2" class="sm"/>
+<line x1="145.3" y1="45.4" x2="147.0" y2="50.1" class="sm"/>
+<line x1="119.3" y1="57.2" x2="121.8" y2="61.6" class="sm"/>
+<line x1="95.7" y1="73.4" x2="98.9" y2="77.3" class="sm"/>
+<line x1="75.3" y1="93.4" x2="79.1" y2="96.7" class="sm"/>
+<line x1="58.7" y1="116.7" x2="63.0" y2="119.2" class="sm"/>
+<line x1="46.4" y1="142.5" x2="51.1" y2="144.2" class="sm"/>
+<line x1="38.8" y1="170.0" x2="43.7" y2="170.9" class="sm"/>
+<line x1="36.0" y1="198.5" x2="41.0" y2="198.5" class="sm"/>
+<line x1="38.2" y1="227.0" x2="43.2" y2="226.2" class="sm"/>
+<line x1="45.4" y1="254.7" x2="50.1" y2="253.0" class="sm"/>
+<line x1="57.2" y1="280.7" x2="61.6" y2="278.2" class="sm"/>
+<line x1="73.4" y1="304.3" x2="77.3" y2="301.1" class="sm"/>
+<line x1="93.4" y1="324.7" x2="96.7" y2="320.9" class="sm"/>
+<line x1="116.7" y1="341.3" x2="119.2" y2="337.0" class="sm"/>
+<circle cx="200" cy="200" r="72" class="sm" fill="none"/>
+<line x1="128.0" y1="200.0" x2="-6.0" y2="200.0" class="st axis"/>
+<text x="126.5" y="236.4" class="hn" text-anchor="middle" dominant-baseline="central">1</text>
+<line x1="156.3" y1="257.2" x2="100.5" y2="330.3" class="sm"/>
+<text x="176.9" y="278.7" class="hn" text-anchor="middle" dominant-baseline="central">2</text>
+<line x1="205.9" y1="271.8" x2="213.4" y2="363.5" class="sm"/>
+<text x="225.4" y="278.0" class="hn" text-anchor="middle" dominant-baseline="central">3</text>
+<line x1="237.6" y1="261.4" x2="307.5" y2="375.7" class="st axis"/>
+<text x="254.2" y="261.5" class="hn" text-anchor="middle" dominant-baseline="central">4</text>
+<line x1="256.2" y1="245.0" x2="327.9" y2="302.6" class="sm"/>
+<text x="271.2" y="240.7" class="hn" text-anchor="middle" dominant-baseline="central">5</text>
+<line x1="267.3" y1="225.5" x2="353.3" y2="258.2" class="sm"/>
+<text x="280.7" y="214.8" class="hn" text-anchor="middle" dominant-baseline="central">6</text>
+<line x1="272.0" y1="200.0" x2="406.0" y2="200.0" class="st axis"/>
+<text x="273.5" y="163.6" class="hn" text-anchor="middle" dominant-baseline="central">7</text>
+<line x1="243.7" y1="142.8" x2="299.5" y2="69.7" class="sm"/>
+<text x="223.1" y="121.3" class="hn" text-anchor="middle" dominant-baseline="central">8</text>
+<line x1="194.1" y1="128.2" x2="186.6" y2="36.5" class="sm"/>
+<text x="174.6" y="122.0" class="hn" text-anchor="middle" dominant-baseline="central">9</text>
+<line x1="162.4" y1="138.6" x2="92.5" y2="24.3" class="st axis"/>
+<text x="145.8" y="138.5" class="hn" text-anchor="middle" dominant-baseline="central">10</text>
+<line x1="143.8" y1="155.0" x2="72.1" y2="97.4" class="sm"/>
+<text x="128.8" y="159.3" class="hn" text-anchor="middle" dominant-baseline="central">11</text>
+<line x1="132.7" y1="174.5" x2="46.7" y2="141.8" class="sm"/>
+<text x="119.3" y="185.2" class="hn" text-anchor="middle" dominant-baseline="central">12</text>
+<text x="-20.0" y="200.0" class="axl" text-anchor="middle" dominant-baseline="central">AS</text>
+<text x="314.8" y="387.7" class="axl" text-anchor="middle" dominant-baseline="central">FC</text>
+<text x="420.0" y="200.0" class="axl" text-anchor="middle" dominant-baseline="central">DS</text>
+<text x="85.2" y="12.3" class="axl" text-anchor="middle" dominant-baseline="central">MC</text>
+<line x1="280.4" y1="342.9" x2="276.0" y2="335.1" class="st"/>
+<text x="268.7" y="322.0" class="pg" text-anchor="middle" dominant-baseline="central">☊︎<title>Nœud Nord</title></text>
+<text x="258.9" y="304.6" class="dg" text-anchor="middle" dominant-baseline="central">19°</text>
+<line x1="361.7" y1="227.1" x2="352.9" y2="225.6" class="st"/>
+<text x="338.1" y="223.1" class="pg" text-anchor="middle" dominant-baseline="central">♄︎<title>Saturne</title></text>
+<text x="318.3" y="219.8" class="dg" text-anchor="middle" dominant-baseline="central">11°</text>
+<line x1="287.3" y1="61.2" x2="282.5" y2="68.8" class="st"/>
+<line x1="282.5" y1="68.8" x2="288.7" y2="77.8" class="sm"/>
+<text x="282.2" y="86.7" class="pg" text-anchor="middle" dominant-baseline="central">♃︎<title>Jupiter</title></text>
+<text x="270.5" y="102.9" class="dg" text-anchor="middle" dominant-baseline="central">18°</text>
+<line x1="283.9" y1="59.1" x2="279.3" y2="66.8" class="st"/>
+<line x1="279.3" y1="66.8" x2="268.5" y2="65.4" class="sm"/>
+<text x="263.5" y="75.2" class="pg pg-l" text-anchor="middle" dominant-baseline="central">☽︎<title>Lune</title></text>
+<text x="254.4" y="93.0" class="dg" text-anchor="middle" dominant-baseline="central">19°</text>
+<line x1="58.9" y1="116.5" x2="66.6" y2="121.1" class="st"/>
+<line x1="66.6" y1="121.1" x2="73.5" y2="117.6" class="sm"/>
+<text x="82.7" y="123.6" class="pg" text-anchor="middle" dominant-baseline="central">♇︎<title>Pluton</title></text>
+<text x="99.4" y="134.5" class="dg" text-anchor="middle" dominant-baseline="central">19°</text>
+<line x1="53.3" y1="126.7" x2="61.3" y2="130.8" class="st"/>
+<line x1="61.3" y1="130.8" x2="62.1" y2="138.4" class="sm"/>
+<text x="72.2" y="142.9" class="pg pg-l" text-anchor="middle" dominant-baseline="central">☉︎<title>Soleil</title></text>
+<text x="90.4" y="151.0" class="dg" text-anchor="middle" dominant-baseline="central">23°</text>
+<line x1="37.6" y1="176.9" x2="46.5" y2="178.1" class="st"/>
+<text x="61.4" y="180.3" class="pg" text-anchor="middle" dominant-baseline="central">☿︎<title>Mercure</title></text>
+<text x="81.2" y="183.1" class="dg" text-anchor="middle" dominant-baseline="central">12°</text>
+<line x1="36.3" y1="209.9" x2="45.3" y2="209.3" class="st"/>
+<text x="60.3" y="208.4" class="pg" text-anchor="middle" dominant-baseline="central">♀︎<title>Vénus</title></text>
+<text x="80.2" y="207.2" class="dg" text-anchor="middle" dominant-baseline="central">23°</text>
+<line x1="46.6" y1="257.9" x2="55.0" y2="254.7" class="st"/>
+<text x="69.0" y="249.4" class="pg" text-anchor="middle" dominant-baseline="central">♆︎<title>Neptune</title></text>
+<text x="87.7" y="242.4" class="dg" text-anchor="middle" dominant-baseline="central">11°</text>
+<line x1="72.5" y1="303.1" x2="79.5" y2="297.5" class="st"/>
+<text x="91.2" y="288.0" class="pg" text-anchor="middle" dominant-baseline="central">♅︎<title>Uranus</title></text>
+<text x="106.7" y="275.5" class="dg" text-anchor="middle" dominant-baseline="central">29°</text>
+<line x1="142.2" y1="353.5" x2="145.4" y2="345.1" class="st"/>
+<text x="150.7" y="331.0" class="pg" text-anchor="middle" dominant-baseline="central">♂︎<title>Mars</title></text>
+<text x="157.7" y="312.3" class="dg" text-anchor="middle" dominant-baseline="central">29°</text>
+<line x1="230.7" y1="148.4" x2="148.4" y2="169.4" class="asp sq"/>
+<line x1="230.7" y1="148.4" x2="140.0" y2="200.0" class="asp tr"/>
+<line x1="140.6" y1="191.5" x2="259.2" y2="209.9" class="asp op"/>
+<line x1="232.0" y1="149.2" x2="148.4" y2="169.4" class="asp sq"/>
+<line x1="232.0" y1="149.2" x2="140.0" y2="200.0" class="asp tr"/>
+<line x1="230.7" y1="148.4" x2="140.1" y2="203.6" class="asp tr"/>
+<line x1="146.3" y1="173.2" x2="230.7" y2="148.4" class="asp sq"/>
+<circle cx="200" cy="200" r="60" class="sm" fill="none"/>
+</svg>
+<div class="legend">
+<span><span class="sw r"></span>Feu</span><span><span class="sw g"></span>Terre</span><span><span class="sw a"></span>Air</span><span><span class="sw b"></span>Eau</span>
+<span><i class="k1"></i>carré, opposition</span><span><i class="k2"></i>trigone</span>
+</div>
+<figcaption>Ton ciel de naissance : l'Ascendant (AS) à gauche, le Milieu du Ciel (MC) en haut, les douze maisons Placidus numérotées au centre. Chaque glyphe planétaire porte son degré dans le signe.</figcaption>
+</figure>
+
+<h3>Lecture traditionnelle</h3>
+<p><b>Soleil en Sagittaire, maison 11.</b> Le Sagittaire est un signe de feu mutable, gouverné par Jupiter. La tradition y place le besoin de comprendre le sens des choses et d'élargir son horizon (études longues, voyages, philosophie), avec une franchise directe et un optimisme de fond. Ses défauts classiques sont l'impatience, la dispersion et la tendance à faire la leçon. En maison 11 (amis, groupes, projets collectifs), cette énergie passe par les réseaux, les équipes et les idéaux partagés.</p>
+<p><b>Ascendant Capricorne.</b> L'Ascendant (rising sign) décrit ta manière d'aborder le monde et la première impression que tu donnes. Le Capricorne, terre cardinale gouvernée par Saturne, donne une façade réservée, sérieuse et patiente, tournée vers des objectifs de long terme : on te lit souvent comme plus mûr que ton âge. Vénus, à 3° de l'Ascendant, adoucit cette façade par le tact, le sens esthétique et un charme discret.</p>
+<p><b>Lune en Vierge, maison 8.</b> La Lune décrit les besoins émotionnels. En Vierge (terre mutable, gouvernée par Mercure), la sécurité passe par l'ordre, l'utilité et la maîtrise des détails ; le revers classique est l'inquiétude et l'autocritique. La maison 8 (crises, transformations, ce qui est caché) rend ces émotions profondes et peu exposées. Deux aspects très serrés colorent cette Lune : la conjonction à Jupiter, que la tradition lit comme un optimisme et une générosité qui tempèrent l'anxiété de la Vierge, et le carré presque exact à Pluton, signe d'intensité émotionnelle, d'un besoin de contrôle et d'une capacité à se reconstruire après les crises.</p>
+
+<h3>Les planètes dans les maisons (houses)</h3>
+<div class="tw"><table>
+<tr><th>Planète et position</th><th class="c">Maison</th><th>Ce que la tradition y lit</th></tr>
+<tr><td><span class="gl">☉&#xFE0E;</span> Soleil<small class="pos">23°59' Sagittaire</small></td><td class="c">11</td><td>L'identité se construit dans les groupes et autour d'idéaux.</td></tr>
+<tr><td><span class="gl">☽&#xFE0E;</span> Lune<small class="pos">19°46' Vierge</small></td><td class="c">8</td><td>Émotions intenses mais contenues, attrait pour ce qui est caché.</td></tr>
+<tr><td><span class="gl">☿&#xFE0E;</span> Mercure<small class="pos">12°25' Capricorne</small></td><td class="c">12</td><td>Pensée méthodique et prudente, réflexion en retrait. Mercure est presque immobile : il repart en arrière 30 heures après ta naissance, et la tradition donne beaucoup de poids à une planète stationnaire.</td></tr>
+<tr><td><span class="gl">♀&#xFE0E;</span> Vénus<small class="pos">23°58' Capricorne</small></td><td class="c">1</td><td>Charme sobre, goût de la fidélité et des choses qui durent.</td></tr>
+<tr><td><span class="gl">♂&#xFE0E;</span> Mars<small class="pos">29°54' Poissons</small></td><td class="c">2</td><td>Action guidée par l'intuition, énergie tournée vers les ressources. Dernier degré du signe : Mars entre en Bélier 4 heures après ta naissance.</td></tr>
+<tr><td><span class="gl">♃&#xFE0E;</span> Jupiter<small class="pos">18°21' Vierge</small></td><td class="c">8</td><td>Croissance par la précision et la méthode. Jupiter est en exil en Vierge, donc affaibli selon la tradition.</td></tr>
+<tr><td><span class="gl">♄&#xFE0E;</span> Saturne<small class="pos">11°00' Cancer, rétrograde</small></td><td class="c">6</td><td>Discipline dans le travail quotidien, sens du devoir. Lui aussi en exil, en Cancer.</td></tr>
+<tr><td><span class="gl">♅&#xFE0E;</span> Uranus<small class="pos">29°29' Verseau</small></td><td class="c">1</td><td>Besoin d'indépendance, goût de l'innovation. Planète lente, commune à toute ta génération, mais rendue personnelle par la maison 1.</td></tr>
+<tr><td><span class="gl">♆&#xFE0E;</span> Neptune<small class="pos">11°12' Verseau</small></td><td class="c">1</td><td>Idéalisme, sensibilité aux causes collectives (même remarque générationnelle).</td></tr>
+<tr><td><span class="gl">♇&#xFE0E;</span> Pluton<small class="pos">19°54' Sagittaire</small></td><td class="c">11</td><td>Générationnel lui aussi, mais à 4° du Soleil : volonté intense.</td></tr>
+<tr><td><span class="gl">☊&#xFE0E;</span> Nœud Nord<small class="pos">19°54' Taureau</small></td><td class="c">3</td><td>Pour l'astrologie moderne, ta direction d'évolution : construire du stable (Taureau) par l'apprentissage et l'échange (maison 3).</td></tr>
+</table></div>
+
+<h3>Les aspects les plus serrés</h3>
+<div class="tw"><table>
+<tr><th>Aspect</th><th class="c">Écart (orbe)</th><th>Lecture</th></tr>
+<tr><td>Lune carré Pluton</td><td class="c mono">0°08'</td><td>Émotions intenses, besoin de maîtrise.</td></tr>
+<tr><td>Lune trigone Ascendant</td><td class="c mono">0°45'</td><td>Accord entre ce que tu ressens et ce que tu montres.</td></tr>
+<tr><td>Mercure opposition Saturne</td><td class="c mono">1°24'</td><td>Esprit sérieux et rigoureux, prudence dans la parole, doute avant de s'exprimer.</td></tr>
+<tr><td>Lune conjonction Jupiter</td><td class="c mono">1°24'</td><td>Générosité émotionnelle, optimisme.</td></tr>
+<tr><td>Jupiter carré Pluton</td><td class="c mono">1°33'</td><td>Ambition forte, goût de l'influence.</td></tr>
+<tr><td>Jupiter trigone Ascendant</td><td class="c mono">2°10'</td><td>Image bienveillante, facilité à inspirer confiance.</td></tr>
+</table></div>
+<p><b>Dominantes.</b> La Terre l'emporte (5 points sur 12 : Lune, Mercure, Vénus, Jupiter et Ascendant), devant l'Eau (3), le Feu (2) et l'Air (2). La maison 1 contient trois planètes (Vénus, Uranus, Neptune). C'est un thème de jour : le Soleil était 12° au-dessus de l'horizon.</p>
+
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Positions calculées avec Swiss Ephemeris 2.10 (éphéméride Moshier intégrée), zodiaque tropical, pour le jour julien <span class="mono">2 452 989,8951</span> (16/12/2003, 09 h 29 UTC) à 48,87° N et 2,71° E. Maisons Placidus, le système le plus utilisé en France. Orbes retenus : 8° avec le Soleil ou la Lune, 6° sinon, 4° pour les sextiles.</p>
+</div>
+<p class="origin"><span class="tag tag-old">Tradition ancienne</span><b>Astrologie hellénistique</b>, née en Égypte ptolémaïque aux IIe et Ier siècles av. J.-C. ; le système de maisons de Placidus de Titis date du XVIIe siècle.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Astrologie chinoise</h2>
+<div class="res">
+<div><span class="rl">Signe animal</span><span class="rv">Chèvre <span class="cjk">未</span></span><span class="rd">aussi appelée Mouton</span></div>
+<div><span class="rl">Élément</span><span class="rv">Eau <span class="cjk">癸</span></span><span class="rd">année 癸未, gui wei</span></div>
+<div><span class="rl">Polarité</span><span class="rv">Yin</span><span class="rd">tige et branche yin</span></div>
+<div><span class="rl">Compagnon secret</span><span class="rv">Cheval <span class="cjk">午</span></span><span class="rd">union 午未, liu he</span></div>
+</div>
+
+<h3>Lecture traditionnelle</h3>
+<p>La Chèvre est réputée douce, créative et sensible à l'harmonie, attachée à la sécurité de son cercle proche ; ses défauts traditionnels sont l'indécision et l'inquiétude. L'Eau ajoute l'adaptabilité, l'intuition et le goût de l'échange : la Chèvre d'Eau est décrite comme diplomate et conciliante, au risque de trop céder aux autres. Le Yin désigne une énergie réceptive et intériorisée.</p>
+<p>Le <b>compagnon secret</b> (secret friend, <span class="cjk">六合</span> liu he) est le Cheval : l'allié discret qui complète la Chèvre. Ses alliés de triangle (<span class="cjk">三合</span> san he) sont le Lièvre et le Cochon ; son opposé (<span class="cjk">冲</span> chong) est le Buffle.</p>
+
+<h3>Les quatre piliers (Bazi)</h3>
+<p>L'animal de l'année ne représente qu'un pilier sur quatre : il décrit surtout ta génération et ton milieu d'origine. Le pilier qui te représente, toi, est celui du jour (encadré en bleu). Dans l'ordre traditionnel, l'année est à droite.</p>
+<div class="pillars">
+<div class="pil"><div class="ph">Heure</div><div class="cj">丁巳</div><div class="py">Ding Si</div><div class="pe">Feu Yin<br>Serpent</div></div>
+<div class="pil me"><div class="ph">Jour</div><div class="cj">癸亥</div><div class="py">Gui Hai</div><div class="pe">Eau Yin<br>Cochon</div></div>
+<div class="pil"><div class="ph">Mois</div><div class="cj">甲子</div><div class="py">Jia Zi</div><div class="pe">Bois Yang<br>Rat</div></div>
+<div class="pil"><div class="ph">Année</div><div class="cj">癸未</div><div class="py">Gui Wei</div><div class="pe">Eau Yin<br>Chèvre</div></div>
+</div>
+<p>Ton « maître du jour » (day master) est <span class="cjk">癸</span> (gui), l'Eau Yin. La tradition l'associe à la pluie et à la rosée : une intelligence fine et intuitive, qui contourne les obstacles au lieu de les heurter. Sur les huit signes des piliers, quatre sont de l'Eau, et le maître du jour Eau est né dans un mois d'Eau (<span class="cjk">子</span>) : l'Eau domine nettement. Le Métal n'apparaît qu'en élément caché, à l'intérieur de <span class="cjk">巳</span>.</p>
+<div class="pips">
+<span>Eau</span><span class="pp"><i></i><i></i><i></i><i></i></span>
+<span>Feu</span><span class="pp"><i></i><i></i></span>
+<span>Bois</span><span class="pp"><i></i></span>
+<span>Terre</span><span class="pp"><i></i></span>
+<span>Métal</span><span class="pp"><i class="o"></i></span>
+</div>
+
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>L'année chinoise ne change pas au 1er janvier : le pilier de l'année part de <span class="cjk">立春</span> (lichun, 4 février 2003). Le mois suit les termes solaires : le 16 décembre est après <span class="cjk">大雪</span> (7 décembre), donc mois <span class="cjk">子</span>, et une année <span class="cjk">癸</span> donne la tige <span class="cjk">甲</span>. Le jour vient du cycle continu des 60 binômes : <span class="mono">(2 452 990 + 49) mod 60 = 59</span>, soit <span class="cjk">癸亥</span>. L'heure <span class="cjk">巳</span> couvre 9 h à 11 h en heure solaire vraie (ici 9 h 44) ; un jour <span class="cjk">癸</span> lui donne la tige <span class="cjk">丁</span>.</p>
+</div>
+<p class="origin"><span class="tag tag-old">Tradition ancienne</span><b>Le cycle des douze animaux</b> est attesté dès le IIIe siècle av. J.-C. ; la méthode des quatre piliers est formalisée sous les Song (Xu Ziping, Xe siècle).</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Astrologie védique (Jyotish)</h2>
+<div class="res">
+<div><span class="rl">Lagna (Ascendant)</span><span class="rv">Dhanu</span><span class="rd">Sagittaire, 26°37'</span></div>
+<div><span class="rl">Rashi (signe lunaire)</span><span class="rv">Simha</span><span class="rd">Lion, 25°51'</span></div>
+<div><span class="rl">Nakshatra lunaire</span><span class="rv">Purva Phalguni</span><span class="rd">pada 4, maître Vénus</span></div>
+<div><span class="rl">Période actuelle</span><span class="rv">Mars / Vénus</span><span class="rd">mahadasha / antardasha</span></div>
+</div>
+
+<h3>Lecture traditionnelle</h3>
+<p>Le Jyotish utilise le zodiaque sidéral, calé sur les étoiles. En 2003, il était décalé de 23°55' par rapport au zodiaque tropical occidental : ton Ascendant passe donc du Capricorne au Sagittaire, et ta Lune de la Vierge au Lion.</p>
+<p><b>Lagna Dhanu.</b> Le Sagittaire, gouverné par Jupiter, est associé à la droiture, au goût de l'étude et au respect des maîtres. Le degré ascendant, lui, tombe pile sur une frontière : il est dans Purva Ashadha (« l'invincible », divinité Apas, les eaux, maître Vénus) jusqu'à 10 h 29 min 10 s, puis dans Uttara Ashadha (« la victoire ultérieure », divinité les Vishvadevas, maître le Soleil). Ton heure n'étant connue qu'à la minute, impossible de trancher ; Uttara Ashadha est même un peu plus probable, puisqu'il couvre 50 des 60 secondes de ta minute de naissance.</p>
+<p><b>Lune en Simha, nakshatra Purva Phalguni.</b> C'est le nakshatra de Bhaga, dieu de la bonne fortune et du bonheur conjugal. Ses symboles sont les pieds avant d'un lit, un hamac et un figuier ; son maître est Vénus. La tradition y lit le goût du repos mérité, de la créativité, des liens affectifs et de la générosité.</p>
+<p><b>Gaja Kesari yoga.</b> Le trait le plus cité de ce thème : la Lune et Jupiter sont conjoints, en Lion, dans la maison 9. Ce yoga (« l'éléphant et le lion ») est réputé donner sagesse, réputation et protection. Jupiter est en plus le maître de ton Ascendant, et la maison 9 est celle du dharma, des études supérieures, des maîtres et des longs voyages.</p>
+
+<h3>Ta période planétaire (dasha)</h3>
+<p>La Vimshottari dasha découpe la vie en périodes planétaires sur un cycle de 120 ans ; la première dépend du nakshatra de la Lune. Tu es né pendant la période de Vénus, et tu es depuis le 2 mars 2021 dans la grande période (mahadasha) de <b>Mars</b>, jusqu'au 2 mars 2028.</p>
+<div class="gantt" role="img" aria-label="Frise des grandes périodes de 2003 à 2083 : Vénus jusqu'en 2005, Soleil 2005-2011, Lune 2011-2021, Mars 2021-2028 (période actuelle), Rahu 2028-2046, Jupiter 2046-2062, Saturne 2062-2081, Mercure ensuite.">
+<div class="g-row"><div class="g-lab">Vénus<small>→ 2005</small></div><div class="g-track"><span class="g-bar" style="left:0.00%;width:2.01%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Soleil<small>2005 – 2011</small></div><div class="g-track"><span class="g-bar" style="left:2.01%;width:10.00%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Lune<small>2011 – 2021</small></div><div class="g-track"><span class="g-bar" style="left:12.00%;width:16.65%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Mars<small>2021 – 2028</small></div><div class="g-track"><span class="g-bar now" style="left:28.65%;width:11.66%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Rahu<small>2028 – 2046</small></div><div class="g-track"><span class="g-bar" style="left:40.32%;width:29.98%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Jupiter<small>2046 – 2062</small></div><div class="g-track"><span class="g-bar" style="left:70.29%;width:26.65%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-row"><div class="g-lab">Saturne<small>2062 – 2081</small></div><div class="g-track"><span class="g-bar" style="left:96.94%;width:3.06%"></span><span class="g-now" style="left:38.11%"></span></div></div>
+<div class="g-axis"><div class="g-lab small muted">aujourd'hui <span style="color:var(--margin)">┆</span></div><div class="g-ticks"><span style="left:10.06%">2010</span><span style="left:26.72%">2020</span><span style="left:43.37%">2030</span><span style="left:60.03%">2040</span><span style="left:76.68%">2050</span><span style="left:93.34%">2060</span></div></div>
+</div>
+<p>Pour un Ascendant Sagittaire, Mars gouverne les maisons 5 (intelligence, études, créativité) et 12 (l'étranger, les dépenses, le retrait), et il occupe la maison 4 (foyer, mère, bien-être). La sous-période en cours est celle de <b>Vénus</b>, qui gouverne les maisons 6 (travail, obstacles, rivalités) et 11 (gains, réseaux, aspirations). La grande période suivante sera celle de Rahu, de 2028 à 2046.</p>
+<div class="tw"><table class="small">
+<tr><th>Sous-période de Mars</th><th>Du</th><th>Au</th></tr>
+<tr><td>Mars / Mars</td><td class="mono">2 mars 2021</td><td class="mono">30 juil. 2021</td></tr>
+<tr><td>Mars / Rahu</td><td class="mono">30 juil. 2021</td><td class="mono">17 août 2022</td></tr>
+<tr><td>Mars / Jupiter</td><td class="mono">17 août 2022</td><td class="mono">24 juil. 2023</td></tr>
+<tr><td>Mars / Saturne</td><td class="mono">24 juil. 2023</td><td class="mono">1er sept. 2024</td></tr>
+<tr><td>Mars / Mercure</td><td class="mono">1er sept. 2024</td><td class="mono">29 août 2025</td></tr>
+<tr><td>Mars / Ketu</td><td class="mono">29 août 2025</td><td class="mono">25 janv. 2026</td></tr>
+<tr class="cur"><td>Mars / Vénus <span class="tag tag-old">en cours</span></td><td class="mono">25 janv. 2026</td><td class="mono">27 mars 2027</td></tr>
+<tr><td>Mars / Soleil</td><td class="mono">27 mars 2027</td><td class="mono">2 août 2027</td></tr>
+<tr><td>Mars / Lune</td><td class="mono">2 août 2027</td><td class="mono">2 mars 2028</td></tr>
+</table></div>
+<p class="small muted">À l'intérieur de Mars-Vénus, la sous-sous-période (pratyantardasha) en cours est celle de Saturne, du 25 octobre 2026 au 1er janvier 2027.</p>
+
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Ayanamsa Lahiri, standard officiel du calendrier indien : <span class="mono">23°54'44"</span> le jour de ta naissance. Position sidérale = position tropicale − ayanamsa. Ta Lune sidérale est à <span class="mono">145,86°</span> ; Purva Phalguni couvre 133°20' à 146°40', elle en a parcouru 93,9 %. Il restait donc 6,1 % des 20 ans de Vénus, soit <span class="mono">1,21 an</span>, après quoi les périodes s'enchaînent : Soleil 6 ans, Lune 10, Mars 7, Rahu 18, Jupiter 16, Saturne 19, Mercure 17, Ketu 7. Années de 365,2425 jours, maisons en signes entiers depuis le Lagna.</p>
+</div>
+<p class="origin"><span class="tag tag-old">Tradition ancienne</span><b>Jyotish classique</b> ; la Vimshottari dasha est décrite dans le Brihat Parashara Hora Shastra, texte de référence dont la date de compilation reste discutée.</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Astrologie égyptienne</h2>
+<div class="res">
+<div><span class="rl">Divinité protectrice</span><span class="rv">Osiris</span><span class="rd">dieu de la mort et de la renaissance</span></div>
+<div><span class="rl">Périodes d'Osiris</span><span class="rv">27 nov. – 18 déc.</span><span class="rd">et 1er – 10 mars</span></div>
+<div><span class="rl">Signes compatibles</span><span class="rv">Isis, Thot</span><span class="rd">selon ce système</span></div>
+</div>
+
+<h3>Lecture traditionnelle</h3>
+<p>Osiris est tué par son frère Seth, puis reconstitué par Isis ; il devient le juge des morts et le garant de la végétation qui repousse après la crue du Nil. Le zodiaque égyptien moderne prête à ses natifs la générosité, la créativité, l'intelligence et l'indépendance, avec un fort sentiment de soi. Leur tempérament est décrit comme fougueux, mais plus sensible et plus fragile qu'il n'y paraît. Planètes associées par ce système : le Soleil et Pluton.</p>
+<div class="box img">
+<p class="lbl">Une coïncidence vérifiable</p>
+<p>Dans le calendrier copte, héritier direct du calendrier égyptien, le 16 décembre 2003 correspond au <b>6 Kiahk 1720</b>. Kiahk (Khoiak) est justement le mois où l'Égypte ancienne célébrait les Mystères d'Osiris, du 12 au 30 du mois. Rien n'indique que le zodiaque moderne ait été construit à partir de ce calendrier : c'est une coïncidence.</p>
+</div>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Une simple table de dates. Pour le calendrier copte : l'année 1720 commence le 12 septembre 2003, chaque mois compte 30 jours, Kiahk commence le 11 décembre.</p>
+</div>
+<p class="origin"><span class="tag tag-new">Invention moderne</span><b>Zodiaque des dieux</b> apparu au XXe siècle, sans source égyptienne antique connue. L'astronomie égyptienne réelle découpait le ciel en 36 décans d'étoiles.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Numérologie</h2>
+<div class="res">
+<div><span class="rl">Chemin de vie</span><span class="rv">6</span><span class="rd">life path, la date</span></div>
+<div><span class="rl">Expression</span><span class="rv">5</span><span class="rd">expression, nom complet</span></div>
+<div><span class="rl">Nombre intime</span><span class="rv">4</span><span class="rd">soul urge, les voyelles</span></div>
+<div><span class="rl">Réalisation</span><span class="rv">1</span><span class="rd">les consonnes</span></div>
+</div>
+
+<div class="letters" aria-label="Valeur de chaque lettre : voyelles en bleu">
+<div class="word"><div class="lt"><b>S</b><span>1</span></div><div class="lt v"><b>I</b><span>9</span></div><div class="lt v"><b>A</b><span>1</span></div><div class="lt v"><b>I</b><span>9</span></div><div class="lt"><b>B</b><span>2</span></div><div class="lt v"><b>O</b><span>6</span></div><div class="lt v"><b>U</b><span>3</span></div><span class="eqn">= 31</span></div>
+<div class="word"><div class="lt"><b>C</b><span>3</span></div><div class="lt v"><b>A</b><span>1</span></div><div class="lt"><b>M</b><span>4</span></div><div class="lt v"><b>A</b><span>1</span></div><div class="lt"><b>R</b><span>9</span></div><div class="lt v"><b>A</b><span>1</span></div><span class="eqn">= 19</span></div>
+</div>
+
+<div class="nums">
+<div><h4><span class="big">6</span>Chemin de vie</h4><p class="small muted mono">1+6+1+2+2+0+0+3 = 15 → 1+5 = 6</p><p>Le nombre de la responsabilité et de l'harmonie : sens de la justice et du foyer, besoin d'être utile et de prendre soin. Ses pièges : le perfectionnisme, porter les problèmes des autres, vouloir tout contrôler.</p></div>
+<div><h4><span class="big">5</span>Expression</h4><p class="small muted mono">31 + 19 = 50 → 5</p><p>Le nombre de la liberté : curiosité, adaptabilité, goût du changement, de la communication et du mouvement. Ses pièges : la dispersion et l'impatience.</p></div>
+<div><h4><span class="big">4</span>Nombre intime</h4><p class="small muted mono">voyelles : 28 + 3 = 31 → 4</p><p>Un besoin intérieur de stabilité, de méthode et de construction solide. Son piège : la rigidité.</p></div>
+<div><h4><span class="big">1</span>Réalisation</h4><p class="small muted mono">consonnes : 3 + 16 = 19 → 10 → 1</p><p>Tu te réalises par l'autonomie et l'initiative, en décidant par toi-même. Son piège : vouloir tout faire seul.</p></div>
+</div>
+<p>La numérologie lirait ici une tension entre une façade mobile et curieuse (le 5) et un besoin intérieur de structure (le 4).</p>
+
+<h3>Compléments</h3>
+<div class="two">
+<div>
+<div class="tw"><table class="small">
+<tr><td>Nombre actif (prénom)</td><td class="c mono">31 → 4</td></tr>
+<tr><td>Nombre héréditaire (nom)</td><td class="c mono">19 → 1</td></tr>
+<tr><td>Nombre de maturité (6 + 5)</td><td class="c mono">11, nombre maître</td></tr>
+<tr><td>Année personnelle 2026</td><td class="c mono">11 / 2</td></tr>
+</table></div>
+</div>
+<div>
+<p class="small" style="margin-top:0">Grille d'inclusion : combien de lettres valent chaque chiffre.</p>
+<div class="incl">
+<div><b>1</b><span>×5</span></div><div><b>2</b><span>×1</span></div><div><b>3</b><span>×2</span></div>
+<div><b>4</b><span>×1</span></div><div class="miss"><b>5</b><span>absent</span></div><div><b>6</b><span>×1</span></div>
+<div class="miss"><b>7</b><span>absent</span></div><div class="miss"><b>8</b><span>absent</span></div><div><b>9</b><span>×3</span></div>
+</div>
+<p class="small">La numérologie appelle les chiffres absents des « leçons karmiques » : l'adaptation (5), l'introspection (7), le rapport à l'argent et au pouvoir (8).</p>
+</div>
+</div>
+
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Table pythagoricienne : A, J, S = 1 ; B, K, T = 2 ; et ainsi de suite jusqu'à I, R = 9. On additionne, puis on réduit en additionnant les chiffres, en gardant 11, 22 et 33. Le « nombre de réalisation » suit la convention française (les consonnes) ; dans la numérologie anglo-saxonne, les consonnes donnent le « nombre de personnalité », et le nombre de maturité (chemin de vie + expression) vaudrait ici 11.</p>
+</div>
+<p class="origin"><span class="tag tag-mix">Moderne, sur base ancienne</span><b>La mystique des nombres</b> est antique, mais la méthode a été formalisée au début du XXe siècle aux États-Unis, puis diffusée en France à partir des années 1930. L'attribution à Pythagore est légendaire.</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Astrologie celtique</h2>
+<div class="res">
+<div><span class="rl">Arbre protecteur</span><span class="rv">Le Figuier</span><span class="rd">« l'arbre de la sensibilité »</span></div>
+<div><span class="rl">Périodes du Figuier</span><span class="rv">12 – 21 déc.</span><span class="rd">et 14 – 23 juin</span></div>
+<div><span class="rl">Calendrier de Graves</span><span class="rv">Le Sureau</span><span class="rd">Ruis, 25 nov. – 22 déc.</span></div>
+</div>
+
+<h3>Lecture traditionnelle</h3>
+<p>Les descriptions prêtent au Figuier la délicatesse, la sensibilité, l'humour, le sérieux professionnel et l'ambition, avec un attachement fort à la vie quotidienne, à la famille et aux racines ; son défaut classique est d'être un peu têtu. Un détail botanique va bien avec ce portrait : les fleurs du figuier sont cachées à l'intérieur de la figue, on ne les voit jamais de l'extérieur.</p>
+<p>L'autre « calendrier celtique » courant, celui de Robert Graves, compte treize mois lunaires. Le 16 décembre y tombe dans le treizième et dernier, celui du <b>Sureau</b> (Ruis) : la fin d'un cycle, la régénération (le sureau repousse vigoureusement) et la figure de la Cailleach, vieille divinité gaélique de l'hiver.</p>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Une table de dates : 21 arbres répartis sur 39 périodes, les quatre arbres des équinoxes et des solstices (Chêne, Bouleau, Olivier, Hêtre) ne régnant que sur un jour. Le 16 décembre est dans la décade du Figuier (12 – 21 décembre).</p>
+</div>
+<p class="origin"><span class="tag tag-new">Invention moderne</span><b>L'horoscope des 21 arbres</b> est une création du XXe siècle, popularisée par la presse ; le calendrier de Graves vient de son livre <i>La Déesse blanche</i> (1948). Les druides n'ont laissé aucun calendrier de ce type.</p>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Astrologie amérindienne (roue de médecine)</h2>
+<div class="res">
+<div><span class="rl">Totem de naissance</span><span class="rv">Le Wapiti</span><span class="rd">Lune des longues neiges</span></div>
+<div><span class="rl">Clan élémentaire</span><span class="rv">Oiseau-Tonnerre</span><span class="rd">élément Feu</span></div>
+<div><span class="rl">Direction</span><span class="rv">Ouest</span><span class="rd">gardée par Mudjekeewis</span></div>
+<div><span class="rl">Minéral, plante, couleur</span><span class="rv">Obsidienne</span><span class="rd">épicéa noir, noir</span></div>
+</div>
+<h3>Lecture traditionnelle</h3>
+<p>Ta position sur la roue, la Lune des longues neiges (22 novembre – 21 décembre), est surnommée « l'Enseignant ». Elle décrit des personnes soucieuses du bien-être des autres et d'un monde plus juste, perspicaces, qui aiment transmettre et peuvent devenir de vrais maîtres si elles restent attentives aux autres ; s'y ajoutent un sens du spectacle et des affaires. Ce que la roue leur demande de travailler : l'esprit de compétition et le tact.</p>
+<p>Le clan de l'Oiseau-Tonnerre apporte l'élément Feu : élan, énergie, intensité. L'Ouest est gardé par Mudjekeewis, « père des vents ». Le noir, ta couleur, renvoie au regard intérieur, à l'intuition et à la renaissance.</p>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Une table de dates : douze « lunes », chacune avec un animal, une plante, un minéral, une couleur, un clan et une direction.</p>
+</div>
+<p class="origin"><span class="tag tag-new">Invention moderne</span><b>Système créé par Sun Bear</b> (Vincent LaDuke, d'ascendance ojibwé) et Wabun Wind dans <i>The Medicine Wheel</i> (1980). Ce n'est le calendrier d'aucune nation autochtone ; des organisations amérindiennes lui reprochent de présenter des idées New Age comme une tradition indienne.</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Astrologie maya</h2>
+<div class="res">
+<div><span class="rl">Tzolk'in traditionnel</span><span class="rv">13 Manik'</span><span class="rd">en k'iche' : Oxlajuj Kej, le cerf</span></div>
+<div><span class="rl">Dreamspell</span><span class="rv">Kin 37</span><span class="rd">Terre Rouge Spectrale</span></div>
+<div><span class="rl">Tonalité galactique</span><span class="rv">11, Spectrale</span><span class="rd">dans le compte Dreamspell</span></div>
+<div><span class="rl">Date maya complète</span><span class="rv">13 Manik' 15 Mak</span><span class="rd">compte long <span class="mono">12.19.10.15.7</span></span></div>
+</div>
+<div class="mayas">
+<div class="mcard"><svg viewBox="0 0 64 82" width="64" height="82" aria-hidden="true" class="maya"><circle cx="16.0" cy="9" r="5" class="mdot"/><circle cx="32.0" cy="9" r="5" class="mdot"/><circle cx="48.0" cy="9" r="5" class="mdot"/><rect x="4" y="18" width="56" height="9" rx="4" class="mbar"/><rect x="4" y="32" width="56" height="9" rx="4" class="mbar"/></svg><div class="mt"><b>13</b> en chiffres mayas<br>trois points au-dessus de deux barres (2 × 5 + 3)</div></div>
+<div class="mcard"><svg viewBox="0 0 64 54" width="64" height="54" aria-hidden="true" class="maya"><circle cx="32.0" cy="9" r="5" class="mdot"/><rect x="4" y="18" width="56" height="9" rx="4" class="mbar"/><rect x="4" y="32" width="56" height="9" rx="4" class="mbar"/></svg><div class="mt"><b>11</b> en chiffres mayas<br>un point au-dessus de deux barres (2 × 5 + 1)</div></div>
+</div>
+
+<h3>Lecture traditionnelle</h3>
+<p>Il existe deux calculs, et ils ne donnent pas le même jour. Le <b>compte traditionnel</b> est celui que les gardiens du temps (daykeepers) k'iche' du Guatemala tiennent sans interruption depuis l'époque préhispanique. Le <b>Dreamspell</b> de José Argüelles, d'où vient le vocabulaire de la « tonalité galactique », est un compte moderne décalé ; c'est celui de la plupart des sites francophones.</p>
+<p><b>13 Manik' (Oxlajuj Kej).</b> Kej, le cerf, est l'un des quatre piliers qui soutiennent le ciel et la terre, la force qui porte les destins humains ; c'est aussi l'un des quatre « porteurs de l'année ». Les gardiens du temps k'iche' décrivent les natifs de Kej comme des défenseurs des autres, robustes et rarement malades, mais prompts à s'irriter. Le 13 est le nombre le plus élevé du compte, celui de la plus forte intensité.</p>
+<p><b>Kin 37, Terre Rouge Spectrale.</b> La Terre Rouge est associée à la navigation, à la synchronicité et à l'évolution ; la tonalité 11, Spectrale, à la dissolution et à la libération. Ton Kin appartient à l'onde enchantée de la Main Bleue. Ton oracle : guide, la Terre Rouge elle-même (c'est la règle pour la tonalité 11) ; analogue, le Vent Blanc ; antipode, la Main Bleue ; occulte, la Graine Jaune.</p>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Compte traditionnel, corrélation GMT 584283 : <span class="mono">2 452 990 − 584 283 = 1 868 707</span> jours depuis le début du compte long (11 août 3114 av. J.-C.). Nombre : <span class="mono">(j + 3) mod 13 + 1 = 13</span>. Signe : <span class="mono">(j + 19) mod 20 = 6</span>, le 7e signe, Manik'. Contrôle : la même formule redonne 4 Ajaw pour le 21 décembre 2012. Dreamspell : le 26 juillet 1987 vaut Kin 34 et les 29 février ne comptent pas ; contrôle, le 21 décembre 2012 redonne Kin 207.</p>
+</div>
+<p class="origin"><span class="tag tag-old">Tradition ancienne</span><b>Le Tzolk'in</b> est utilisé depuis au moins 2 500 ans et reste vivant chez les K'iche'. <span class="tag tag-new">Invention moderne</span><b>Le Dreamspell</b> date de 1990.</p>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Astrologie kabbalistique</h2>
+<div class="res">
+<div><span class="rl">Ange gardien</span><span class="rv">Nanaël</span><span class="rd">n° 53 sur 72, lettres ננא</span></div>
+<div><span class="rl">Période de l'ange</span><span class="rv">13 – 16 déc.</span><span class="rd">20° à 25° du Sagittaire</span></div>
+<div><span class="rl">Chœur et séphira</span><span class="rv">Principautés</span><span class="rd">Netzach, la Victoire</span></div>
+<div><span class="rl">Sentier associé</span><span class="rv">25e, Samekh</span><span class="rd">de Tiphereth à Yesod</span></div>
+</div>
+<div class="two">
+<div>
+<h3 style="margin-top:6px">Lecture traditionnelle</h3>
+<p>Nanaël est le cinquième ange du chœur des Principautés. La tradition lui confie les hautes sciences et les sciences abstraites, la méditation et la contemplation. Il protège les philosophes, les enseignants, les religieux et les gens de loi, et pousse ses protégés vers une connaissance plus élevée.</p>
+<p>Le chœur des Principautés est rattaché à la séphira <b>Netzach</b>, la Victoire, sous l'archange Haniel et la planète Vénus. Le sentier passe par le signe de Nanaël : le Sagittaire correspond au <b>25e sentier</b>, celui de la lettre Samekh (ס), qui relie Tiphereth (la Beauté) à Yesod (le Fondement) et correspond à l'arcane XIV, la Tempérance.</p>
+<p class="small">La même tradition donne à chaque ange une tranche de 20 minutes dans la journée : ta naissance (10 h 29) tombe dans celle de Vasariah (n° 32, 10 h 20 – 10 h 40) ; celle de Nanaël va de 17 h 20 à 17 h 40.</p>
+</div>
+<figure style="margin:0">
+<svg viewBox="0 0 300 530" role="img" aria-labelledby="tree-t tree-d" class="tree">
+<title id="tree-t">Arbre de Vie</title>
+<desc id="tree-d">Les dix séphiroth et les vingt-deux sentiers. Netzach et le 25e sentier, Samekh, sont mis en évidence.</desc>
+<line x1="150" y1="40" x2="250" y2="98" class="path"/>
+<line x1="150" y1="40" x2="50" y2="98" class="path"/>
+<line x1="150" y1="40" x2="150" y2="272" class="path"/>
+<line x1="250" y1="98" x2="50" y2="98" class="path"/>
+<line x1="250" y1="98" x2="150" y2="272" class="path"/>
+<line x1="250" y1="98" x2="250" y2="214" class="path"/>
+<line x1="50" y1="98" x2="150" y2="272" class="path"/>
+<line x1="50" y1="98" x2="50" y2="214" class="path"/>
+<line x1="250" y1="214" x2="50" y2="214" class="path"/>
+<line x1="250" y1="214" x2="150" y2="272" class="path"/>
+<line x1="250" y1="214" x2="250" y2="330" class="path"/>
+<line x1="50" y1="214" x2="150" y2="272" class="path"/>
+<line x1="50" y1="214" x2="50" y2="330" class="path"/>
+<line x1="150" y1="272" x2="250" y2="330" class="path"/>
+<line x1="150" y1="272" x2="150" y2="388" class="path-hl"/>
+<line x1="150" y1="272" x2="50" y2="330" class="path"/>
+<line x1="250" y1="330" x2="50" y2="330" class="path"/>
+<line x1="250" y1="330" x2="150" y2="388" class="path"/>
+<line x1="250" y1="330" x2="150" y2="486" class="path"/>
+<line x1="50" y1="330" x2="150" y2="388" class="path"/>
+<line x1="50" y1="330" x2="150" y2="486" class="path"/>
+<line x1="150" y1="388" x2="150" y2="486" class="path"/>
+<text x="162.0" y="330.0" class="hb" dominant-baseline="central">ס 25</text>
+<circle cx="150" cy="40" r="27" class="seph"/>
+<text x="150" y="35" class="sn" text-anchor="middle" dominant-baseline="central">Kether</text>
+<text x="150" y="49" class="sf" text-anchor="middle" dominant-baseline="central">Couronne</text>
+<circle cx="250" cy="98" r="27" class="seph"/>
+<text x="250" y="93" class="sn" text-anchor="middle" dominant-baseline="central">Chokmah</text>
+<text x="250" y="107" class="sf" text-anchor="middle" dominant-baseline="central">Sagesse</text>
+<circle cx="50" cy="98" r="27" class="seph"/>
+<text x="50" y="93" class="sn" text-anchor="middle" dominant-baseline="central">Binah</text>
+<text x="50" y="107" class="sf" text-anchor="middle" dominant-baseline="central">Intelligence</text>
+<circle cx="250" cy="214" r="27" class="seph"/>
+<text x="250" y="209" class="sn" text-anchor="middle" dominant-baseline="central">Chesed</text>
+<text x="250" y="223" class="sf" text-anchor="middle" dominant-baseline="central">Grâce</text>
+<circle cx="50" cy="214" r="27" class="seph"/>
+<text x="50" y="209" class="sn" text-anchor="middle" dominant-baseline="central">Geburah</text>
+<text x="50" y="223" class="sf" text-anchor="middle" dominant-baseline="central">Rigueur</text>
+<circle cx="150" cy="272" r="27" class="seph"/>
+<text x="150" y="267" class="sn" text-anchor="middle" dominant-baseline="central">Tiphereth</text>
+<text x="150" y="281" class="sf" text-anchor="middle" dominant-baseline="central">Beauté</text>
+<circle cx="250" cy="330" r="27" class="seph-hl"/>
+<text x="250" y="325" class="sn sn-hl" text-anchor="middle" dominant-baseline="central">Netzach</text>
+<text x="250" y="339" class="sf" text-anchor="middle" dominant-baseline="central">Victoire</text>
+<circle cx="50" cy="330" r="27" class="seph"/>
+<text x="50" y="325" class="sn" text-anchor="middle" dominant-baseline="central">Hod</text>
+<text x="50" y="339" class="sf" text-anchor="middle" dominant-baseline="central">Gloire</text>
+<circle cx="150" cy="388" r="27" class="seph"/>
+<text x="150" y="383" class="sn" text-anchor="middle" dominant-baseline="central">Yesod</text>
+<text x="150" y="397" class="sf" text-anchor="middle" dominant-baseline="central">Fondement</text>
+<circle cx="150" cy="486" r="27" class="seph"/>
+<text x="150" y="481" class="sn" text-anchor="middle" dominant-baseline="central">Malkuth</text>
+<text x="150" y="495" class="sf" text-anchor="middle" dominant-baseline="central">Royaume</text>
+</svg>
+<figcaption>L'Arbre de Vie : Netzach (séphira de ton chœur) et le 25e sentier, Samekh (lié au Sagittaire).</figcaption>
+</figure>
+</div>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Chaque ange couvre 5° du zodiaque à partir de 0° Bélier (l'équinoxe de printemps). Ton Soleil est à <span class="mono">263,99°</span> : <span class="mono">263,99 / 5 = 52,8</span>, donc la 53e tranche. Les listes par dates donnent le même ange (13 – 16 décembre). Les 72 noms sont tirés de trois versets de l'Exode (14,19-21), de 72 lettres chacun, lus en triplets de lettres. Sentier : correspondances signe-lettre de la Golden Dawn.</p>
+</div>
+<p class="origin"><span class="tag tag-mix">Moderne, sur base ancienne</span><b>Les 72 noms</b> (Shem HaMephorash) viennent de la Kabbale médiévale ; leur attribution aux dates de naissance vient de l'occultisme français du XIXe siècle (Lazare Lenain, 1823), et le lien entre signes et sentiers, de la Golden Dawn (fin du XIXe siècle).</p>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Astrologie arabe</h2>
+<div class="res">
+<div><span class="rl">Arme de naissance</span><span class="rv">L'Arc</span><span class="rd">période du 23 nov. au 21 déc.</span></div>
+<div><span class="rl">Rang</span><span class="rv">12 sur 12</span><span class="rd">« la plus accomplie des armes »</span></div>
+<div><span class="rl">Catégorie</span><span class="rv">Armes longues</span><span class="rd">avec l'épée, la lance, la fronde</span></div>
+<div><span class="rl">Planète</span><span class="rv">Jupiter</span><span class="rd">compatibilité forte : la Chaîne</span></div>
+</div>
+<h3>Lecture traditionnelle</h3>
+<p>Dans l'horoscope arabe des armes, les douze signes vont du Couteau (1) à l'Arc (12) et se répartissent en armes courtes, moyennes et longues. L'Arc agit à distance et vise loin. Ce système le décrit comme intelligent, lucide, curieux et précis : <b>face aux épreuves</b>, il s'appuie sur sa tête plus que sur la force, et cherche la reconnaissance plus que la richesse. Il est réputé généreux et idéaliste ; ses risques sont l'arrogance, la superficialité et la confiance mal placée.</p>
+<div class="box warn">
+<p class="lbl">Ce que tu as demandé, et ce qui se calcule</p>
+<p>Tu as demandé une arme calculée avec le nom, le prénom, la date et le lieu. Dans toutes les versions publiées, seule la date compte : le 16 décembre tombe dans la période du Sagittaire, donc l'Arc. Le site Astrorient affirme que l'arme dépend aussi de la taille de la ville de naissance et du métier des parents (c'est la seule méthode de cette page où ta classe sociale pourrait jouer), mais il ne publie pas la règle qui combine ces facteurs : je ne peux donc pas la calculer honnêtement. Le nom n'intervient dans aucune version.</p>
+</div>
+<h3>Ce que calculait l'astrologie arabe médiévale</h3>
+<p>Les astrologues de langue arabe, comme Abu Ma'shar au IXe siècle, utilisaient les douze signes hellénistiques. Le Sagittaire s'y appelle <i>al-Qaws</i>, « l'arc » : c'est sans doute de là que vient l'arme. Ce qu'ils calculaient vraiment, avec l'heure et le lieu :</p>
+<ul>
+<li><b>La Part de Fortune</b> (sahm al-sa'ada) : Ascendant + Lune − Soleil, pour une naissance de jour = <span class="mono">16°18' Balance</span>, en maison 8.</li>
+<li><b>Les firdaria</b>, périodes planétaires de la vie : depuis tes 18 ans, période de Mercure (jusqu'à 31 ans), avec la sous-période de Saturne du 2 septembre 2025 au 12 juillet 2027.</li>
+<li><b>La planète maîtresse du thème</b> (almuten) : Saturne, détaillée en <a href="#p11">section 11</a>.</li>
+</ul>
+<p class="origin"><span class="tag tag-new">Invention moderne</span><b>L'horoscope des armes</b> vient de la presse et des sites de voyance ; on ne lui connaît aucune source arabe médiévale. <span class="tag tag-old">Tradition ancienne</span><b>L'astrologie arabe savante</b> (VIIIe – XIIIe siècle) est, elle, bien réelle.</p>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="p11">
+<h2><span class="num">11</span>Astrologie alchimique</h2>
+<div class="res">
+<div><span class="rl">Métal dominant</span><span class="rv">Le Plomb</span><span class="rd">Saturne</span></div>
+<div><span class="rl">Second métal</span><span class="rv">Le Cuivre</span><span class="rd">Vénus</span></div>
+<div><span class="rl">Élément dominant</span><span class="rv">Terre</span><span class="rd">5 points sur 12</span></div>
+<div><span class="rl">Principe dominant</span><span class="rv">Mercure</span><span class="rd">tria prima de Paracelse</span></div>
+</div>
+<h3>Lecture traditionnelle</h3>
+<p>Le plomb est le métal de Saturne : le temps, la patience, la profondeur, la structure et la gravité, au sens propre comme au figuré. En alchimie, ce n'est pas un mauvais métal : c'est la matière première du Grand Œuvre, le point de départ de la transmutation vers l'or, qui commence par l'œuvre au noir (nigredo). Le second métal, le cuivre, est celui de Vénus : l'harmonie, la beauté et les liens.</p>
+<p>La Terre domine ton thème (Lune, Mercure, Vénus, Jupiter et Ascendant), ce qui renvoie au concret et à la persévérance. Parmi les trois principes de Paracelse, le Mercure l'emporte avec 5 points mutables sur 12 : l'esprit mobile, l'adaptabilité. Le Soufre (cardinal, l'élan) en compte 4, le Sel (fixe, la stabilité) 3. La version courte des sites grand public part du seul signe solaire : Sagittaire, donc Jupiter, donc l'étain.</p>
+
+<h3>Le calcul de la planète dominante</h3>
+<p class="small">Points de dignité de chaque planète sur les cinq points vitaux du thème (almuten).</p>
+<div class="bars" role="img" aria-label="Scores de dignité : Saturne 19, Vénus 16, Mercure 14, Jupiter 9, Mars 5, Soleil 4, Lune 0.">
+<span class="pl">Saturne <small>plomb</small></span><span class="bt win"><i style="width:100.0%"></i></span><span class="sc">19</span>
+<span class="pl">Vénus <small>cuivre</small></span><span class="bt"><i style="width:84.2%"></i></span><span class="sc">16</span>
+<span class="pl">Mercure <small>vif-argent</small></span><span class="bt"><i style="width:73.7%"></i></span><span class="sc">14</span>
+<span class="pl">Jupiter <small>étain</small></span><span class="bt"><i style="width:47.4%"></i></span><span class="sc">9</span>
+<span class="pl">Mars <small>fer</small></span><span class="bt"><i style="width:26.3%"></i></span><span class="sc">5</span>
+<span class="pl">Soleil <small>or</small></span><span class="bt"><i style="width:21.1%"></i></span><span class="sc">4</span>
+<span class="pl">Lune <small>argent</small></span><span class="bt"><i style="width:0.0%"></i></span><span class="sc">0</span>
+</div>
+<div class="box nts calc">
+<p class="lbl">Comment c'est calculé</p>
+<p>Sept planètes, sept métaux : Soleil-or, Lune-argent, Mercure-vif-argent, Vénus-cuivre, Mars-fer, Jupiter-étain, Saturne-plomb. Pour désigner la planète dominante, deux méthodes classiques : le maître de l'Ascendant (Capricorne, donc Saturne) et l'almuten du thème, qui additionne les dignités essentielles (domicile 5, exaltation 4, triplicité 3, terme 2, face 1) sur le Soleil, la Lune, l'Ascendant, la Part de Fortune et la pleine lune qui a précédé ta naissance (8 décembre 2003). Les deux désignent Saturne : <span class="num-t">19 = 3 (Soleil) + 5 (Ascendant) + 8 (Part de Fortune) + 3 (pleine lune)</span>. Si l'on ajoute les dignités accidentelles (maison, jour, heure), Vénus passe devant : elle est en maison 1 et maîtresse de l'heure de ta naissance. Correspondance des principes : cardinal-Soufre, fixe-Sel, mutable-Mercure (ésotérisme moderne).</p>
+</div>
+<p class="origin"><span class="tag tag-mix">Moderne, sur base ancienne</span><b>Les correspondances planètes-métaux</b> remontent à l'Antiquité tardive et la tria prima à Paracelse (XVIe siècle) ; le « métal de naissance » est un usage moderne.</p>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="p12">
+<h2><span class="num">12</span>Ce qui revient, ce qui se contredit</h2>
+<h3>Ce qui revient</h3>
+<p>Plusieurs traditions tournent autour du savoir, de la transmission et de la justice : le Soleil en Sagittaire, le Lagna Sagittaire avec Jupiter en maison 9, l'Arc, « l'Enseignant » de la roue de médecine, Nanaël protecteur des enseignants et des gens de loi. Ces convergences ne sont pas indépendantes : l'Arc, l'Enseignant et Nanaël ne dépendent que de la date, et ces systèmes ont été calqués sur la période du Sagittaire. Ils répètent la même information sous d'autres noms.</p>
+<p>Saturne revient pour des raisons différentes : maître du thème occidental, planète dominante (le plomb), et sous-période en cours dans deux systèmes de périodes qui n'ont rien à voir l'un avec l'autre, la pratyantardasha védique (jusqu'au 1er janvier 2027) et la firdaria arabe (jusqu'au 12 juillet 2027).</p>
+<p>La conjonction Lune-Jupiter apparaît en occidental et en védique : ce n'est pas une coïncidence, c'est le même fait astronomique lu dans deux zodiaques.</p>
+<h3>Ce qui se contredit</h3>
+<p>Ton élément dominant est la Terre en astrologie occidentale, mais l'Eau en astrologie chinoise. Ton Ascendant est Capricorne en tropical, Sagittaire en sidéral ; ta Lune, Vierge ou Lion selon le zodiaque. En numérologie, la liberté du 5 tire contre le besoin de structure du 4.</p>
+<h3>Deux coïncidences amusantes</h3>
+<p>Le figuier apparaît deux fois sans lien : c'est ton arbre celtique, et Purva Phalguni, ton nakshatra lunaire, porte aussi le nom de « petit figuier ». Et ton dieu égyptien, Osiris, tombe pendant le mois copte de Kiahk, celui des Mystères d'Osiris.</p>
+
+<h3>Ce qui est solide, ce qui est fragile</h3>
+<p>Un résultat qui dépend de l'heure peut basculer si l'heure de l'acte de naissance est approximative. Voici, à la minute près, l'intervalle d'heures de naissance pour lequel chaque résultat resterait le même.</p>
+<div class="tw"><table class="small">
+<tr><th>Résultat</th><th>Reste vrai entre</th><th>Sinon</th></tr>
+<tr><td>Nakshatra du Lagna : Purva Ashadha</td><td class="mono">jusqu'à 10 h 29 min 10 s</td><td>Uttara Ashadha ensuite</td></tr>
+<tr><td>Lagna védique Sagittaire</td><td class="mono">8 h 43 et 10 h 40</td><td>Capricorne après 10 h 40</td></tr>
+<tr><td>Lune en maison 8</td><td class="mono">8 h 37 et 10 h 45</td><td>maison 7 après 10 h 45</td></tr>
+<tr><td>Ascendant Capricorne</td><td class="mono">9 h 11 et 10 h 58</td><td>Verseau après 10 h 58</td></tr>
+<tr><td>Milieu du Ciel Scorpion</td><td class="mono">9 h 03 et 11 h 01</td><td>Sagittaire après 11 h 01</td></tr>
+<tr><td>Soleil en maison 11</td><td class="mono">10 h 04 et 11 h 23</td><td>maison 12 avant 10 h 04</td></tr>
+<tr><td>Nakshatra Purva Phalguni, donc toutes les dasha</td><td class="mono">jusqu'à 11 h 56</td><td>Uttara Phalguni ensuite</td></tr>
+<tr><td>Tout le reste (animaux, arbre, dieu, ange, arme, numérologie)</td><td>toute la journée</td><td></td></tr>
+</table></div>
+<p>Le point le plus fragile est le nakshatra du Lagna : il change à 10 h 29 min 10 s, à l'intérieur même de ta minute de naissance, donc personne ne peut le trancher. Vient ensuite le Lagna lui-même : onze minutes plus tard, il passerait en Capricorne. L'heure 10 h 29 n'est pas un chiffre rond, ce qui laisse penser qu'elle a été notée avec précision ; le reste du tableau tient donc.</p>
+</section>
+</main>
+
+<footer>
+<p><b>Calculs.</b> Swiss Ephemeris 2.10 (éphéméride Moshier), zodiaque tropical et sidéral Lahiri, maisons Placidus, corrélation maya GMT 584283, calendrier copte de la bibliothèque convertdate. Page préparée le 4 novembre 2026.</p>
+<p><b>Sources consultées pour les tables et les lectures</b></p>
+<ul>
+<li><a href="https://maya.nmai.si.edu/sites/default/files/resources/The%20Meaning%20of%20the%20Days%20in%20the%20Maya%20Sacred%20Calendar.pdf">The Meaning of the Days in the Maya Sacred Calendar</a> (gardiens du temps k'iche' Komon Tohil, Smithsonian NMAI)</li>
+<li><a href="https://en.wikipedia.org/wiki/Mysteries_of_Osiris">Mysteries of Osiris</a> et <a href="https://en.wikipedia.org/wiki/Koiak">Koiak</a> (Wikipedia)</li>
+<li><a href="https://www.drikpanchang.com/tutorials/nakshatra/purva-phalguni-nakshatra.html">Purva Phalguni Nakshatra</a> (Drik Panchang)</li>
+<li><a href="https://ewebtribe.com/StarSpiderDancing/longsnomoon.html">Long Snows Moon, Elk</a> (roue de médecine de Sun Bear)</li>
+<li><a href="https://www.astrorient.com/fr/arc">L'Arc, horoscope arabe</a> (Astrorient)</li>
+<li><a href="https://www.demotivateur.fr/astrologie/astrologie-celtique-comment-connaitre-son-arbre-protecteur-27413">Astrologie celtique : les dates des arbres</a> (Demotivateur)</li>
+<li><a href="https://www.maryjones.us/jce/celtictreecalendar.html">The Celtic Tree Calendar</a> (Mary Jones, sur le calendrier de Graves)</li>
+<li><a href="https://www.mon-horoscope-du-jour.com/numerologie/glossaire-numerologique/">Glossaire numérologique</a> (définition française du nombre de réalisation)</li>
+<li><a href="https://philstar.com/entertainment/2001/12/01/141989/guardian-angels-those-born-december">Guardian Angels of those born in December</a> (Philstar)</li>
+<li><a href="https://www.cabinet.ox.ac.uk/node/3388">Alchemy, the Four Elements, and the Tria Prima</a> (Université d'Oxford)</li>
+</ul>
+</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+</body>
+</html>
