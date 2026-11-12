@@ -47,6 +47,17 @@ export const themes = [
     ],
   },
   {
+    id: 'spiritualite',
+    nom: 'Spiritualité',
+    description: 'Mes lectures et réflexions sur les traditions spirituelles.',
+    groupes: [
+      {
+        titre: 'Traditions',
+        contenus: [{ titre: 'Siaibou en onze traditions', href: '/cours/siaibou-en-onze-traditions-1.html' }],
+      },
+    ],
+  },
+  {
     id: 'intelligence-artificielle',
     nom: 'Intelligence artificielle',
     description: "Machine learning, LLM et sécurité de l'IA : la destination de mon parcours.",
