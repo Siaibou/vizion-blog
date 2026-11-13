@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finance : le parcours vers l'inclusion financière</title>
+<meta name="description" content="Parcours d'apprentissage de la finance, de la L1 au master, pour un futur ingénieur en technologies du langage au service de l'inclusion financière.">
+<!--
+  METTRE À JOUR TA PROGRESSION (tout se règle dans ce fichier)
+  - Carte d'un module ou d'un projet : change l'attribut data-statut en
+    "a-faire", "en-cours" ou "fait".
+  - Critère de sortie atteint : ajoute l'attribut checked à sa case
+    (<input type="checkbox" disabled checked>).
+  - À la fin de chaque module : ajoute une ligne au journal de la partie 8.
+  Les barres de progression et la « prochaine étape » se calculent seules.
+
+  LIENS ENTRE LES PAGES
+  - Le lien vers le cours F01 est relatif : range ce fichier et
+    finance-f01-pourcentages-et-interets.html dans le même dossier.
+
+  INTÉGRATION
+  - Tout le style est rangé sous la classe .parcours : tu peux aussi copier
+    le bloc <div class="parcours">, la balise <style> et le script dans un
+    gabarit de ton site sans toucher au reste de tes pages.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.parcours{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13); --soft-m:rgba(93,103,132,.12);
+  color-scheme:light;
+  min-height:100vh;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px);
+  background-size:100% 28px;
+  color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%;
+}
+@media (prefers-color-scheme: dark){
+  .parcours{
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16); --soft-m:rgba(155,165,194,.15);
+    color-scheme:dark;
+  }
+}
+.parcours *,.parcours *::before,.parcours *::after{box-sizing:border-box}
+.parcours a{color:var(--blue)}
+.parcours a:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.parcours .hero{padding:44px 16px 10px 30px;max-width:820px;margin:0 auto}
+.parcours .kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+.parcours h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+.parcours h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:10px;line-height:1.3}
+.parcours .meta{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:14px 0 0}
+.parcours .meta li{font-size:.85rem;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px;color:var(--muted)}
+.parcours main{max-width:820px;margin:0 auto;padding:0 16px 90px 30px;position:relative}
+.parcours main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:760px){
+  .parcours .hero,.parcours main,.parcours footer{padding-left:64px}
+  .parcours main::before{left:34px}
+  .parcours h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+.parcours h2,.parcours h3,.parcours h4{line-height:1.2;letter-spacing:-.01em}
+.parcours h2{font-size:1.65rem;margin:60px 0 10px;position:relative}
+.parcours h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+.parcours h3{font-size:1.2rem;margin:34px 0 6px}
+.parcours p{margin:12px 0}
+.parcours ul,.parcours ol{padding-left:1.3em}
+.parcours li{margin:6px 0}
+.parcours code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px}
+.parcours .box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.parcours .box>:first-child{margin-top:0}.parcours .box>:last-child{margin-bottom:0}
+.parcours .lbl{font-weight:700;margin:0 0 4px}
+.parcours .key{border:2px solid var(--red)}.parcours .key .lbl{color:var(--red)}
+.parcours .nts{border-left:5px solid var(--blue)}.parcours .nts .lbl{color:var(--blue)}
+.parcours .warn{border-left:5px solid var(--amber)}.parcours .warn .lbl{color:var(--amber)}
+.parcours .cap{margin:26px 0 0;font-size:1.04rem}
+/* sommaire */
+.parcours .blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.parcours .blk li{margin:0}
+.parcours .blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.parcours .blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.parcours .blk a:hover{border-color:var(--blue)}
+/* tableaux */
+.parcours .tw{overflow-x:auto;margin:16px 0}
+.parcours table{border-collapse:collapse;width:100%;background:var(--card);font-size:.95rem}
+.parcours th,.parcours td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.parcours th{background:var(--soft-b)}
+@media (max-width:640px){
+  .parcours table.stack,.parcours table.stack tbody,.parcours table.stack tr,.parcours table.stack td{display:block;width:100%}
+  .parcours table.stack{background:transparent}
+  .parcours table.stack thead{display:none}
+  .parcours table.stack tr{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:0 0 10px}
+  .parcours table.stack td{border:0;padding:3px 0}
+  .parcours table.stack td::before{content:attr(data-label);display:block;font-size:.78rem;font-weight:700;color:var(--muted)}
+  .parcours table.stack td:first-child{font-weight:700;font-size:1.02rem}
+  .parcours table.stack td:first-child::before{display:none}
+}
+.parcours .tag{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:1px 9px;margin-right:4px;white-space:nowrap}
+.parcours .t-core{background:var(--soft-r);color:var(--red)}
+.parcours .t-ess{background:var(--soft-g);color:var(--green)}
+.parcours .t-later{background:var(--soft-b);color:var(--blue)}
+.parcours .t-low{background:var(--soft-m);color:var(--muted)}
+/* chiffres */
+.parcours .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0}
+.parcours .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.parcours .stat b{display:block;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.9rem;line-height:1.1;color:var(--blue)}
+.parcours .stat span{display:block;font-size:.92rem;color:var(--muted);margin-top:4px;line-height:1.4}
+/* principes */
+.parcours .princ{list-style:none;padding:0;counter-reset:pr;display:grid;gap:10px;margin:16px 0}
+.parcours .princ li{counter-increment:pr;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px 10px 50px;position:relative;margin:0}
+.parcours .princ li::before{content:counter(pr);position:absolute;left:14px;top:8px;font-family:'STIX Two Text',serif;font-size:1.4rem;color:var(--margin);font-weight:600}
+.parcours .princ b{display:block}
+/* frise des phases */
+.parcours .frise{list-style:none;padding:0;margin:18px 0 8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative}
+.parcours .frise li{margin:0;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:10px;padding:10px 12px}
+.parcours .frise li:nth-child(1){border-top-color:var(--green)}
+.parcours .frise li:nth-child(4){border-top-color:var(--muted)}
+.parcours .frise a{text-decoration:none;color:inherit;display:block}
+.parcours .frise b{display:block;color:var(--margin);font-family:'STIX Two Text',serif;font-size:1.05rem}
+.parcours .frise .quand{display:block;font-size:.82rem;color:var(--muted);margin:2px 0 4px}
+.parcours .frise .quoi{display:block;font-size:.93rem;line-height:1.35}
+@media (max-width:700px){.parcours .frise{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:380px){.parcours .frise{grid-template-columns:1fr}}
+/* phases et modules */
+.parcours .phase-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.parcours .phase-head h3{margin-bottom:2px}
+.parcours .quand-ph{font-size:.9rem;color:var(--muted)}
+.parcours .prog{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:6px 0 4px;font-size:.88rem;color:var(--muted)}
+.parcours .prog .bar{flex:1 1 auto;max-width:260px;height:8px;border-radius:4px;background:var(--soft-m);overflow:hidden}
+.parcours .prog .bar i{display:block;height:100%;width:0;background:var(--green);border-radius:4px}
+.parcours .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:14px 0}
+.parcours .mod{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px 12px;display:flex;flex-direction:column;position:relative}
+.parcours .mod .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.parcours .mod .code{font-family:'STIX Two Text',serif;font-weight:600;color:var(--margin);font-size:1.1rem}
+.parcours .mod .statut{font-size:.75rem;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--soft-m);color:var(--muted);white-space:nowrap}
+.parcours .mod .statut::after{content:"à faire"}
+.parcours .mod[data-statut="en-cours"] .statut{background:var(--soft-a);color:var(--amber)}
+.parcours .mod[data-statut="en-cours"] .statut::after{content:"en cours"}
+.parcours .mod[data-statut="fait"] .statut{background:var(--soft-g);color:var(--green)}
+.parcours .mod[data-statut="fait"] .statut::after{content:"fait"}
+.parcours .mod[data-statut="fait"]{border-color:var(--green)}
+.parcours .mod.next{border:2px solid var(--blue);box-shadow:0 0 0 3px var(--soft-b)}
+.parcours .mod.next .top::before{content:"prochaine étape";position:absolute;top:-11px;left:12px;font-size:.72rem;font-weight:700;background:var(--blue);color:var(--paper);border-radius:999px;padding:1px 9px}
+.parcours .mod h4{font-size:1.04rem;margin:4px 0 4px;line-height:1.25}
+.parcours .mod p{font-size:.93rem;margin:0 0 8px;flex:1 1 auto}
+.parcours .mod dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:0;font-size:.86rem}
+.parcours .mod dt{color:var(--muted);font-weight:700}
+.parcours .mod dd{margin:0}
+.parcours .mod .go{margin-top:10px;font-weight:700;font-size:.93rem;align-self:flex-start;border:1.5px solid var(--blue);border-radius:999px;padding:4px 14px;text-decoration:none}
+.parcours .mod .go:hover{background:var(--soft-b)}
+.parcours .mod.proj{border-style:dashed}
+.parcours .mod.proj .code{color:var(--blue)}
+/* critères */
+.parcours .crit{list-style:none;padding:0;margin:10px 0}
+.parcours .crit li{display:flex;align-items:flex-start;gap:10px;margin:6px 0}
+.parcours .crit input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin:4px 0 0;border:2px solid var(--muted);border-radius:4px;background:var(--card) center/12px 12px no-repeat;opacity:1;cursor:default}
+.parcours .crit input:checked{background-color:var(--green);border-color:var(--green);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.2l2.6 2.6L10 3.4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.parcours .crit input:checked+span{color:var(--muted)}
+/* suivi */
+.parcours .resume{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:16px 0}
+.parcours .resume p{margin:4px 0}
+.parcours .resume .big{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.4rem;color:var(--blue)}
+.parcours .sources{font-size:.93rem}
+.parcours .sources li{margin:4px 0}
+.parcours footer{max-width:820px;margin:0 auto;padding:0 16px 50px 30px;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="parcours">
+
+<header class="hero">
+<p class="kicker">Finance pour l'inclusion</p>
+<h1>Finance : le parcours vers l'inclusion financière<small>De la L1 au master, la finance dont a besoin un ingénieur en technologies du langage au service de l'inclusion financière.</small></h1>
+<ul class="meta">
+<li>Niveau de départ : débutant</li>
+<li>Mis à jour le 13 novembre 2026</li>
+<li>Révisé chaque semestre</li>
+</ul>
+<div class="box key cap">
+<p class="lbl">Le cap en trois phrases</p>
+<p>Tu ne vas pas devenir financier : tu vas apprendre la finance dont a besoin un ingénieur qui construit des outils pour les personnes que le système financier laisse de côté. D'abord la finance du quotidien (intérêts, crédit, épargne, paiements), puis l'inclusion financière proprement dite (mobile money, microfinance, protection des clients), enfin le risque et les données, là où le machine learning et le langage entrent en jeu. Chaque module s'appuie sur les maths que tu apprends au même moment, pour les renforcer au lieu de leur prendre du temps.</p>
+</div>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="mode-emploi">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<h3>Les pages du parcours</h3>
+<ul>
+<li><a href="finance-f01-pourcentages-et-interets.html">Pourcentages et intérêts, depuis le tout début</a> : le module F01, un cours interactif, à faire en premier ;</li>
+<li>le <b>glossaire de finance</b> : une page à créer sur ton site. Commence-la avec le glossaire de F01 (section 8 du cours), puis complète-la à chaque module.</li>
+</ul>
+<p>Les modules suivants arrivent au fil du parcours : demande-les-moi par leur numéro (« F02 »). Chaque module est un cours au format de F01 : des explications depuis le tout début, des questions « Vérifie-toi », des outils, un entraînement corrigé, et trois questions à me renvoyer.</p>
+<p>Cette page se révise chaque semestre, en même temps que la partie « Mon niveau » de tes instructions de projet.</p>
+<h3>Où trouver quoi</h3>
+<ul class="blk">
+<li><a href="#besoins"><b>1</b>La finance dont tu as besoin</a></li>
+<li><a href="#terrain"><b>2</b>Le terrain en chiffres</a></li>
+<li><a href="#priorites"><b>3</b>La place de la finance dans tes priorités</a></li>
+<li><a href="#methode"><b>4</b>La méthode en cinq principes</a></li>
+<li><a href="#phases"><b>5</b>Les phases du parcours</a></li>
+<li><a href="#semaine"><b>6</b>La semaine type et le protocole d'un module</a></li>
+<li><a href="#ressources"><b>7</b>Les ressources</a></li>
+<li><a href="#suivi"><b>8</b>Le suivi</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="besoins">
+<h2><span class="num">1</span>La finance dont tu as besoin</h2>
+<p>Le mot « finance » recouvre des métiers très différents. Les cours et les vidéos grand public parlent surtout de la Bourse : c'est la branche la moins utile pour ton projet.</p>
+<div class="tw"><table class="stack">
+<thead><tr><th>Branche</th><th>Ce qu'elle étudie</th><th>Pour toi</th></tr></thead>
+<tbody>
+<tr><td>Finance des ménages (household finance)</td><td data-label="Ce qu'elle étudie">comment les personnes et les familles gagnent, dépensent, épargnent, empruntent et se protègent</td><td data-label="Pour toi"><span class="tag t-ess">essentielle</span>ce sont tes futurs utilisateurs</td></tr>
+<tr><td>Banque et monnaie (money and banking)</td><td data-label="Ce qu'elle étudie">ce que font les banques, les banques centrales et les systèmes de paiement</td><td data-label="Pour toi"><span class="tag t-ess">essentielle</span>c'est l'infrastructure que tes outils utiliseront</td></tr>
+<tr><td>Finance inclusive (inclusive finance)</td><td data-label="Ce qu'elle étudie">l'accès aux services financiers des personnes qui en sont exclues : mobile money, microfinance, assurance, protection des clients</td><td data-label="Pour toi"><span class="tag t-core">le cœur du projet</span></td></tr>
+<tr><td>Gestion des risques (risk management)</td><td data-label="Ce qu'elle étudie">mesurer et gérer le risque de crédit, de fraude, d'assurance</td><td data-label="Pour toi"><span class="tag t-ess">essentielle dès la L3</span>c'est là que le machine learning intervient le plus</td></tr>
+<tr><td>Finance d'entreprise (corporate finance)</td><td data-label="Ce qu'elle étudie">comment une entreprise se finance, investit et se valorise</td><td data-label="Pour toi"><span class="tag t-later">utile plus tard</span>pour comprendre une fintech ou une institution de microfinance, ou si tu crées une entreprise</td></tr>
+<tr><td>Finance de marché (capital markets)</td><td data-label="Ce qu'elle étudie">actions, obligations, produits dérivés, trading</td><td data-label="Pour toi"><span class="tag t-low">marginale</span>les notions de base suffiront</td></tr>
+</tbody>
+</table></div>
+<h3>Ce que tu dois savoir faire à la fin du parcours</h3>
+<ol>
+<li><b>calculer le coût réel</b> d'un crédit, ou le rendement réel d'une épargne, quelle que soit la façon dont il est affiché (taux flat, frais, période) ;</li>
+<li><b>comprendre la vie financière des ménages modestes</b> : revenus irréguliers, outils informels, chocs, et pourquoi les solutions des pays riches ne s'y transposent pas telles quelles ;</li>
+<li><b>connaître l'infrastructure</b> : banques, banques centrales, mobile money, agents, paiements instantanés, règles de connaissance du client (know your customer, KYC) ;</li>
+<li><b>lire et produire des données</b> sur l'inclusion financière, avec un regard critique sur ce qu'elles mesurent vraiment ;</li>
+<li><b>comprendre le risque</b> de crédit et de fraude, les modèles qui le mesurent, leurs biais et leurs limites légales ;</li>
+<li><b>savoir où le langage lève une barrière</b>, et où il en crée une nouvelle : dans un outil financier, une erreur sur un montant n'est pas une faute de style.</li>
+</ol>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="terrain">
+<h2><span class="num">2</span>Le terrain en chiffres</h2>
+<p>D'après le Global Findex 2025 de la Banque mondiale, une enquête menée en 2024 :</p>
+<div class="stats">
+<div class="stat"><b>79 %</b><span>des adultes dans le monde ont un compte (banque, institution similaire ou mobile money) ; 75 % dans les pays à revenu faible et intermédiaire</span></div>
+<div class="stat"><b>1,3 milliard</b><span>d'adultes n'ont toujours pas de compte, et la moitié d'entre eux vivent dans huit pays seulement</span></div>
+<div class="stat"><b>58 %</b><span>des adultes d'Afrique subsaharienne ont un compte, contre 49 % en 2021 ; la région reste la première au monde pour l'usage du mobile money</span></div>
+<div class="stat"><b>15 %</b><span>des adultes dans le monde ont un compte de mobile money</span></div>
+</div>
+<p>Ce que ces chiffres veulent dire pour toi : la question n'est plus seulement l'accès, c'est l'usage. Dans les pays à revenu faible et intermédiaire, seuls 42 % des adultes ont payé un commerçant par voie numérique en 2024, et le rapport souligne qu'un manque de confiance dans ses propres connaissances financières peut décourager d'ouvrir un compte. Un compte ne sert à rien si l'on ne comprend ni ce qu'on peut en faire, ni ce que coûte ce qu'on signe. C'est là que la langue, la voix et l'explication comptent : c'est ta niche.</p>
+<p class="box nts">Ces chiffres viennent de résumés du rapport. Au module F07, tu les vérifieras dans le rapport lui-même : c'est un bon exercice.</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="priorites">
+<h2><span class="num">3</span>La place de la finance dans tes priorités</h2>
+<p>La finance n'apparaît pas dans tes priorités 0 à 2 : elle sert la priorité 3 (projets NLP et finance inclusive) et ton objectif à long terme. Elle ne doit donc jamais prendre le temps des maths ni des notes. Quatre règles :</p>
+<ol>
+<li><b>Un budget fixe</b> : environ 1 h 30 par semaine en L1, en une ou deux séances. Jamais sur un créneau de maths.</li>
+<li><b>Les modules de calcul servent aussi les maths.</b> F01 à F03 sont des exercices de suites, d'équations et de dichotomie déguisés. Fais-les de préférence quand ton cours de suites numériques traite le même sujet : ils te serviront d'application. Mais ils ne remplacent jamais les feuilles d'exercices de la fac.</li>
+<li><b>Le mode partiels</b> : pendant les révisions d'examens, la finance s'arrête complètement. Rien à réviser, rien à rattraper : le parcours reprend après.</li>
+<li><b>Pas de projet de code avant d'avoir le Python qu'il faut</b> (priorité 2). Le projet P1 attend que tu saches écrire des fonctions, des boucles et des tests en Python sans aide.</li>
+</ol>
+<div class="box warn">
+<p class="lbl">Ce qui t'éloignerait du cap</p>
+<p>Le trading, les cryptomonnaies et les vidéos « devenir riche en investissant » sont la distraction la plus probable quand on commence la finance. À ce stade, ils ne servent pas ton projet. Les transferts d'argent par cryptomonnaies stables (stablecoins) apparaîtront peut-être au module F08, mais comme un objet d'analyse, pas de spéculation. Si tu te surprends à y passer du temps, dis-le-moi.</p>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="methode">
+<h2><span class="num">4</span>La méthode en cinq principes</h2>
+<ol class="princ">
+<li><b>Calculer à la main avant de faire calculer.</b> Comme en maths : une formule que tu as appliquée toi-même, tu la comprends ; une formule que tu as tapée dans un simulateur, tu l'oublies. Les outils de chaque cours servent à vérifier, pas à remplacer.</li>
+<li><b>Toujours revenir à une personne.</b> Chaque notion se teste sur un cas concret : Awa, une vendeuse de tissus fictive, qui épargne, emprunte et envoie de l'argent à sa famille. Que change cette notion pour elle ? Si tu ne sais pas répondre, tu n'as pas encore compris la notion.</li>
+<li><b>Lire les sources primaires.</b> Les rapports de la Banque mondiale, du CGAP ou des banques centrales, plutôt que des résumés de résumés. C'est plus lent au début, mais c'est ce que tu citeras dans un dossier de master ou en entretien.</li>
+<li><b>Garder une trace bilingue.</b> Un glossaire français-anglais sur ton site, enrichi à chaque module : presque toute la littérature de ton domaine est en anglais.</li>
+<li><b>Écrire pour comprendre.</b> Tous les deux ou trois modules, un article Vizion (Objectif, Concepts à connaître, Ma démarche, Outils et bibliothèques découverts, Ce que je retiens). Expliquer le taux flat à un lecteur, c'est vérifier que tu l'as compris.</li>
+</ol>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="phases">
+<h2><span class="num">5</span>Les phases du parcours</h2>
+<p>Les durées sont des estimations par module, exercices compris. Les dates supposent le budget de la partie 3 ; le bilan de chaque semestre dira s'il faut les décaler.</p>
+<ol class="frise">
+<li><a href="#phase-1"><b>Phase 1</b><span class="quand">L1, nov. 2026 à juin 2027</span><span class="quoi">La valeur de l'argent et la vie financière des ménages</span></a></li>
+<li><a href="#phase-2"><b>Phase 2</b><span class="quand">L2, sept. 2027 à juin 2028</span><span class="quoi">L'inclusion financière</span></a></li>
+<li><a href="#phase-3"><b>Phase 3</b><span class="quand">L3, 2028-2029</span><span class="quoi">Le risque, les données et le langage</span></a></li>
+<li><a href="#phase-4"><b>Phase 4</b><span class="quand">Master</span><span class="quoi">La spécialisation</span></a></li>
+</ol>
+
+<!-- Phase 1 -->
+<section class="phase" id="phase-1" data-phase="1">
+<div class="phase-head"><h3>5.1 Phase 1 : la valeur de l'argent et la vie financière des ménages</h3><span class="quand-ph">L1, novembre 2026 à juin 2027</span></div>
+<div class="prog" aria-hidden="true"></div>
+<p><b>Objectif</b> : savoir calculer ce que coûte et ce que rapporte l'argent dans le temps, et comprendre comment vivent financièrement les ménages modestes.</p>
+<div class="mods">
+<article class="mod" data-statut="a-faire" id="f01">
+<div class="top"><span class="code">F01</span><span class="statut"></span></div>
+<h4>Pourcentages et intérêts</h4>
+<p>Coefficients multiplicateurs, intérêts simples et composés, taux nominal et effectif, piège du taux flat.</p>
+<dl><dt>Maths</dt><dd>suites arithmétiques et géométriques</dd><dt>Durée</dt><dd>4 h</dd></dl>
+<a class="go" href="finance-f01-pourcentages-et-interets.html">Ouvrir le cours</a>
+</article>
+<article class="mod" data-statut="a-faire" id="f02">
+<div class="top"><span class="code">F02</span><span class="statut"></span></div>
+<h4>Actualiser : la valeur du temps</h4>
+<p>Valeur actuelle (present value), comparer des sommes reçues à des dates différentes, valeur d'une suite de versements.</p>
+<dl><dt>Maths</dt><dd>somme des termes d'une suite géométrique</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f03">
+<div class="top"><span class="code">F03</span><span class="statut"></span></div>
+<h4>Le coût réel d'un crédit</h4>
+<p>Mensualité, tableau d'amortissement (amortization schedule), TAEG, taux réel d'un prêt flat, frais cachés.</p>
+<dl><dt>Maths</dt><dd>équations, fonctions monotones, dichotomie</dd><dt>Durée</dt><dd>5 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f04">
+<div class="top"><span class="code">F04</span><span class="statut"></span></div>
+<h4>Inflation, taux réel et change</h4>
+<p>Pouvoir d'achat, taux réel, taux de change, coût d'un transfert d'argent des migrants (remittance).</p>
+<dl><dt>Maths</dt><dd>pourcentages composés</dd><dt>Durée</dt><dd>3 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f05">
+<div class="top"><span class="code">F05</span><span class="statut"></span></div>
+<h4>L'argent des ménages modestes</h4>
+<p>Revenus irréguliers ; épargne informelle : tontines (rotating savings and credit associations, ROSCA), associations villageoises d'épargne et de crédit (AVEC, en anglais VSLA) ; crédit informel ; chocs ; pourquoi les pauvres paient souvent plus cher.</p>
+<dl><dt>Maths</dt><dd>lecture</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f06">
+<div class="top"><span class="code">F06</span><span class="statut"></span></div>
+<h4>Banques, monnaie et banque centrale</h4>
+<p>Ce que fait une banque (intermédiation, transformation, création monétaire), le rôle d'une banque centrale, la garantie des dépôts, la connaissance du client.</p>
+<dl><dt>Maths</dt><dd>lecture</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod proj" data-statut="a-faire" id="p1">
+<div class="top"><span class="code">P1</span><span class="statut"></span></div>
+<h4>Projet : calculateur du coût réel d'un crédit</h4>
+<p>En Python, si ton Python est prêt. Il prend un prêt (montant, taux, durée, frais, mode flat ou dégressif), affiche le tableau d'amortissement, le taux réel et le coût total, et explique le résultat en une phrase simple, sans pourcentage. Tests unitaires obligatoires : c'est un code qui manipule de l'argent. Un article Vizion à la clé.</p>
+<dl><dt>Quand</dt><dd>fin de phase 1</dd></dl>
+</article>
+</div>
+<p class="lbl">Critères de sortie</p>
+<ul class="crit">
+<li><input type="checkbox" disabled><span>tu calcules à la main la mensualité et le coût total d'un prêt dégressif, et le taux réel approximatif d'un prêt flat ;</span></li>
+<li><input type="checkbox" disabled><span>tu expliques à voix haute, en deux minutes et sans notes, pourquoi « 2 % par mois flat » coûte plus cher que « 3 % par mois dégressif » ;</span></li>
+<li><input type="checkbox" disabled><span>tu décris trois outils d'épargne informelle et ce que chacun apporte à un ménage ;</span></li>
+<li><input type="checkbox" disabled><span>tu expliques ce qu'une banque fait de l'argent qu'on lui dépose.</span></li>
+</ul>
+</section>
+
+<!-- Phase 2 -->
+<section class="phase" id="phase-2" data-phase="2">
+<div class="phase-head"><h3>5.2 Phase 2 : l'inclusion financière</h3><span class="quand-ph">L2, septembre 2027 à juin 2028</span></div>
+<div class="prog" aria-hidden="true"></div>
+<p><b>Objectif</b> : connaître les outils, les données et les débats de la finance inclusive.</p>
+<div class="mods">
+<article class="mod" data-statut="a-faire" id="f07">
+<div class="top"><span class="code">F07</span><span class="statut"></span></div>
+<h4>Mesurer l'inclusion : lire le Global Findex</h4>
+<p>Définitions (compte, usage, santé financière), lire un indicateur, points de pourcentage, limites d'une enquête.</p>
+<dl><dt>Maths</dt><dd>statistiques descriptives, proportions</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f08">
+<div class="top"><span class="code">F08</span><span class="statut"></span></div>
+<h4>Paiements et mobile money</h4>
+<p>Le fonctionnement d'un portefeuille mobile (mobile wallet) : agents, dépôt et retrait d'espèces (cash-in, cash-out), USSD, interopérabilité, paiements instantanés et QR codes en Asie du Sud-Est, coûts pour l'utilisateur.</p>
+<dl><dt>Maths</dt><dd>aucune</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f09">
+<div class="top"><span class="code">F09</span><span class="statut"></span></div>
+<h4>Microfinance : promesses et preuves</h4>
+<p>Crédit solidaire, microépargne, microassurance ; ce que montrent les essais randomisés contrôlés (randomized controlled trials) ; les crises de surendettement.</p>
+<dl><dt>Maths</dt><dd>lire une étude, notion de groupe témoin</dd><dt>Durée</dt><dd>5 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f10">
+<div class="top"><span class="code">F10</span><span class="statut"></span></div>
+<h4>Le risque et l'assurance des ménages</h4>
+<p>Mutualisation, espérance, prime ; microassurance, assurance indicielle (index insurance).</p>
+<dl><dt>Maths</dt><dd>probabilités : espérance, intuition de la loi des grands nombres</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f11">
+<div class="top"><span class="code">F11</span><span class="statut"></span></div>
+<h4>La finance islamique</h4>
+<p>Interdiction de l'intérêt (riba), partage des profits et des pertes, murabaha, ijara, sukuk ; sa place en Malaisie, en Indonésie et en Afrique de l'Ouest.</p>
+<dl><dt>Maths</dt><dd>réutilise F01 à F03</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f12">
+<div class="top"><span class="code">F12</span><span class="statut"></span></div>
+<h4>Protéger les clients</h4>
+<p>Arnaques par SMS et par appel, crédit numérique et surendettement, transparence des prix, données personnelles.</p>
+<dl><dt>Maths</dt><dd>aucune</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod proj" data-statut="a-faire" id="p2">
+<div class="top"><span class="code">P2</span><span class="statut"></span></div>
+<h4>Projet : analyse du Global Findex</h4>
+<p>Une analyse des données publiques du Global Findex en Python (pandas), pour quelques pays d'Asie du Sud-Est et d'Afrique de l'Ouest : écarts selon le genre, le revenu et l'âge, place du mobile money. Un notebook propre, des graphiques honnêtes, un article Vizion.</p>
+<dl><dt>Quand</dt><dd>pendant la phase 2</dd></dl>
+</article>
+</div>
+<p class="lbl">Critères de sortie</p>
+<ul class="crit">
+<li><input type="checkbox" disabled><span>tu expliques comment une personne sans compte bancaire reçoit, garde et envoie de l'argent avec un téléphone ;</span></li>
+<li><input type="checkbox" disabled><span>tu résumes, sources à l'appui, ce que les études disent des effets du microcrédit ;</span></li>
+<li><input type="checkbox" disabled><span>tu lis un tableau du Global Findex et tu repères ce qu'il ne mesure pas ;</span></li>
+<li><input type="checkbox" disabled><span>P2 est publié sur GitHub et sur Vizion.</span></li>
+</ul>
+</section>
+
+<!-- Phase 3 -->
+<section class="phase" id="phase-3" data-phase="3">
+<div class="phase-head"><h3>5.3 Phase 3 : le risque, les données et le langage</h3><span class="quand-ph">L3, 2028-2029, autour de l'échange</span></div>
+<div class="prog" aria-hidden="true"></div>
+<p><b>Objectif</b> : relier la finance au machine learning et aux technologies du langage. Cette phase suppose les bases de machine learning de ta priorité 2.</p>
+<div class="mods">
+<article class="mod" data-statut="a-faire" id="f13">
+<div class="top"><span class="code">F13</span><span class="statut"></span></div>
+<h4>Le risque de crédit</h4>
+<p>Défaut, probabilité de défaut (probability of default, PD), perte en cas de défaut (loss given default, LGD), exposition au moment du défaut (exposure at default, EAD), perte attendue EL = PD × LGD × EAD ; les grilles de score traditionnelles (scorecards).</p>
+<dl><dt>Maths</dt><dd>probabilités, espérance</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f14">
+<div class="top"><span class="code">F14</span><span class="statut"></span></div>
+<h4>Le scoring par apprentissage automatique</h4>
+<p>Régression logistique, métriques (matrice de confusion, AUC), données alternatives (téléphone, paiements), équité (fairness), explicabilité ; le cadre légal : le règlement européen sur l'IA (AI Act) classe le scoring de crédit des particuliers parmi les systèmes à haut risque.</p>
+<dl><dt>Maths</dt><dd>algèbre linéaire, optimisation, statistiques</dd><dt>Durée</dt><dd>6 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f15">
+<div class="top"><span class="code">F15</span><span class="statut"></span></div>
+<h4>Fraude et lutte contre le blanchiment</h4>
+<p>Anti-money laundering (AML) : détection d'anomalies, classes déséquilibrées, connaissance du client, vérification d'identité.</p>
+<dl><dt>Maths</dt><dd>probabilités, statistiques</dd><dt>Durée</dt><dd>4 h</dd></dl>
+</article>
+<article class="mod" data-statut="a-faire" id="f16">
+<div class="top"><span class="code">F16</span><span class="statut"></span></div>
+<h4>Le langage au service de l'inclusion financière</h4>
+<p>Interfaces vocales et SMS en langues locales, assistants d'éducation financière, analyse des SMS de transaction, détection d'arnaques ; évaluer un tel système et lui poser des garde-fous (montants, chiffres, conseils).</p>
+<dl><dt>Maths</dt><dd>NLP</dd><dt>Durée</dt><dd>6 h</dd></dl>
+</article>
+<article class="mod proj" data-statut="a-faire" id="p3">
+<div class="top"><span class="code">P3</span><span class="statut"></span></div>
+<h4>Projet : classifieur d'arnaques par SMS</h4>
+<p>D'abord sur un jeu de données public en anglais, puis sur un petit corpus que tu crées toi-même dans une langue peu dotée, le wolof par exemple, dans le prolongement de ton Wolof NLP Toolkit. Uniquement des messages publics ou écrits par toi, jamais de vrais SMS d'autres personnes.</p>
+<dl><dt>Quand</dt><dd>phase 3</dd></dl>
+</article>
+<article class="mod proj" data-statut="a-faire" id="p4">
+<div class="top"><span class="code">P4</span><span class="statut"></span></div>
+<h4>Projet : assistant vocal d'éducation financière</h4>
+<p>Un prototype dans une langue peu dotée, où les calculs sont faits par du code testé (celui de P1) et où le modèle de langage est seulement chargé d'expliquer.</p>
+<dl><dt>Quand</dt><dd>horizon master</dd></dl>
+</article>
+</div>
+<p class="lbl">Critères de sortie</p>
+<ul class="crit">
+<li><input type="checkbox" disabled><span>tu entraînes et évalues un modèle de scoring sur un jeu de données public, et tu mesures ses biais ;</span></li>
+<li><input type="checkbox" disabled><span>tu expliques à un non-spécialiste comment un modèle de scoring peut discriminer sans jamais utiliser le genre ou l'origine ;</span></li>
+<li><input type="checkbox" disabled><span>P3 est publié, avec une fiche qui décrit le jeu de données et ses limites (data card).</span></li>
+</ul>
+</section>
+
+<!-- Phase 4 -->
+<section class="phase" id="phase-4">
+<div class="phase-head"><h3>5.4 Phase 4 : la spécialisation</h3><span class="quand-ph">master</span></div>
+<p>Elle dépendra du master choisi. Les pistes : l'économie du développement et l'évaluation d'impact, la réglementation des fintechs (bacs à sable réglementaires, en anglais regulatory sandboxes), la lecture des comptes d'une institution de microfinance, et les bases de la finance de marché si un poste l'exige.</p>
+</section>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="semaine">
+<h2><span class="num">6</span>La semaine type et le protocole d'un module</h2>
+<h3>6.1 La semaine type (L1)</h3>
+<div class="tw"><table class="stack">
+<thead><tr><th>Quand</th><th>Durée</th><th>Activité</th></tr></thead>
+<tbody>
+<tr><td>Un créneau</td><td data-label="Durée">60 min</td><td data-label="Activité">une partie du module en cours, crayon en main</td></tr>
+<tr><td>Un autre jour</td><td data-label="Durée">20 min</td><td data-label="Activité">les questions « Vérifie-toi », l'entraînement corrigé, le glossaire</td></tr>
+<tr><td>Les trajets</td><td data-label="Durée">0 min en plus</td><td data-label="Activité">un épisode du podcast du CGAP, ou un chapitre de lecture pour F05 et F06</td></tr>
+</tbody>
+</table></div>
+<p>Total : environ 1 h 20 de travail délibéré par semaine. Un module prend donc trois à quatre semaines.</p>
+<h3>6.2 Le protocole d'un module</h3>
+<ol>
+<li>Lis le cours section par section, et refais chaque exemple sur papier avant de lire la suite.</li>
+<li>Réponds aux questions « Vérifie-toi » avant de cliquer.</li>
+<li>Fais l'entraînement corrigé jusqu'à tout réussir.</li>
+<li>Réponds par écrit aux trois questions de fin de module, et envoie-les-moi.</li>
+<li>Ajoute les termes du module à la page de glossaire de ton site.</li>
+<li>Passe la carte du module au statut « fait » et ajoute une ligne au journal de la partie 8.</li>
+</ol>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="ressources">
+<h2><span class="num">7</span>Les ressources</h2>
+<p>Toutes gratuites, sauf les livres, à emprunter à la BU si elle les a.</p>
+<div class="tw"><table class="stack">
+<thead><tr><th>Ressource</th><th>Pour</th><th>Pourquoi</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td><b>La finance pour tous</b> (lafinancepourtous.com, Institut pour l'éducation financière du public)</td><td data-label="Pour">les bases, en français</td><td data-label="Pourquoi">des fiches claires sur le crédit, l'épargne et les taux</td><td data-label="Quand">F01 à F04</td></tr>
+<tr><td><b>Mes questions d'argent</b> (mesquestionsdargent.fr, Banque de France)</td><td data-label="Pour">les bases, en français</td><td data-label="Pourquoi">le portail public d'éducation financière, utile pour le TAEG et le crédit en France</td><td data-label="Quand">F01 à F04</td></tr>
+<tr><td><b>Khan Academy</b>, économie et finance</td><td data-label="Pour">compléter</td><td data-label="Pourquoi">des vidéos courtes, à prendre comme complément, pas comme parcours</td><td data-label="Quand">F01, F04, F06</td></tr>
+<tr><td>Stuart Rutherford, <i>The Poor and Their Money</i></td><td data-label="Pour">les ménages modestes</td><td data-label="Pourquoi">un petit livre fondateur sur la façon dont les pauvres épargnent et empruntent</td><td data-label="Quand">F05</td></tr>
+<tr><td>Daryl Collins, Jonathan Morduch, Stuart Rutherford et Orlanda Ruthven, <i>Portfolios of the Poor</i></td><td data-label="Pour">les ménages modestes</td><td data-label="Pourquoi">les carnets financiers tenus pendant un an par des centaines de ménages en Inde, au Bangladesh et en Afrique du Sud</td><td data-label="Quand">F05</td></tr>
+<tr><td>Abhijit Banerjee et Esther Duflo, <i>Repenser la pauvreté</i> (<i>Poor Economics</i>)</td><td data-label="Pour">l'économie de la pauvreté</td><td data-label="Pourquoi">le microcrédit, l'épargne et l'assurance, vus à travers des études de terrain</td><td data-label="Quand">F05, F09</td></tr>
+<tr><td>David Roodman, <i>Due Diligence</i></td><td data-label="Pour">la critique de la microfinance</td><td data-label="Pourquoi">ce que la microfinance a tenu, et ce qu'elle n'a pas tenu</td><td data-label="Quand">F09</td></tr>
+<tr><td>MIT OpenCourseWare, <b>14.73 The Challenges of Global Poverty</b> (Banerjee et Duflo)</td><td data-label="Pour">un cours complet</td><td data-label="Pourquoi">les cours et les lectures, en accès libre</td><td data-label="Quand">phase 2</td></tr>
+<tr><td><b>Global Findex</b> (Banque mondiale)</td><td data-label="Pour">les données</td><td data-label="Pourquoi">la base de données de référence, téléchargeable</td><td data-label="Quand">F07, P2</td></tr>
+<tr><td><b>CGAP</b> (cgap.org) et son podcast <i>Inclusive Finance Frontiers</i></td><td data-label="Pour">l'actualité du secteur</td><td data-label="Pourquoi">le centre de référence de la finance inclusive</td><td data-label="Quand">toute l'année</td></tr>
+<tr><td><b>GSMA</b>, <i>State of the Industry Report on Mobile Money</i> (annuel)</td><td data-label="Pour">le mobile money</td><td data-label="Pourquoi">les chiffres et les tendances du secteur</td><td data-label="Quand">F08</td></tr>
+<tr><td>Les <b>banques centrales</b> : BCEAO pour l'UEMOA, Bank Indonesia, Bangko Sentral ng Pilipinas, Bank Negara Malaysia</td><td data-label="Pour">les politiques publiques</td><td data-label="Pourquoi">leurs stratégies nationales d'inclusion financière</td><td data-label="Quand">F06, F08</td></tr>
+<tr><td><b>J-PAL</b>, synthèses pour les politiques publiques (policy insights)</td><td data-label="Pour">les preuves</td><td data-label="Pourquoi">ce que les essais randomisés disent du microcrédit et de l'épargne</td><td data-label="Quand">F09</td></tr>
+<tr><td>Naeem Siddiqi, <i>Intelligent Credit Scoring</i></td><td data-label="Pour">le scoring</td><td data-label="Pourquoi">le scoring tel qu'il se pratique dans les banques</td><td data-label="Quand">F13, F14</td></tr>
+<tr><td>Kaggle, <i>Home Credit Default Risk</i></td><td data-label="Pour">s'entraîner sur des données</td><td data-label="Pourquoi">un jeu de données public de scoring, centré sur des emprunteurs peu ou pas bancarisés</td><td data-label="Quand">F14</td></tr>
+<tr><td>UCI, <i>SMS Spam Collection</i></td><td data-label="Pour">les arnaques par SMS</td><td data-label="Pourquoi">un jeu de données public, point de départ de P3</td><td data-label="Quand">F16, P3</td></tr>
+<tr><td><code>numpy-financial</code> (Python)</td><td data-label="Pour">coder</td><td data-label="Pourquoi">les fonctions financières classiques, pour vérifier tes propres fonctions</td><td data-label="Quand">P1</td></tr>
+</tbody>
+</table></div>
+<div class="box nts">
+<p class="lbl">Les ressources à éviter</p>
+<p>Les chaînes et les formations « trading », « investir en crypto », « liberté financière ». Ce n'est pas le même domaine, et la qualité y est très inégale.</p>
+</div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="suivi">
+<h2><span class="num">8</span>Le suivi</h2>
+<div class="resume" id="resume"><p>Ta progression s'affiche ici : elle se calcule à partir du statut des cartes de la partie 5.</p></div>
+<h3>Le journal</h3>
+<p>Une ligne par module terminé, et une ligne quand quelque chose bloque.</p>
+<div class="tw"><table class="stack">
+<thead><tr><th>Date</th><th>Module</th><th>Entraînement</th><th>Ce qui a coincé</th></tr></thead>
+<tbody>
+<!-- Ajoute tes lignes ici, la plus récente en haut. -->
+<tr><td>13/11/2026</td><td data-label="Module">parcours</td><td data-label="Entraînement">aucun</td><td data-label="Ce qui a coincé">création du parcours et du module F01</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="sources">
+<h3>Sources des chiffres de la partie 2</h3>
+<ul class="sources">
+<li><a href="https://www.worldbank.org/en/publication/globalfindex">Banque mondiale, Global Findex</a></li>
+<li><a href="https://www.findevgateway.org/data/global-findex-database">FinDev Gateway, The Global Findex Database</a> : 79 %, 75 %, 1,3 milliard, les huit pays</li>
+<li><a href="https://www.cgap.org/research/podcast/whats-next-for-financial-inclusion-unpacking-findex-2025">CGAP, What's Next for Financial Inclusion? Unpacking Findex 2025</a></li>
+<li><a href="https://www.biia.com/?p=123700">BIIA, résumé du Global Findex 2025</a> : l'Afrique subsaharienne et le mobile money</li>
+<li><a href="https://fxcintel.com/research/reports/ct-world-bank-global-findex-2025-remittances">FXC Intelligence, Global Findex 2025 and remittances</a> : 15 % des adultes avec un compte de mobile money</li>
+<li><a href="https://www.betterthancash.org/news/beyond-access-from-accounts-to-opportunity">Better Than Cash Alliance, Beyond Access: From Accounts to Opportunity</a> : 42 % de paiements numériques aux commerçants</li>
+<li><a href="https://corporate.review.visa.com/en/sites/visa-economic-empowerment-institute/world-bank-global-findex-2025-insight.html">Visa Economic Empowerment Institute, Global Findex 2025 insight</a> : le manque de confiance financière</li>
+</ul>
+</section>
+
+</main>
+
+<footer>Parcours de finance, version du 13 novembre 2026. Awa est un personnage fictif. Paris 8, 2026-2027.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var root = document.querySelector(".parcours");
+  if (!root) return;
+  var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+  var mods = root.querySelectorAll(".mod:not(.proj)"), projs = root.querySelectorAll(".mod.proj");
+  function done(el){ return el.getAttribute("data-statut") === "fait"; }
+  function count(list){ var n = 0; each(list, function(el){ if (done(el)) n++; }); return n; }
+
+  /* la prochaine étape : le premier module qui n'est pas fait */
+  var next = null;
+  each(mods, function(m){ if (!next && !done(m)) next = m; });
+  if (next) next.classList.add("next");
+
+  /* une barre de progression par phase */
+  each(root.querySelectorAll(".phase[data-phase]"), function(ph){
+    var ms = ph.querySelectorAll(".mod:not(.proj)"), ps = ph.querySelectorAll(".mod.proj");
+    var d = count(ms), t = ms.length, box = ph.querySelector(".prog");
+    if (!box || !t) return;
+    var txt = d + " module" + (d > 1 ? "s" : "") + " sur " + t;
+    if (ps.length) txt += ", " + count(ps) + " projet" + (count(ps) > 1 ? "s" : "") + " sur " + ps.length;
+    box.innerHTML = "<span class='bar'><i style='width:" + Math.round(d / t * 100) + "%'></i></span><span>" + txt + "</span>";
+  });
+
+  /* le résumé de la partie 8 */
+  var res = root.querySelector("#resume");
+  if (res){
+    var dm = count(mods), dp = count(projs), h = "";
+    h += "<p><span class='big'>" + dm + " / " + mods.length + "</span> modules terminés, " + dp + " / " + projs.length + " projets.</p>";
+    if (next){
+      var code = next.querySelector(".code"), title = next.querySelector("h4");
+      h += "<p>Prochaine étape : <a href='#" + next.id + "'>" + (code ? code.textContent : "") + ", " + (title ? title.textContent : "") + "</a>.</p>";
+    } else {
+      h += "<p>Tous les modules sont faits : il est temps de réviser ce parcours pour le master.</p>";
+    }
+    res.innerHTML = h;
+  }
+})();
+</script>
+</body>
+</html>
