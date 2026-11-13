@@ -14,6 +14,12 @@ export const themes = [
           { titre: 'Finance : le parcours vers l\'inclusion financière', href: '/cours/finance-00-parcours.html' },
         ],
       },
+      {
+        titre: 'Les bases',
+        contenus: [
+          { titre: 'Pourcentages et intérêts, depuis le tout début', href: '/cours/finance-f01-pourcentages-et-interets.html' },
+        ],
+      },
     ],
   },
   {
