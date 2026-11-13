@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pourcentages et intérêts, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:760px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:760px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:'STIX Two Text','Cambria Math',serif}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+sup,sub{line-height:0;font-size:.72em}
+.mr{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.1em}
+.eq{font-family:'STIX Two Text','Cambria Math','Times New Roman',serif;font-size:1.3rem;text-align:center;margin:18px 0;padding:6px 0;overflow-x:auto;line-height:1.6}
+.q{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.85em;margin:0 .12em}
+.q>span:first-child{border-bottom:1.2px solid currentColor;padding:0 .15em .05em}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em;background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.92rem;word-break:normal}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 12px}
+figure svg{display:block;width:100%;max-width:460px;height:auto;margin:0 auto}
+figcaption{font-size:.92rem;color:var(--muted);margin-top:10px;text-align:center}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.n td,table.n th{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.n td:first-child,table.n th:first-child{text-align:left}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:'STIX Two Text',serif}
+.blk a:hover{border-color:var(--blue)}
+.sym{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.sym b{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.2rem;text-align:center;min-width:1.8em;color:var(--blue)}
+.steps{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:1.1em}
+.redac{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:10px 16px;margin:16px 0}
+.redac p{margin:6px 0}
+.note{font-size:.92rem;color:var(--muted)}
+/* SVG */
+svg text{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:14px;fill:var(--ink)}
+svg text.s{font-size:12px}
+svg text.b{font-weight:700}
+svg text.tb{fill:var(--blue)} svg text.tr{fill:var(--red)} svg text.tg{fill:var(--green)} svg text.tm{fill:var(--muted)}
+svg text.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+.st{stroke:var(--ink);stroke-width:2;fill:none}
+.sb{stroke:var(--blue);stroke-width:2.5;fill:none}
+.sr{stroke:var(--red);stroke-width:2.5;fill:none}
+.sg{stroke:var(--green);stroke-width:2.5;fill:none}
+.sm{stroke:var(--line);stroke-width:1;fill:none}
+.sk{stroke:var(--muted);stroke-width:1.2;fill:none}
+.dash{stroke-dasharray:5 4}
+.fi{fill:var(--ink)}.fb{fill:var(--blue)}.fr{fill:var(--red)}.fg{fill:var(--green)}.fm{fill:var(--muted)}
+/* outils */
+.widget .lbl{margin-bottom:6px}
+.widget label{font-weight:700;display:block;margin:10px 0 2px}
+.widget label .val{font-weight:400;color:var(--blue);font-family:'STIX Two Text','Cambria Math',serif;margin-left:6px}
+.widget input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.field{width:100%;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.15rem;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:44px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 14px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.presets button{font:inherit;font-size:.9rem;padding:6px 12px;min-height:36px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--green)}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.seg button{font:inherit;font-size:.92rem;padding:6px 12px;min-height:38px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--blue);background:var(--soft-b);color:var(--blue);font-weight:700}
+.readout{background:var(--paper);border-radius:8px;padding:6px 14px;margin:12px 0;font-size:.98rem}
+.readout>div{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 14px;padding:6px 0;border-top:1px solid var(--line)}
+.readout>div:first-child{border-top:0}
+.readout b{font-weight:700}
+.readout span{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.08rem;text-align:right;margin-left:auto}
+.readout .k{color:var(--red);font-weight:600}
+.readout .s{color:var(--blue);font-weight:600}
+.tool-err{color:var(--red);font-weight:700;margin:8px 0}
+.tool-note{font-size:.93rem;color:var(--muted);margin:6px 0}
+.chart{background:var(--paper);border-radius:8px;padding:8px 6px;margin:12px 0}
+.chart svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center;font-size:.9rem;margin-top:4px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+.legend .lk i{border-color:var(--red)} .legend .ls i{border-color:var(--blue)} .legend .ld i{border-top:2px dashed var(--muted)}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.cmp>div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px 14px}
+.cmp>div.flat{border-color:var(--red)}.cmp>div.deg{border-color:var(--green)}
+.cmp h5{margin:0 0 6px;font-size:1rem}
+.cmp .flat h5{color:var(--red)}.cmp .deg h5{color:var(--green)}
+.cmp p{margin:4px 0;font-size:.97rem}
+.cmp p span{font-family:'STIX Two Text','Cambria Math',serif;font-size:1.06rem;font-weight:600}
+.bar{height:14px;border-radius:7px;margin:4px 0 2px;min-width:4px}
+.bar.flat{background:var(--red)}.bar.deg{background:var(--green)}
+.verdict{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:1rem}
+.verdict p{margin:4px 0}
+.verdict.ok{background:var(--soft-g)}
+.verdict.ko{background:var(--soft-r)}
+.verdict.mid{background:var(--soft-a)}
+.verdict.info{background:var(--soft-b)}
+details.more{margin:10px 0}
+details.more>summary{color:var(--blue);cursor:pointer;font-size:.95rem;padding:4px 0}
+details.more .tw{max-height:360px;overflow:auto}
+/* questions guidées */
+.mq{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+.mq-ok>:first-child{margin-top:0}.mq-ok>:last-child{margin-bottom:0}
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.drill .mq{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0 6px;margin:0;background:transparent}
+/* entraînement */
+.ex-list{display:grid;gap:12px;margin:14px 0}
+.ex-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.ex-item[data-ok="1"]{border-color:var(--green)}
+.ex-q{margin:0 0 8px;font-weight:700}
+.ex-n{color:var(--margin);font-family:'STIX Two Text','Cambria Math',serif;margin-right:6px}
+.ex-tag{font-size:.75rem;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--soft-b);color:var(--blue);margin-left:8px;white-space:nowrap}
+.ex-in{display:flex;flex-wrap:wrap;gap:8px}
+.ex-in input{flex:1 1 180px;min-width:0;font-family:'STIX Two Text','Cambria Math',serif;font-size:1.1rem;padding:6px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px}
+.ex-in button{font:inherit;font-weight:700;border:1.5px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 16px;min-height:42px;cursor:pointer}
+.ex-in button:hover{background:var(--soft-b)}
+.ex-fb{margin-top:8px}
+.ex-fb:empty{display:none}
+details.hint{margin:6px 0}
+details.hint>summary{color:var(--blue);cursor:pointer;font-size:.95rem;padding:4px 0}
+details.hint>div{background:var(--soft-b);border-radius:8px;padding:8px 12px;margin-top:4px;font-size:.97rem}
+.ex-score{background:var(--soft-g);border-radius:10px;padding:8px 14px;font-weight:700}
+.ex-score:empty{display:none}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:760px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+</style>
+</head>
+<body>
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Finance pour l'inclusion, module F01</p>
+<h1>Pourcentages et intérêts, depuis le tout début<small>Calculer ce que rapporte une épargne et ce que coûte un crédit, avec les suites de ton cours de maths.</small></h1>
+<p class="lede">Tout produit financier répond à une seule question : combien coûte le temps ? Une épargne, un crédit, un microcrédit, une avance d'argent par téléphone : à chaque fois, quelqu'un donne de l'argent aujourd'hui contre plus d'argent demain. Ce cours part des pourcentages du collège, construit les intérêts simples et composés comme des suites arithmétiques et géométriques, puis montre comment un taux affiché peut cacher un coût presque deux fois plus élevé.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Crayon, feuille et calculatrice.</b> En finance, la calculatrice est normale. Mais pose toujours le calcul avant de taper, comme on écrit le test avant le code.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b> Une erreur ici ne coûte rien.</li>
+<li><b>Les quatre outils</b> (sections 1.5, 4.4, 5.4 et 6.3) détaillent les étapes de n'importe quel calcul que tu leur donnes. Sers-t'en pour vérifier, pas pour remplacer ton calcul.</li>
+<li><b>L'entraînement de la section 7</b> corrige ta réponse et reconnaît les erreurs les plus fréquentes.</li>
+<li><b>Rythme conseillé :</b> sections 1 à 3 à une première séance, sections 4 et 5 à une deuxième, sections 6 à 8 à une troisième. Environ 4 heures en tout.</li>
+</ul>
+</div>
+<div class="box nts">
+<p class="lbl">Ce que tu as déjà vu</p>
+<p>Un pourcentage est une fraction : si les fractions te gênent encore, la section 1 de ton cours <a href="https://claude.ai/artifact/67x1rsnNRPF5BqmhdPheid">Fractions et racines, depuis le tout début</a> suffit. Les intérêts simples et composés sont des suites arithmétiques et géométriques : si ton cours de suites numériques ne les a pas encore traitées, ce n'est pas grave, les sections 3.2 et 4.2 les reconstruisent depuis le début.</p>
+</div>
+<div class="box">
+<p class="lbl">Où ce module se place</p>
+<p>C'est le premier module de ton parcours de finance (la page <a href="finance-00-parcours.html">« Finance : le parcours vers l'inclusion financière »</a> de ton site). Il prépare F02, actualiser (ce que vaut aujourd'hui une somme promise pour plus tard), et F03, le coût réel d'un crédit. Les deux réutilisent tout ce qui suit.</p>
+</div>
+<h3>Où trouver quoi</h3>
+<ul class="blk">
+<li><a href="#p1"><b>1</b>Les pourcentages</a></li>
+<li><a href="#p2"><b>2</b>Ce qu'est un intérêt</a></li>
+<li><a href="#p3"><b>3</b>Les intérêts simples</a></li>
+<li><a href="#p4"><b>4</b>Les intérêts composés</a></li>
+<li><a href="#p5"><b>5</b>La période compte</a></li>
+<li><a href="#p6"><b>6</b>Le piège du taux flat</a></li>
+<li><a href="#p7"><b>7</b>Entraînement corrigé</a></li>
+<li><a href="#p8"><b>8</b>Bilan et glossaire</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Les pourcentages</h2>
+
+<h3>1.1 « Pour cent » veut dire « sur cent »</h3>
+<p>Le symbole % se lit « pour cent », c'est-à-dire « sur cent ». 5 % veut dire 5 sur 100 : la fraction 5/100, ou le nombre décimal 0,05.</p>
+<p class="eq">t % = <span class="q"><span>t</span><span>100</span></span></p>
+<p>Un pourcentage n'est donc pas une sorte spéciale de nombre : c'est une fraction de dénominateur 100, écrite autrement. Toutes les règles des fractions s'appliquent. Dans les calculs, on l'écrit presque toujours sous forme décimale.</p>
+<div class="tw"><table class="n">
+<tr><th>Pourcentage</th><th>Fraction</th><th>Décimal</th></tr>
+<tr><td>50 %</td><td>1/2</td><td>0,5</td></tr>
+<tr><td>25 %</td><td>1/4</td><td>0,25</td></tr>
+<tr><td>10 %</td><td>1/10</td><td>0,1</td></tr>
+<tr><td>5 %</td><td>1/20</td><td>0,05</td></tr>
+<tr><td>1 %</td><td>1/100</td><td>0,01</td></tr>
+<tr><td>0,5 %</td><td>1/200</td><td>0,005</td></tr>
+<tr><td>100 %</td><td>1</td><td>1</td></tr>
+<tr><td>150 %</td><td>3/2</td><td>1,5</td></tr>
+</table></div>
+
+<h4>Prendre t % d'une quantité</h4>
+<p>« t % de V » veut dire <span class="mr">t/100 × V</span> : le mot « de » se traduit par une multiplication, comme dans « la moitié de 40 ».</p>
+<div class="steps">
+<span class="op"></span><span>15 % de 40 000 FCFA = 0,15 × 40 000 = 6 000 FCFA</span>
+</div>
+
+<h4>Exprimer une part en pourcentage</h4>
+<p>Dans l'autre sens, pour dire quelle part une quantité p représente d'un total T, on calcule p/T, puis on multiplie par 100. Dans un groupe d'épargne de 12 membres, 3 ont un compte en banque :</p>
+<div class="steps">
+<span class="op"></span><span>3/12 = 0,25 = 25 %</span>
+</div>
+
+<h3>1.2 Augmenter et diminuer : le coefficient multiplicateur</h3>
+<p>Un salaire de 1 500 € augmente de 4 %. Le calcul naturel se fait en deux temps : l'augmentation vaut 0,04 × 1 500 = 60 €, et on l'ajoute, ce qui donne 1 560 €. On peut le faire en une seule multiplication :</p>
+<div class="steps">
+<span class="op"></span><span>V + V × 0,04 = V × (1 + 0,04) = V × 1,04</span>
+<span class="why">On factorise par V : c'est la distributivité de ton cours de calcul, lue de droite à gauche.</span>
+<span class="op"></span><span>1 500 × 1,04 = 1 560 €</span>
+</div>
+<div class="box key">
+<p class="lbl">Le coefficient multiplicateur (growth factor)</p>
+<p>Augmenter de t %, c'est multiplier par <span class="mr">1 + t/100</span>.</p>
+<p>Diminuer de t %, c'est multiplier par <span class="mr">1 − t/100</span>.</p>
+</div>
+<div class="tw"><table class="n">
+<tr><th>Variation</th><th>Coefficient</th></tr>
+<tr><td>+4 %</td><td>× 1,04</td></tr>
+<tr><td>+50 %</td><td>× 1,5</td></tr>
+<tr><td>+100 %</td><td>× 2</td></tr>
+<tr><td>−20 %</td><td>× 0,8</td></tr>
+<tr><td>−50 %</td><td>× 0,5</td></tr>
+<tr><td>−100 %</td><td>× 0</td></tr>
+</table></div>
+<p>Le tableau se lit aussi à l'envers : un coefficient supérieur à 1 est une hausse, un coefficient inférieur à 1 est une baisse. Multiplier par 1,25, c'est augmenter de 25 % ; multiplier par 0,7, c'est baisser de 30 %.</p>
+<div class="box nts">
+<p class="lbl">Pourquoi c'est si utile</p>
+<p>Le coefficient remplace un calcul en deux temps par une seule multiplication. Et des multiplications, ça s'enchaîne. C'est exactement ce dont on aura besoin pour les intérêts composés.</p>
+</div>
+
+<h3>1.3 Des variations successives se multiplient</h3>
+<p>Un prix augmente de 10 %, puis encore de 10 %. A-t-il augmenté de 20 % ? Calcule avec 100 € : <span class="mr">100 × 1,1 = 110</span>, puis <span class="mr">110 × 1,1 = 121</span>. Il a augmenté de 21 %.</p>
+<p>Le deuxième 10 % ne s'applique pas aux 100 € de départ, mais aux 110 € : il ajoute 11 €, pas 10. L'euro de plus, ce sont les 10 % des 10 € gagnés la première fois. <b>Retiens bien cette phrase : c'est toute l'idée des intérêts composés.</b></p>
+<div class="box key">
+<p class="lbl">Variations successives</p>
+<p>On multiplie les coefficients : <span class="mr">(1 + t<sub>1</sub>) × (1 + t<sub>2</sub>) × …</span></p>
+<p>On n'additionne jamais les pourcentages.</p>
+</div>
+<div class="box warn">
+<p class="lbl">+50 % puis −50 % ne ramènent pas au départ</p>
+<p><span class="mr">100 × 1,5 × 0,5 = 75</span> : on a perdu 25 %. La baisse de 50 % porte sur 150, elle enlève 75 ; la hausse portait sur 100, elle n'avait ajouté que 50.</p>
+</div>
+
+<h3>1.4 Revenir en arrière, et les points de pourcentage</h3>
+<h4>Retrouver la valeur de départ</h4>
+<p>Une épargne vaut 1 260 € après une hausse de 5 %. Combien valait-elle avant ? Le réflexe « j'enlève 5 % » donne <span class="mr">1 260 × 0,95 = 1 197 €</span>, et c'est faux : les 5 % portaient sur l'ancienne valeur, pas sur la nouvelle. On remonte la flèche en divisant :</p>
+<div class="steps">
+<span class="op"></span><span>avant × 1,05 = 1 260</span>
+<span class="op">⇔</span><span>avant = 1 260 / 1,05 = 1 200 €</span>
+<span class="why">Vérification : 1 200 × 1,05 = 1 260.</span>
+</div>
+<p>Défaire une variation, c'est multiplier par l'inverse de son coefficient. Défaire une baisse de 20 %, c'est multiplier par <span class="mr">1/0,8 = 1,25</span> : il faut une hausse de 25 %.</p>
+
+<h4>Le taux d'évolution</h4>
+<p>Pour mesurer la variation entre une valeur de départ V<sub>d</sub> et une valeur d'arrivée V<sub>a</sub> :</p>
+<p class="eq">taux d'évolution = <span class="q"><span>V<sub>a</sub> − V<sub>d</sub></span><span>V<sub>d</sub></span></span></p>
+<p>On divise toujours par la valeur de départ. De 80 € à 92 € : <span class="mr">(92 − 80)/80 = 12/80 = 0,15</span>, soit une hausse de 15 %.</p>
+
+<h4>Points de pourcentage (percentage points)</h4>
+<p>Quand la grandeur mesurée est elle-même un pourcentage, il y a deux façons de parler de sa variation, que la presse confond souvent. D'après le Global Findex 2025 de la Banque mondiale, en Afrique subsaharienne, la part des adultes qui ont un compte est passée de 49 % en 2021 à 58 % en 2024.</p>
+<ul>
+<li><b>en points de pourcentage</b> : 58 − 49 = 9 points ;</li>
+<li><b>en pourcentage</b> : (58 − 49)/49 ≈ 0,184, soit une hausse de 18,4 %.</li>
+</ul>
+<p>Les deux phrases sont justes. Ce qui est faux, c'est de dire « une hausse de 9 % ». Tu liras des points de pourcentage dans tous les rapports sur l'inclusion financière.</p>
+
+<h3 id="outil-var">1.5 L'outil : enchaîner des variations</h3>
+<div class="box widget" id="pv">
+<p>Tape une suite de variations en pour cent, séparées par des virgules. L'outil multiplie les coefficients, suit 100 € pas à pas, et calcule la variation qui ramène au départ.</p>
+<input class="field" id="pv-in" type="text" autocomplete="off" spellcheck="false" value="+10, -10" aria-label="Les variations, en pour cent">
+<div class="presets" id="pv-pre">
+<button type="button" data-v="+10, +10">+10, +10</button>
+<button type="button" data-v="+50, -50">+50, −50</button>
+<button type="button" data-v="-20, +25">−20, +25</button>
+<button type="button" data-v="+5, +5, +5, +5, +5">cinq fois +5</button>
+<button type="button" data-v="+100, -50">+100, −50</button>
+<button type="button" data-v="-30, -30">−30, −30</button>
+</div>
+<div id="pv-out" aria-live="polite"></div>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 1)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien valent 15 % de 60 000 FCFA ?</p>
+<div class="mq-c"><button type="button" data-fb="Tu as divisé 60 000 par 15. « 15 % de V », c'est 0,15 × V.">4 000 FCFA</button><button type="button">9 000 FCFA</button><button type="button" data-fb="Vérifie la place de la virgule : 0,15 × 60 000 = 9 000.">900 FCFA</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">0,15 × 60 000 = 9 000 FCFA.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Un loyer augmente de 10 %, puis encore de 10 %. Au total, il a augmenté de :</p>
+<div class="mq-c"><button type="button" data-fb="Le second +10 % s'applique au loyer déjà augmenté : × 1,1 × 1,1 = × 1,21.">20 %</button><button type="button" data-fb="Deux hausses de 10 % font plus qu'une : calcule 1,1 × 1,1.">11 %</button><button type="button">21 %</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1,1 × 1,1 = 1,21 : une hausse de 21 %.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Après une baisse de 20 %, quelle hausse ramène au prix de départ ?</p>
+<div class="mq-c"><button type="button">25 %</button><button type="button" data-fb="Essaie avec 100 : 100 → 80 → 96. La hausse de 20 % porte sur 80, elle ne rajoute que 16.">20 %</button><button type="button" data-fb="Il faut multiplier par 1/0,8. Calcule cette fraction.">16 %</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1/0,8 = 1,25 : il faut une hausse de 25 %. Vérification : 80 × 1,25 = 100.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">La part d'adultes qui ont un compte passe de 40 % à 50 %. Elle a augmenté de :</p>
+<div class="mq-c"><button type="button" data-fb="10, ce sont des points de pourcentage. En pourcentage, la hausse vaut 10/40.">10 %</button><button type="button">10 points de pourcentage, soit une hausse de 25 %</button><button type="button" data-fb="La différence entre 50 et 40 vaut 10 points, pas 25.">25 points de pourcentage</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">50 − 40 = 10 points, et 10/40 = 0,25 : une hausse de 25 %.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>Ce qu'est un intérêt</h2>
+
+<h3>2.1 Le loyer de l'argent</h3>
+<p>Quand tu loues un scooter, tu le rends à la fin, et tu paies en plus un loyer pour l'avoir utilisé. Un prêt, c'est la location d'une somme d'argent : l'emprunteur rend la somme, plus un loyer, l'<b>intérêt</b> (<i>interest</i>).</p>
+<p>Pourquoi le prêteur demande-t-il ce loyer ? Pour trois raisons, qui reviendront tout au long du parcours :</p>
+<ol>
+<li><b>il se prive de son argent</b> : pendant le prêt, il ne peut ni le dépenser ni le placer ailleurs. Ce renoncement a un prix, le <b>coût d'opportunité</b> (<i>opportunity cost</i>) ;</li>
+<li><b>il prend un risque</b> : l'emprunteur peut ne pas rembourser. C'est le <b>risque de défaut</b> (<i>default risk</i>). Plus ce risque est grand, plus le prêteur demande cher : la différence s'appelle la <b>prime de risque</b> (<i>risk premium</i>) ;</li>
+<li><b>l'argent perd de la valeur</b> : avec l'inflation, 1 000 € dans un an achèteront moins que 1 000 € aujourd'hui. Le module F04 y est consacré.</li>
+</ol>
+<div class="box nts">
+<p class="lbl">Le lien avec ton futur métier</p>
+<p>La deuxième raison est au cœur de l'exclusion financière. Une personne sans historique de crédit, sans fiche de paie et sans garantie est, pour un prêteur, un risque qu'il ne sait pas mesurer : soit il ne lui prête pas, soit il lui prête très cher. Mesurer ce risque autrement, avec d'autres données, c'est l'objet du <b>scoring de crédit</b> (<i>credit scoring</i>), un des terrains du machine learning en finance inclusive (modules F13 et F14). C'est aussi un terrain de vigilance : un modèle de scoring peut reproduire, ou cacher, une discrimination.</p>
+</div>
+
+<h3>2.2 Le vocabulaire</h3>
+<div class="box key">
+<p class="lbl">Les cinq grandeurs d'un placement ou d'un prêt</p>
+<div class="sym">
+<b>C<sub>0</sub></b><span>le <b>capital</b> (<i>principal</i>) : la somme placée ou prêtée au départ ;</span>
+<b>t</b><span>le <b>taux d'intérêt</b> (<i>interest rate</i>) <b>par période</b>, sous forme décimale : 5 % s'écrit 0,05 ;</span>
+<b>n</b><span>le <b>nombre de périodes</b> ;</span>
+<b>I</b><span>les <b>intérêts</b> : la somme payée pour l'usage du capital ;</span>
+<b>C<sub>n</sub></b><span>la <b>valeur acquise</b> (<i>future value</i>) : ce que vaut le capital après n périodes, intérêts compris.</span>
+</div>
+</div>
+<p>Un taux n'a de sens qu'avec sa période. « 3 % » ne veut rien dire ; « 3 % par an » et « 3 % par mois » sont deux prêts très différents. Prends le réflexe de toujours demander : <b>par quelle période ?</b> La section 5 montre ce qui arrive quand on oublie de poser la question.</p>
+<p>Dans toutes les formules de ce cours, t et n utilisent la même période : un taux annuel avec un nombre d'années, un taux mensuel avec un nombre de mois.</p>
+
+<h3>2.3 Le même prêt, vu des deux côtés</h3>
+<p>Awa, vendeuse de tissus, dépose 1 000 € sur un compte d'épargne qui rapporte 5 % par an. Dans un an, la banque lui devra 1 050 €. En finance, on dessine ce genre d'opération sur un <b>diagramme des flux</b> (<i>cash-flow diagram</i>) : une ligne du temps, une flèche vers le bas pour l'argent qui sort, une flèche vers le haut pour l'argent qui entre.</p>
+<figure>
+<svg viewBox="0 0 440 290" role="img" aria-label="Diagramme des flux : Awa verse 1 000 euros aujourd'hui et reçoit 1 050 euros dans un an ; la banque reçoit 1 000 euros aujourd'hui et verse 1 050 euros dans un an.">
+<defs>
+<marker id="ah-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="fr"/></marker>
+<marker id="ah-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="fg"/></marker>
+</defs>
+<text x="20" y="95" class="b">Awa</text>
+<line x1="105" y1="90" x2="418" y2="90" class="st"/><path d="M426 90l-10 -5v10z" class="fi"/>
+<line x1="150" y1="84" x2="150" y2="96" class="st"/><line x1="370" y1="84" x2="370" y2="96" class="st"/>
+<text x="150" y="74" text-anchor="middle" class="s tm">aujourd'hui</text>
+<text x="370" y="114" text-anchor="middle" class="s tm">dans 1 an</text>
+<line x1="150" y1="92" x2="150" y2="126" class="sr" marker-end="url(#ah-r)"/>
+<text x="150" y="148" text-anchor="middle" class="tr b">−1 000 €</text>
+<line x1="370" y1="88" x2="370" y2="54" class="sg" marker-end="url(#ah-g)"/>
+<text x="370" y="42" text-anchor="middle" class="tg b">+1 050 €</text>
+<text x="20" y="225" class="b">La banque</text>
+<line x1="105" y1="220" x2="418" y2="220" class="st"/><path d="M426 220l-10 -5v10z" class="fi"/>
+<line x1="150" y1="214" x2="150" y2="226" class="st"/><line x1="370" y1="214" x2="370" y2="226" class="st"/>
+<text x="150" y="244" text-anchor="middle" class="s tm">aujourd'hui</text>
+<text x="370" y="204" text-anchor="middle" class="s tm">dans 1 an</text>
+<line x1="150" y1="218" x2="150" y2="184" class="sg" marker-end="url(#ah-g)"/>
+<text x="150" y="176" text-anchor="middle" class="tg b">+1 000 €</text>
+<line x1="370" y1="222" x2="370" y2="256" class="sr" marker-end="url(#ah-r)"/>
+<text x="370" y="278" text-anchor="middle" class="tr b">−1 050 €</text>
+</svg>
+<figcaption>Le même placement vu des deux côtés : les flèches sont inversées. Les 50 € qu'Awa gagne, la banque les paie.</figcaption>
+</figure>
+<p>Une épargne et un crédit sont donc le même objet, vu de deux côtés. Quand Awa dépose de l'argent sur un compte d'épargne, c'est elle qui prête à la banque, et c'est la banque qui lui paie l'intérêt. Quand elle emprunte, les rôles s'inversent. Les formules de ce cours servent dans les deux sens : ce qu'une épargne rapporte, et ce qu'un crédit coûte.</p>
+<div class="box nts">
+<p class="lbl">Une autre façon de faire</p>
+<p>La finance islamique interdit l'intérêt fixé à l'avance (<i>riba</i>) et construit ses produits autrement, par exemple en partageant les profits et les pertes, ou en vendant un bien avec une marge connue d'avance. Elle compte beaucoup en Malaisie, en Indonésie et en Afrique de l'Ouest. Le module F11 y est consacré, et il réutilisera les calculs de ce cours pour comparer les deux approches.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Tu déposes 500 € sur un compte d'épargne. Qui paie l'intérêt ?</p>
+<div class="mq-c"><button type="button" data-fb="Sur un compte d'épargne, c'est toi qui prêtes ton argent à la banque : c'est elle qui paie le loyer.">Toi, à la banque</button><button type="button">La banque, à toi</button><button type="button" data-fb="L'intérêt est le loyer de l'argent prêté : il est payé par celui qui l'utilise, ici la banque.">Personne</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Déposer de l'argent, c'est le prêter à la banque : elle te paie l'intérêt.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Un prêt affiche « 3 % ». Quelle information manque avant tout calcul ?</p>
+<div class="mq-c"><button type="button">La période : 3 % par mois, par an ?</button><button type="button" data-fb="3 % par mois et 3 % par an sont deux prêts très différents : il manque la période.">Rien, c'est clair</button><button type="button" data-fb="Le nom du prêteur ne change pas le calcul. Ce qui manque, c'est la période du taux.">Le nom du prêteur</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Un taux n'a de sens qu'avec sa période.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Pourquoi une personne sans historique de crédit ni garantie se voit-elle souvent proposer un taux plus élevé ?</p>
+<div class="mq-c"><button type="button" data-fb="L'inflation est la même pour tous les habitants d'un pays. Ce qui change d'un emprunteur à l'autre, c'est le risque perçu.">L'inflation est plus forte pour elle</button><button type="button" data-fb="Aucune loi n'impose cela. C'est le prêteur qui ajoute une prime parce qu'il ne sait pas mesurer le risque.">La loi l'impose</button><button type="button">Le prêteur ajoute une prime de risque</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Faute d'information, le prêteur juge le risque de défaut élevé et ajoute une prime de risque.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>Les intérêts simples</h2>
+
+<h3>3.1 La règle</h3>
+<div class="box key">
+<p class="lbl">Intérêts simples (simple interest)</p>
+<p>Chaque période rapporte la même somme, <span class="mr">C<sub>0</sub> × t</span>, calculée sur le capital de départ seulement. Les intérêts déjà gagnés ne rapportent rien.</p>
+<p class="eq">I = C<sub>0</sub> × t × n &nbsp;&nbsp;&nbsp; C<sub>n</sub> = C<sub>0</sub> + C<sub>0</sub> t n = C<sub>0</sub>(1 + n t)</p>
+</div>
+<p>Awa place 1 000 € à 4 % par an, en intérêts simples, pendant 5 ans.</p>
+<div class="steps">
+<span class="op"></span><span>intérêts d'une année : 1 000 × 0,04 = 40 €</span>
+<span class="op"></span><span>intérêts sur 5 ans : I = 1 000 × 0,04 × 5 = 200 €</span>
+<span class="op"></span><span>valeur acquise : C<sub>5</sub> = 1 000 + 200 = 1 200 €</span>
+<span class="why">En une ligne : 1 000 × (1 + 5 × 0,04) = 1 000 × 1,2 = 1 200 €.</span>
+</div>
+
+<h3>3.2 Une suite arithmétique</h3>
+<p>Note C<sub>0</sub>, C<sub>1</sub>, C<sub>2</sub>… les valeurs acquises année après année : 1 000, 1 040, 1 080, 1 120… Chaque terme s'obtient en ajoutant 40 au précédent :</p>
+<p class="eq">C<sub>n+1</sub> = C<sub>n</sub> + 40</p>
+<p>Une suite où l'on passe d'un terme au suivant en ajoutant toujours le même nombre r s'appelle une <b>suite arithmétique</b> (<i>arithmetic sequence</i>) de <b>raison</b> r (<i>common difference</i>). Ici, la raison vaut <span class="mr">r = C<sub>0</sub> × t = 40</span>.</p>
+<h4>Pourquoi u<sub>n</sub> = u<sub>0</sub> + n r</h4>
+<p>Déroule la définition, comme on déroule une boucle à la main :</p>
+<div class="steps">
+<span class="op"></span><span>u<sub>1</sub> = u<sub>0</sub> + r</span>
+<span class="op"></span><span>u<sub>2</sub> = u<sub>1</sub> + r = u<sub>0</sub> + 2r</span>
+<span class="op"></span><span>u<sub>3</sub> = u<sub>2</sub> + r = u<sub>0</sub> + 3r</span>
+<span class="op"></span><span>…</span>
+<span class="op"></span><span>u<sub>n</sub> = u<sub>0</sub> + n r</span>
+<span class="why">n étapes, et chaque étape ajoute r une fois.</span>
+</div>
+<p>Avec u<sub>0</sub> = C<sub>0</sub> et r = C<sub>0</sub>t, on retrouve la formule de la section 3.1 : <span class="mr">C<sub>n</sub> = C<sub>0</sub> + n C<sub>0</sub>t</span>.</p>
+<pre class="code"><code>capital = 1000
+interet = 1000 * 0.04      # calculé une seule fois, sur le capital de départ
+for annee in range(1, 6):
+    capital = capital + interet
+    print(annee, capital)  # 1040.0, 1080.0, 1120.0, 1160.0, 1200.0</code></pre>
+<p>Une boucle qui ajoute une constante : c'est la définition même d'une suite arithmétique. Sur un graphique, les points (n, C<sub>n</sub>) sont alignés : en intérêts simples, la valeur acquise grandit en ligne droite (tu le verras sur le simulateur de la section 4.4).</p>
+
+<h3>3.3 Les durées qui ne tombent pas juste</h3>
+<p>La formule marche aussi quand n n'est pas un entier : 3 mois, c'est n = 3/12 = 0,25 an. Pour une durée en jours, on divise par le nombre de jours de l'année, et là, il faut lire le contrat : selon les usages, l'année compte 360 ou 365 jours. Les marchés monétaires de la zone euro, par exemple, comptent les jours exacts sur une année de 360 jours.</p>
+<div class="steps">
+<span class="op"></span><span>10 000 € à 6 % par an pendant 90 jours, année de 360 jours :</span>
+<span class="op"></span><span>I = 10 000 × 0,06 × <span class="q"><span>90</span><span>360</span></span> = 150 €</span>
+</div>
+
+<h3>3.4 Où l'on rencontre les intérêts simples</h3>
+<ul>
+<li>dans les placements et les prêts de moins d'un an ;</li>
+<li>dans le Livret A, en France : au cours de l'année, ses intérêts sont calculés par quinzaine, en intérêts simples. Le 31 décembre, ils sont ajoutés au capital, et ils rapportent à leur tour l'année suivante. D'une année sur l'autre, ce sont donc des intérêts composés (section 4) ;</li>
+<li>dans de nombreux microcrédits affichés « à taux flat » : on y calcule les intérêts sur le capital de départ pendant toute la durée du prêt, même quand l'emprunteur en a déjà remboursé une partie. La section 6 montre pourquoi c'est un piège.</li>
+</ul>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">1 000 € à 6 % par an en intérêts simples pendant 3 ans. Valeur acquise ?</p>
+<div class="mq-c"><button type="button">1 180 €</button><button type="button" data-fb="C'est le résultat en intérêts composés. En intérêts simples, on ajoute les mêmes 60 € chaque année.">1 191,02 €</button><button type="button" data-fb="C'est la valeur après un an seulement.">1 060 €</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 000 × (1 + 3 × 0,06) = 1 000 × 1,18 = 1 180 €.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">En intérêts simples, la suite des valeurs acquises est :</p>
+<div class="mq-c"><button type="button" data-fb="Ce sera le cas des intérêts composés (section 4). Ici, on ajoute toujours la même somme.">géométrique de raison 1 + t</button><button type="button" data-fb="On ajoute C₀ × t euros chaque période, pas t.">arithmétique de raison t</button><button type="button">arithmétique de raison C₀ × t</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Chaque période ajoute C₀ × t : c'est une suite arithmétique de raison C₀ × t.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">6 000 € à 5 % par an en intérêts simples pendant 4 mois. Combien d'intérêts ?</p>
+<div class="mq-c"><button type="button" data-fb="5 % est un taux annuel : sur 4 mois, n = 4/12, pas 1.">300 €</button><button type="button">100 €</button><button type="button" data-fb="Tu as compté 4 ans au lieu de 4 mois : n = 4/12 d'année.">1 200 €</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">6 000 × 0,05 × 4/12 = 100 €.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Les intérêts composés</h2>
+
+<h3>4.1 L'intérêt sur l'intérêt</h3>
+<p>En <b>intérêts composés</b> (<i>compound interest</i>), à la fin de chaque période, les intérêts sont ajoutés au capital : on dit qu'ils sont <b>capitalisés</b> (<i>compounded</i>). À la période suivante, ils rapportent à leur tour. Reprends les 1 000 € à 4 % par an :</p>
+<div class="tw"><table class="n">
+<tr><th>Année</th><th>Capital au début</th><th>Intérêts de l'année</th><th>Capital à la fin</th></tr>
+<tr><td>1</td><td>1 000,00</td><td>40,00</td><td>1 040,00</td></tr>
+<tr><td>2</td><td>1 040,00</td><td>41,60</td><td>1 081,60</td></tr>
+<tr><td>3</td><td>1 081,60</td><td>43,26</td><td>1 124,86</td></tr>
+<tr><td>4</td><td>1 124,86</td><td>44,99</td><td>1 169,86</td></tr>
+<tr><td>5</td><td>1 169,86</td><td>46,79</td><td>1 216,65</td></tr>
+</table></div>
+<p>La deuxième année rapporte 41,60 € au lieu de 40 € : les 40 € gagnés la première année rapportent eux aussi 4 %, soit 1,60 €. C'est la phrase de la section 1.3 : chaque pourcentage s'applique au montant déjà augmenté. Après 5 ans, Awa a 1 216,65 €, contre 1 200 € en intérêts simples.</p>
+<figure>
+<svg viewBox="0 0 440 262" role="img" aria-label="Intérêts accumulés sur 1 000 euros à 10 % par an pendant 5 ans : la part des intérêts simples augmente de 100 euros par an, la part des intérêts des intérêts grandit chaque année, de 0 à 110 euros.">
+<text x="60" y="14" class="s tm">intérêts accumulés (€)</text>
+<line x1="60" y1="200" x2="420" y2="200" class="sk"/>
+<line x1="60" y1="144.6" x2="420" y2="144.6" class="sm"/>
+<line x1="60" y1="89.2" x2="420" y2="89.2" class="sm"/>
+<line x1="60" y1="33.8" x2="420" y2="33.8" class="sm"/>
+<text x="54" y="204" text-anchor="end" class="s tm">0</text>
+<text x="54" y="148.6" text-anchor="end" class="s tm">200</text>
+<text x="54" y="93.2" text-anchor="end" class="s tm">400</text>
+<text x="54" y="37.8" text-anchor="end" class="s tm">600</text>
+<rect x="80" y="172.3" width="40" height="27.7" class="fb"/>
+<rect x="150" y="144.6" width="40" height="55.4" class="fb"/>
+<rect x="150" y="141.8" width="40" height="2.8" class="fr"/>
+<rect x="220" y="116.9" width="40" height="83.1" class="fb"/>
+<rect x="220" y="108.3" width="40" height="8.6" class="fr"/>
+<rect x="290" y="89.2" width="40" height="110.8" class="fb"/>
+<rect x="290" y="71.5" width="40" height="17.7" class="fr"/>
+<rect x="360" y="61.5" width="40" height="138.5" class="fb"/>
+<rect x="360" y="30.9" width="40" height="30.6" class="fr"/>
+<text x="100" y="166" text-anchor="middle" class="s">100</text>
+<text x="170" y="135.5" text-anchor="middle" class="s">210</text>
+<text x="240" y="102" text-anchor="middle" class="s">331</text>
+<text x="310" y="65" text-anchor="middle" class="s">464</text>
+<text x="380" y="24.5" text-anchor="middle" class="s">611</text>
+<text x="100" y="218" text-anchor="middle" class="s tm">an 1</text>
+<text x="170" y="218" text-anchor="middle" class="s tm">an 2</text>
+<text x="240" y="218" text-anchor="middle" class="s tm">an 3</text>
+<text x="310" y="218" text-anchor="middle" class="s tm">an 4</text>
+<text x="380" y="218" text-anchor="middle" class="s tm">an 5</text>
+<rect x="74" y="236" width="12" height="12" class="fb"/>
+<text x="92" y="246" class="s">intérêts simples</text>
+<rect x="224" y="236" width="12" height="12" class="fr"/>
+<text x="242" y="246" class="s">intérêts des intérêts</text>
+</svg>
+<figcaption>Le même mécanisme à 10 % par an sur 1 000 €, pour mieux le voir. En bleu, les 100 € par an des intérêts simples ; en rouge, ce que la capitalisation ajoute. La part rouge grandit chaque année : 0, 10, 31, 64, puis 111 €.</figcaption>
+</figure>
+
+<h3>4.2 Une suite géométrique</h3>
+<p>Cette fois, on passe d'une année à la suivante en multipliant toujours par le même nombre, le coefficient multiplicateur de la section 1.2 :</p>
+<p class="eq">C<sub>n+1</sub> = C<sub>n</sub> × (1 + t)</p>
+<p>Une suite où l'on passe d'un terme au suivant en multipliant toujours par le même nombre q s'appelle une <b>suite géométrique</b> (<i>geometric sequence</i>) de <b>raison</b> q (<i>common ratio</i>). Ici, q = 1 + t = 1,04.</p>
+<h4>Pourquoi u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></h4>
+<div class="steps">
+<span class="op"></span><span>u<sub>1</sub> = u<sub>0</sub> × q</span>
+<span class="op"></span><span>u<sub>2</sub> = u<sub>1</sub> × q = u<sub>0</sub> × q<sup>2</sup></span>
+<span class="op"></span><span>u<sub>3</sub> = u<sub>2</sub> × q = u<sub>0</sub> × q<sup>3</sup></span>
+<span class="op"></span><span>…</span>
+<span class="op"></span><span>u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></span>
+<span class="why">n étapes, et chaque étape multiplie par q une fois : en tout, on multiplie par q n fois, c'est-à-dire par qⁿ.</span>
+</div>
+<div class="box key">
+<p class="lbl">Valeur acquise en intérêts composés</p>
+<p class="eq">C<sub>n</sub> = C<sub>0</sub> × (1 + t)<sup>n</sup></p>
+</div>
+<div class="redac">
+<p class="lbl">La même chose, rédigée comme une démonstration</p>
+<p>Pour tout entier naturel n, notons P(n) la propriété « C<sub>n</sub> = C<sub>0</sub>(1 + t)<sup>n</sup> ».</p>
+<p><b>Initialisation.</b> C<sub>0</sub>(1 + t)<sup>0</sup> = C<sub>0</sub> × 1 = C<sub>0</sub> : P(0) est vraie.</p>
+<p><b>Hérédité.</b> Soit n un entier naturel tel que P(n) soit vraie. Alors C<sub>n+1</sub> = C<sub>n</sub>(1 + t) = C<sub>0</sub>(1 + t)<sup>n</sup>(1 + t) = C<sub>0</sub>(1 + t)<sup>n+1</sup> : P(n + 1) est vraie.</p>
+<p><b>Conclusion.</b> Par récurrence, P(n) est vraie pour tout entier naturel n.</p>
+<p class="note">C'est une démonstration par récurrence (<i>proof by induction</i>), le sujet du chapitre 6 de <i>How to Prove It</i>. Le déroulement ci-dessus en donne l'idée ; la récurrence la rend rigoureuse.</p>
+</div>
+<pre class="code"><code>capital = 1000
+for annee in range(1, 6):
+    capital = capital * 1.04  # l'intérêt porte sur le capital déjà augmenté
+    print(annee, round(capital, 2))
+
+print(round(1000 * 1.04 ** 5, 2))  # la formule directe : 1216.65</code></pre>
+<div class="box warn">
+<p class="lbl">L'argent et les nombres à virgule</p>
+<p>En Python, <code>0.1 + 0.2</code> donne <code>0.30000000000000004</code>. Les nombres à virgule (<i>float</i>) sont stockés en binaire, et 0,1 n'a pas d'écriture binaire finie, de même que 1/3 n'a pas d'écriture décimale finie. Pour un exercice, arrondir à la fin suffit. Mais un vrai logiciel financier ne stocke jamais de l'argent dans un float : il compte en centimes avec des entiers, ou il utilise le module <code>decimal</code>. Une erreur d'un centime, répétée sur un million de transactions, n'est plus une erreur d'arrondi.</p>
+</div>
+
+<h3>4.3 Simples contre composés</h3>
+<p>1 000 € placés à 5 % par an :</p>
+<div class="tw"><table class="n">
+<tr><th>Années</th><th>Intérêts simples</th><th>Intérêts composés</th><th>Écart</th></tr>
+<tr><td>1</td><td>1 050,00</td><td>1 050,00</td><td>0,00</td></tr>
+<tr><td>2</td><td>1 100,00</td><td>1 102,50</td><td>2,50</td></tr>
+<tr><td>5</td><td>1 250,00</td><td>1 276,28</td><td>26,28</td></tr>
+<tr><td>10</td><td>1 500,00</td><td>1 628,89</td><td>128,89</td></tr>
+<tr><td>20</td><td>2 000,00</td><td>2 653,30</td><td>653,30</td></tr>
+<tr><td>30</td><td>2 500,00</td><td>4 321,94</td><td>1 821,94</td></tr>
+</table></div>
+<p>Trois choses à remarquer :</p>
+<ol>
+<li><b>Sur une seule période, les deux règles donnent le même résultat.</b> La différence vient de la capitalisation, donc elle n'apparaît qu'à partir de la deuxième période.</li>
+<li><b>L'écart est d'abord minuscule, puis il explose.</b> Il vaut 2,50 € la deuxième année ; après 30 ans, les intérêts composés ont rapporté 3 321,94 €, contre 1 500 € en intérêts simples. Une suite arithmétique grandit en ligne droite ; une suite géométrique de raison supérieure à 1 finit toujours par la dépasser, et de très loin.</li>
+<li><b>Le mécanisme joue dans les deux sens.</b> Pour une épargne, c'est une chance. Pour une dette qu'on ne rembourse pas, c'est un piège : les intérêts impayés produisent à leur tour des intérêts. C'est ainsi qu'une petite dette peut devenir écrasante.</li>
+</ol>
+
+<h3 id="outil-sc">4.4 L'outil : simples contre composés</h3>
+<div class="box widget" id="sc">
+<p>Choisis un capital, un taux annuel et une durée. Le graphique trace les deux valeurs acquises ; le tableau donne le détail année par année.</p>
+<div class="row2">
+<div><label for="sc-c">Capital de départ</label><input class="field" id="sc-c" type="text" inputmode="decimal" autocomplete="off" value="1000"></div>
+<div><label for="sc-t">Taux annuel <span class="val" id="sc-tv"></span></label><input id="sc-t" type="range" min="0.5" max="30" step="0.5" value="5"></div>
+<div><label for="sc-n">Durée <span class="val" id="sc-nv"></span></label><input id="sc-n" type="range" min="1" max="50" step="1" value="30"></div>
+</div>
+<div class="presets" id="sc-pre">
+<button type="button" data-c="1000" data-t="5" data-n="30">Épargne à 5 % sur 30 ans</button>
+<button type="button" data-c="1000" data-t="2" data-n="40">Épargne à 2 % sur 40 ans</button>
+<button type="button" data-c="1000" data-t="24" data-n="10">Dette impayée à 24 % sur 10 ans</button>
+<button type="button" data-c="100" data-t="6" data-n="12">Prix avec 6 % d'inflation</button>
+</div>
+<div class="chart"><svg id="sc-svg" viewBox="0 0 440 262" role="img" aria-label="Graphique des valeurs acquises en intérêts simples et composés"></svg>
+<div class="legend"><span class="lk"><i></i>intérêts composés</span><span class="ls"><i></i>intérêts simples</span><span class="ld"><i></i>double du capital</span></div></div>
+<div id="sc-out" aria-live="polite"></div>
+<details class="more"><summary>Le détail année par année</summary><div class="tw" id="sc-tab"></div></details>
+</div>
+
+<h3>4.5 La règle de 72</h3>
+<p>Combien de temps faut-il pour doubler un capital ? En intérêts simples, c'est facile : il faut que n t = 1, donc n = 1/t ; à 5 %, 20 ans. En intérêts composés, il faut résoudre <span class="mr">(1 + t)<sup>n</sup> = 2</span>, ce qui demande le logarithme. Les financiers utilisent un raccourci :</p>
+<div class="box key">
+<p class="lbl">La règle de 72 (rule of 72)</p>
+<p>À t % par période, un capital double en environ <span class="mr">72 / t</span> périodes.</p>
+</div>
+<div class="tw"><table class="n">
+<tr><th>Taux</th><th>72 / t</th><th>Valeur exacte</th></tr>
+<tr><td>2 %</td><td>36</td><td>35,0</td></tr>
+<tr><td>3 %</td><td>24</td><td>23,4</td></tr>
+<tr><td>4 %</td><td>18</td><td>17,7</td></tr>
+<tr><td>6 %</td><td>12</td><td>11,9</td></tr>
+<tr><td>8 %</td><td>9</td><td>9,0</td></tr>
+<tr><td>12 %</td><td>6</td><td>6,1</td></tr>
+<tr><td>24 %</td><td>3</td><td>3,2</td></tr>
+<tr><td>36 %</td><td>2</td><td>2,3</td></tr>
+</table></div>
+<p>La règle est excellente entre 2 % et 15 %, et devient plus grossière au-delà. Pourquoi 72 ? Pour les très petits taux, la valeur exacte est proche de 69,3 / t (69,3 vient de 100 × ln 2, que tu rencontreras avec le logarithme). Pour les taux courants, 72 corrige une partie de l'écart, et il a l'avantage d'avoir beaucoup de diviseurs : 2, 3, 4, 6, 8, 9, 12.</p>
+<p>Elle sert aussi pour les dettes et pour l'inflation : une dette à 24 % par an qu'on ne rembourse pas double en 3 ans environ ; avec 6 % d'inflation par an, les prix doublent en 12 ans environ.</p>
+
+<div class="box nts">
+<p class="lbl">Où tu reverras la suite géométrique en machine learning</p>
+<ul>
+<li><b>La décroissance du taux d'apprentissage</b> (<i>learning rate decay</i>) : pendant l'entraînement d'un réseau de neurones, on multiplie souvent le taux d'apprentissage par un même coefficient inférieur à 1 à chaque étape, par exemple 0,95. C'est une suite géométrique de raison 0,95 : une baisse composée.</li>
+<li><b>La moyenne mobile exponentielle</b> (<i>exponential moving average</i>), au cœur de l'optimiseur Adam : le poids d'une observation vieille de k étapes est proportionnel à β<sup>k</sup>, une suite géométrique de raison β inférieure à 1.</li>
+</ul>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">2 000 € à 5 % par an en intérêts composés pendant 2 ans. Valeur acquise ?</p>
+<div class="mq-c"><button type="button" data-fb="C'est le résultat en intérêts simples. En composés, la deuxième année rapporte 5 % de 2 100 €.">2 200 €</button><button type="button">2 205 €</button><button type="button" data-fb="C'est la valeur après un an seulement.">2 100 €</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2 000 × 1,05² = 2 000 × 1,1025 = 2 205 €.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">En intérêts composés, pourquoi la deuxième année rapporte-t-elle plus que la première ?</p>
+<div class="mq-c"><button type="button" data-fb="Le taux ne change pas : c'est la somme sur laquelle il s'applique qui a grandi.">Le taux augmente avec le temps</button><button type="button" data-fb="Personne n'ajoute de bonus : tout vient de la règle de calcul.">La banque ajoute une prime de fidélité</button><button type="button">Les intérêts de la première année rapportent à leur tour</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les intérêts de la première année ont été ajoutés au capital : pendant la deuxième année, ils rapportent eux aussi.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Avec la règle de 72, en combien de temps une dette à 18 % par an, jamais remboursée, double-t-elle ?</p>
+<div class="mq-c"><button type="button">4 ans environ</button><button type="button" data-fb="On divise 72 par le taux : 72/18.">18 ans environ</button><button type="button" data-fb="On divise 72 par le taux, on ne soustrait pas.">54 ans environ</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">72/18 = 4 : environ 4 ans (4,2 ans en valeur exacte).</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Quelle expression Python calcule C₁₀ pour 1 000 € à 5 % par an, en intérêts composés ?</p>
+<div class="mq-c"><button type="button" data-fb="5 % s'écrit 0,05 : le coefficient est 1,05, pas 1,5.">1000 * 1.5 ** 10</button><button type="button">1000 * 1.05 ** 10</button><button type="button" data-fb="C'est la formule des intérêts simples : C₀(1 + n t).">1000 * (1 + 0.05 * 10)</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">C₁₀ = 1 000 × 1,05¹⁰, soit environ 1 628,89 €.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>La période compte : taux nominal et taux effectif</h2>
+
+<h3>5.1 Un taux mensuel, ramené à l'année</h3>
+<p>Beaucoup de crédits à la consommation, et beaucoup de microcrédits, affichent un taux par mois, ou même par semaine. Pour comparer des offres, on veut un taux annuel. Il y a deux façons de l'obtenir, et elles ne donnent pas le même résultat.</p>
+<h4>Le taux nominal annuel</h4>
+<p>On multiplie le taux par période par le nombre de périodes dans l'année : 2 % par mois × 12 = 24 % par an. C'est le <b>taux nominal annuel</b> (<i>nominal annual rate</i>), aussi appelé taux proportionnel. Il ignore la capitalisation : c'est un raisonnement d'intérêts simples.</p>
+<h4>Le taux effectif annuel</h4>
+<p>On se demande ce que devient vraiment 1 € au bout d'un an quand les intérêts sont capitalisés chaque mois : <span class="mr">1 × 1,02<sup>12</sup> ≈ 1,2682</span>. Un euro devient 1,2682 € : le <b>taux effectif annuel</b> (<i>effective annual rate</i>) vaut 26,82 %.</p>
+<div class="box key">
+<p class="lbl">Taux effectif annuel</p>
+<p>Pour un taux t par période et m périodes dans l'année :</p>
+<p class="eq">t<sub>eff</sub> = (1 + t)<sup>m</sup> − 1</p>
+</div>
+<div class="tw"><table class="n">
+<tr><th>Taux par période</th><th>Nominal annuel</th><th>Effectif annuel</th></tr>
+<tr><td>0,5 % par mois</td><td>6 %</td><td>6,17 %</td></tr>
+<tr><td>1 % par mois</td><td>12 %</td><td>12,68 %</td></tr>
+<tr><td>2 % par mois</td><td>24 %</td><td>26,82 %</td></tr>
+<tr><td>3 % par mois</td><td>36 %</td><td>42,58 %</td></tr>
+<tr><td>7,5 % par mois</td><td>90 %</td><td>138,18 %</td></tr>
+<tr><td>5 % par semaine</td><td>260 %</td><td>1 164 %</td></tr>
+<tr><td>1 % par jour</td><td>365 %</td><td>3 678 %</td></tr>
+</table></div>
+<p>Plus le taux est élevé et la période courte, plus l'écart se creuse. Sur les deux dernières lignes, le taux effectif est 4 à 10 fois plus grand que le taux nominal.</p>
+<div class="box nts">
+<p class="lbl">Ce que mesure le taux effectif</p>
+<p>Un taux effectif annuel suppose que la dette court toute l'année, intérêts compris. Pour un prêt de 30 jours remboursé à temps, personne ne paie 138 %. Mais c'est le seul moyen de comparer un prêt « 7,5 % pour 30 jours » à un crédit « 20 % par an » : on met les deux sur la même règle graduée. Et pour l'emprunteur qui renouvelle son prêt de mois en mois, c'est bien ce qu'il finit par payer.</p>
+</div>
+
+<h3>5.2 Le taux équivalent : dans l'autre sens</h3>
+<p>Une banque annonce 12 % par an, effectif, et veut capitaliser chaque mois. Quel taux mensuel appliquer ? Le réflexe 12/12 = 1 % est faux : 1 % par mois donne 12,68 % par an, c'est trop. On cherche t tel que <span class="mr">(1 + t)<sup>12</sup> = 1,12</span> :</p>
+<div class="steps">
+<span class="op"></span><span>(1 + t)<sup>12</sup> = 1,12</span>
+<span class="op">⇔</span><span>1 + t = 1,12<sup>1/12</sup></span>
+<span class="why">Élever à la puissance 1/12, c'est prendre la racine douzième : le nombre qui, multiplié 12 fois par lui-même, redonne 1,12. C'est la même idée que √a = a<sup>1/2</sup>. En Python : 1.12 ** (1/12).</span>
+<span class="op">⇔</span><span>t = 1,12<sup>1/12</sup> − 1 ≈ 0,00949</span>
+</div>
+<p>Le <b>taux mensuel équivalent</b> (<i>equivalent rate</i>) vaut donc environ 0,949 %, un peu moins que 1 %.</p>
+<div class="box key">
+<p class="lbl">Taux équivalent sur une période plus courte</p>
+<p class="eq">t = (1 + t<sub>an</sub>)<sup>1/m</sup> − 1</p>
+</div>
+
+<h3>5.3 TAEG, APR : ce que dit l'étiquette</h3>
+<p>Ce qui compte pour un emprunteur, c'est le coût total : les intérêts, mais aussi les frais obligatoires (frais de dossier, assurance imposée, commissions). Dans l'Union européenne, le prêteur doit afficher le <b>TAEG</b>, taux annuel effectif global (<i>annual percentage rate of charge</i>), qui inclut ces frais et se calcule comme un taux effectif.</p>
+<p>Attention en lisant des documents américains : l'<b>APR</b> (<i>annual percentage rate</i>) des États-Unis inclut lui aussi des frais, mais c'est un taux nominal : le taux par période multiplié par le nombre de périodes. Deux acronymes qui se ressemblent, deux calculs différents.</p>
+<div class="box warn">
+<p class="lbl">Les quatre questions à poser devant un taux</p>
+<ol>
+<li>Sur quelle période ?</li>
+<li>Nominal ou effectif ?</li>
+<li>Calculé sur quel capital : celui de départ, ou celui qui reste dû ? (section 6)</li>
+<li>Quels frais sont inclus ?</li>
+</ol>
+</div>
+
+<h3 id="outil-cv">5.4 L'outil : convertir un taux</h3>
+<div class="box widget" id="cv">
+<p class="lbl">Du taux par période vers l'année</p>
+<label for="cv-a">Taux par période, en %</label>
+<input class="field" id="cv-a" type="text" inputmode="decimal" autocomplete="off" value="2">
+<div class="seg" id="cv-pa" role="group" aria-label="Période du taux">
+<button type="button" data-m="365" aria-pressed="false">par jour</button><button type="button" data-m="52" aria-pressed="false">par semaine</button><button type="button" data-m="12" aria-pressed="true">par mois</button><button type="button" data-m="4" aria-pressed="false">par trimestre</button><button type="button" data-m="2" aria-pressed="false">par semestre</button>
+</div>
+<div id="cv-a-out" aria-live="polite"></div>
+<p class="lbl" style="margin-top:22px">De l'année vers une période plus courte</p>
+<label for="cv-b">Taux effectif annuel, en %</label>
+<input class="field" id="cv-b" type="text" inputmode="decimal" autocomplete="off" value="12">
+<div class="seg" id="cv-pb" role="group" aria-label="Période cherchée">
+<button type="button" data-m="365" aria-pressed="false">par jour</button><button type="button" data-m="52" aria-pressed="false">par semaine</button><button type="button" data-m="12" aria-pressed="true">par mois</button><button type="button" data-m="4" aria-pressed="false">par trimestre</button><button type="button" data-m="2" aria-pressed="false">par semestre</button>
+</div>
+<div id="cv-b-out" aria-live="polite"></div>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 5)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">2 % par mois correspondent à un taux nominal annuel de :</p>
+<div class="mq-c"><button type="button">24 %</button><button type="button" data-fb="26,82 % est le taux effectif. Le nominal, c'est simplement 2 × 12.">26,82 %</button><button type="button" data-fb="2 % est le taux d'un mois. Sur l'année, il y a 12 mois.">2 %</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Nominal : 2 % × 12 = 24 %.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Une banque affiche 6 % par an et capitalise chaque mois à 0,5 %. Le taux effectif annuel est :</p>
+<div class="mq-c"><button type="button" data-fb="6 % est le taux nominal. Avec une capitalisation mensuelle, les intérêts des premiers mois rapportent aussi.">exactement 6 %</button><button type="button" data-fb="Capitaliser plus souvent ne peut que faire grandir le résultat : chaque intérêt ajouté rapporte à son tour.">un peu moins de 6 %</button><button type="button">un peu plus de 6 %, environ 6,17 %</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1,005¹² ≈ 1,0617 : le taux effectif vaut environ 6,17 %.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Quel taux mensuel est équivalent à 12 % par an, effectif ?</p>
+<div class="mq-c"><button type="button" data-fb="1 % est le taux proportionnel. Capitalisé 12 fois, il donne 12,68 % : c'est trop.">exactement 1 %</button><button type="button">environ 0,949 %</button><button type="button" data-fb="Le taux mensuel équivalent est plus petit que 12/12, pas plus grand : la capitalisation fait le reste.">environ 1,05 %</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1,12<sup>1/12</sup> − 1 ≈ 0,00949, soit 0,949 % par mois.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Tu compares un crédit européen affiché avec un TAEG et un crédit américain affiché avec une APR. Que dois-tu vérifier ?</p>
+<div class="mq-c"><button type="button">Si chaque taux est nominal ou effectif, et quels frais il inclut</button><button type="button" data-fb="Les deux incluent des frais, mais le TAEG est un taux effectif et l'APR américaine un taux nominal.">Rien : c'est la même chose</button><button type="button" data-fb="La durée compte, mais même à durée égale, les deux taux ne se calculent pas de la même façon.">Seulement la durée</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Le TAEG est effectif, l'APR américaine est nominale : à frais égaux, l'APR paraît plus basse.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>Pourquoi ça compte : le piège du taux flat</h2>
+
+<h3>6.1 Deux façons de calculer les intérêts d'un prêt</h3>
+<p>Awa emprunte 100 000 FCFA à une institution de microfinance, sur 12 mois, et rembourse chaque mois. L'offre affiche « 2 % par mois ». Deux calculs sont possibles :</p>
+<ul>
+<li><b>le taux dégressif</b> (<i>declining balance</i>) : chaque mois, l'intérêt est calculé sur le <b>capital restant dû</b> (<i>outstanding balance</i>). Plus Awa rembourse, moins elle paie d'intérêts ;</li>
+<li><b>le taux flat</b> (<i>flat rate</i>) : chaque mois, l'intérêt est calculé sur le capital de départ, comme si Awa n'avait rien remboursé. C'est un calcul d'intérêts simples sur 100 000 FCFA, pendant toute la durée du prêt.</li>
+</ul>
+<p>Avec le taux flat, le calcul est très simple :</p>
+<div class="steps">
+<span class="op"></span><span>intérêts totaux : 100 000 × 0,02 × 12 = 24 000 FCFA</span>
+<span class="op"></span><span>total à rembourser : 100 000 + 24 000 = 124 000 FCFA</span>
+<span class="op"></span><span>mensualité : 124 000 / 12 ≈ 10 333 FCFA</span>
+</div>
+<div class="box nts">
+<p class="lbl">Le franc CFA</p>
+<p>Le franc CFA d'Afrique de l'Ouest (FCFA) a une parité fixe avec l'euro : 1 € = 655,957 FCFA. Les 100 000 FCFA d'Awa valent donc environ 152 €.</p>
+</div>
+
+<h3>6.2 Ce que coûte vraiment un taux flat</h3>
+<p>Regarde ce qu'Awa doit vraiment, mois après mois. Découpons chaque mensualité en une part fixe de capital, 100 000/12 ≈ 8 333 FCFA, et une part fixe d'intérêts, 2 000 FCFA. Au début du premier mois, Awa doit 100 000 FCFA ; au début du dernier, plus que 8 333. Mais elle paie 2 000 FCFA d'intérêts tous les mois.</p>
+<div class="tw"><table class="n">
+<tr><th>Mois</th><th>Capital restant dû au début du mois</th><th>Intérêts payés</th><th>Taux réel ce mois-là</th></tr>
+<tr><td>1</td><td>100 000</td><td>2 000</td><td>2,0 %</td></tr>
+<tr><td>2</td><td>91 667</td><td>2 000</td><td>2,2 %</td></tr>
+<tr><td>6</td><td>58 333</td><td>2 000</td><td>3,4 %</td></tr>
+<tr><td>10</td><td>25 000</td><td>2 000</td><td>8,0 %</td></tr>
+<tr><td>12</td><td>8 333</td><td>2 000</td><td>24,0 %</td></tr>
+</table></div>
+<p>Le dernier mois, Awa paie 2 000 FCFA d'intérêts pour 8 333 FCFA encore dus : 24 % en un seul mois. <b>Elle paie des intérêts sur de l'argent qu'elle a déjà rendu.</b></p>
+<h4>Un ordre de grandeur</h4>
+<p>En moyenne sur l'année, Awa ne doit qu'environ la moitié du prêt : 54 167 FCFA. Payer 24 000 FCFA pour disposer en moyenne de 54 167 FCFA pendant un an, c'est environ <span class="mr">24 000 / 54 167 ≈ 44 %</span> par an, soit à peu près 3,7 % par mois. Presque le double des 2 % affichés.</p>
+<h4>La valeur exacte</h4>
+<p>L'ordre de grandeur suffit pour voir le problème. Le calcul exact cherche le taux dégressif qui produirait exactement les mêmes mensualités : tu apprendras à le poser au module F03. Le simulateur ci-dessous le fait pour toi, par dichotomie (<i>bisection</i>) : il trouve 3,48 % par mois, soit un taux nominal de 41,7 % par an et un taux effectif de 50,7 %.</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Avant d'ouvrir le simulateur : pour Awa, sur 12 mois et 100 000 FCFA, quelle offre coûte le moins ?</p>
+<div class="mq-c"><button type="button" data-fb="C'est le piège : le 2 % flat porte sur tout le capital, même déjà remboursé. Son taux réel est d'environ 3,48 % par mois, plus que 3 %.">2 % par mois, flat</button><button type="button">3 % par mois, dégressif</button><button type="button" data-fb="Compare les taux réels : environ 3,48 % par mois pour le flat, 3 % pour le dégressif.">Elles coûtent pareil</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Le 3 % dégressif coûte 20 555 FCFA d'intérêts (mensualité de 10 046 FCFA), contre 24 000 FCFA pour le 2 % flat. <b>Le taux affiché le plus bas est le plus cher.</b></div>
+</div>
+
+<h3 id="outil-fl">6.3 Le simulateur : flat contre dégressif</h3>
+<div class="box widget" id="fl">
+<p>Entre un prêt remboursé chaque mois. Le simulateur calcule le prêt flat, le même taux en dégressif, et le taux réel du prêt flat.</p>
+<div class="row2">
+<div><label for="fl-c">Montant emprunté</label><input class="field" id="fl-c" type="text" inputmode="decimal" autocomplete="off" value="100000"></div>
+<div><label for="fl-t">Taux affiché, % par mois</label><input class="field" id="fl-t" type="text" inputmode="decimal" autocomplete="off" value="2"></div>
+<div><label for="fl-n">Durée, en mois</label><input class="field" id="fl-n" type="text" inputmode="numeric" autocomplete="off" value="12"></div>
+</div>
+<div class="presets" id="fl-pre">
+<button type="button" data-c="100000" data-t="2" data-n="12">Awa : 100 000, 2 %, 12 mois</button>
+<button type="button" data-c="60000" data-t="3" data-n="6">60 000, 3 %, 6 mois</button>
+<button type="button" data-c="500000" data-t="1.5" data-n="24">500 000, 1,5 %, 24 mois</button>
+<button type="button" data-c="200000" data-t="4" data-n="4">200 000, 4 %, 4 mois</button>
+</div>
+<div id="fl-out" aria-live="polite"></div>
+<details class="more"><summary>Le tableau mois par mois du prêt flat</summary><div class="tw" id="fl-tab"></div></details>
+</div>
+
+<h3>6.4 Ce que ça change pour ton futur métier</h3>
+<p>Un taux élevé n'est pas forcément abusif. Prêter 100 000 FCFA demande presque autant de travail que prêter 10 millions : un agent qui se déplace, une évaluation, un suivi chaque mois. Rapporté à une petite somme, ce coût fixe pèse lourd, et une institution de microfinance doit le couvrir pour survivre. Ce qui pose problème, c'est un taux qu'on ne peut pas comparer, parce qu'il est affiché d'une façon qui le fait paraître plus bas.</p>
+<p>Et un taux bien affiché ne protège que celui qui sait le lire. Une personne qui lit difficilement le français, ou qui ne le lit pas, ne tirera rien d'un TAEG imprimé en bas d'un contrat. Lui dire, dans sa langue et à voix haute, « tu vas rembourser 10 333 FCFA par mois pendant 12 mois, soit 24 000 FCFA de plus que ce que tu as reçu », c'est déjà de l'inclusion financière. C'est exactement le genre d'outil que les technologies du langage peuvent construire.</p>
+<div class="box warn">
+<p class="lbl">Et le jour où tu le construiras</p>
+<p>Dans un assistant financier, une erreur de montant n'est pas une faute de style. Si un modèle de langage dit « 1 033 » au lieu de « 10 333 », il trompe quelqu'un sur sa dette. Les calculs doivent être faits par du code vérifié, comme les formules de ce cours ; le modèle de langage, lui, se charge de les expliquer.</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 6)</p>
+<div class="mq" data-a="0">
+<p class="mq-q">Dans un prêt flat, sur quel montant les intérêts de chaque mois sont-ils calculés ?</p>
+<div class="mq-c"><button type="button">Sur le capital de départ</button><button type="button" data-fb="Ça, c'est le taux dégressif.">Sur le capital restant dû</button><button type="button" data-fb="La mensualité contient les intérêts ; elle ne sert pas à les calculer.">Sur la mensualité</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Sur le capital de départ, pendant toute la durée du prêt.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Le dernier mois d'un prêt flat sur 12 mois, le taux réel de ce mois-là est :</p>
+<div class="mq-c"><button type="button" data-fb="Les intérêts restent les mêmes alors que la dette a presque disparu : rapportés à ce qui reste dû, ils pèsent bien plus.">le taux affiché</button><button type="button" data-fb="L'emprunteur paie toujours les mêmes intérêts, même le dernier mois.">nul</button><button type="button">bien plus élevé que le taux affiché</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les intérêts restent fixes alors que la dette a presque disparu : pour Awa, 24 % ce mois-là.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Pour expliquer le coût d'un prêt à quelqu'un qui n'est pas à l'aise avec les pourcentages, le plus clair est de donner :</p>
+<div class="mq-c"><button type="button" data-fb="Un taux, même effectif, demande de savoir le lire. Une somme d'argent se comprend tout de suite.">le taux effectif annuel</button><button type="button">la mensualité et le coût total, en FCFA</button><button type="button" data-fb="Un taux journalier paraît minuscule et cache le coût réel.">le taux par jour</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Des sommes d'argent : combien par mois, pendant combien de temps, et combien en plus de ce qu'on a reçu.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Entraînement corrigé</h2>
+<p>Calcule sur papier, avec ta calculatrice si besoin, puis tape ta réponse : un nombre, avec une virgule ou un point. Tu peux ajouter l'unité (€, FCFA, %), la page l'ignore. Si ta réponse correspond à une erreur fréquente, la page te dit laquelle.</p>
+<div class="ex-list" id="ex-list"></div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Bilan et glossaire</h2>
+<div class="box key">
+<p class="lbl">Bilan : tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>calculer un pourcentage d'une quantité, et exprimer une part en pourcentage ;</li>
+<li>écrire le coefficient multiplicateur d'une hausse ou d'une baisse, et enchaîner des variations ;</li>
+<li>retrouver une valeur de départ, et distinguer points de pourcentage et pourcentage ;</li>
+<li>calculer des intérêts simples, y compris sur une durée en jours ;</li>
+<li>démontrer que C<sub>n</sub> = C<sub>0</sub>(1 + t)<sup>n</sup>, et expliquer d'où vient l'écart avec les intérêts simples ;</li>
+<li>estimer un temps de doublement avec la règle de 72 ;</li>
+<li>passer d'un taux par période à un taux nominal et à un taux effectif annuel, et faire le chemin inverse ;</li>
+<li>expliquer à quelqu'un, sans formule, pourquoi un taux flat coûte plus cher qu'il n'en a l'air.</li>
+</ul>
+</div>
+
+<h3>Trois questions pour moi</h3>
+<p>Réponds par écrit, avec tes mots, et envoie-moi tes réponses : je te dirai ce qui est juste et ce qui manque.</p>
+<ol>
+<li>Sans formule, en trois phrases au plus : pourquoi un placement à intérêts composés finit-il toujours par dépasser le même placement à intérêts simples ?</li>
+<li>Une application de prêt affiche « seulement 1 % par jour ». Calcule le taux nominal annuel et le taux effectif annuel. Puis explique pourquoi l'application préfère afficher un taux par jour.</li>
+<li>Awa hésite entre « 2 % par mois, flat » et « 3 % par mois, dégressif », sur 12 mois. Écris la phrase, sans aucun pourcentage, que tu lui dirais pour l'aider à choisir.</li>
+</ol>
+
+<h3>Glossaire du module</h3>
+<p>À recopier dans la page de glossaire de finance de ton site.</p>
+<div class="tw"><table>
+<tr><th>Français</th><th>Anglais</th></tr>
+<tr><td>pourcentage</td><td>percentage</td></tr>
+<tr><td>point de pourcentage</td><td>percentage point</td></tr>
+<tr><td>coefficient multiplicateur</td><td>growth factor, multiplier</td></tr>
+<tr><td>taux d'évolution</td><td>rate of change</td></tr>
+<tr><td>intérêt</td><td>interest</td></tr>
+<tr><td>capital</td><td>principal</td></tr>
+<tr><td>valeur acquise</td><td>future value</td></tr>
+<tr><td>intérêts simples</td><td>simple interest</td></tr>
+<tr><td>intérêts composés</td><td>compound interest</td></tr>
+<tr><td>capitaliser</td><td>to compound</td></tr>
+<tr><td>suite arithmétique, raison</td><td>arithmetic sequence, common difference</td></tr>
+<tr><td>suite géométrique, raison</td><td>geometric sequence, common ratio</td></tr>
+<tr><td>taux nominal annuel</td><td>nominal annual rate</td></tr>
+<tr><td>taux effectif annuel</td><td>effective annual rate</td></tr>
+<tr><td>taux équivalent</td><td>equivalent rate</td></tr>
+<tr><td>TAEG</td><td>annual percentage rate of charge (APRC)</td></tr>
+<tr><td>taux flat</td><td>flat rate</td></tr>
+<tr><td>taux dégressif</td><td>declining balance rate</td></tr>
+<tr><td>capital restant dû</td><td>outstanding balance</td></tr>
+<tr><td>mensualité</td><td>monthly installment</td></tr>
+<tr><td>risque de défaut</td><td>default risk</td></tr>
+<tr><td>prime de risque</td><td>risk premium</td></tr>
+<tr><td>coût d'opportunité</td><td>opportunity cost</td></tr>
+<tr><td>diagramme des flux</td><td>cash-flow diagram</td></tr>
+</table></div>
+
+<h3>La suite</h3>
+<p>Le module F02 pose la question inverse de ce cours. Si 1 000 € aujourd'hui valent 1 050 € dans un an, combien valent aujourd'hui 1 050 € promis dans un an ? C'est l'<b>actualisation</b> (<i>discounting</i>), la clé pour comparer deux offres étalées dans le temps. Demande-le-moi quand tu as fini les trois questions ci-dessus.</p>
+</section>
+</main>
+
+<footer>Module F01 du parcours de finance (page <a href="finance-00-parcours.html">« Finance : le parcours vers l'inclusion financière »</a> de ton site). Awa et tous les prêts des exemples sont fictifs. Chiffres de l'Afrique subsaharienne : Global Findex 2025, Banque mondiale. Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+/* ---------- Formats ---------- */
+var NF = {};
+function nf(min, max){
+  var k = min + "-" + max;
+  if (!NF[k]){
+    try { NF[k] = new Intl.NumberFormat("fr-FR", {minimumFractionDigits:min, maximumFractionDigits:max}); }
+    catch (e){ NF[k] = null; }
+  }
+  return NF[k];
+}
+function fmt(x, d){
+  if (!isFinite(x)) return "—";
+  if (d === undefined) d = 2;
+  if (Math.abs(x) < 0.5 * Math.pow(10, -d)) x = 0;
+  var f = nf(d, d), s = f ? f.format(x) : x.toFixed(d).replace(".", ",");
+  return s.replace("-", "−");
+}
+function fmtS(x, maxd){
+  if (!isFinite(x)) return "—";
+  if (maxd === undefined) maxd = 2;
+  if (Math.abs(x) < 0.5 * Math.pow(10, -maxd)) x = 0;
+  var f = nf(0, maxd), s = f ? f.format(x) : String(+x.toFixed(maxd)).replace(".", ",");
+  return s.replace("-", "−");
+}
+function pct(x, d){ return fmtS(x * 100, d === undefined ? 2 : d) + "\u00a0%"; }
+function row(label, value, cls){ return "<div><b>" + label + "</b><span" + (cls ? " class='" + cls + "'" : "") + ">" + value + "</span></div>"; }
+function spct(x, d){ var r = Math.round(x * 100 * Math.pow(10, d === undefined ? 2 : d)); return (r > 0 ? "+" : "") + pct(x, d); }
+function parseNum(raw){
+  var s = String(raw).replace(/[−–—]/g, "-").replace(/[\s  ]/g, "");
+  s = s.replace(/[^0-9.,+\-]/g, "");
+  if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", ".");
+  if (!/^[+\-]?(\d+(\.\d*)?|\.\d+)$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+
+/* ---------- Questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll(".mq"), function(mq){
+  var a = +mq.getAttribute("data-a"), fb = mq.querySelector(".mq-fb"), ok = mq.querySelector(".mq-ok");
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll(".mq-c button"), function(b, i){
+    b.addEventListener("click", function(){
+      if (i === a){ b.classList.add("good"); if (fb) fb.textContent = ""; if (ok) ok.hidden = false; }
+      else { b.classList.add("bad"); if (fb) fb.textContent = b.getAttribute("data-fb") || "Pas tout à fait. Relis le passage juste au-dessus, et réessaie."; }
+    });
+  });
+});
+
+/* ---------- Outil 1 : variations successives ---------- */
+function pvRun(){
+  var out = $("pv-out"), raw = $("pv-in").value.replace(/[−–—]/g, "-");
+  var m = raw.match(/[+\-]?\s*\d+(?:[.,]\d+)?/g);
+  if (!m){ out.innerHTML = "<p class='tool-err'>Écris au moins une variation, par exemple +10, −20.</p>"; return; }
+  if (m.length > 10){ out.innerHTML = "<p class='tool-err'>Dix variations au plus.</p>"; return; }
+  var ts = m.map(function(x){ return parseFloat(x.replace(/\s/g, "").replace(",", ".")); });
+  for (var i = 0; i < ts.length; i++){
+    if (ts[i] < -100){ out.innerHTML = "<p class='tool-err'>Une baisse ne peut pas dépasser 100 % : il ne resterait rien, et même moins que rien.</p>"; return; }
+    if (ts[i] > 10000){ out.innerHTML = "<p class='tool-err'>Reste en dessous de +10 000 %.</p>"; return; }
+  }
+  var prod = 1, val = 100, chain = ["100"], rows = "", ks = [], sum = 0;
+  ts.forEach(function(t){
+    var k = 1 + t / 100; prod *= k; val *= k; sum += t; ks.push(fmtS(k, 4));
+    chain.push(fmtS(val, 2));
+    rows += "<span class='op'></span><span>" + (t >= 0 ? "+" : "") + fmtS(t, 2) + "\u00a0% &nbsp;→&nbsp; × " + fmtS(k, 4) + "</span>";
+  });
+  var g = prod - 1, h = "<div class='steps'>" + rows + "</div>";
+  h += "<div class='readout'>" + row("Coefficients", ks.join(" × ") + (ts.length > 1 ? " = " + fmtS(prod, 6) : ""));
+  h += row("Sur 100 €", chain.join(" → "));
+  h += row("Variation globale", spct(g, 2), "k");
+  h += row("Pour revenir au départ", prod === 0 ? "impossible : il ne reste rien" : spct(1 / prod - 1, 2)) + "</div>";
+  if (ts.length > 1 && Math.abs(sum - g * 100) > 1e-9){
+    h += "<p class='tool-note'>Si l'on additionnait les pourcentages, on trouverait " + (sum > 0 ? "+" : "") + fmtS(sum, 2) + "\u00a0% : c'est faux, parce que chaque variation s'applique au montant déjà modifié par les précédentes.</p>";
+  }
+  out.innerHTML = h;
+}
+if ($("pv")){
+  $("pv-in").addEventListener("input", pvRun);
+  each(document.querySelectorAll("#pv-pre button"), function(b){ b.addEventListener("click", function(){ $("pv-in").value = b.getAttribute("data-v"); pvRun(); }); });
+  pvRun();
+}
+
+/* ---------- Outil 2 : simples contre composés ---------- */
+function niceStep(raw){
+  if (!(raw > 0)) return 1;
+  var p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), f = raw / p;
+  var s = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+  return s * p;
+}
+function axisLabel(v, top){
+  if (top >= 1e7) return fmtS(v / 1e6, 1) + " M";
+  if (top >= 1e5) return fmtS(v / 1e3, 0) + " k";
+  return fmtS(v, 0);
+}
+function scRun(){
+  var C = parseNum($("sc-c").value), t = +$("sc-t").value / 100, N = +$("sc-n").value;
+  $("sc-tv").textContent = fmtS(t * 100, 1) + " %";
+  $("sc-nv").textContent = N + (N > 1 ? " ans" : " an");
+  var out = $("sc-out"), svg = $("sc-svg");
+  if (!(C > 0) || C > 1e9){ out.innerHTML = "<p class='tool-err'>Écris un capital positif, sans espace inutile (jusqu'à un milliard).</p>"; svg.innerHTML = ""; $("sc-tab").innerHTML = ""; return; }
+  var S = [], K = [], n;
+  for (n = 0; n <= N; n++){ S.push(C * (1 + n * t)); K.push(C * Math.pow(1 + t, n)); }
+  var ymax = Math.max(K[N], S[N]), step = niceStep(ymax / 5), top = Math.ceil(ymax / step - 1e-9) * step;
+  var L = 58, R = 428, T = 12, B = 228;
+  function X(i){ return L + (R - L) * i / N; }
+  function Y(v){ return B - (B - T) * v / top; }
+  var g = "";
+  for (var v = 0; v <= top + 1e-9; v += step){
+    g += "<line x1='" + L + "' y1='" + Y(v).toFixed(1) + "' x2='" + R + "' y2='" + Y(v).toFixed(1) + "' class='" + (v === 0 ? "sk" : "sm") + "'/>";
+    g += "<text x='" + (L - 6) + "' y='" + (Y(v) + 4).toFixed(1) + "' text-anchor='end' class='s tm'>" + axisLabel(v, top) + "</text>";
+  }
+  var xs = Math.max(1, niceStep(N / 6));
+  for (n = 0; n <= N; n += xs){
+    g += "<line x1='" + X(n).toFixed(1) + "' y1='" + B + "' x2='" + X(n).toFixed(1) + "' y2='" + (B + 5) + "' class='sk'/>";
+    g += "<text x='" + X(n).toFixed(1) + "' y='" + (B + 19) + "' text-anchor='middle' class='s tm'>" + n + "</text>";
+  }
+  g += "<text x='" + R + "' y='" + (B + 34) + "' text-anchor='end' class='s tm'>années</text>";
+  if (2 * C <= top){
+    g += "<line x1='" + L + "' y1='" + Y(2 * C).toFixed(1) + "' x2='" + R + "' y2='" + Y(2 * C).toFixed(1) + "' class='sk dash'/>";
+  }
+  function poly(arr, cls){
+    var pts = arr.map(function(val, i){ return X(i).toFixed(1) + "," + Y(val).toFixed(1); }).join(" ");
+    return "<polyline points='" + pts + "' class='" + cls + "'/>";
+  }
+  g += poly(S, "sb") + poly(K, "sr");
+  svg.innerHTML = g;
+  var dS = 1 / t, dK = Math.log(2) / Math.log(1 + t), d72 = 72 / (t * 100);
+  var h = "<div class='readout'>";
+  h += row("Valeur acquise, intérêts simples", fmt(S[N], 2), "s");
+  h += row("Valeur acquise, intérêts composés", fmt(K[N], 2), "k");
+  h += row("Écart : les intérêts des intérêts", fmt(K[N] - S[N], 2));
+  h += row("Doublement en intérêts simples (1/t)", fmtS(dS, 1) + " ans");
+  h += row("Doublement en intérêts composés", fmtS(dK, 1) + " ans");
+  h += row("Règle de 72 (72/" + fmtS(t * 100, 1) + ")", fmtS(d72, 1) + " ans");
+  h += "</div>";
+  out.innerHTML = h;
+  var tb = "<table class='n'><tr><th>Année</th><th>Simples</th><th>Composés</th><th>Intérêts de l'année (composés)</th><th>Écart</th></tr>";
+  for (n = 1; n <= N; n++){
+    tb += "<tr><td>" + n + "</td><td>" + fmt(S[n], 2) + "</td><td>" + fmt(K[n], 2) + "</td><td>" + fmt(K[n] - K[n - 1], 2) + "</td><td>" + fmt(K[n] - S[n], 2) + "</td></tr>";
+  }
+  $("sc-tab").innerHTML = tb + "</table>";
+}
+if ($("sc")){
+  ["sc-c", "sc-t", "sc-n"].forEach(function(id){ $(id).addEventListener("input", scRun); });
+  each(document.querySelectorAll("#sc-pre button"), function(b){
+    b.addEventListener("click", function(){ $("sc-c").value = b.getAttribute("data-c"); $("sc-t").value = b.getAttribute("data-t"); $("sc-n").value = b.getAttribute("data-n"); scRun(); });
+  });
+  scRun();
+}
+
+/* ---------- Outil 3 : convertir un taux ---------- */
+var PER = {"365":"jour", "52":"semaine", "12":"mois", "4":"trimestre", "2":"semestre"};
+var PERS = {"365":"jours", "52":"semaines", "12":"mois", "4":"trimestres", "2":"semestres"};
+function segVal(id){ var b = document.querySelector("#" + id + " button[aria-pressed='true']"); return b ? +b.getAttribute("data-m") : 12; }
+function segInit(id, fn){
+  each(document.querySelectorAll("#" + id + " button"), function(b){
+    b.addEventListener("click", function(){
+      each(document.querySelectorAll("#" + id + " button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+      fn();
+    });
+  });
+}
+function cvA(){
+  var out = $("cv-a-out"), p = parseNum($("cv-a").value), m = segVal("cv-pa");
+  if (!isFinite(p) || p <= -100 || p > 100){ out.innerHTML = "<p class='tool-err'>Écris un taux entre −100 % et 100 % par période, par exemple 2 ou 0,5.</p>"; return; }
+  var t = p / 100, k = Math.pow(1 + t, m), nom = t * m, eff = k - 1;
+  var h = "<div class='steps'>";
+  h += "<span class='op'></span><span>nominal : " + fmtS(p, 4) + " % × " + m + " = " + pct(nom, 2) + "</span>";
+  h += "<span class='why'>Il y a " + m + " " + PERS[m] + " dans l'année. On multiplie, sans capitaliser.</span>";
+  h += "<span class='op'></span><span>effectif : (1 + " + fmtS(t, 6) + ")<sup>" + m + "</sup> − 1 = " + fmtS(k, 4) + " − 1 = " + pct(eff, 2) + "</span>";
+  h += "<span class='why'>Chaque " + PER[m] + ", les intérêts sont ajoutés à la dette et rapportent à leur tour.</span>";
+  h += "</div>";
+  if (t > 0){
+    h += "<p class='tool-note'>Sur un an, une dette jamais remboursée est multipliée par " + fmtS(k, 3) + ". Le taux effectif vaut " + fmtS(eff / nom, 2) + " fois le taux nominal.</p>";
+  }
+  out.innerHTML = h;
+}
+function cvB(){
+  var out = $("cv-b-out"), p = parseNum($("cv-b").value), m = segVal("cv-pb");
+  if (!isFinite(p) || p <= -100 || p > 100000){ out.innerHTML = "<p class='tool-err'>Écris un taux effectif annuel supérieur à −100 %, par exemple 12.</p>"; return; }
+  var T = p / 100, eq = Math.pow(1 + T, 1 / m) - 1, prop = T / m, back = Math.pow(1 + prop, m) - 1;
+  var h = "<div class='steps'>";
+  h += "<span class='op'></span><span>équivalent : (1 + " + fmtS(T, 6) + ")<sup>1/" + m + "</sup> − 1 = " + pct(eq, 4) + " par " + PER[m] + "</span>";
+  h += "<span class='why'>Vérification : (1 + " + fmtS(eq, 6) + ")<sup>" + m + "</sup> − 1 = " + pct(Math.pow(1 + eq, m) - 1, 2) + ".</span>";
+  h += "<span class='op'></span><span>proportionnel : " + fmtS(p, 4) + " % / " + m + " = " + pct(prop, 4) + " par " + PER[m] + "</span>";
+  h += "<span class='why'>" + (T > 0 ? "Trop élevé : capitalisé " + m + " fois, il donnerait " + pct(back, 2) + " par an, et non " + pct(T, 2) + "." : "Avec un taux nul ou négatif, les deux méthodes s'écartent dans l'autre sens.") + "</span>";
+  h += "</div>";
+  out.innerHTML = h;
+}
+if ($("cv")){
+  $("cv-a").addEventListener("input", cvA); $("cv-b").addEventListener("input", cvB);
+  segInit("cv-pa", cvA); segInit("cv-pb", cvB);
+  cvA(); cvB();
+}
+
+/* ---------- Outil 4 : flat contre dégressif ---------- */
+function pvAnn(pmt, r, n){ return r === 0 ? pmt * n : pmt * (1 - Math.pow(1 + r, -n)) / r; }
+function realRate(C, pmt, n){
+  if (pmt * n <= C) return 0;
+  var lo = 0, hi = 2;
+  for (var i = 0; i < 200; i++){
+    var mid = (lo + hi) / 2;
+    if (pvAnn(pmt, mid, n) > C) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+function annuity(C, r, n){ return r === 0 ? C / n : C * r / (1 - Math.pow(1 + r, -n)); }
+function flRun(){
+  var out = $("fl-out"), C = parseNum($("fl-c").value), p = parseNum($("fl-t").value), n = parseNum($("fl-n").value);
+  if (!(C > 0) || C > 1e12){ out.innerHTML = "<p class='tool-err'>Écris un montant emprunté positif.</p>"; $("fl-tab").innerHTML = ""; return; }
+  if (!(p > 0) || p > 20){ out.innerHTML = "<p class='tool-err'>Écris un taux mensuel strictement positif, jusqu'à 20 %.</p>"; $("fl-tab").innerHTML = ""; return; }
+  if (!(n >= 1) || n > 120 || Math.round(n) !== n){ out.innerHTML = "<p class='tool-err'>Écris une durée en mois entière, de 1 à 120.</p>"; $("fl-tab").innerHTML = ""; return; }
+  var t = p / 100, If = C * t * n, Tf = C + If, Mf = Tf / n;
+  var r = realRate(C, Mf, n), Md = annuity(C, t, n), Id = Md * n - C;
+  var h = "<div class='cmp'>";
+  h += "<div class='flat'><h5>" + fmtS(p, 2) + " % par mois, flat</h5>";
+  h += "<p>Mensualité : <span>" + fmtS(Mf, 0) + "</span></p><p>Intérêts totaux : <span>" + fmtS(If, 0) + "</span></p><div class='bar flat' style='width:100%'></div></div>";
+  h += "<div class='deg'><h5>" + fmtS(p, 2) + " % par mois, dégressif</h5>";
+  h += "<p>Mensualité : <span>" + fmtS(Md, 0) + "</span></p><p>Intérêts totaux : <span>" + fmtS(Id, 0) + "</span></p><div class='bar deg' style='width:" + Math.max(2, Id / If * 100).toFixed(1) + "%'></div></div>";
+  h += "</div>";
+  h += "<div class='verdict info'>";
+  h += "<p><b>Taux réel du prêt flat : " + pct(r, 2) + " par mois</b>, soit " + fmtS(r / t, 2) + " fois le taux affiché.</p>";
+  h += "<p>En taux annuel : " + pct(12 * r, 1) + " nominal, " + pct(Math.pow(1 + r, 12) - 1, 1) + " effectif.</p>";
+  h += "<p>Au même taux affiché, le flat coûte " + fmtS(If - Id, 0) + " de plus que le dégressif (" + fmtS((If / Id - 1) * 100, 0) + " % de plus). Un prêt dégressif à " + pct(r, 2) + " par mois coûterait exactement autant que ce prêt flat.</p>";
+  h += "</div>";
+  h += "<p class='tool-note'>Le taux réel est le taux dégressif qui donne les mêmes mensualités. L'outil le cherche par dichotomie : il essaie un taux, regarde si les mensualités obtenues sont trop fortes ou trop faibles, et coupe l'intervalle en deux, 200 fois de suite. Tu apprendras à poser cette équation au module F03.</p>";
+  out.innerHTML = h;
+  var cap = C / n, tb = "<table class='n'><tr><th>Mois</th><th>Dû au début du mois</th><th>Capital remboursé</th><th>Intérêts payés</th><th>Taux réel ce mois-là</th></tr>";
+  for (var k = 1; k <= n; k++){
+    var due = C - (k - 1) * cap;
+    tb += "<tr><td>" + k + "</td><td>" + fmtS(due, 0) + "</td><td>" + fmtS(cap, 0) + "</td><td>" + fmtS(C * t, 0) + "</td><td>" + pct(C * t / due, 1) + "</td></tr>";
+  }
+  $("fl-tab").innerHTML = tb + "</table>";
+}
+if ($("fl")){
+  ["fl-c", "fl-t", "fl-n"].forEach(function(id){ $(id).addEventListener("input", flRun); });
+  each(document.querySelectorAll("#fl-pre button"), function(b){
+    b.addEventListener("click", function(){ $("fl-c").value = b.getAttribute("data-c"); $("fl-t").value = b.getAttribute("data-t").replace(".", ","); $("fl-n").value = b.getAttribute("data-n"); flRun(); });
+  });
+  flRun();
+}
+
+/* ---------- Entraînement corrigé ---------- */
+var EX = [
+  {q:"Combien valent 12 % de 25 000 FCFA ?", a:3000, tol:0.5, s:"0,12 × 25 000 = 3 000 FCFA.", h:"« 12 % de V », c'est V × 12/100 = V × 0,12.", tag:"pourcentages",
+   tr:[[300, "Vérifie la place de la virgule : 12 % s'écrit 0,12, pas 0,012."], [2083.33, "Tu as divisé 25 000 par 12. Il faut multiplier par 0,12."]]},
+  {q:"Un prix passe de 80 € à 92 €. De combien de pour cent a-t-il augmenté ?", a:15, tol:0.01, s:"(92 − 80)/80 = 12/80 = 0,15 : +15 %.", h:"Taux d'évolution = (arrivée − départ) / départ, avec 80 comme départ.", tag:"pourcentages",
+   tr:[[12, "12 € est la hausse en euros. En pour cent, on la divise par le prix de départ."], [13.04, "Tu as divisé par le prix d'arrivée. Le taux d'évolution se calcule par rapport au départ, 80."]]},
+  {q:"Quel est le coefficient multiplicateur d'une baisse de 35 % ?", a:0.65, tol:0.0001, s:"1 − 0,35 = 0,65.", h:"Diminuer de t %, c'est multiplier par 1 − t/100.", tag:"pourcentages",
+   tr:[[0.35, "0,35 est la part qu'on enlève. Il reste 1 − 0,35."], [1.35, "1,35 correspond à une hausse de 35 %."], [-0.35, "Un coefficient multiplicateur est positif : c'est ce qui reste, 1 − 0,35."]]},
+  {q:"Une épargne gagne 20 %, puis perd 20 %. Quelle est la variation globale, en pour cent ?", a:-4, tol:0.01, s:"1,2 × 0,8 = 0,96 : une baisse de 4 %.", h:"Multiplie les deux coefficients, 1,2 et 0,8, puis compare à 1.", tag:"pourcentages",
+   tr:[[0, "On n'additionne pas les pourcentages : la baisse de 20 % porte sur un montant déjà augmenté. Calcule 1,2 × 0,8."], [4, "Regarde le signe : 1,2 × 0,8 = 0,96, c'est une baisse."], [96, "0,96 est le coefficient global. La variation, c'est 0,96 − 1, exprimé en pour cent."], [-96, "0,96 est le coefficient global. La variation, c'est 0,96 − 1, exprimé en pour cent."]]},
+  {q:"Après une hausse de 8 %, un loyer vaut 648 €. Combien valait-il avant ?", a:600, tol:0.01, s:"648 / 1,08 = 600 €. Vérification : 600 × 1,08 = 648.", h:"Avant × 1,08 = 648 : pour revenir en arrière, on divise par 1,08.", tag:"pourcentages",
+   tr:[[596.16, "Tu as enlevé 8 % au nouveau loyer. Mais les 8 % portaient sur l'ancien : divise 648 par 1,08."], [640, "Une hausse de 8 % n'ajoute pas 8 € : divise 648 par 1,08."]]},
+  {q:"La part d'adultes qui ont un compte passe de 49 % à 58 %. De combien de points de pourcentage a-t-elle augmenté ?", a:9, tol:0.01, s:"58 − 49 = 9 points.", h:"Les points de pourcentage, c'est la simple différence entre les deux pourcentages.", tag:"pourcentages",
+   tr:[[18.37, "18,4 % est la hausse relative. On demande les points : la simple différence 58 − 49."]]},
+  {q:"Même situation : de combien de pour cent la part a-t-elle augmenté ? Arrondis au dixième.", a:18.4, tol:0.051, s:"(58 − 49)/49 ≈ 0,184 : +18,4 %.", h:"Hausse relative = (58 − 49) / 49.", tag:"pourcentages",
+   tr:[[9, "9, ce sont les points de pourcentage. En pour cent, on divise la différence par la valeur de départ, 49."], [15.52, "Tu as divisé par 58. Le départ est 49."]]},
+  {q:"5 000 € sont placés à 3 % par an, en intérêts simples, pendant 4 ans. Quelle est la valeur acquise ?", a:5600, tol:0.01, s:"5 000 × (1 + 4 × 0,03) = 5 000 × 1,12 = 5 600 €.", h:"C₄ = C₀(1 + 4t) : on ajoute quatre fois 150 €.", tag:"simples",
+   tr:[[5627.54, "C'est le résultat en intérêts composés. En intérêts simples, chaque année rapporte les mêmes 150 €."], [600, "600 € sont les intérêts. La valeur acquise, c'est le capital plus les intérêts."]]},
+  {q:"20 000 € sont placés à 6 % par an, en intérêts simples, pendant 90 jours, avec une année de 360 jours. Combien rapportent-ils ?", a:300, tol:0.01, s:"20 000 × 0,06 × 90/360 = 300 €.", h:"I = C₀ × t × n, avec n = 90/360 d'année.", tag:"simples",
+   tr:[[1200, "1 200 € correspondent à une année entière. Ici, n = 90/360."], [108000, "Tu as multiplié par 90 sans convertir les jours en années : n = 90/360."], [295.89, "Tu as pris une année de 365 jours. L'énoncé impose 360."]]},
+  {q:"5 000 € sont placés à 3 % par an, en intérêts composés, pendant 4 ans. Quelle est la valeur acquise, au centime près ?", a:5627.54, tol:0.011, s:"5 000 × 1,03⁴ ≈ 5 000 × 1,125509 ≈ 5 627,54 €.", h:"C₄ = 5 000 × 1,03⁴.", tag:"composés",
+   tr:[[5600, "C'est le résultat en intérêts simples. En composés, on multiplie quatre fois par 1,03."], [5150, "C'est la valeur après un an seulement : il faut 1,03 à la puissance 4."]]},
+  {q:"2 000 € sont placés à 10 % par an, en intérêts composés. Combien d'intérêts rapporte la troisième année ?", a:242, tol:0.01, s:"C₂ = 2 000 × 1,1² = 2 420 €, et 10 % de 2 420 = 242 €.", h:"Calcule d'abord C₂, le capital au début de la troisième année, puis 10 % de C₂.", tag:"composés",
+   tr:[[200, "200 € sont les intérêts de la première année. Pendant la troisième, le capital a grandi."], [220, "220 € sont les intérêts de la deuxième année, 10 % de 2 200."], [662, "662 € sont les intérêts des trois années ensemble. On demande la troisième seulement."]]},
+  {q:"Une valeur acquise de 1 331 € a été obtenue en 3 ans à 10 % par an, en intérêts composés. Quel était le capital de départ ?", a:1000, tol:0.01, s:"1 331 / 1,1³ = 1 331 / 1,331 = 1 000 €.", h:"C₀ × 1,1³ = 1 331 : divise par 1,1³.", tag:"composés",
+   tr:[[1031, "On ne retire pas trois fois 100 € : en intérêts composés, on divise par 1,1³."], [1023.85, "Tu as divisé par 1,3. Mais trois hausses de 10 % ne font pas +30 % : elles multiplient par 1,1³ = 1,331."], [931.7, "Retirer 30 % ne défait pas trois hausses de 10 % : il faut diviser par 1,1³ = 1,331."]]},
+  {q:"Avec la règle de 72, en combien d'années environ un capital placé à 9 % par an double-t-il ?", a:8, tol:0.01, s:"72 / 9 = 8 ans (8,04 ans en valeur exacte).", h:"Divise 72 par le taux exprimé en pour cent.", tag:"composés",
+   tr:[[11.11, "100/9, c'est le doublement en intérêts simples. La règle de 72 vaut pour les intérêts composés."], [0.125, "Divise 72 par 9, pas 9 par 72."]]},
+  {q:"Quel est le taux effectif annuel d'un crédit à 1,5 % par mois, capitalisé chaque mois ? En %, au centième.", a:19.56, tol:0.011, s:"1,015¹² − 1 ≈ 1,1956 − 1 : 19,56 %.", h:"Calcule (1 + 0,015)¹² − 1, puis multiplie par 100.", tag:"taux",
+   tr:[[18, "18 % est le taux nominal, 1,5 × 12. Le taux effectif tient compte des intérêts sur les intérêts."], [119.56, "1,1956 est le coefficient sur un an. Le taux, c'est 1,1956 − 1."], [1.1956, "1,1956 est le coefficient sur un an. Le taux, c'est 1,1956 − 1, en pour cent."]]},
+  {q:"Quel taux mensuel est équivalent à un taux effectif annuel de 10 % ? En %, au millième.", a:0.797, tol:0.0011, s:"1,10<sup>1/12</sup> − 1 ≈ 0,00797 : 0,797 % par mois.", h:"Cherche t tel que (1 + t)¹² = 1,10 : t = 1,10<sup>1/12</sup> − 1.", tag:"taux",
+   tr:[[0.833, "0,833 % est le taux proportionnel, 10/12. Il est trop élevé : capitalisé 12 fois, il donnerait plus de 10 %."]]},
+  {q:"Un microcrédit de 60 000 FCFA sur 6 mois affiche « 3 % par mois, flat ». Quelle est la mensualité ?", a:11800, tol:0.5, s:"Intérêts : 60 000 × 0,03 × 6 = 10 800 FCFA. Mensualité : (60 000 + 10 800)/6 = 11 800 FCFA.", h:"Intérêts totaux = 60 000 × 0,03 × 6. Ajoute le capital, puis divise par 6.", tag:"flat",
+   tr:[[10800, "10 800 FCFA sont les intérêts totaux. La mensualité rembourse aussi le capital : (60 000 + 10 800)/6."], [10000, "10 000 FCFA, c'est seulement le capital divisé par 6. Ajoute la part d'intérêts."], [1800, "1 800 FCFA sont les intérêts d'un seul mois. La mensualité contient aussi 10 000 FCFA de capital."]]},
+  {q:"Même prêt : d'après le simulateur de la section 6.3, quel est son taux réel mensuel ? En %, au dixième.", a:4.9, tol:0.051, s:"Environ 4,94 % par mois, soit 1,65 fois le taux affiché.", h:"Dans le simulateur, entre 60 000, 3 et 6, puis lis la ligne « taux réel ».", tag:"flat",
+   tr:[[3, "3 % est le taux affiché. Le taux réel est plus élevé, parce que les intérêts portent sur tout le capital, même déjà remboursé."]]}
+];
+function exCheck(i){
+  var e = EX[i], raw = $("ex-in-" + i).value, out = $("ex-fb-" + i), item = $("ex-item-" + i), v = parseNum(raw);
+  if (!raw.trim()){ out.innerHTML = "<p class='tool-err'>Écris ta réponse dans la case.</p>"; return; }
+  if (isNaN(v)){ out.innerHTML = "<p class='tool-err'>Je ne lis pas un nombre. Écris par exemple 5627,54 ou 19,56.</p>"; return; }
+  if (Math.abs(v - e.a) <= e.tol){
+    out.innerHTML = "<div class='verdict ok'><p><b>Juste.</b> " + e.s + "</p></div>";
+    item.setAttribute("data-ok", "1");
+  } else {
+    var trap = null;
+    (e.tr || []).forEach(function(t){
+      if (trap === null && Math.abs(v - t[0]) <= Math.max(e.tol, Math.abs(t[0]) * 0.002, 0.006)) trap = t[1];
+    });
+    if (trap !== null){
+      out.innerHTML = "<div class='verdict ko'><p><b>Erreur classique.</b> " + esc(trap) + "</p></div>";
+    } else if (Math.abs(v - e.a) <= Math.max(10 * e.tol, Math.abs(e.a) * 0.003)){
+      out.innerHTML = "<div class='verdict mid'><p><b>Très proche.</b> C'est sans doute un arrondi : relis la précision demandée dans l'énoncé.</p></div>";
+    } else {
+      out.innerHTML = "<div class='verdict ko'><p><b>Pas tout à fait.</b> Ta réponse, " + fmtS(v, 4) + ", ne correspond pas.</p><details class='hint'><summary>Un indice</summary><div>" + e.h + "</div></details></div>";
+    }
+    item.setAttribute("data-ok", "0");
+  }
+  var nok = document.querySelectorAll(".ex-item[data-ok='1']").length;
+  $("ex-score").textContent = nok ? nok + " sur " + EX.length + " réussis." : "";
+}
+if ($("ex-list")){
+  var h = "";
+  EX.forEach(function(e, i){
+    h += "<div class='ex-item' id='ex-item-" + i + "'><p class='ex-q'><span class='ex-n'>" + (i + 1) + ".</span>" + e.q + "<span class='ex-tag'>" + e.tag + "</span></p>" +
+      "<div class='ex-in'><input id='ex-in-" + i + "' type='text' inputmode='decimal' autocomplete='off' autocapitalize='off' spellcheck='false' aria-label='Ta réponse à l&apos;exercice " + (i + 1) + "'><button type='button' data-i='" + i + "'>Vérifier</button></div>" +
+      "<div class='ex-fb' id='ex-fb-" + i + "' aria-live='polite'></div></div>";
+  });
+  $("ex-list").innerHTML = h + "<p class='ex-score' id='ex-score' aria-live='polite'></p>";
+  each(document.querySelectorAll("#ex-list .ex-in button"), function(b){ b.addEventListener("click", function(){ exCheck(+b.getAttribute("data-i")); }); });
+  EX.forEach(function(e, i){ $("ex-in-" + i).addEventListener("keydown", function(ev){ if (ev.key === "Enter"){ ev.preventDefault(); exCheck(i); } }); });
+}
+
+window.__f01 = {parseNum: parseNum, realRate: realRate, annuity: annuity, EX: EX, exCheck: exCheck, fmt: fmt, fmtS: fmtS};
+})();
+</script>
+</body>
+</html>

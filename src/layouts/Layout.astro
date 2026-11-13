@@ -4,9 +4,9 @@ import Navigation from '../components/Navigation.astro';
 // Fil d'Ariane des articles : leur place dans la partie Autodidacte.
 // Les articles gardent leurs adresses d'origine, d'où ces préfixes.
 const FILS = [
-    ['/cybersecurite/', 'Cybersécurité', '/autodidacte/#cybersecurite'],
-    ['/informatique/git-', 'Outils du développeur', '/autodidacte/#outils'],
-    ['/informatique/python-', 'Projets personnels', '/autodidacte/#projets-personnels'],
+    ['/cybersecurite/', 'Cybersécurité', '/autodidacte/', 'NLP & Inclusive finance', '/autodidacte/'],
+    ['/informatique/git-', 'Outils du développeur', '/personnel/#outils', 'Personnel', '/personnel/'],
+    ['/informatique/python-', 'Projets personnels', '/autodidacte/#projets-personnels', 'NLP & Inclusive finance', '/autodidacte/'],
 ];
 const fil = FILS.find(([prefixe]) => Astro.url.pathname.startsWith(prefixe));
 ---
@@ -34,7 +34,7 @@ const fil = FILS.find(([prefixe]) => Astro.url.pathname.startsWith(prefixe));
         <main class="page-main">
             {fil && (
                 <p class="fil">
-                    <a href="/autodidacte/">Autodidacte</a>
+                    <a href={fil[4]}>{fil[3]}</a>
                     <span aria-hidden="true">/</span>
                     <a href={fil[2]}>{fil[1]}</a>
                 </p>
