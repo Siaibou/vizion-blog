@@ -1,37 +1,26 @@
 // Tout ce que j'apprends en dehors des cours de la licence.
 // Pour publier un nouveau contenu : ajoute une ligne dans « contenus » du groupe concerné.
 
-const bandit = Array.from({ length: 10 }, (_, n) => ({
-  titre: `Niveau ${n} → ${n + 1}`,
-  href: `/cybersecurite/bandit-${n}`,
-}));
-
+// Menu « NLP & Inclusive finance ».
 export const themes = [
   {
-    id: 'cybersecurite',
-    nom: 'Cybersécurité',
-    description: "Mon journal d'apprentissage de la sécurité offensive et défensive, de mes récapitulatifs de cours aux wargames.",
+    id: 'finance',
+    nom: 'Finance',
+    description: "Mon parcours d'apprentissage de la finance, et en particulier de l'inclusion financière.",
     groupes: [
       {
-        titre: 'Récapitulatifs Vizion',
+        titre: 'Parcours',
         contenus: [
-          { titre: 'Vizion 1 — Réseaux : OSI, TCP/UDP, intermédiaires', href: '/cybersecurite/vizion-1-reseaux' },
+          { titre: 'Finance : le parcours vers l\'inclusion financière', href: '/cours/finance-00-parcours.html' },
         ],
       },
-      { titre: 'OverTheWire — Bandit', contenus: bandit },
-      { titre: 'TryHackMe', contenus: [] },
     ],
   },
   {
-    id: 'outils',
-    nom: 'Outils du développeur',
-    description: "Les outils que j'utilise au quotidien pour coder, versionner et publier.",
-    groupes: [
-      {
-        titre: 'Git et GitHub',
-        contenus: [{ titre: 'Fiche des commandes & concepts essentiels', href: '/informatique/git-essentiels' }],
-      },
-    ],
+    id: 'linguistique',
+    nom: 'Linguistique',
+    description: 'Mes notes de linguistique, en lien avec le traitement automatique des langues (NLP).',
+    groupes: [],
   },
   {
     id: 'projets-personnels',
@@ -47,6 +36,27 @@ export const themes = [
     ],
   },
   {
+    id: 'intelligence-artificielle',
+    nom: 'Intelligence artificielle',
+    description: "Machine learning, LLM et sécurité de l'IA : la destination de mon parcours.",
+    groupes: [],
+  },
+];
+
+// Menu « Personnel ».
+export const themesPersonnel = [
+  {
+    id: 'outils',
+    nom: 'Outils du développeur',
+    description: "Les outils que j'utilise au quotidien pour coder, versionner et publier.",
+    groupes: [
+      {
+        titre: 'Git et GitHub',
+        contenus: [{ titre: 'Fiche des commandes & concepts essentiels', href: '/informatique/git-essentiels' }],
+      },
+    ],
+  },
+  {
     id: 'spiritualite',
     nom: 'Spiritualité',
     description: 'Mes lectures et réflexions sur les traditions spirituelles.',
@@ -57,15 +67,10 @@ export const themes = [
       },
     ],
   },
-  {
-    id: 'intelligence-artificielle',
-    nom: 'Intelligence artificielle',
-    description: "Machine learning, LLM et sécurité de l'IA : la destination de mon parcours.",
-    groupes: [],
-  },
 ];
 
 export function bilanAutodidacte() {
-  const contenus = themes.flatMap((t) => t.groupes.flatMap((g) => g.contenus));
-  return { themes: themes.length, contenus: contenus.length };
+  const tous = [...themes, ...themesPersonnel];
+  const contenus = tous.flatMap((t) => t.groupes.flatMap((g) => g.contenus));
+  return { themes: tous.length, contenus: contenus.length };
 }

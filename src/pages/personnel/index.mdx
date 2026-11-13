@@ -1,0 +1,19 @@
+---
+layout: ../../layouts/Layout.astro
+title: "Personnel"
+date: 2026-06-01
+description: "Mes outils de développeur et mes lectures spirituelles."
+---
+
+import Dossier from '../../components/Dossier.astro';
+import { themesPersonnel } from '../../data/autodidacte.js';
+
+# Personnel
+
+Mes outils de développeur et mes lectures spirituelles.
+
+<div>
+  {themesPersonnel.map((t) => (
+    <Dossier id={t.id} nom={t.nom} description={t.description} etiquette="En bref" groupes={t.groupes} />
+  ))}
+</div>
