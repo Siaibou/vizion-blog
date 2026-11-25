@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les encodages, depuis le tout début</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Cahier à grands carreaux : même identité que les cours de maths et d'architecture (papier ligné, marge rouge,
+   Atkinson + STIX), police à chasse fixe pour les octets. Une couleur par type Python : str vert, bytes bleu, int ambre. */
+:root{
+  --paper:#f8fafd; --card:#ffffff; --ink:#1c2748; --muted:#5d6784; --line:#dbe1ee;
+  --margin:#d8434b; --blue:#2350c4; --red:#c9302c; --green:#17835a; --amber:#a86b00;
+  --rule:rgba(35,80,196,.07);
+  --soft-b:rgba(35,80,196,.10); --soft-r:rgba(201,48,44,.10); --soft-g:rgba(23,131,90,.12); --soft-a:rgba(168,107,0,.13);
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --serif:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+    --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+    --rule:rgba(138,169,255,.05);
+    --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1422; --card:#171e31; --ink:#e4e8f5; --muted:#9ba5c2; --line:#2a3350;
+  --margin:#ff6b73; --blue:#8aa9ff; --red:#ff8a80; --green:#5fd39b; --amber:#f2b64a;
+  --rule:rgba(138,169,255,.05);
+  --soft-b:rgba(138,169,255,.15); --soft-r:rgba(255,138,128,.15); --soft-g:rgba(95,211,155,.15); --soft-a:rgba(242,182,74,.16);
+  color-scheme:dark;
+}
+:root{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 28px;color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--blue)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
+.hero{padding:44px 16px 20px 30px;max-width:780px;margin:0 auto;position:relative}
+.kicker{color:var(--margin);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(2rem,7vw,3rem);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;text-wrap:balance}
+h1 small{display:block;font-size:.5em;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:8px}
+.lede{font-size:1.1rem;margin:0;max-width:62ch}
+main{max-width:780px;margin:0 auto;padding:0 16px 110px 30px;position:relative}
+main::before{content:"";position:absolute;top:0;bottom:0;left:13px;width:2px;background:var(--margin);opacity:.6}
+@media (min-width:720px){
+  .hero,main{padding-left:64px}
+  main::before{left:34px}
+  h2 .num{position:absolute;left:-54px;width:36px;text-align:right}
+}
+h2,h3{line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.65rem;margin:64px 0 10px;position:relative}
+h2 .num{color:var(--margin);margin-right:.4em;font-family:var(--serif)}
+h3{font-size:1.2rem;margin:36px 0 6px}
+h4{font-size:1.05rem;margin:26px 0 4px;color:var(--blue)}
+p{margin:12px 0}
+ul,ol{padding-left:1.3em}
+li{margin:6px 0}
+.mr{font-family:var(--serif);font-size:1.1em}
+code,.bits{font-family:var(--mono);font-size:.86em}
+code{background:var(--soft-b);padding:.1em .35em;border-radius:5px;word-break:break-word}
+.bits{white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+sub{font-size:.7em}
+.c-b{color:var(--blue);font-weight:700}.c-r{color:var(--red);font-weight:700}.c-g{color:var(--green);font-weight:700}.c-a{color:var(--amber);font-weight:700}.c-m{color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:18px 0}
+.box>:first-child{margin-top:0}.box>:last-child{margin-bottom:0}
+.lbl{font-weight:700;margin:0 0 4px}
+.key{border:2px solid var(--red)}.key .lbl{color:var(--red)}
+.img{border-left:5px solid var(--green)}.img .lbl{color:var(--green)}
+.nts{border-left:5px solid var(--blue)}.nts .lbl{color:var(--blue)}
+.warn{border-left:5px solid var(--amber)}.warn .lbl{color:var(--amber)}
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;background:var(--card);font-size:.96rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft-b)}
+table.c td,table.c th{text-align:center;white-space:nowrap}
+table.tight{width:auto;margin:0 auto}
+td.rest{color:var(--red);font-weight:700;font-family:var(--mono)}
+.blk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0;padding:0;list-style:none}
+.blk li{margin:0}
+.blk a{display:flex;gap:10px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink);height:100%}
+.blk a b{color:var(--margin);min-width:1.4em;font-family:var(--serif)}
+.blk a:hover{border-color:var(--blue)}
+details.check{margin:22px 0 8px;background:var(--card);border:1.5px dashed var(--muted);border-radius:12px;padding:4px 16px}
+details.check>summary{font-weight:700;cursor:pointer;padding:10px 0}
+.check ol{padding-left:1.3em}
+.check li{margin:16px 0}
+.check details{margin-top:4px}
+.check details>summary{color:var(--blue);cursor:pointer;font-size:.93rem}
+.check details>div{background:var(--soft-g);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.96rem;overflow-x:auto}
+.check details>div>:first-child{margin-top:0}.check details>div>:last-child{margin-bottom:0}
+.steps{font-family:var(--serif);font-size:1.08rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:baseline;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:16px 0}
+.steps .why{font-family:var(--sans);font-size:.88rem;color:var(--muted);grid-column:2;margin:-2px 0 8px}
+.steps .op{color:var(--blue);text-align:right;font-size:.92rem;font-family:var(--sans);font-weight:700}
+.steps code{font-size:.84em}
+.steps .bits{font-size:.9em}
+pre.code{background:var(--soft-b);border-radius:8px;padding:10px 14px;overflow-x:auto;margin:14px 0;line-height:1.5}
+pre.code code{background:none;padding:0;font-size:.88rem;word-break:normal}
+pre.code .cm{color:var(--muted)}
+pre.code .er{color:var(--red)}
+.note{font-size:.92rem;color:var(--muted)}
+.top{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+footer{max-width:780px;margin:0 auto;padding:0 16px 60px 30px;color:var(--muted);font-size:.9rem}
+@media (min-width:720px){footer{padding-left:64px}}
+
+/* questions guidées */
+.drill{margin:24px 0 8px;padding:8px 16px 12px;border:1.5px dashed var(--muted);border-radius:12px;background:var(--card)}
+.drill>.lbl{margin:6px 0 2px}
+.mq{border-top:1px solid var(--line);padding:10px 0 6px}
+.mq-q{margin:0 0 8px;font-weight:700}
+.mq-c{display:flex;flex-wrap:wrap;gap:8px}
+.mq-c button{font:inherit;font-size:.98rem;text-align:left;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;min-height:40px;cursor:pointer;max-width:100%}
+.mq-c button:hover{border-color:var(--blue)}
+.mq-c button.good{border-color:var(--green);background:var(--soft-g)}
+.mq-c button.bad{border-color:var(--red);background:var(--soft-r)}
+.mq-fb{margin:8px 0 0;color:var(--red);font-size:.95rem}
+.mq-fb:empty{display:none}
+.mq-ok{margin-top:8px;background:var(--soft-g);border-radius:8px;padding:8px 12px;font-size:.97rem}
+[hidden]{display:none!important}
+
+/* laboratoires */
+.lab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:18px 0}
+.lab>.lbl{color:var(--blue)}
+.btn{font:inherit;font-weight:700;border:0;background:var(--blue);color:var(--paper);border-radius:999px;padding:8px 18px;cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:8px 0}
+.row>*{min-width:0}
+.fld{display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:var(--muted);font-weight:700}
+.fld input{font-family:var(--mono);font-size:1.02rem;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);min-height:42px;min-width:0;width:100%}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.92rem;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:38px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--soft-b);color:var(--blue);font-weight:700}
+.chk{font-size:.93rem;display:flex;gap:8px;align-items:center;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--blue)}
+.out{margin-top:10px}
+.msg{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:.98rem}
+.msg>:first-child{margin-top:0}.msg>:last-child{margin-bottom:0}
+.msg.ok{background:var(--soft-g)}.msg.ko{background:var(--soft-r)}.msg.info{background:var(--soft-b)}.msg.meh{background:var(--soft-a)}
+.msg code.py{display:block;background:none;padding:0;margin:2px 0 4px;color:var(--red);font-size:.84rem}
+.cv-grid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;background:var(--paper);border-radius:8px;padding:10px 14px;align-items:baseline;margin:10px 0}
+.cv-grid b{font-size:.88rem;color:var(--muted)}
+.cv-grid span{font-family:var(--mono);font-size:.98rem;overflow-wrap:anywhere}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center;font-size:.86rem;color:var(--muted);margin:6px 0}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px;border:1px solid var(--line)}
+table.bt td,table.bt th{padding:4px 8px}
+table.bt td.r{text-align:left;font-family:var(--sans);color:var(--muted)}
+
+/* paquets d'octets */
+.grpw{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:14px 0;overflow-x:auto}
+.grpt{margin:6px 0 4px;font-size:.9rem;color:var(--muted);font-weight:700}
+.grp{display:flex;gap:6px;flex-wrap:nowrap;margin:2px 0 8px}
+.gcell{display:flex;flex-direction:column;align-items:center;min-width:52px;border:1.5px solid var(--blue);border-radius:8px;padding:2px 8px;background:var(--soft-b)}
+.gcell:nth-child(even){border-color:var(--green);background:var(--soft-g)}
+.gc{font-family:var(--mono);font-size:.9rem}
+.gn{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.gd{font-family:var(--mono);font-weight:700;font-size:1.1rem}
+
+/* table ASCII */
+.asc-w{overflow-x:auto;margin:8px 0}
+table.asc{border-collapse:separate;border-spacing:4px;width:auto;margin:0 auto;background:none}
+table.asc th{border:0;background:none;color:var(--muted);font-family:var(--mono);font-size:.82rem;padding:0 2px;text-align:center;vertical-align:middle}
+table.asc td{border:0;padding:0}
+.ak{font-family:var(--mono);font-size:1.05rem;width:38px;height:34px;border-radius:7px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;padding:0;display:grid;place-items:center}
+.ak.ctl,.ak.sp{font-family:var(--sans);font-size:.6rem;font-weight:700;color:var(--muted)}
+.ak.ctl{background:var(--paper);border-style:dashed}
+.ak.dig{background:var(--soft-g)}.ak.up{background:var(--soft-b)}.ak.lo{background:var(--soft-a)}
+.ak:hover{border-color:var(--blue)}
+.ak[aria-pressed="true"]{border-color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+@media (max-width:430px){.ak{width:31px;height:31px;font-size:.95rem} table.asc{border-spacing:3px}}
+.asc-d{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;align-items:center;background:var(--paper);border-radius:10px;padding:10px 14px;margin-top:8px;min-height:120px}
+.asc-big{font-family:var(--mono);font-size:2.6rem;font-weight:700;min-width:1.4em;text-align:center;line-height:1;color:var(--blue)}
+.asc-big.sm{font-size:1.3rem}
+.asc-d p{margin:3px 0;font-size:.96rem}
+.bh{color:var(--red);font-weight:700;text-decoration:underline}
+
+/* Base64 : les 24 bits */
+.b64w{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:14px 0}
+.b64t{font-size:.9rem;color:var(--muted);font-weight:700;margin:0 0 8px}
+.b64{display:grid;grid-template-columns:repeat(24,minmax(11px,1fr));gap:3px 1px;min-width:288px;max-width:560px;margin:0 auto}
+.b64 .lb{font-size:.78rem;text-align:center;border-radius:6px;padding:1px 0;white-space:nowrap;overflow:hidden;line-height:1.4}
+.b64 .lb.m{font-family:var(--mono)}
+.b64 .bt{font-family:var(--mono);font-size:.9rem;text-align:center;line-height:1.75;border-radius:2px;min-height:1.75em}
+.b64 .y0{background:var(--soft-b)}.b64 .y1{background:var(--soft-g)}.b64 .y2{background:var(--soft-a)}
+.b64 .pz{color:var(--muted);background:repeating-linear-gradient(135deg,transparent 0 3px,var(--line) 3px 4px)}
+.b64 .pz.bad{color:var(--red);font-weight:700}
+.b64 .no{background:none;color:var(--muted)}
+.b64 .gs{box-shadow:inset 2px 0 0 var(--ink)}
+.b64 .eqc{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.95rem}
+.b64cap{font-size:.86rem;color:var(--muted);margin:8px 0 0}
+.alpha{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;max-width:440px;margin:12px auto}
+.alpha span{display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:6px;padding:2px 0;line-height:1.2;background:var(--card)}
+.alpha span.u{background:var(--soft-b)}.alpha span.l{background:var(--soft-a)}.alpha span.d{background:var(--soft-g)}.alpha span.s{background:var(--soft-r)}
+.alpha b{font-family:var(--mono);font-size:1.05rem}
+.alpha i{font-style:normal;font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+
+/* carte des conversions */
+.map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.mcard.hub{grid-column:1/-1;border:2px solid var(--blue);background:var(--soft-b)}
+.mcard h4{margin:0 0 2px;color:var(--ink);font-size:1.02rem}
+.mcard .val{font-family:var(--mono);font-size:1rem;margin:2px 0 8px;overflow-wrap:anywhere;font-weight:700}
+.mcard .fn{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 8px;font-size:.88rem;align-items:baseline}
+.mcard .fn>span:nth-child(odd){color:var(--muted);white-space:nowrap}
+.mcard .fn code{font-size:.84rem}
+.mnote{font-size:.85rem;color:var(--muted);margin:8px 0 0}
+@media (max-width:560px){.map{grid-template-columns:minmax(0,1fr)}}
+.tp{display:inline-block;font-family:var(--sans);font-size:.74rem;font-weight:700;border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.tp.str{background:var(--soft-g);color:var(--green)}.tp.bytes{background:var(--soft-b);color:var(--blue)}.tp.int{background:var(--soft-a);color:var(--amber)}
+
+/* atelier des couches */
+.ch-ops{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.ch-ops button{font-family:var(--mono);font-size:.84rem;border:1.5px solid var(--blue);background:var(--card);color:var(--blue);border-radius:8px;padding:5px 10px;min-height:38px;cursor:pointer}
+.ch-ops button:hover:not(:disabled){background:var(--soft-b)}
+.ch-ops button:disabled{opacity:.4;cursor:not-allowed;border-style:dashed}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.presets button{font:inherit;font-size:.86rem;border:1px dashed var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:4px 12px;cursor:pointer;min-height:34px}
+.presets button:hover{background:var(--soft-b)}
+ol.ch-h{list-style:none;padding:0;margin:8px 0}
+ol.ch-h li{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:0 8px;padding:7px 0;margin:0;border-top:1px solid var(--line)}
+.ch-n{font-family:var(--serif);color:var(--margin);font-weight:600;text-align:right}
+.ch-e{font-family:var(--mono);font-size:.84rem;color:var(--muted);overflow-wrap:anywhere}
+.ch-v{font-family:var(--mono);font-size:.95rem;overflow-wrap:anywhere}
+li.ch-cur{background:var(--soft-b);border-radius:8px}
+
+/* exercices et indices */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px 14px;margin:18px 0}
+.ex h3{margin-top:14px}
+.hints p{display:none;background:var(--soft-b);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:.96rem}
+.hints p.shown{display:block}
+.hints .btn{margin-top:6px}
+</style>
+</head>
+<body>
+<div id="haut"></div>
+<header class="hero">
+<p class="kicker">Cryptographie, CryptoHack : la catégorie Encoding</p>
+<h1>Les encodages, depuis le tout début<small>ASCII, hexadécimal, Base64, et le passage des octets aux grands entiers dont RSA a besoin.</small></h1>
+<p class="lede">Les quatre premiers défis de CryptoHack se résolvent en quelques lignes de Python. Derrière ces lignes se cache une idée qu'un ingénieur en cryptographie manipule tous les jours : une même suite d'octets peut s'écrire comme du texte, comme des chiffres hexadécimaux, comme du Base64 ou comme un seul très grand nombre. On reprend tout depuis le début, en s'appuyant sur ta page sur le binaire. Cinq laboratoires te laissent manipuler les octets toi-même, et les défis eux-mêmes n'ont droit qu'à des indices.</p>
+</header>
+
+<main>
+
+<!-- ============ 0 ============ -->
+<section id="p0">
+<h2><span class="num">0</span>Mode d'emploi</h2>
+<div class="box">
+<p class="lbl">Comment travailler</p>
+<ul>
+<li><b>Lis dans l'ordre.</b> Chaque section s'appuie sur la précédente, et la section 5 réutilise directement les sections 2 et 3 de ta page sur le binaire.</li>
+<li><b>Garde un terminal Python ouvert</b> (<code>python3</code> dans Konsole) et tape chaque exemple toi-même avant de lire la réponse. C'est la meilleure façon de t'habituer à la manière dont Python affiche les octets.</li>
+<li><b>Pose les conversions à la main</b> sur ta feuille avant d'utiliser un laboratoire. Python et les laboratoires servent à vérifier, pas à calculer à ta place.</li>
+<li><b>Réponds aux questions « Vérifie-toi » avant de cliquer.</b> Une erreur ici ne coûte rien.</li>
+<li><b>Rythme conseillé :</b> sections 1 et 2 à une première séance, 3 et 4 à une deuxième, 5 et 6 à une troisième, puis les exercices de la section 8 avant de reprendre les défis (section 9).</li>
+</ul>
+</div>
+<div class="box warn">
+<p class="lbl">Tes priorités d'abord</p>
+<p>Cette page sert aussi ton cours d'architecture : elle prolonge la section 8.1 de ta page sur le binaire. Mais CryptoHack vient après les maths et tes notes dans tes priorités. Compte trois séances d'environ une heure, et ne les mets jamais à la place d'une révision.</p>
+</div>
+<div class="box nts">
+<p class="lbl">Où ça se place</p>
+<p>Sur CryptoHack, les quatre défis de tes notes (ASCII, Hex, Base64, Bytes and Big Integers) ouvrent la catégorie Encoding du parcours General. Ils demandent très peu de calcul, mais ils posent le vocabulaire de tout le reste : AES chiffre des blocs de 16 octets, RSA calcule sur de très grands nombres, et les normes publient leurs clés de test et leurs résultats attendus en hexadécimal.</p>
+<p>La page s'appuie sur <a href="https://claude.ai/artifact/Jk1cLjvFtNNsWqrjH3NpJN">Le binaire, depuis le tout début</a> (bits, bases, conversions, paquets de 4 bits) et sur <a href="https://claude.ai/artifact/Qu6Qq1xDuxR2SzvBEoh2Bv">Les portes logiques, depuis le tout début</a> (la porte XOR et la parité).</p>
+</div>
+<h3>Les mots, et où ils sont expliqués</h3>
+<ul class="blk">
+<li><a href="#p1"><b>•</b>Octet et encodage</a></li>
+<li><a href="#p1-enc"><b>•</b>Encoder, chiffrer, décrypter</a></li>
+<li><a href="#p2"><b>•</b>La table ASCII</a></li>
+<li><a href="#p2-py"><b>•</b>chr, ord, str et bytes</a></li>
+<li><a href="#p2-utf8"><b>•</b>Unicode et UTF-8</a></li>
+<li><a href="#p3"><b>•</b>Hexadécimal</a></li>
+<li><a href="#p3-c"><b>•</b>Octets et chaînes en C</a></li>
+<li><a href="#p4"><b>•</b>Base64</a></li>
+<li><a href="#p4-pad"><b>•</b>Le remplissage =</a></li>
+<li><a href="#p4-bits"><b>•</b>Décalages et masques</a></li>
+<li><a href="#p4-piege"><b>•</b>Le piège des deux couches</a></li>
+<li><a href="#p5"><b>•</b>Octets et grands entiers</a></li>
+<li><a href="#p5-install"><b>•</b>PyCryptodome sur Debian</a></li>
+<li><a href="#p5-endian"><b>•</b>L'ordre des octets</a></li>
+<li><a href="#p6"><b>•</b>La carte des conversions</a></li>
+<li><a href="#p6-rec"><b>•</b>Reconnaître une écriture</a></li>
+<li><a href="#p7"><b>•</b>Relecture de tes notes</a></li>
+<li><a href="#p8"><b>•</b>Exercices d'entraînement</a></li>
+<li><a href="#p9"><b>•</b>Tes défis CryptoHack</a></li>
+</ul>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="p1">
+<h2><span class="num">1</span>Des octets, du texte, des nombres</h2>
+
+<h3>1.1 Tout est octet</h3>
+<p>Ta page sur le binaire l'a montré : la mémoire est découpée en <b>octets</b> (<i>bytes</i>), des cases de 8 bits qui ont chacune leur adresse. Un fichier sur ton SSD, un paquet réseau, une clé AES, un message chiffré : tout cela n'est qu'une suite d'octets. Et un octet, c'est un entier entre 0 et 255, puisque 8 bits donnent 2⁸ = 256 valeurs.</p>
+<p>Un ordinateur ne stocke donc ni lettres, ni images, ni grands nombres : seulement des octets. Pour représenter autre chose, on fixe une convention qui dit comment passer de cette chose aux octets, et retour. Une telle convention s'appelle un <b>encodage</b> (<i>encoding</i>).</p>
+<div class="box key">
+<p class="lbl">Le principe de ta page sur le binaire, encore une fois</p>
+<p>Une suite d'octets ne veut rien dire toute seule : c'est la convention de lecture qui lui donne un sens. Voici quatre octets, et cinq façons de les lire ou de les écrire.</p>
+<div class="tw"><table>
+<tr><th>les quatre mêmes octets, lus ou écrits…</th><th>donnent</th><th>expliqué en</th></tr>
+<tr><td>comme quatre entiers de 0 à 255</td><td class="bits">67, 73, 69, 76</td><td>section 1</td></tr>
+<tr><td>comme du texte ASCII</td><td class="bits">CIEL</td><td>section 2</td></tr>
+<tr><td>en hexadécimal</td><td class="bits">4349454c</td><td>section 3</td></tr>
+<tr><td>en Base64</td><td class="bits">Q0lFTA==</td><td>section 4</td></tr>
+<tr><td>comme un seul nombre</td><td class="bits">1 128 875 340</td><td>section 5</td></tr>
+</table></div>
+<p>Toute cette page consiste à passer d'une ligne de ce tableau à une autre, dans les deux sens, à la main puis en Python.</p>
+</div>
+
+<h3 id="p1-enc">1.2 Encoder n'est pas chiffrer</h3>
+<p><b>Encoder</b> (<i>to encode</i>), c'est changer d'écriture selon une règle publique, sans clé. N'importe qui peut décoder. Le but est pratique : afficher, transporter, stocker.</p>
+<p><b>Chiffrer</b> (<i>to encrypt</i>), c'est transformer un message avec une clé secrète, pour que seuls ceux qui ont la clé puissent le lire. Le but est la confidentialité.</p>
+<div class="box img">
+<p class="lbl">L'image du morse</p>
+<p>Le morse est un encodage : il traduit les lettres en traits et en points pour les faire passer par un fil télégraphique. Sa table est publique, et un message en morse n'a rien de secret. Un message chiffré ressemble plutôt à une lettre enfermée dans un coffre : sans la clé, il reste fermé, même si tout le monde sait comment le coffre est fabriqué. C'est le principe de Kerckhoffs, publié en français en 1883 : la sécurité doit reposer sur le secret de la clé, jamais sur le secret de la méthode.</p>
+</div>
+<div class="box key">
+<p class="lbl">À retenir</p>
+<p>L'hexadécimal et le Base64 ne cachent rien. Un texte en Base64 a l'air illisible, mais il se décode en une commande. S'en servir pour « protéger » un mot de passe est une faille répertoriée, <b>CWE-261</b> (<i>Weak Encoding for Password</i>). On la trouve encore régulièrement dans des équipements embarqués, comme des automates industriels ou des écrans de supervision.</p>
+</div>
+<div class="box nts">
+<p class="lbl">Le bon vocabulaire en français</p>
+<ul>
+<li><b>chiffrer</b> (<i>encrypt</i>) : transformer un message avec une clé. Le message de départ est le <b>clair</b> (<i>plaintext</i>), le résultat le <b>chiffré</b> (<i>ciphertext</i>).</li>
+<li><b>déchiffrer</b> (<i>decrypt</i>) : retrouver le clair <b>avec</b> la clé.</li>
+<li><b>décrypter</b> : retrouver le clair <b>sans</b> la clé, en attaquant le chiffrement. C'est le travail du cryptanalyste, et ce que la plupart des défis de CryptoHack te demanderont.</li>
+<li><b>crypter</b> : à éviter. Les cryptographes francophones disent « chiffrer » ; « crypter » laisserait entendre qu'on chiffre sans clé, ce qui n'a pas de sens.</li>
+<li><b>encoder</b>, <b>décoder</b> : changer d'écriture, sans clé.</li>
+</ul>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 1)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Un mot de passe stocké en Base64 est-il protégé ?</p>
+<div class="mq-c"><button type="button" data-fb="Le Base64 n'a pas de clé : sa règle est publique.">oui, il faut une clé pour le lire</button><button type="button">non, n'importe qui peut le décoder</button><button type="button" data-fb="La longueur ne change rien : le décodage suit une règle publique.">seulement s'il est long</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Encoder, c'est changer d'écriture sans clé. Pour protéger un mot de passe, on ne l'encode pas : on le hache avec une fonction prévue pour ça.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de valeurs différentes un octet peut-il prendre ?</p>
+<div class="mq-c"><button type="button" data-fb="255 est la plus grande valeur, pas le nombre de valeurs : n'oublie pas le 0.">255</button><button type="button">256</button><button type="button" data-fb="8, c'est le nombre de bits d'un octet.">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">2⁸ = 256 valeurs, de 0 à 255.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Tu retrouves le clair d'un message chiffré sans connaître la clé, en exploitant une faiblesse. Tu l'as…</p>
+<div class="mq-c"><button type="button" data-fb="Déchiffrer, c'est avec la clé.">déchiffré</button><button type="button">décrypté</button><button type="button" data-fb="Décoder, c'est inverser un encodage, qui n'a pas de clé.">décodé</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Décrypter, c'est retrouver le clair sans la clé.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="p2">
+<h2><span class="num">2</span>ASCII : un numéro pour chaque caractère</h2>
+
+<h3>2.1 Numéroter les caractères</h3>
+<p>Pour stocker du texte, on numérote les caractères, et on stocke les numéros. La table <b>ASCII</b> (<i>American Standard Code for Information Interchange</i>), publiée en 1963 aux États-Unis, numérote 128 caractères : les 26 lettres dans les deux casses, les 10 chiffres, la ponctuation, l'espace, et 33 caractères de contrôle. Comme 128 = 2⁷, chaque numéro tient sur 7 bits, de 0 à 127. C'est la première ligne de tes notes.</p>
+<div class="box img">
+<p class="lbl">Pourquoi 7 bits, et pas 8 ?</p>
+<p>En 1963, chaque bit coûtait cher, sur les lignes de transmission comme sur les rubans perforés des téléscripteurs, et 7 bits suffisaient pour l'anglais. Quand on transmettait sur 8 bits, le huitième servait souvent de bit de parité, pour détecter une erreur : c'est exactement le montage de la section 3.2 de ta page sur les portes logiques. Sur une liaison série (UART), le réglage 7E1 (7 bits de données, parité paire, 1 bit de stop) vient de là. Aujourd'hui, on utilise surtout 8N1 (8 bits, pas de parité, 1 bit de stop) : tu le rencontreras en configurant l'UART d'une carte STM32.</p>
+</div>
+
+<h3 id="p2-table">2.2 Le plan de la table</h3>
+<p>Voici la table, rangée comme sur le tableau d'origine : la <b>colonne</b> donne le chiffre hexadécimal de gauche du code, la <b>ligne</b> celui de droite. 'A' est dans la colonne 4, à la ligne 1 : son code est (41)₁₆ = 65. Clique sur une case pour voir son code en décimal, en hexadécimal et en binaire, et ce qu'on peut en tirer.</p>
+<div class="lab" id="ascii"></div>
+<p>Les zones à connaître par cœur :</p>
+<div class="tw"><table class="c tight">
+<tr><th>codes</th><th>en hexadécimal</th><th>contenu</th></tr>
+<tr><td>0 à 31, et 127</td><td class="bits">00 à 1f, 7f</td><td style="text-align:left;white-space:normal">33 caractères de contrôle, invisibles</td></tr>
+<tr><td>32</td><td class="bits">20</td><td style="text-align:left;white-space:normal">l'espace</td></tr>
+<tr><td>48 à 57</td><td class="bits">30 à 39</td><td style="text-align:left;white-space:normal">les chiffres '0' à '9'</td></tr>
+<tr><td>65 à 90</td><td class="bits">41 à 5a</td><td style="text-align:left;white-space:normal">les majuscules 'A' à 'Z'</td></tr>
+<tr><td>97 à 122</td><td class="bits">61 à 7a</td><td style="text-align:left;white-space:normal">les minuscules 'a' à 'z'</td></tr>
+<tr><td>le reste de 33 à 126</td><td></td><td style="text-align:left;white-space:normal">ponctuation et symboles : ! " # … { | } ~</td></tr>
+</table></div>
+<p>Les 95 codes de 32 à 126 sont les caractères <b>imprimables</b> (<i>printable</i>). Les caractères de contrôle ne s'affichent pas : ils commandaient la machine, d'abord le téléscripteur, puis le terminal. Quelques-uns servent encore tous les jours.</p>
+<div class="tw"><table>
+<tr><th>code</th><th>nom</th><th>en Python</th><th>rôle</th></tr>
+<tr><td>0</td><td>NUL</td><td><code>'\x00'</code></td><td>octet nul ; en C, il marque la fin d'une chaîne (section 3.5)</td></tr>
+<tr><td>9</td><td>HT</td><td><code>'\t'</code></td><td>tabulation</td></tr>
+<tr><td>10</td><td>LF (<i>line feed</i>)</td><td><code>'\n'</code></td><td>saut de ligne : fin de ligne sous Linux</td></tr>
+<tr><td>13</td><td>CR (<i>carriage return</i>)</td><td><code>'\r'</code></td><td>retour chariot : Windows termine ses lignes par CR puis LF</td></tr>
+<tr><td>27</td><td>ESC</td><td><code>'\x1b'</code></td><td>échappement : début des séquences qui colorent ton terminal</td></tr>
+<tr><td>127</td><td>DEL</td><td><code>'\x7f'</code></td><td>effacement</td></tr>
+</table></div>
+<p class="note">Pourquoi DEL vaut 127, c'est-à-dire 111 1111 ? Sur un ruban perforé, on ne pouvait pas reboucher un trou. Pour effacer un caractère raté, on perforait les sept trous : tous les bits à 1.</p>
+
+<h3>2.3 Trois régularités cachées dans la table</h3>
+<p>La table n'est pas rangée au hasard. Écris les codes en binaire, et des régularités apparaissent. Vérifie chacune dans le laboratoire ci-dessus.</p>
+<h4>Les chiffres</h4>
+<p>'0' = 0x30 et '7' = 0x37 : le chiffre hexadécimal de droite est la valeur du chiffre. La valeur d'un chiffre, c'est donc son code moins 48 : <code>ord('7') - ord('0')</code> = 55 − 48 = 7. Ne confonds jamais le caractère '7', qui vaut 55, avec le nombre 7.</p>
+<h4>La casse tient en un bit</h4>
+<p>'A' = 0x41 = <span class="bits">1<b class="c-r">0</b>0 0001</span> et 'a' = 0x61 = <span class="bits">1<b class="c-r">1</b>0 0001</span>. Seul le bit de poids 32 (0x20) change. Pour passer en minuscule, on allume ce bit ; en majuscule, on l'éteint ; pour changer de casse, on l'inverse. En Python, l'opérateur <code>^</code> (XOR) inverse des bits : <code>chr(ord('a') ^ 0x20)</code> donne <code>'A'</code>. C'est la porte XOR de ta page sur les portes logiques, appliquée à chaque paire de bits. Attention, ça ne marche que pour les lettres : <code>'1'</code> devient <code>'\x11'</code>, un caractère de contrôle.</p>
+<h4>La position dans l'alphabet tient dans les 5 bits de droite</h4>
+<p>'A' = <span class="bits">10<b class="c-r">0 0001</b></span> : ses 5 bits de droite valent 1. 'Z' = <span class="bits">10<b class="c-r">1 1010</b></span> : 11010 = 26. Et 'a' donne 1 aussi. Pour ne garder que ces 5 bits, on fait un ET avec 0x1f = <span class="bits">001 1111</span> : <code>ord('z') &amp; 0x1f</code> donne 26. Garder certains bits grâce à un ET s'appelle appliquer un <b>masque</b> (<i>mask</i>) ; on y revient en section 4.6.</p>
+
+<h3 id="p2-py">2.4 En Python : chr, ord, et deux types de chaînes</h3>
+<p><code>ord(c)</code> donne le numéro d'un caractère, <code>chr(n)</code> le caractère d'un numéro. Ce sont deux fonctions réciproques : chacune défait ce que fait l'autre.</p>
+<pre class="code"><code>&gt;&gt;&gt; ord('A')
+65
+&gt;&gt;&gt; chr(65)
+'A'
+&gt;&gt;&gt; chr(ord('A') + 1)
+'B'
+&gt;&gt;&gt; ord('AB')
+<span class="er">TypeError: ord() expected a character, but string of length 2 found</span></code></pre>
+<p>Pour passer d'une liste de codes à un texte, on applique <code>chr</code> à chaque code, puis on colle les morceaux :</p>
+<pre class="code"><code>codes = [67, 73, 69, 76]
+texte = ""
+for c in codes:
+    texte = texte + chr(c)    <span class="cm"># on accumule</span>
+print(texte)                  <span class="cm"># CIEL</span></code></pre>
+<p class="note">C'est le même schéma d'accumulation que le calcul de la parité, dans ta page sur les portes logiques.</p>
+
+<h4>Deux types pour deux choses différentes</h4>
+<p>Python 3 distingue soigneusement le texte et les octets :</p>
+<div class="tw"><table>
+<tr><th></th><th><code>str</code> : chaîne de caractères</th><th><code>bytes</code> : chaîne d'octets</th></tr>
+<tr><th>contient</th><td>des caractères (des points de code, section 2.5)</td><td>des entiers de 0 à 255</td></tr>
+<tr><th>s'écrit</th><td><code>'Hi!'</code></td><td><code>b'Hi!'</code></td></tr>
+<tr><th>un élément</th><td><code>'Hi!'[0]</code> donne <code>'H'</code>, un str</td><td><code>b'Hi!'[0]</code> donne <code>72</code>, un int</td></tr>
+<tr><th>sert à</th><td>afficher, lire du texte</td><td>stocker, transmettre, chiffrer</td></tr>
+<tr><th>vers l'autre type</th><td><code>'Hi!'.encode()</code> donne <code>b'Hi!'</code></td><td><code>b'Hi!'.decode()</code> donne <code>'Hi!'</code></td></tr>
+</table></div>
+<div class="box key">
+<p class="lbl">La cryptographie travaille sur des octets</p>
+<p>AES, SHA-256, XOR : tout prend des bytes et rend des bytes. Le texte n'apparaît qu'au tout début (le message qu'on encode) et à la toute fin (le message qu'on affiche). Avant chaque opération, demande-toi quel type tu tiens : <code>str</code>, <code>bytes</code> ou <code>int</code>. Dans toute la page, ces trois types gardent la même couleur : <span class="tp str">str</span> <span class="tp bytes">bytes</span> <span class="tp int">int</span>.</p>
+</div>
+<h4>Comment Python affiche un bytes</h4>
+<p>Python montre chaque octet imprimable (32 à 126) comme son caractère ASCII, et tous les autres sous la forme <code>\x</code> suivie de deux chiffres hexadécimaux. Trois octets de contrôle ont une écriture à eux, <code>\t</code>, <code>\n</code> et <code>\r</code>, et l'antislash lui-même s'écrit <code>\\</code>.</p>
+<pre class="code"><code>&gt;&gt;&gt; bytes([72, 105, 33])
+b'Hi!'
+&gt;&gt;&gt; bytes([0, 65, 200, 10, 255])
+b'\x00A\xc8\n\xff'
+&gt;&gt;&gt; len(b'\x00A\xc8\n\xff')
+5
+&gt;&gt;&gt; list(b'Hi!')
+[72, 105, 33]
+&gt;&gt;&gt; b'\x48\x69' == b'Hi'
+True
+&gt;&gt;&gt; bytes([256])
+<span class="er">ValueError: bytes must be in range(0, 256)</span></code></pre>
+<div class="box warn">
+<p class="lbl">Ne te laisse pas tromper par l'affichage</p>
+<p><code>b'\x00A\xc8\n\xff'</code> occupe 15 caractères entre ses apostrophes, mais ne contient que 5 octets. Et dans <code>b'Hi!'</code>, les lettres sont seulement une façon commode d'afficher les octets 72, 105 et 33 : Python a choisi de montrer les octets imprimables comme des caractères ASCII. Un bytes n'est pas du texte pour autant.</p>
+</div>
+
+<h3 id="p2-utf8">2.5 Au-delà de 127 : Unicode et UTF-8</h3>
+<p>L'ASCII ne connaît ni « é », ni « 中 », ni « ب ». Aujourd'hui, la table qui numérote tous les caractères s'appelle <b>Unicode</b> : plus de 150 000 caractères, chacun avec son numéro, appelé <b>point de code</b> (<i>code point</i>) et noté U+ suivi de chiffres hexadécimaux. Les 128 premiers sont ceux de l'ASCII, dans le même ordre. En Python, <code>chr</code> et <code>ord</code> travaillent sur ces points de code, pas seulement sur l'ASCII :</p>
+<div class="tw"><table class="c">
+<tr><th>caractère</th><th>ord(c)</th><th>point de code</th><th>octets en UTF-8</th><th>taille</th></tr>
+<tr><td>A</td><td>65</td><td>U+0041</td><td class="bits">41</td><td>1 octet</td></tr>
+<tr><td>é</td><td>233</td><td>U+00E9</td><td class="bits">c3 a9</td><td>2 octets</td></tr>
+<tr><td>ب (bāʾ)</td><td>1 576</td><td>U+0628</td><td class="bits">d8 a8</td><td>2 octets</td></tr>
+<tr><td>€</td><td>8 364</td><td>U+20AC</td><td class="bits">e2 82 ac</td><td>3 octets</td></tr>
+<tr><td>中 (zhōng)</td><td>20 013</td><td>U+4E2D</td><td class="bits">e4 b8 ad</td><td>3 octets</td></tr>
+<tr><td>𝔽</td><td>120 125</td><td>U+1D53D</td><td class="bits">f0 9d 94 bd</td><td>4 octets</td></tr>
+</table></div>
+<p class="note">𝔽 est la lettre des corps finis : AES calcule dans 𝔽<sub>256</sub>, un corps à 256 éléments, que tu rencontreras en algèbre.</p>
+<p>Le point de code et les octets ne sont plus la même chose. Il faut une règle pour écrire un point de code avec des octets : c'est l'encodage <b>UTF-8</b>, utilisé par presque tout le web et par ta Debian. Sa règle tient en quatre lignes :</p>
+<div class="tw"><table>
+<tr><th>points de code</th><th>octets</th><th>motif (les x portent les bits du point de code)</th></tr>
+<tr><td>0 à 127</td><td>1</td><td class="bits">0xxxxxxx</td></tr>
+<tr><td>128 à 2 047</td><td>2</td><td class="bits">110xxxxx 10xxxxxx</td></tr>
+<tr><td>2 048 à 65 535</td><td>3</td><td class="bits">1110xxxx 10xxxxxx 10xxxxxx</td></tr>
+<tr><td>65 536 à 1 114 111</td><td>4</td><td class="bits">11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</td></tr>
+</table></div>
+<p>Encodons « é », de point de code 233 :</p>
+<div class="steps">
+<span class="op">233</span><span><span class="bits">1110 1001</span> : 8 bits, trop pour le motif à un octet, qui n'en porte que 7</span>
+<span class="op">11 bits</span><span><span class="bits">000 1110 1001</span> : le motif à deux octets porte 5 + 6 = 11 bits, on complète à gauche</span>
+<span class="op">coupe</span><span><span class="bits">00011 | 101001</span> : 5 bits pour le premier octet, 6 pour le second</span>
+<span class="op">octets</span><span><span class="bits">110<b class="c-b">00011</b> 10<b class="c-b">101001</b></span> = <span class="bits">c3 a9</span></span>
+</div>
+<p>Trois conséquences à retenir :</p>
+<ul>
+<li><b>Un texte en ASCII est déjà de l'UTF-8 valide</b> : les 128 premiers caractères gardent leur octet unique. C'est ce qui a fait le succès d'UTF-8.</li>
+<li><b>Un caractère peut valoir plusieurs octets</b> : <code>len('é')</code> vaut 1, mais <code>len('é'.encode())</code> vaut 2.</li>
+<li><b>Une suite d'octets n'est pas toujours de l'UTF-8 valide.</b> L'octet 0xc8 = <span class="bits">110 01000</span> annonce un caractère sur deux octets. S'il arrive seul, le décodage échoue :</li>
+</ul>
+<pre class="code"><code>&gt;&gt;&gt; b'\xc8'.decode()
+<span class="er">UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc8 in position 0: unexpected end of data</span></code></pre>
+<p>Tu verras souvent cette erreur sur CryptoHack, en voulant afficher comme du texte des octets qui n'en sont pas : une clé, un chiffré. Ce n'est pas un bug, ces octets ne sont simplement pas du texte. Affiche-les plutôt en hexadécimal (section 3).</p>
+<div class="box nts">
+<p class="lbl">Latin-1, le décodage qui n'échoue jamais</p>
+<p>L'ancien encodage Latin-1 (ISO 8859-1) associe à chaque octet de 0 à 255 le point de code de même numéro. <code>b.decode('latin-1')</code> réussit donc toujours, mais le résultat n'a de sens que si le texte était vraiment écrit en Latin-1. Lire en Latin-1 des octets UTF-8 donne le bug « Ã© » de ta page sur le binaire : les deux octets c3 a9 de « é » deviennent deux caractères, « Ã » et « © ».</p>
+</div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 2)</p>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut ord('a') − ord('A') ?</p>
+<div class="mq-c"><button type="button" data-fb="Les deux lettres ne sont pas voisines dans la table : regarde leurs colonnes.">1</button><button type="button" data-fb="26 est le nombre de lettres. La différence des codes tient en un seul bit.">26</button><button type="button">32</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">97 − 65 = 32 = 0x20 : la casse tient dans le bit de poids 32.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Que donne b'Hi!'[1] ?</p>
+<div class="mq-c"><button type="button" data-fb="Ce serait le résultat de 'Hi!'[1], sur un str. Un élément d'un bytes est un entier.">'i'</button><button type="button">105</button><button type="button" data-fb="Ce serait le résultat de la tranche b'Hi!'[1:2].">b'i'</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Un bytes est une suite d'entiers : l'élément d'indice 1 est l'octet 105, le code de 'i'.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien d'octets occupe 'clé' en UTF-8 ?</p>
+<div class="mq-c"><button type="button" data-fb="c et l prennent un octet chacun, mais é en prend deux.">3</button><button type="button">4</button><button type="button" data-fb="Seul le é dépasse 127.">6</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">c et l : 1 octet chacun ; é : 2 octets (c3 a9). Total 4, alors que len('clé') vaut 3.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Le caractère '0' et l'octet nul, c'est…</p>
+<div class="mq-c"><button type="button" data-fb="Le caractère '0' a le code 48, c'est-à-dire 0x30.">le même octet</button><button type="button">deux octets différents, 0x30 et 0x00</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">'0' est un caractère imprimable de code 48. L'octet 0x00 est le caractère de contrôle NUL.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="p3">
+<h2><span class="num">3</span>L'hexadécimal : deux chiffres par octet</h2>
+
+<h3>3.1 Pourquoi un chiffré est illisible</h3>
+<p>Un bon chiffrement produit des octets qui ressemblent à du hasard : chacune des 256 valeurs est aussi probable que les autres. Or seules 95 valeurs sur 256 sont des caractères imprimables, soit environ 37 %. Voici un vrai bloc chiffré, tiré de l'exemple de l'annexe B de la norme AES (FIPS 197) :</p>
+<pre class="code"><code>&gt;&gt;&gt; chiffre = bytes.fromhex('3925841d02dc09fbdc118597196a0b32')
+&gt;&gt;&gt; chiffre
+b'9%\x84\x1d\x02\xdc\t\xfb\xdc\x11\x85\x97\x19j\x0b2'</code></pre>
+<p>Sur ses 16 octets, 4 seulement sont imprimables : 9, %, j et 2. La probabilité que les 16 octets d'un bloc le soient tous vaut (95/256)¹⁶, environ une chance sur 7,7 millions. Et les autres octets posent de vrais problèmes : 0x0a coupe la ligne, 0x00 arrête la lecture d'une chaîne en C, 0x1b envoie un ordre au terminal. Impossible de copier-coller ça dans un message ou un fichier texte.</p>
+<p>C'est le problème que résolvent l'hexadécimal et le Base64 : écrire n'importe quels octets avec des caractères imprimables, sans ambiguïté.</p>
+
+<h3>3.2 Deux chiffres par octet</h3>
+<p>Ta page sur le binaire (section 3.4) l'a montré : un chiffre hexadécimal vaut exactement 4 bits, donc un octet s'écrit avec exactement 2 chiffres hexadécimaux, de 00 à ff. Pour encoder des octets en hexadécimal, on écrit chaque octet sur deux chiffres, et on colle le tout :</p>
+<div class="grpw">
+<p class="grpt">b'Hi!' → '486921'</p>
+<div class="grp" role="img" aria-label="H, i et point d'exclamation : 72, 105, 33, soit 48, 69, 21 en hexadécimal">
+<span class="gcell"><span class="gc">'H'</span><span class="gn">72</span><span class="gd">48</span></span>
+<span class="gcell"><span class="gc">'i'</span><span class="gn">105</span><span class="gd">69</span></span>
+<span class="gcell"><span class="gc">'!'</span><span class="gn">33</span><span class="gd">21</span></span>
+</div>
+<p class="grpt">un saut de ligne puis 'A' → '0a41', jamais 'a41'</p>
+<div class="grp" role="img" aria-label="saut de ligne et A : 10 et 65, soit 0a et 41">
+<span class="gcell"><span class="gc">LF</span><span class="gn">10</span><span class="gd">0a</span></span>
+<span class="gcell"><span class="gc">'A'</span><span class="gn">65</span><span class="gd">41</span></span>
+</div>
+</div>
+<div class="box key">
+<p class="lbl">La règle des deux chiffres</p>
+<p>Chaque octet s'écrit avec <b>exactement deux chiffres</b>, même s'il est petit : l'octet 10 s'écrit 0a, jamais a. Une chaîne hexadécimale qui représente des octets a donc toujours une <b>longueur paire</b>, égale à deux fois le nombre d'octets.</p>
+</div>
+<p><b>Pourquoi c'est indispensable :</b> sans le zéro, les octets 10 et 65 donneraient « a41 », qu'on pourrait aussi bien lire « a4 1 ». Avec deux chiffres fixes, on découpe sans hésiter, par paires. Et comme toutes les paires ont la même taille, peu importe qu'on coupe depuis la gauche ou depuis la droite. C'est différent d'un nombre écrit en hexadécimal, comme 0xa0a, dont le chiffre de gauche peut être seul : on y revient en section 5.7.</p>
+<p>Le coût : chaque octet devient deux caractères, donc des données encodées en hexadécimal prennent deux fois plus de place. Le Base64 (section 4) fait mieux.</p>
+<div class="box nts">
+<p class="lbl">Deux remarques de notation</p>
+<p>La norme qui définit le Base64 (RFC 4648) définit aussi cet encodage, sous le nom de <b>Base16</b> : 16 symboles de 4 bits chacun. L'hexadécimal et le Base64 sont deux membres de la même famille.</p>
+<p>En Python et en cryptographie, on écrit plutôt les chiffres hexadécimaux en minuscules : 0x4c et 0x4C désignent le même octet. Cette page fait comme Python.</p>
+</div>
+
+<h3>3.3 En Python</h3>
+<pre class="code"><code>&gt;&gt;&gt; b'Hi!'.hex()
+'486921'
+&gt;&gt;&gt; b'Hi!'.hex(' ')                <span class="cm"># avec un séparateur entre les octets</span>
+'48 69 21'
+&gt;&gt;&gt; bytes.fromhex('486921')
+b'Hi!'
+&gt;&gt;&gt; bytes.fromhex('48 69 21')      <span class="cm"># les espaces entre les paires sont acceptées</span>
+b'Hi!'
+&gt;&gt;&gt; bytes.fromhex('48692')         <span class="cm"># longueur impaire</span>
+<span class="er">ValueError: non-hexadecimal number found in fromhex() arg at position 5</span></code></pre>
+<p>Le message d'erreur est trompeur : à la position 5, il n'y a pas un mauvais chiffre, il n'y a <b>plus rien</b>. Python cherchait le second chiffre de la dernière paire. Deux autres pièges :</p>
+<ul>
+<li><b><code>hex()</code> et <code>.hex()</code> ne font pas la même chose.</b> <code>hex(255)</code> donne <code>'0xff'</code> : c'est l'écriture d'un <i>nombre</i>, avec le préfixe 0x et sans zéro de tête (<code>hex(10)</code> donne <code>'0xa'</code>). <code>b'\xff'.hex()</code> donne <code>'ff'</code> : c'est l'encodage d'<i>octets</i>, toujours deux chiffres par octet.</li>
+<li><b><code>bytes.fromhex</code> refuse le préfixe 0x</b> : <code>bytes.fromhex('0x48')</code> échoue à la position 1, sur le x.</li>
+</ul>
+<p>Pour écrire un seul octet sur deux chiffres, <code>format(10, '02x')</code> donne <code>'0a'</code> : <code>02</code> veut dire « au moins deux chiffres, complétés par des 0 », et <code>x</code> « en hexadécimal ». Dans l'autre sens, <code>int('ff', 16)</code> donne 255.</p>
+
+<h3>3.4 Sur ta Debian : xxd</h3>
+<p>En ligne de commande, <code>xxd</code> affiche en hexadécimal le contenu d'un fichier, ou ce qu'on lui envoie. S'il te manque : <code>sudo apt install xxd</code>.</p>
+<pre class="code"><code>$ echo -n 'Hi!' | xxd
+00000000: 4869 21                                  Hi!
+$ echo -n 'Hi!' | xxd -p
+486921
+$ echo 486921 | xxd -r -p
+Hi!</code></pre>
+<p>Chaque ligne de <code>xxd</code> donne la position du premier octet (en hexadécimal), les octets par groupes de deux, puis leur lecture en ASCII, avec un point pour chaque octet non imprimable. L'option <code>-p</code> (<i>plain</i>) donne l'hexadécimal seul, <code>-r</code> (<i>reverse</i>) fait le chemin inverse.</p>
+<div class="box warn">
+<p class="lbl">Le saut de ligne caché d'echo</p>
+<p>Sans l'option <code>-n</code>, <code>echo</code> ajoute un saut de ligne à la fin, et tu encodes un octet de trop :</p>
+<pre class="code"><code>$ echo 'Hi!' | xxd
+00000000: 4869 210a                                Hi!.</code></pre>
+<p>Ce 0a final est une source d'erreurs classique en CTF : le Base64 ou l'empreinte (<i>hash</i>) d'un mot change complètement à cause de lui. Les apostrophes, elles, empêchent bash d'interpréter le point d'exclamation.</p>
+</div>
+
+<h3 id="p3-c">3.5 Dans l'embarqué : des octets ne sont pas une chaîne C</h3>
+<p>En C, une chaîne de caractères est un tableau de <code>char</code> terminé par un octet nul : c'est ainsi que <code>strlen</code> trouve sa longueur, en avançant jusqu'au premier 0x00. Une clé ou un chiffré peut contenir 0x00 n'importe où, ou n'en contenir aucun. Les fonctions de chaînes (<code>strlen</code>, <code>strcpy</code>, <code>printf("%s")</code>) coupent alors les données au premier octet nul, ou lisent au-delà du tableau s'il n'y en a pas, sans le moindre message d'erreur.</p>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+<span class="cm">/* La clé de l'exemple de la norme AES (FIPS 197, annexe B). */</span>
+static const uint8_t cle[16] = {
+    0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
+};
+
+<span class="cm">/* Des octets voyagent toujours avec leur taille : (pointeur, taille). */</span>
+void afficher_hex(const uint8_t *octets, size_t taille) {
+    for (size_t i = 0; i &lt; taille; i++)
+        printf("%02x", octets[i]);   <span class="cm">/* deux chiffres, zéro de tête : comme format(n, '02x') */</span>
+    printf("\n");
+}
+
+int main(void) {
+    afficher_hex(cle, sizeof(cle));  <span class="cm">/* 2b7e151628aed2a6abf7158809cf4f3c */</span>
+    <span class="cm">/* strlen((const char *)cle) n'aurait aucun sens : pas d'octet nul final,
+       strlen lirait au-delà du tableau (lecture hors limites). */</span>
+    return 0;
+}</code></pre>
+<div class="box nts">
+<p class="lbl">Ce que tu feras sur ta carte</p>
+<p>Cette clé est celle de l'exemple de la norme AES. Quand tu programmeras AES en C sur ta carte STM32, tu la taperas telle quelle, tu chiffreras le bloc d'exemple de la norme, et tu vérifieras que ta carte produit exactement le chiffré <span class="bits">3925841d…</span> de la section 3.1. Les normes donnent toujours leurs <b>vecteurs de test</b> (<i>test vectors</i>) en hexadécimal : c'est la première chose qu'on vérifie sur une implémentation.</p>
+</div>
+
+<h3>3.6 Laboratoire : le traducteur d'octets</h3>
+<p>Tape un texte, une chaîne hexadécimale ou une liste d'entiers : la page montre chaque octet en décimal, en hexadécimal et en binaire, puis la façon dont Python l'afficherait. Essaie « Clé AES », puis le chiffré AES de la section 3.1 en mode hexadécimal.</p>
+<div class="lab" id="trad"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 3)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de caractères fait l'écriture hexadécimale d'un bloc AES de 16 octets ?</p>
+<div class="mq-c"><button type="button" data-fb="Chaque octet donne deux chiffres.">16</button><button type="button">32</button><button type="button" data-fb="128, c'est le nombre de bits du bloc.">128</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Deux chiffres par octet : 32 caractères.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Dans une chaîne d'octets en hexadécimal, comment s'écrit l'octet 10 ?</p>
+<div class="mq-c"><button type="button" data-fb="Sans le zéro de tête, la chaîne ne se découpe plus par paires.">a</button><button type="button">0a</button><button type="button" data-fb="(10)₁₆ vaut 16.">10</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Toujours deux chiffres : 0a.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Que donne bytes.fromhex('abc') ?</p>
+<div class="mq-c"><button type="button" data-fb="fromhex ne complète rien tout seul : il lit les chiffres par paires.">b'\xab\x0c'</button><button type="button">une erreur, car la longueur est impaire</button><button type="button" data-fb="'abc' est lu comme des chiffres hexadécimaux, pas comme du texte.">b'abc'</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Trois chiffres ne font pas un nombre entier d'octets : ValueError, à la position 3.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Que donne hex(10) ?</p>
+<div class="mq-c"><button type="button" data-fb="hex() écrit un nombre : sans zéro de tête, avec le préfixe 0x.">'0a'</button><button type="button">'0xa'</button><button type="button" data-fb="hex() ajoute toujours le préfixe 0x.">'a'</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">hex() écrit un nombre. Pour des octets, utilise .hex(), ou format(n, '02x') pour un seul octet.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="p4">
+<h2><span class="num">4</span>Base64 : six bits par caractère</h2>
+
+<h3>4.1 Pourquoi encore un encodage</h3>
+<p>L'hexadécimal double la taille des données : une image de 300 ko incluse dans une page web en ferait 600. Le <b>Base64</b> (RFC 4648) fait mieux : il n'ajoute qu'un tiers, et n'utilise que des caractères qui passent partout (lettres, chiffres, + et /), même dans les vieux systèmes de courrier électronique qui ne transportaient que du texte.</p>
+
+<h3>4.2 Le principe : 3 octets, 24 bits, 4 caractères</h3>
+<p>L'hexadécimal a 16 = 2⁴ symboles : chacun porte 4 bits. Le Base64 en a 64 = 2⁶ : chacun porte 6 bits. La difficulté, c'est qu'un octet fait 8 bits, et que 8 n'est pas un multiple de 6. Il faut un nombre de bits qui se découpe à la fois en octets et en paquets de 6 : le plus petit est 24, le plus petit multiple commun de 8 et de 6.</p>
+<div class="box key">
+<p class="lbl">L'égalité à retenir</p>
+<p class="mr" style="text-align:center">3 octets = 24 bits = 4 paquets de 6 bits = 4 caractères Base64</p>
+<p>C'est la phrase de tes notes : « 4 characters of Base64 encode three 8-bit bytes ».</p>
+</div>
+<div class="box img">
+<p class="lbl">L'image des verres</p>
+<p>Trois verres de 8 cl à transvaser dans des verres de 6 cl : avec 24 cl, tu remplis exactement quatre petits verres. Au passage, les contenus se mélangent : le deuxième petit verre reçoit la fin du premier grand verre et le début du deuxième. C'est pareil avec les bits : les paquets de 6 chevauchent les frontières des octets.</p>
+</div>
+
+<h3>4.3 L'alphabet</h3>
+<p>Chaque paquet de 6 bits vaut de 0 à 63, et chaque valeur a son caractère :</p>
+<div class="tw"><table class="c tight">
+<tr><th>valeurs</th><th>caractères</th></tr>
+<tr><td>0 à 25</td><td>A à Z</td></tr>
+<tr><td>26 à 51</td><td>a à z</td></tr>
+<tr><td>52 à 61</td><td>0 à 9</td></tr>
+<tr><td>62</td><td>+</td></tr>
+<tr><td>63</td><td>/</td></tr>
+</table></div>
+<div class="alpha" id="alpha" role="img" aria-label="Les 64 caractères du Base64, avec leur valeur de 0 à 63"></div>
+<p>Retiens les débuts de plage : A vaut 0, a vaut 26, le caractère 0 vaut 52. Pour trouver la valeur de m, on compte depuis a : 26 + 12 = 38. Un 65<sup>e</sup> caractère, <code>=</code>, sert au remplissage (section 4.5) ; il ne fait pas partie des 64.</p>
+
+<h3>4.4 Encoder à la main</h3>
+<p>Encodons « AES », soit les 3 octets 0x41, 0x45 et 0x53. On écrit leurs 24 bits à la suite, puis on les recoupe par paquets de 6 :</p>
+<div class="b64w b64fig" data-hex="414553" data-t="« AES » : 3 octets, 4 caractères, pas de remplissage"></div>
+<p class="note">Ligne 1 : les octets. Ligne 2 : leurs 24 bits, coupés tous les 8. Ligne 3 : les mêmes bits, coupés tous les 6 ; chaque bit garde la couleur de son octet d'origine, et tu vois les paquets chevaucher les frontières. Ligne 4 : la valeur de chaque paquet et son caractère.</p>
+<div class="steps">
+<span class="op">bits</span><span><span class="bits">01000001 01000101 01010011</span></span>
+<span class="op">par 6</span><span><span class="bits">010000 010100 010101 010011</span></span>
+<span class="op">valeurs</span><span>16, 20, 21, 19</span>
+<span class="op">résultat</span><span>Q, U, V, T : « QUVT »</span>
+</div>
+<p>Vérification en Python : <code>base64.b64encode(b'AES')</code> donne <code>b'QUVT'</code>.</p>
+
+<h3 id="p4-pad">4.5 Le remplissage</h3>
+<p>Quand le nombre d'octets n'est pas un multiple de 3, le dernier groupe est incomplet. On le complète avec des bits à 0 jusqu'au multiple de 6 suivant, puis on ajoute des <code>=</code> pour que le résultat ait toujours une longueur multiple de 4. Les bits de remplissage sont hachurés :</p>
+<div class="b64w b64fig" data-hex="4f4b" data-t="« OK » : 2 octets, 3 caractères et un ="></div>
+<div class="b64w b64fig" data-hex="41" data-t="« A » : 1 octet, 2 caractères et deux ="></div>
+<div class="tw"><table class="c tight">
+<tr><th>octets du dernier groupe</th><th>bits</th><th>bits de remplissage</th><th>caractères utiles</th><th>signes =</th></tr>
+<tr><td>3</td><td>24</td><td>0</td><td>4</td><td>aucun</td></tr>
+<tr><td>2</td><td>16</td><td>2</td><td>3</td><td>un</td></tr>
+<tr><td>1</td><td>8</td><td>4</td><td>2</td><td>deux</td></tr>
+</table></div>
+<p>Le nombre de <code>=</code> dit donc au décodeur combien d'octets garder dans le dernier groupe : un <code>=</code> pour 2 octets, deux pour 1 octet. Il n'y en a jamais trois.</p>
+<div class="box key">
+<p class="lbl">La taille d'un texte Base64</p>
+<p>n octets donnent 4 × ⌈n/3⌉ caractères, où ⌈ ⌉ arrondit à l'entier supérieur. Pour un bloc AES de 16 octets : ⌈16/3⌉ = 6 groupes, donc 24 caractères, contre 32 en hexadécimal.</p>
+</div>
+<div class="box img">
+<p class="lbl">Pour aller plus loin : deux Base64 pour les mêmes octets</p>
+<p>Dans <code>QQ==</code>, le second Q vaut 010000 : ses quatre derniers bits sont du remplissage et devraient valoir 0. Le décodeur de Python ne le vérifie pas : <code>base64.b64decode('QR==')</code> donne aussi <code>b'A'</code>, alors que R vaut 010001. Deux textes Base64 différents peuvent donc représenter les mêmes octets. Conséquence pratique : pour savoir si deux données sont identiques (deux signatures, deux jetons), compare les octets décodés, jamais leurs écritures en Base64.</p>
+</div>
+
+<h3 id="p4-bits">4.6 Sous le capot : décalages et masques</h3>
+<p>Un programme ne découpe pas les bits avec des ciseaux. Il utilise des <b>opérateurs bit à bit</b> (<i>bitwise operators</i>), les mêmes en Python et en C :</p>
+<div class="tw"><table>
+<tr><th>opérateur</th><th>nom</th><th>effet</th><th>exemple</th></tr>
+<tr><td><code>a &lt;&lt; k</code></td><td>décalage à gauche (<i>left shift</i>)</td><td>pousse les bits de k crans vers la gauche et ajoute des 0 à droite : multiplie par 2<sup>k</sup></td><td><code>5 &lt;&lt; 2</code> = 20 (101 → 10100)</td></tr>
+<tr><td><code>a &gt;&gt; k</code></td><td>décalage à droite (<i>right shift</i>)</td><td>pousse les bits de k crans vers la droite ; ceux de droite tombent : division entière par 2<sup>k</sup></td><td><code>20 &gt;&gt; 2</code> = 5</td></tr>
+<tr><td><code>a &amp; m</code></td><td>ET bit à bit (<i>AND</i>)</td><td>garde les bits de a là où m a des 1 : m est un <b>masque</b></td><td><code>0b110101 &amp; 0b111</code> = <code>0b101</code></td></tr>
+<tr><td><code>a | b</code></td><td>OU bit à bit (<i>OR</i>)</td><td>réunit les bits à 1 de a et de b</td><td><code>0b1000 | 0b0011</code> = <code>0b1011</code></td></tr>
+<tr><td><code>a ^ b</code></td><td>OU exclusif (<i>XOR</i>)</td><td>inverse les bits de a là où b a des 1</td><td><code>0x61 ^ 0x20</code> = <code>0x41</code></td></tr>
+</table></div>
+<p>Chacun applique une porte de ta page sur les portes logiques à chaque paire de bits, colonne par colonne. Voici l'encodage d'un groupe de 3 octets ; suis-le avec « AES » (b0 = 0x41, b1 = 0x45, b2 = 0x53) :</p>
+<pre class="code"><code>ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+def groupe_b64(b0, b1, b2):
+    x = (b0 &lt;&lt; 16) | (b1 &lt;&lt; 8) | b2      <span class="cm"># les 24 bits à la suite, dans un seul entier</span>
+    return (ALPHABET[(x &gt;&gt; 18) &amp; 0x3F]    <span class="cm"># bits 23 à 18</span>
+          + ALPHABET[(x &gt;&gt; 12) &amp; 0x3F]    <span class="cm"># bits 17 à 12</span>
+          + ALPHABET[(x &gt;&gt; 6) &amp; 0x3F]     <span class="cm"># bits 11 à 6</span>
+          + ALPHABET[x &amp; 0x3F])           <span class="cm"># bits 5 à 0</span>
+
+print(groupe_b64(0x41, 0x45, 0x53))      <span class="cm"># QUVT</span></code></pre>
+<div class="steps">
+<span class="op">coller</span><span><code>(b0 &lt;&lt; 16) | (b1 &lt;&lt; 8) | b2</code> = <span class="bits">01000001 01000101 01010011</span></span>
+<span class="why">b0 est poussé de 16 crans, b1 de 8, et le OU réunit les trois sans qu'ils se chevauchent. En nombre, x = b0 × 256² + b1 × 256 + b2 : c'est la numération en base 256 de la section 5.</span>
+<span class="op">décaler</span><span><code>x &gt;&gt; 18</code> = <span class="bits">010000</span></span>
+<span class="why">Les 18 bits de droite tombent : il ne reste que les 6 bits de gauche.</span>
+<span class="op">masquer</span><span><code>(x &gt;&gt; 12) &amp; 0x3F</code> = <span class="bits">010100</span> = 20</span>
+<span class="why">Le décalage amène les bits 17 à 12 tout à droite, et le masque 0x3F = 11 1111 efface tout ce qui reste à leur gauche.</span>
+</div>
+<div class="box key">
+<p class="lbl">Décaler, puis masquer</p>
+<p>C'est le geste de base de toute la cryptographie embarquée : les implémentations en C d'AES, de SHA-256 ou de ML-KEM sont remplies de <code>&gt;&gt;</code>, <code>&lt;&lt;</code> et <code>&amp;</code>. Sur ton STM32, chacun de ces opérateurs devient une instruction du processeur : LSL, LSR, AND, ORR et EOR en assembleur ARM.</p>
+</div>
+
+<h3 id="p4-piege">4.7 En Python, et le piège des deux couches</h3>
+<pre class="code"><code>&gt;&gt;&gt; import base64
+&gt;&gt;&gt; base64.b64encode(b'AES')
+b'QUVT'
+&gt;&gt;&gt; base64.b64encode(b'AES').decode()
+'QUVT'
+&gt;&gt;&gt; base64.b64decode('QUVT')
+b'AES'
+&gt;&gt;&gt; base64.b64encode('AES')
+<span class="er">TypeError: a bytes-like object is required, not 'str'</span>
+&gt;&gt;&gt; base64.b64decode('QUV')
+<span class="er">binascii.Error: Incorrect padding</span></code></pre>
+<p>Retiens : <code>b64encode</code> prend des octets et rend des octets (<code>b'QUVT'</code>) ; pour obtenir un str, ajoute <code>.decode()</code>. <code>b64decode</code> accepte un str ou un bytes, et rend des octets.</p>
+<h4>Le piège des deux couches</h4>
+<p>La consigne du défi Base64 insiste : « decode the hex first ». Voici pourquoi. La chaîne hexadécimale <code>'4869'</code> représente 2 octets, 0x48 et 0x69, c'est-à-dire <code>b'Hi'</code>. Mais en tant que texte, c'est 4 caractères, '4', '8', '6' et '9', dont les codes ASCII sont 0x34, 0x38, 0x36 et 0x39.</p>
+<p><b>Le bon chemin :</b> on décode l'hexadécimal, puis on encode les octets obtenus.</p>
+<div class="steps">
+<span class="op">départ</span><span><code>'4869'</code><span class="tp str">str</span> 4 caractères</span>
+<span class="op">fromhex</span><span><code>b'Hi'</code><span class="tp bytes">bytes</span> 2 octets : <span class="bits">48 69</span></span>
+<span class="op">b64encode</span><span><code>b'SGk='</code><span class="tp bytes">bytes</span></span>
+</div>
+<p><b>Le piège :</b> on encode en Base64 le texte hexadécimal lui-même.</p>
+<div class="steps">
+<span class="op">départ</span><span><code>'4869'</code><span class="tp str">str</span> 4 caractères</span>
+<span class="op">encode</span><span><code>b'4869'</code><span class="tp bytes">bytes</span> 4 octets : <span class="bits">34 38 36 39</span></span>
+<span class="op">b64encode</span><span><code>b'NDg2OQ=='</code><span class="tp bytes">bytes</span></span>
+</div>
+<p>Les deux résultats n'ont rien à voir. Le second encode l'<i>écriture</i> des octets, pas les octets. C'est comme traduire en anglais la transcription en morse d'un message, au lieu du message lui-même.</p>
+<div class="box key">
+<p class="lbl">La question à te poser avant chaque conversion</p>
+<p>Est-ce que je tiens les octets eux-mêmes, ou un texte qui les représente ? L'hexadécimal et le Base64 sont des textes qui représentent des octets : on les décode toujours avant de travailler sur les données. L'atelier de la section 6.3 te fait rejouer ces deux chemins.</p>
+</div>
+
+<h3>4.8 Où tu le croiseras</h3>
+<ul>
+<li><b>Dans une page web</b>, comme celles de ton cours de site personnel : une petite image peut être incluse directement dans le HTML ou le CSS, sans fichier à part, grâce à une adresse <code>data:</code>, par exemple <code>&lt;img src="data:image/png;base64,iVBORw0KGgo…"&gt;</code>. Toutes les images PNG en Base64 commencent par <code>iVBORw0KGgo</code>, parce que tout fichier PNG commence par les mêmes 8 octets, <span class="bits">89 50 4e 47 0d 0a 1a 0a</span> (50 4e 47, c'est « PNG » en ASCII). Un début fixe en octets donne un début fixe en Base64.</li>
+<li><b>Dans les clés cryptographiques</b> : une clé publique RSA au format PEM est du Base64 placé entre une ligne <code>-----BEGIN PUBLIC KEY-----</code> et une ligne <code>-----END PUBLIC KEY-----</code>. Une clé de 2048 bits commence toujours par <code>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA</code> : l'emballage de la clé (le format DER) est le même d'une clé à l'autre, seuls les octets du nombre changent. Tu décortiqueras ce format dans la catégorie Data Formats de CryptoHack.</li>
+<li><b>Dans ta clé SSH</b> : une clé publique ed25519 (le fichier <code>~/.ssh/id_ed25519.pub</code>) commence par <code>ssh-ed25519 AAAAC3NzaC1lZDI1NTE5</code>. Décode ce Base64 : tu obtiens <span class="bits">00 00 00 0b</span> suivi de « ssh-ed25519 », le nom du type de clé, précédé de sa longueur sur 4 octets (0x0b = 11 caractères).</li>
+<li><b>Dans les courriels</b> : les pièces jointes voyagent en Base64 (norme MIME).</li>
+</ul>
+<div class="box nts">
+<p class="lbl">La variante base64url</p>
+<p>Dans une adresse web, + et / ont déjà un sens : / sépare les dossiers, et + remplace parfois l'espace. La variante <b>base64url</b> remplace + par - et / par _, et omet souvent les =. Elle sert par exemple dans les jetons JWT. En Python : <code>base64.urlsafe_b64encode</code>.</p>
+</div>
+
+<h3>4.9 Laboratoire : la machine Base64</h3>
+<p>Choisis encoder ou décoder, tape ta donnée, et regarde chaque groupe de 3 octets passer par la grille de 24 bits. Essaie des textes de 1, 2, 3 puis 4 caractères, et observe les =.</p>
+<div class="lab" id="b64lab"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 4)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien de bits porte un caractère Base64 ?</p>
+<div class="mq-c"><button type="button" data-fb="Ça, c'est un chiffre hexadécimal : 16 = 2⁴.">4</button><button type="button">6</button><button type="button" data-fb="8 bits, c'est un octet. Le Base64 a 64 = 2⁶ symboles.">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">64 = 2⁶ : chaque caractère porte 6 bits.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Combien de caractères Base64 pour 5 octets ?</p>
+<div class="mq-c"><button type="button" data-fb="6 caractères ne portent que 36 bits, il en faut 40.">6</button><button type="button" data-fb="Le résultat a toujours une longueur multiple de 4 : compte les =.">7</button><button type="button">8</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">⌈5/3⌉ = 2 groupes, donc 8 caractères, dont un = (le dernier groupe contient 2 octets).</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Une chaîne Base64 se termine par ==. Combien d'octets contient son dernier groupe ?</p>
+<div class="mq-c"><button type="button">1</button><button type="button" data-fb="Deux octets font 16 bits : 3 caractères et un seul =.">2</button><button type="button" data-fb="Un groupe complet n'a pas de =.">3</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 octet, 8 bits : 2 caractères (12 bits, dont 4 de remplissage), puis deux =.</div>
+</div>
+<div class="mq" data-a="0">
+<p class="mq-q">Que vaut (0x414553 &gt;&gt; 18) &amp; 0x3F ?</p>
+<div class="mq-c"><button type="button">16</button><button type="button" data-fb="0x41 = 65 est le premier octet entier ; le premier caractère n'en prend que les 6 bits de gauche.">65</button><button type="button" data-fb="Le décalage de 18 ne garde que les 6 bits de gauche des 24.">0x414553</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les 6 bits de gauche, 010000 = 16 : la lettre Q.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">On te donne '4869' et on te demande son Base64 « après décodage de l'hexadécimal ». Tu encodes…</p>
+<div class="mq-c"><button type="button" data-fb="34 38 36 39 sont les codes ASCII des caractères '4', '8', '6', '9' : tu encoderais l'écriture, pas les octets.">les 4 octets 34 38 36 39</button><button type="button">les 2 octets 48 69</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">On décode d'abord : bytes.fromhex('4869') donne b'Hi', dont le Base64 est SGk=.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="p5">
+<h2><span class="num">5</span>Des octets aux grands entiers</h2>
+
+<h3>5.1 Pourquoi RSA a besoin d'un nombre</h3>
+<p>AES travaille directement sur des octets : il chiffre des blocs de 16 octets. RSA, lui, fait des calculs : chiffrer un message m, c'est calculer m<sup>e</sup> mod n, une puissance réduite modulo un très grand nombre n. Le « mod », c'est l'arithmétique modulaire de ton programme de maths ; ta page sur le binaire l'a déjà rencontrée, puisqu'une machine de n bits calcule modulo 2<sup>n</sup> (section 5). Pour chiffrer un texte avec RSA, il faut donc le transformer en nombre, puis, après le déchiffrement, retransformer le nombre en texte. C'est l'objet du dernier défi de tes notes.</p>
+
+<h3>5.2 Un message est un nombre écrit en base 256</h3>
+<p>La consigne dit : on écrit chaque octet en hexadécimal, on colle le tout, et on lit le résultat comme un nombre en base 16. Il y a une façon plus directe de voir la même chose. Un octet prend 256 valeurs, de 0 à 255 : c'est exactement un <b>chiffre de la base 256</b>. Une suite d'octets est donc un nombre écrit en base 256, et on le lit avec la formule de ta page sur le binaire (section 2.2), chiffre × base<sup>position</sup> :</p>
+<div class="steps">
+<span class="op"></span><span><code>b'Hi!'</code> = [72, 105, 33]</span>
+<span class="op">=</span><span>72 × 256² + 105 × 256 + 33</span>
+<span class="op">=</span><span>4 718 592 + 26 880 + 33</span>
+<span class="op">=</span><span>4 745 505</span>
+</div>
+<div class="box key">
+<p class="lbl">Trois façons de voir le même nombre</p>
+<ul>
+<li><b>en base 256</b> : les octets 72, 105, 33 sont ses chiffres ;</li>
+<li><b>en base 16</b> : 0x486921, parce que 256 = 16², donc chaque chiffre de la base 256 s'écrit avec exactement deux chiffres hexadécimaux ;</li>
+<li><b>en base 2</b> : <span class="bits">0100 1000 0110 1001 0010 0001</span>, parce que 256 = 2⁸.</li>
+</ul>
+<p>Concaténer l'hexadécimal, comme dit la consigne, c'est la méthode des paquets de ta page sur le binaire (section 3.4), avec des paquets de 8 bits.</p>
+</div>
+<p>C'est le compteur kilométrique de ta page sur le binaire, avec des roues de 256 crans au lieu de 10 : chaque roue est un octet, et quand une roue passe de 255 à 0, elle fait avancer sa voisine de gauche.</p>
+
+<h3>5.3 Dans un sens : la méthode de Horner</h3>
+<p>Pour calculer la valeur, la méthode du programmeur de ta page sur le binaire (section 3.1) marche telle quelle : on lit les octets de gauche à droite et, à chaque octet, valeur = valeur × 256 + octet.</p>
+<div class="tw"><table class="c tight">
+<tr><th>octet</th><th>calcul</th><th>valeur</th></tr>
+<tr><td>72 ('H')</td><td>0 × 256 + 72</td><td>72</td></tr>
+<tr><td>105 ('i')</td><td>72 × 256 + 105</td><td>18 537</td></tr>
+<tr><td>33 ('!')</td><td>18 537 × 256 + 33</td><td>4 745 505</td></tr>
+</table></div>
+<pre class="code"><code>def octets_vers_entier(octets):
+    valeur = 0
+    for o in octets:               <span class="cm"># o est un int de 0 à 255</span>
+        valeur = valeur * 256 + o
+    return valeur
+
+print(octets_vers_entier(b'Hi!'))  <span class="cm"># 4745505</span></code></pre>
+<p>Multiplier par 256, c'est décaler de 8 bits : <code>valeur * 256 + o</code> s'écrit aussi <code>(valeur &lt;&lt; 8) | o</code>. C'est le collage de la section 4.6, étendu à autant d'octets qu'on veut.</p>
+
+<h3>5.4 Dans l'autre sens : les divisions successives</h3>
+<p>Pour retrouver les octets d'un nombre, on applique la méthode des divisions successives de ta page sur le binaire (section 3.2), avec 256 comme diviseur. Chaque reste est un octet, et on lit les restes de bas en haut, puisque le premier reste est le chiffre de droite.</p>
+<div class="tw"><table class="c tight">
+<tr><th>division</th><th>quotient</th><th>reste</th></tr>
+<tr><td>4 745 505 ÷ 256</td><td>18 537</td><td class="rest">33 ('!')</td></tr>
+<tr><td>18 537 ÷ 256</td><td>72</td><td class="rest">105 ('i')</td></tr>
+<tr><td>72 ÷ 256</td><td>0</td><td class="rest">72 ('H')</td></tr>
+</table></div>
+<p>Restes lus de bas en haut : 72, 105, 33, c'est-à-dire <code>b'Hi!'</code>.</p>
+<pre class="code"><code>def entier_vers_octets(n):
+    octets = []
+    while n &gt; 0:
+        octets.insert(0, n % 256)   <span class="cm"># le reste est l'octet de droite : on l'ajoute à GAUCHE</span>
+        n = n // 256
+    return bytes(octets)
+
+print(entier_vers_octets(4745505))  <span class="cm"># b'Hi!'</span></code></pre>
+
+<h3>5.5 En Python</h3>
+<p>Python fait ces deux calculs nativement, sans rien installer :</p>
+<pre class="code"><code>&gt;&gt;&gt; int.from_bytes(b'Hi!', 'big')
+4745505
+&gt;&gt;&gt; (4745505).to_bytes(3, 'big')
+b'Hi!'
+&gt;&gt;&gt; (4745505).bit_length()
+23</code></pre>
+<p><code>'big'</code> fixe l'ordre des octets : le premier octet est le chiffre de poids fort, comme quand on écrit un nombre (section 5.8). Depuis Python 3.11, c'est la valeur par défaut, mais l'écrire rend ton code plus clair. <code>to_bytes</code> demande la longueur voulue. Le nombre d'octets nécessaires est ⌈nombre de bits / 8⌉, ce qui s'écrit <code>(n.bit_length() + 7) // 8</code> : pour 4 745 505, (23 + 7) // 8 = 3 octets.</p>
+<p>La bibliothèque PyCryptodome, citée par la consigne, fournit les mêmes conversions sous des noms plus courts, et calcule la longueur toute seule :</p>
+<pre class="code"><code>&gt;&gt;&gt; from Crypto.Util.number import bytes_to_long, long_to_bytes
+&gt;&gt;&gt; bytes_to_long(b'Hi!')
+4745505
+&gt;&gt;&gt; long_to_bytes(4745505)
+b'Hi!'</code></pre>
+<p>La consigne écrit <code>from Crypto.Util.number import *</code>, qui importe d'un coup tous les noms du module. Dans du code que tu relis, préfère importer explicitement ceux dont tu as besoin : tu sais d'où vient chaque nom.</p>
+<div class="box nts">
+<p class="lbl">Les noms officiels</p>
+<p>La norme de RSA, PKCS #1 (RFC 8017), définit exactement ces deux conversions, sous les noms <b>OS2IP</b> (<i>Octet String to Integer Primitive</i>) et <b>I2OSP</b> (<i>Integer to Octet String Primitive</i>), avec le premier octet en poids fort. bytes_to_long et long_to_bytes en sont les versions PyCryptodome.</p>
+</div>
+
+<h3 id="p5-install">5.6 Installer PyCryptodome sur ta Debian 13</h3>
+<p>Sur Debian 13, un <code>pip install pycryptodome</code> lancé directement est refusé avec l'erreur <code>externally-managed-environment</code> : Debian protège le Python du système, dont dépendent ses propres outils. Deux solutions propres.</p>
+<p><b>1. Un environnement virtuel</b>, recommandé pour CryptoHack, où tu installeras d'autres bibliothèques plus tard :</p>
+<pre class="code"><code>sudo apt install python3-venv
+python3 -m venv ~/venvs/crypto
+source ~/venvs/crypto/bin/activate
+pip install pycryptodome</code></pre>
+<p>À chaque nouveau terminal, refais <code>source ~/venvs/crypto/bin/activate</code> : l'invite affiche alors <code>(crypto)</code>. Dans VS Code, choisis l'interpréteur <code>~/venvs/crypto/bin/python</code> (commande <i>Python: Select Interpreter</i>) pour que l'éditeur trouve la bibliothèque.</p>
+<p><b>2. Le paquet Debian</b> : <code>sudo apt install python3-pycryptodome</code>. C'est plus simple, mais sa version suit le rythme des versions de Debian.</p>
+
+<h3 id="p5-pieges">5.7 Les pièges</h3>
+<h4>Les octets nuls de tête disparaissent</h4>
+<p><code>b'\x00Hi'</code> et <code>b'Hi'</code> donnent le même nombre, 18 537, pour la même raison que 007 = 7 : un zéro à gauche ne change pas un nombre. Au retour, un octet a disparu :</p>
+<pre class="code"><code>&gt;&gt;&gt; bytes_to_long(b'\x00Hi')
+18537
+&gt;&gt;&gt; long_to_bytes(18537)
+b'Hi'
+&gt;&gt;&gt; (18537).to_bytes(3, 'big')     <span class="cm"># en imposant la longueur, on le récupère</span>
+b'\x00Hi'</code></pre>
+<p>En cryptographie, la longueur fait partie de la donnée : une clé de 16 octets qui commence par 0x00 reste une clé de 16 octets. C'est pour cela qu'I2OSP, dans la norme de RSA, prend toujours la longueur voulue en paramètre, et que <code>to_bytes</code> l'exige.</p>
+<h4>hex() n'encode pas des octets</h4>
+<p>Pour passer d'un nombre à ses octets, il est tentant d'écrire <code>bytes.fromhex(hex(n)[2:])</code>. Ça marche… sauf quand le nombre de chiffres est impair :</p>
+<pre class="code"><code>&gt;&gt;&gt; hex(2570)
+'0xa0a'
+&gt;&gt;&gt; bytes.fromhex(hex(2570)[2:])
+<span class="er">ValueError: non-hexadecimal number found in fromhex() arg at position 3</span></code></pre>
+<p><code>hex()</code> n'écrit pas de zéro de tête : 2 570 = 0x0a0a s'écrit '0xa0a'. Utilise <code>to_bytes</code> ou <code>long_to_bytes</code>, qui gèrent la longueur.</p>
+<h4>Le message doit tenir</h4>
+<p>Avec RSA, le nombre m doit être plus petit que le module n. Pour une clé de 2048 bits, le message fait donc au plus 256 octets. En Python, les entiers n'ont pas de taille limite (ta page sur le binaire, section 5) : 256 octets donnent un entier de 617 chiffres décimaux, sans aucun problème. En C, il faut une bibliothèque (section 5.8).</p>
+<div class="box warn">
+<p class="lbl">En vrai, on ne chiffre jamais un message brut avec RSA</p>
+<p>Les défis RSA de CryptoHack utilisent le RSA « des manuels » (<i>textbook RSA</i>) : on convertit le message en nombre et on calcule m<sup>e</sup> mod n. C'est parfait pour apprendre, et dangereux en vrai : un même message donne toujours le même chiffré, et certains messages trop petits se retrouvent par un simple calcul. Les vrais systèmes ajoutent d'abord un remplissage aléatoire (OAEP, défini dans PKCS #1), puis convertissent avec I2OSP. Plusieurs défis de CryptoHack consistent justement à attaquer le RSA des manuels.</p>
+</div>
+
+<h3 id="p5-endian">5.8 Aperçu embarqué : l'ordre des octets, et les grands nombres en C</h3>
+<p>Jusqu'ici, le premier octet était le chiffre de poids fort, comme quand on écrit un nombre sur papier. Cet ordre s'appelle <b>gros-boutiste</b> (<i>big-endian</i>). L'ordre inverse, le premier octet pour le chiffre de poids faible, s'appelle <b>petit-boutiste</b> (<i>little-endian</i>). Les noms viennent des <i>Voyages de Gulliver</i>, où deux peuples se font la guerre pour savoir s'il faut casser un œuf par le gros bout ou par le petit.</p>
+<div class="box img">
+<p class="lbl">L'image des dates</p>
+<p>2026-11-22 commence par la plus grosse unité, l'année : c'est gros-boutiste. 22/11/2026 commence par la plus petite, le jour : c'est petit-boutiste. Les mêmes informations, rangées dans deux ordres opposés.</p>
+</div>
+<pre class="code"><code>&gt;&gt;&gt; (0x12345678).to_bytes(4, 'big').hex(' ')
+'12 34 56 78'
+&gt;&gt;&gt; (0x12345678).to_bytes(4, 'little').hex(' ')
+'78 56 34 12'
+&gt;&gt;&gt; int.from_bytes(b'Hi!', 'little')       <span class="cm"># = 0x216948 : les mêmes octets, lus à l'envers</span>
+2189640</code></pre>
+<ul>
+<li><b>Gros-boutiste</b> : bytes_to_long, la norme de RSA (I2OSP), les en-têtes des protocoles réseau (on parle d'<b>ordre réseau</b>, <i>network byte order</i>).</li>
+<li><b>Petit-boutiste</b> : la mémoire de ton i5 (x86-64) et celle des Cortex-M des cartes STM32. Un <code>uint32_t</code> qui vaut 0x12345678, rangé à l'adresse A, occupe les octets 78, 56, 34, 12 aux adresses A, A+1, A+2, A+3. Certains algorithmes ont fait le même choix : X25519 (RFC 7748) code ses clés en petit-boutiste.</li>
+</ul>
+<div class="box key">
+<p class="lbl">À retenir</p>
+<p>Un mauvais ordre des octets ne produit aucun message d'erreur, seulement un résultat faux qui a l'air aléatoire. Quand tu lis une norme, cherche toujours la phrase qui fixe l'ordre des octets.</p>
+</div>
+<div class="box nts">
+<p class="lbl">Les grands nombres en C</p>
+<p>En C, le plus grand entier standard fait 64 bits (<code>uint64_t</code>). Un nombre RSA de 2048 bits se range dans un tableau, par exemple 64 mots de 32 bits : c'est un nombre écrit en base 2³², dont chaque mot est un chiffre. Encore la numération positionnelle. Les bibliothèques de cryptographie embarquée, comme Mbed TLS sur STM32, additionnent et multiplient ces nombres mot par mot, avec des retenues, exactement comme les additions posées de ta page sur le binaire.</p>
+</div>
+
+<h3>5.9 Laboratoire : octets et grand entier</h3>
+<p>Dans un sens, la page applique la méthode de Horner ; dans l'autre, les divisions successives par 256. Change l'ordre des octets pour voir la lecture petit-boutiste, et impose une longueur pour faire réapparaître des octets nuls de tête.</p>
+<div class="lab" id="biglab"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 5)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">En base 256, combien de « chiffres » (d'octets) faut-il pour écrire 65 536 ?</p>
+<div class="mq-c"><button type="button" data-fb="Deux octets montent au plus à 256² − 1 = 65 535.">2</button><button type="button">3</button><button type="button" data-fb="5, c'est le nombre de chiffres décimaux.">5</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">65 536 = 1 × 256² : ses octets sont 01 00 00.</div>
+</div>
+<div class="mq" data-a="2">
+<p class="mq-q">Que vaut bytes_to_long(b'\x01\x00') ?</p>
+<div class="mq-c"><button type="button" data-fb="Le 01 est en position 1 : il vaut 1 × 256.">1</button><button type="button" data-fb="On n'est pas en base 10.">100</button><button type="button">256</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">1 × 256 + 0 = 256.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Que donne <code>long_to_bytes(bytes_to_long(b'\x00\x00AB'))</code> ?</p>
+<div class="mq-c"><button type="button" data-fb="Les zéros de tête ne changent pas le nombre : ils ne reviennent pas.">b'\x00\x00AB'</button><button type="button">b'AB'</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Les deux octets nuls sont perdus : il faut connaître la longueur pour les retrouver.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Sur ton i5, l'entier 32 bits 0x00000001 est rangé en mémoire comme…</p>
+<div class="mq-c"><button type="button" data-fb="C'est l'ordre gros-boutiste. Le x86 est petit-boutiste.">00 00 00 01</button><button type="button">01 00 00 00</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Petit-boutiste : l'octet de poids faible, 01, à la plus petite adresse.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Combien d'octets faut-il pour écrire un nombre de 23 bits ?</p>
+<div class="mq-c"><button type="button" data-fb="2 octets = 16 bits : c'est trop peu.">2</button><button type="button">3</button><button type="button" data-fb="23, c'est le nombre de bits.">23</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">⌈23/8⌉ = 3, c'est-à-dire (23 + 7) // 8.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="p6">
+<h2><span class="num">6</span>La carte des conversions</h2>
+
+<h3>6.1 Les octets au centre</h3>
+<p>Toutes les conversions de cette page passent par les octets. Le texte, la liste d'entiers, l'hexadécimal, le Base64 et le grand entier sont cinq écritures d'une même suite d'octets. Voici le même message, <code>b'Hi!'</code>, sous ses six formes, avec la fonction Python qui fait chaque passage. Dans les cartes, <code>b</code> désigne les octets.</p>
+<div class="map">
+<div class="mcard hub">
+<h4>octets <span class="tp bytes">bytes</span></h4>
+<p class="val">b'Hi!'</p>
+<p class="mnote" style="margin-top:0">Les 3 octets <span class="bits">48 69 21</span> : la donnée elle-même. Les cinq autres cartes en sont des écritures, et on passe toujours par celle-ci.</p>
+</div>
+<div class="mcard">
+<h4>texte <span class="tp str">str</span></h4>
+<p class="val">'Hi!'</p>
+<div class="fn"><span>vers les octets</span><span><code>t.encode()</code></span><span>depuis les octets</span><span><code>b.decode()</code></span></div>
+<p class="mnote">Seulement si les octets sont de l'UTF-8 valide (section 2.5).</p>
+</div>
+<div class="mcard">
+<h4>liste d'entiers</h4>
+<p class="val">[72, 105, 33]</p>
+<div class="fn"><span>vers les octets</span><span><code>bytes(L)</code></span><span>depuis les octets</span><span><code>list(b)</code></span></div>
+<p class="mnote">Pour un caractère seul : <code>ord(c)</code> et <code>chr(n)</code> (section 2.4).</p>
+</div>
+<div class="mcard">
+<h4>hexadécimal <span class="tp str">str</span></h4>
+<p class="val">'486921'</p>
+<div class="fn"><span>vers les octets</span><span><code>bytes.fromhex(h)</code></span><span>depuis les octets</span><span><code>b.hex()</code></span></div>
+<p class="mnote">Toujours deux chiffres par octet (section 3.2).</p>
+</div>
+<div class="mcard">
+<h4>Base64 <span class="tp bytes">bytes</span> ou <span class="tp str">str</span></h4>
+<p class="val">'SGkh'</p>
+<div class="fn"><span>vers les octets</span><span><code>base64.b64decode(s)</code></span><span>depuis les octets</span><span><code>base64.b64encode(b)</code></span></div>
+<p class="mnote">b64encode rend des bytes : ajoute <code>.decode()</code> pour obtenir un str (section 4.7).</p>
+</div>
+<div class="mcard">
+<h4>grand entier <span class="tp int">int</span></h4>
+<p class="val">4745505</p>
+<div class="fn"><span>vers les octets</span><span><code>long_to_bytes(n)</code> ou <code>n.to_bytes(k, 'big')</code></span><span>depuis les octets</span><span><code>bytes_to_long(b)</code> ou <code>int.from_bytes(b, 'big')</code></span></div>
+<p class="mnote">Les octets nuls de tête se perdent (section 5.7).</p>
+</div>
+</div>
+<div class="box key">
+<p class="lbl">La méthode pour tout défi d'encodage</p>
+<ol>
+<li><b>Identifie ce que tu tiens</b> : son type Python, et son écriture (section 6.2).</li>
+<li><b>Ramène-le aux octets</b>, avec la fonction « vers les octets » de sa carte.</li>
+<li><b>Depuis les octets, va vers ce qu'on te demande</b>, avec la fonction « depuis les octets » de la carte d'arrivée.</li>
+<li><b>Vérifie en faisant le chemin inverse</b> : tu dois retrouver exactement ton point de départ.</li>
+</ol>
+</div>
+
+<h3 id="p6-rec">6.2 Reconnaître une écriture au premier coup d'œil</h3>
+<div class="tw"><table>
+<tr><th>écriture</th><th>caractères</th><th>longueur</th><th>signes distinctifs</th></tr>
+<tr><td>hexadécimal</td><td>0 à 9, a à f</td><td>paire</td><td>aucune lettre après f ; le préfixe 0x quand c'est un nombre</td></tr>
+<tr><td>Base64</td><td>A à Z, a à z, 0 à 9, + et /</td><td>multiple de 4</td><td>se termine souvent par = ou == ; - et _ en base64url</td></tr>
+<tr><td>grand entier décimal</td><td>0 à 9</td><td>quelconque</td><td>aucune lettre ; environ 2,4 chiffres par octet</td></tr>
+<tr><td>liste d'entiers</td><td>nombres de 0 à 255</td><td></td><td>entre crochets, séparés par des virgules</td></tr>
+<tr><td>bytes affiché par Python</td><td></td><td></td><td>le préfixe b, et des <code>\x</code> suivis de deux chiffres</td></tr>
+</table></div>
+<p>Pourquoi environ 2,4 chiffres par octet : chaque octet multiplie le nombre par 256, et 256 ≈ 10<sup>2,41</sup>. Un nombre de 80 chiffres décimaux tient donc dans 80 / 2,41 ≈ 33 octets.</p>
+<p>Attention aux ambiguïtés : <code>1234</code> est à la fois de l'hexadécimal valide (2 octets), du Base64 valide (3 octets) et un nombre décimal. C'est le contexte, ou l'essai des trois lectures, qui tranche.</p>
+
+<h3 id="p6-atelier">6.3 Laboratoire : l'atelier des couches</h3>
+<p>Pars d'un texte et applique les fonctions une par une, comme dans ton terminal. Les boutons qui ne s'appliquent pas au type que tu tiens sont désactivés : c'est exactement ce que Python te reprocherait. Les exemples rejouent les chemins et les pièges des sections 4.7 et 5.7.</p>
+<div class="lab" id="atelier"></div>
+
+<div class="drill">
+<p class="lbl">Vérifie-toi (section 6)</p>
+<div class="mq" data-a="1">
+<p class="mq-q">'SGVsbG8=' est très probablement…</p>
+<div class="mq-c"><button type="button" data-fb="S, G, V, l ne sont pas des chiffres hexadécimaux.">de l'hexadécimal</button><button type="button">du Base64</button><button type="button" data-fb="Un nombre décimal ne contient pas de lettres.">un grand entier</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Des lettres des deux casses, une longueur de 8, un = final : du Base64. Il se décode en b'Hello'.</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Tu tiens des bytes et tu veux un grand entier. Quelle fonction ?</p>
+<div class="mq-c"><button type="button" data-fb="fromhex part d'un texte hexadécimal, pas d'octets.">bytes.fromhex</button><button type="button">bytes_to_long</button><button type="button" data-fb="ord ne prend qu'un seul caractère.">ord</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Des octets vers un entier : bytes_to_long(b), ou int.from_bytes(b, 'big').</div>
+</div>
+<div class="mq" data-a="1">
+<p class="mq-q">Quelle écriture est la plus courte pour 30 octets ?</p>
+<div class="mq-c"><button type="button" data-fb="Deux caractères par octet : 60.">l'hexadécimal</button><button type="button">le Base64</button><button type="button" data-fb="Environ 2,4 chiffres par octet : jusqu'à 73 chiffres.">le nombre décimal</button></div>
+<p class="mq-fb" aria-live="polite"></p>
+<div class="mq-ok">Le Base64 : 40 caractères, contre 60 en hexadécimal et jusqu'à 73 chiffres en décimal.</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="p7">
+<h2><span class="num">7</span>Relecture de tes notes</h2>
+<p>Tes notes reprennent les consignes de CryptoHack. Elles sont justes, mais elles passent sous silence des détails qui comptent dès qu'on sort des exemples.</p>
+<h3>Ce qui est juste</h3>
+<ul>
+<li>L'ASCII sur 7 bits, de 0 à 127, et chr et ord, réciproques l'une de l'autre.</li>
+<li>Les chiffrés contiennent des octets non imprimables, d'où le besoin d'encodages.</li>
+<li>L'hexadécimal : chaque caractère devient un nombre, écrit en base 16, et on met tout bout à bout ; <code>bytes.fromhex()</code> et <code>.hex()</code>.</li>
+<li>Le Base64 : 6 bits par caractère, 4 caractères pour 3 octets.</li>
+<li>Pour RSA, les octets mis bout à bout en hexadécimal se lisent comme un nombre ; <code>bytes_to_long()</code> et <code>long_to_bytes()</code>.</li>
+</ul>
+<h3>Ce qu'il faut préciser</h3>
+<ol>
+<li><b>chr et ord ne s'arrêtent pas à l'ASCII.</b> Ils travaillent sur les points de code Unicode : <code>chr(233)</code> donne 'é', <code>ord('中')</code> donne 20 013. Pour l'ASCII, point de code et octet coïncident ; au-delà, un caractère occupe plusieurs octets en UTF-8 (section 2.5).</li>
+<li><b>« The numbers can be combined together »</b> : seulement si chaque octet s'écrit avec exactement deux chiffres. Sans le zéro de tête, la chaîne ne se découpe plus (section 3.2).</li>
+<li><b>Le Base64 utilise un 65<sup>e</sup> caractère</b>, =, pour le remplissage, et le résultat a toujours une longueur multiple de 4 (section 4.5).</li>
+<li><b>« Encoding » n'est pas « encryption ».</b> Ni l'hexadécimal ni le Base64 ne protègent quoi que ce soit (section 1.2).</li>
+<li><b>Concaténer l'hexadécimal, c'est lire les octets en base 256</b>, avec le premier octet en poids fort. Les octets nuls de tête se perdent au retour (section 5.7), et l'ordre inverse existe aussi (section 5.8).</li>
+<li><b>« Cryptosystems like RSA work on numbers »</b> : c'est le RSA des manuels. En pratique, on ajoute un remplissage aléatoire, OAEP, avant la conversion (section 5.7).</li>
+<li><b>« You will first have to install PyCryptodome »</b> : sur Debian 13, passe par un environnement virtuel ou par apt (section 5.6). Et Python sait faire la même chose sans rien installer, avec <code>int.from_bytes</code> et <code>int.to_bytes</code>.</li>
+<li><b>Le vocabulaire de Python.</b> Tes notes parlent des « methods » bytes_to_long() et long_to_bytes() : ce sont des <b>fonctions</b> du module <code>Crypto.Util.number</code>. En revanche, <code>.hex()</code> est une <b>méthode d'instance</b> (on l'appelle sur un objet bytes : <code>b.hex()</code>), <code>bytes.fromhex()</code> une <b>méthode de classe</b> (on l'appelle sur le type lui-même), et <code>base64.b64encode()</code> une fonction du module <code>base64</code>. Cette distinction te servira dans ton cours de méthodologie de la programmation.</li>
+</ol>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="p8">
+<h2><span class="num">8</span>Exercices d'entraînement</h2>
+<p>Ces exercices sont les miens, pas ceux de CryptoHack : leurs réponses sont dans la page. Fais-les sur ta feuille, puis vérifie en dépliant la réponse, ou dans Python.</p>
+<details class="check" open><summary>Douze exercices, du plus court au plus long</summary><ol>
+<li>À la main, écris « CTF » en hexadécimal, puis en binaire.<details><summary>Réponse</summary><div>C = 67 = 0x43, T = 84 = 0x54, F = 70 = 0x46. En hexadécimal : <span class="bits">435446</span>. En binaire : <span class="bits">0100 0011 0101 0100 0100 0110</span>.</div></details></li>
+<li>À la main, décode la chaîne hexadécimale <span class="bits">53 54 4d 33 32</span>.<details><summary>Réponse</summary><div>0x53 = 83 = 'S', 0x54 = 84 = 'T', 0x4d = 77 = 'M', 0x33 = '3', 0x32 = '2' : « STM32 ». Les chiffres '3' et '2' sont à 0x33 et 0x32 : leur chiffre hexadécimal de droite donne leur valeur (section 2.3).</div></details></li>
+<li>Que valent <code>ord('5') - ord('0')</code>, <code>chr(ord('q') ^ 0x20)</code> et <code>ord('k') &amp; 0x1f</code> ?<details><summary>Réponse</summary><div>5 (53 − 48) ; <code>'Q'</code>, car on inverse le bit de poids 32 ; 11, car k est la 11<sup>e</sup> lettre de l'alphabet (107 = <span class="bits">110 1011</span>, dont les 5 bits de droite valent 01011 = 11).</div></details></li>
+<li>Encode « Key » en Base64, à la main.<details><summary>Réponse</summary><div>K = 0x4b = <span class="bits">0100 1011</span>, e = 0x65 = <span class="bits">0110 0101</span>, y = 0x79 = <span class="bits">0111 1001</span>. Par 6 : <span class="bits">010010 110110 010101 111001</span>, soit 18, 54, 21, 57, donc S, 2, V, 5. Résultat : <code>S2V5</code>.</div></details></li>
+<li>Décode « Q0lFTA== » à la main. Combien d'octets obtiens-tu ?<details><summary>Réponse</summary><div><p>Q = 16, 0 = 52, l = 37, F = 5, T = 19, A = 0. En bits : <span class="bits">010000 110100 100101 000101</span> | <span class="bits">010011 000000</span>.</p><p>Premier groupe : <span class="bits">01000011 01001001 01000101</span> = 43 49 45. Second groupe : avec ==, on ne garde qu'un octet, <span class="bits">01001100</span> = 4c ; les 4 bits restants sont du remplissage. Résultat : 43 49 45 4c, « CIEL », 4 octets.</p></div></details></li>
+<li>Combien de caractères Base64 pour 100 octets ? Comment se termine le résultat ?<details><summary>Réponse</summary><div>⌈100/3⌉ = 34 groupes, donc 136 caractères. Comme 100 = 3 × 33 + 1, le dernier groupe ne contient qu'un octet : le résultat se termine par ==.</div></details></li>
+<li>Calcule à la main l'entier qui correspond à <code>b'Ok'</code>, puis refais le chemin inverse par divisions.<details><summary>Réponse</summary><div>O = 79, k = 107 : 79 × 256 + 107 = 20 331. Retour : 20 331 ÷ 256 = 79, reste 107 ; 79 ÷ 256 = 0, reste 79. Restes lus de bas en haut : 79, 107, c'est-à-dire <code>b'Ok'</code>.</div></details></li>
+<li>Que valent <code>bytes_to_long(b'\x01\x00')</code>, <code>bytes_to_long(b'\x00\x01')</code> et <code>bytes_to_long(b'\x01')</code> ? Qu'en conclus-tu ?<details><summary>Réponse</summary><div>256, 1 et 1. <code>b'\x00\x01'</code> et <code>b'\x01'</code> donnent le même nombre : à partir du nombre seul, on ne peut pas savoir s'il y avait des octets nuls au début. Il faut connaître la longueur.</div></details></li>
+<li>Pour un nombre de 2048 bits (une clé RSA), combien faut-il d'octets ? De caractères hexadécimaux ? De caractères Base64 ? Combien de chiffres décimaux au plus ?<details><summary>Réponse</summary><div>2048 / 8 = 256 octets ; 512 caractères hexadécimaux ; 4 × ⌈256/3⌉ = 4 × 86 = 344 caractères Base64 ; 2²⁰⁴⁸ − 1 a 617 chiffres décimaux, car 2048 × log₁₀ 2 ≈ 616,5.</div></details></li>
+<li>Reconnais l'écriture de ces trois chaînes, puis décode-les : <code>68656c6c6f</code>, <code>aGVsbG8=</code>, <code>448378203247</code>.<details><summary>Réponse</summary><div>De l'hexadécimal (longueur paire, chiffres 0 à 9 et a à f) : <code>b'hello'</code>. Du Base64 (longueur 8, un = final) : <code>b'hello'</code>. Un nombre décimal : <code>long_to_bytes(448378203247)</code> donne <code>b'hello'</code>. Les trois écrivent le même message.</div></details></li>
+<li>Sur ton processeur, comment l'entier 32 bits 0x0a0b0c0d est-il rangé en mémoire, de la plus petite adresse à la plus grande ?<details><summary>Réponse</summary><div><span class="bits">0d 0c 0b 0a</span> : en petit-boutiste, l'octet de poids faible vient en premier.</div></details></li>
+<li>Programmation : complète la fonction de la section 4.6 pour encoder en Base64 une suite d'octets de longueur quelconque, remplissage compris, sans utiliser le module base64. Teste-la contre <code>base64.b64encode</code> sur des suites de 0 à 6 octets.<details><summary>Une solution</summary><div>
+<pre class="code"><code>import base64
+
+ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+def b64(octets):
+    sortie = ""
+    for i in range(0, len(octets), 3):
+        groupe = octets[i:i + 3]
+        n = len(groupe)                        <span class="cm"># 1, 2 ou 3 octets</span>
+        groupe = groupe + bytes(3 - n)         <span class="cm"># complète avec des octets nuls</span>
+        x = (groupe[0] &lt;&lt; 16) | (groupe[1] &lt;&lt; 8) | groupe[2]
+        quatre = "".join(ALPHABET[(x &gt;&gt; d) &amp; 0x3F] for d in (18, 12, 6, 0))
+        sortie += quatre[:n + 1] + "=" * (3 - n)
+    return sortie
+
+for k in range(7):
+    donnees = bytes(range(250, 250 + k))
+    assert b64(donnees) == base64.b64encode(donnees).decode()
+print("tout est juste")</code></pre>
+<p>Pourquoi <code>n + 1</code> caractères utiles : n octets font 8n bits, et il faut ⌈8n/6⌉ caractères pour les porter, soit 2 pour 1 octet, 3 pour 2 octets, 4 pour 3 octets. C'est toujours n + 1. Pour aller plus loin, écris la fonction inverse, qui décode.</p>
+</div></details></li>
+</ol></details>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="p9">
+<h2><span class="num">9</span>Tes défis CryptoHack</h2>
+<p>Voici les quatre défis de tes notes. Comme convenu, seulement des indices, à débloquer un par un : ni code appliqué aux données des défis, ni flag. Les laboratoires de cette page refusent d'ailleurs d'afficher un résultat qui ressemble à un flag (il contient <code>crypto{</code> ou <code>crypto/</code>) : c'est dans ton terminal que ça se passe.</p>
+
+<div class="ex">
+<h3>ASCII</h3>
+<p><b>Ce que demande le défi :</b> une liste d'entiers est donnée ; chacun est le code ASCII d'un caractère du flag. <span class="note">Sections utiles : 2.2 et 2.4.</span></p>
+<div class="hints">
+<p>Prends le premier nombre de la liste et retrouve son caractère dans la table de la section 2.2, à la main. Fais de même avec le deuxième. Tu sais maintenant comment le flag commence.</p>
+<p>En Python, quelle fonction va d'un code vers un caractère ? Teste-la seule, sur ces deux premiers nombres.</p>
+<p>Il reste à l'appliquer à chaque élément de la liste et à coller les résultats : la boucle de la section 2.4 suffit. Une autre voie passe par les octets : construis un bytes à partir de la liste, puis transforme-le en texte (carte de la section 6.1).</p>
+<p>Quand ça marche, écris la même chose en une seule ligne avec <code>''.join(…)</code>. Contrôle : un flag CryptoHack a la forme <code>crypto{…}</code>.</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Hex</h3>
+<p><b>Ce que demande le défi :</b> une chaîne hexadécimale est donnée ; elle représente les octets du flag. <span class="note">Sections utiles : 3.2 et 3.3.</span></p>
+<div class="hints">
+<p>Combien d'octets la chaîne représente-t-elle ? Compte ses chiffres. Si tu trouves un nombre impair de chiffres, recompte.</p>
+<p>Décode à la main les deux premières paires, avec la table ASCII de la section 2.2. Elles doivent donner les deux premières lettres du format de flag.</p>
+<p>La consigne te donne la fonction qui décode toute la chaîne d'un coup. Elle rend des bytes : regarde comment Python les affiche (section 2.4). Pour obtenir un str, il reste une étape (carte de la section 6.1).</p>
+<p>Contrôle : applique <code>.hex()</code> à tes octets. Tu dois retrouver exactement la chaîne du défi.</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Base64</h3>
+<p><b>Ce que demande le défi :</b> une chaîne hexadécimale est donnée ; il faut la décoder, puis encoder en Base64 les octets obtenus. Le résultat est le flag. <span class="note">Sections utiles : 4.5, 4.7 et 6.1.</span></p>
+<div class="hints">
+<p>Relis le piège des deux couches (section 4.7). Il y a deux étapes, et leur ordre compte : laquelle vient en premier ?</p>
+<p>Avant de calculer : combien d'octets obtiens-tu après la première étape ? Combien de caractères Base64 dois-tu donc obtenir après la seconde, et y aura-t-il des = ? (section 4.5)</p>
+<p><code>base64.b64encode</code> rend des bytes. Le flag se soumet sous forme de texte : regarde la carte de la section 6.1.</p>
+<p>Contrôle : ce flag-là ne s'écrit pas avec des accolades. Pourquoi ne peut-il pas en contenir ? Relis l'alphabet de la section 4.3.</p>
+</div>
+</div>
+
+<div class="ex">
+<h3>Bytes and Big Integers</h3>
+<p><b>Ce que demande le défi :</b> un très grand nombre décimal est donné ; c'est le flag, vu comme un nombre en base 256. <span class="note">Sections utiles : 5.2 à 5.6.</span></p>
+<div class="hints">
+<p>Dans quel sens dois-tu convertir : des octets vers un entier, ou d'un entier vers des octets ?</p>
+<p>Estime d'abord la taille du flag : compte les chiffres décimaux du nombre, puis divise par 2,4 (section 6.2). Tu sauras combien d'octets attendre.</p>
+<p>Deux outils possibles : la fonction de PyCryptodome citée par la consigne (installe la bibliothèque comme en section 5.6), ou la méthode <code>to_bytes</code>, à qui il faut donner la longueur. Essaie les deux : la seconde t'oblige à utiliser la formule de la section 5.5.</p>
+<p>Contrôle : reconvertis ton résultat en nombre avec la fonction inverse. Tu dois retrouver exactement le nombre du défi.</p>
+</div>
+</div>
+
+<div class="box nts">
+<p class="lbl">Et ensuite</p>
+<p>Le défi suivant de la catégorie, <b>Encoding Challenge</b>, te demande d'enchaîner ces décodages automatiquement : un serveur t'envoie des messages encodés de plusieurs façons (hexadécimal, Base64, grand entier, liste de codes, et ROT13, un décalage des lettres de 13 crans), et ton script doit répondre à chacun. Tout est dans cette page, sauf la partie réseau. Vient ensuite la catégorie XOR, qui prolonge la porte XOR de ta page sur les portes logiques et l'astuce de la casse de la section 2.3.</p>
+</div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="p10">
+<h2><span class="num">10</span>Bilan</h2>
+<div class="box key">
+<p class="lbl">Avant de passer à la suite, tu dois pouvoir, sans tes notes…</p>
+<ul>
+<li>expliquer la différence entre encoder, chiffrer, déchiffrer et décrypter ;</li>
+<li>situer dans la table ASCII les chiffres, les majuscules, les minuscules et les caractères de contrôle, et expliquer le bit de la casse ;</li>
+<li>distinguer str et bytes en Python, et passer de l'un à l'autre ;</li>
+<li>expliquer pourquoi « é » prend 2 octets en UTF-8, et pourquoi <code>b'\xc8'.decode()</code> échoue ;</li>
+<li>encoder et décoder de l'hexadécimal à la main, avec deux chiffres par octet ;</li>
+<li>encoder et décoder du Base64 à la main, remplissage compris ;</li>
+<li>extraire des bits avec un décalage et un masque ;</li>
+<li>convertir des octets en entier par la méthode de Horner, et un entier en octets par divisions successives par 256 ;</li>
+<li>dire ce que deviennent les octets nuls de tête, et ce qu'est l'ordre des octets ;</li>
+<li>reconnaître une écriture hexadécimale, Base64 ou décimale au premier coup d'œil.</li>
+</ul>
+</div>
+<p>La suite : la catégorie XOR de CryptoHack. Les pages du même cycle : <a href="https://claude.ai/artifact/Jk1cLjvFtNNsWqrjH3NpJN">Le binaire, depuis le tout début</a> et <a href="https://claude.ai/artifact/Qu6Qq1xDuxR2SzvBEoh2Bv">Les portes logiques, depuis le tout début</a>.</p>
+</section>
+</main>
+
+<footer>Cours préparé à partir de tes notes sur les premiers défis de CryptoHack (catégorie Encoding), avec la documentation de Python et les normes citées : RFC 4648 (Base16 et Base64), RFC 8017 (PKCS #1), FIPS 197 (AES), RFC 7748 (X25519). Paris 8, 2026-2027.</footer>
+<a class="top" href="#haut" aria-label="Revenir en haut">↑</a>
+
+<script>
+/* Fonctions pures : conversions, écriture à la Python, garde-fou. Aucune ne touche à la page. */
+var ENC = (function(){
+  "use strict";
+  var HX = "0123456789abcdef";
+  var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  function h2(b){ return HX.charAt(b >> 4) + HX.charAt(b & 15); }
+  function bin(b, w){ var s = b.toString(2); while (s.length < w) s = '0' + s; return s; }
+  function utf8(s){ return Array.prototype.slice.call(new TextEncoder().encode(s)); }
+  function utf8dec(bytes){ try { return new TextDecoder('utf-8', {fatal:true}).decode(new Uint8Array(bytes)); } catch (e){ return null; } }
+  function latin1(bytes){ var s = ''; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return s; }
+  function hexOf(bytes, sep){ return bytes.map(h2).join(sep || ''); }
+  function isHexDigit(c){ return c.length === 1 && HX.indexOf(c.toLowerCase()) >= 0; }
+  function isSpace(c){ return c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\x0b' || c === '\x0c'; }
+
+  /* Même algorithme que bytes.fromhex de Python : des espaces sont permises entre les paires, pas au milieu. */
+  function fromhex(s){
+    var out = [], i = 0, n = s.length;
+    function bad(p){
+      var c = p < n ? s.charAt(p) : '', why;
+      if (c === '' || isSpace(c)) why = 'Il manque un chiffre : un octet s\'écrit toujours avec deux chiffres hexadécimaux. La longueur est sans doute impaire (un 0 de tête oublié).';
+      else if ((c === 'x' || c === 'X') && p > 0 && s.charAt(p - 1) === '0') why = 'bytes.fromhex n\'accepte pas le préfixe 0x : enlève-le.';
+      else why = '« ' + c + ' » n\'est pas un chiffre hexadécimal (0 à 9, a à f).';
+      return {err:'ValueError: non-hexadecimal number found in fromhex() arg at position ' + p, why:why};
+    }
+    while (i < n){
+      if (isSpace(s.charAt(i))){ i++; continue; }
+      if (!isHexDigit(s.charAt(i))) return bad(i);
+      if (i + 1 >= n || !isHexDigit(s.charAt(i + 1))) return bad(i + 1);
+      out.push(parseInt(s.substr(i, 2), 16));
+      i += 2;
+    }
+    return {bytes:out};
+  }
+  function parseList(raw){
+    var s = raw.replace(/[\[\]()]/g, ' ').trim();
+    if (!s) return {bytes:[]};
+    var parts = s.split(/[\s,;]+/).filter(function(x){ return x; }), out = [];
+    for (var i = 0; i < parts.length; i++){
+      if (!/^\d+$/.test(parts[i])) return {err:'« ' + parts[i] + ' » n\'est pas un entier positif.'};
+      var v = parseInt(parts[i], 10);
+      if (v > 255) return {err:'ValueError: bytes must be in range(0, 256)', why:v + ' ne tient pas dans un octet, qui va de 0 à 255.'};
+      out.push(v);
+    }
+    return {bytes:out};
+  }
+
+  function b64Groups(bytes){
+    var gs = [];
+    for (var i = 0; i < bytes.length; i += 3){
+      var g = bytes.slice(i, i + 3), n = g.length;
+      var x = ((g[0] || 0) << 16) | ((g[1] || 0) << 8) | (g[2] || 0);
+      var vals = [(x >> 18) & 63, (x >> 12) & 63, (x >> 6) & 63, x & 63];
+      gs.push({bytes:g, n:n, vals:vals, chars:vals.map(function(v, k){ return k <= n ? B64.charAt(v) : '='; })});
+    }
+    return gs;
+  }
+  function b64enc(bytes){ return b64Groups(bytes).map(function(g){ return g.chars.join(''); }).join(''); }
+  function b64dec(raw){
+    var s = raw.replace(/\s+/g, '');
+    if (!s) return {bytes:[], groups:[]};
+    for (var i = 0; i < s.length; i++){
+      var c = s.charAt(i);
+      if (c !== '=' && B64.indexOf(c) < 0)
+        return {err:'« ' + c + ' » ne fait pas partie de l\'alphabet Base64' + (c === '-' || c === '_' ? ' standard : c\'est un caractère de la variante base64url (section 4.8).' : '.') + ' Par défaut, base64.b64decode l\'ignorerait sans rien dire ; avec validate=True, il lève une erreur. Ce laboratoire préfère te le signaler.'};
+    }
+    var eq = s.indexOf('=');
+    if (eq >= 0 && !/^=+$/.test(s.slice(eq))) return {err:'Le signe = ne peut apparaître qu\'à la fin.'};
+    var pad = eq >= 0 ? s.length - eq : 0;
+    if (pad > 2) return {err:'Il y a au plus deux = à la fin.'};
+    if (s.length % 4) return {err:'Longueur ' + s.length + ' : ce n\'est pas un multiple de 4, il manque des caractères ou du remplissage. Python lève binascii.Error: Incorrect padding.'};
+    var out = [], groups = [];
+    for (var j = 0; j < s.length; j += 4){
+      var cs = s.substr(j, 4).split(''), p = cs.filter(function(ch){ return ch === '='; }).length;
+      var vals = cs.map(function(ch){ return ch === '=' ? 0 : B64.indexOf(ch); });
+      var x = (vals[0] << 18) | (vals[1] << 12) | (vals[2] << 6) | vals[3];
+      var bs = [(x >> 16) & 255, (x >> 8) & 255, x & 255].slice(0, 3 - p);
+      var canon = p === 0 || (p === 1 ? (vals[2] & 3) === 0 : (vals[1] & 15) === 0);
+      groups.push({bytes:bs, n:3 - p, vals:vals, chars:cs, canon:canon});
+      out = out.concat(bs);
+    }
+    return {bytes:out, groups:groups};
+  }
+
+  function toBig(bytes, order){
+    var seq = order === 'little' ? bytes.slice().reverse() : bytes, v = BigInt(0), k = BigInt(256);
+    for (var i = 0; i < seq.length; i++) v = v * k + BigInt(seq[i]);
+    return v;
+  }
+  function divSteps(n){
+    var steps = [], m = n, k = BigInt(256), zero = BigInt(0);
+    while (m > zero){ var q = m / k; steps.push({n:m, q:q, r:Number(m % k)}); m = q; }
+    return steps;
+  }
+  function fromBig(n, len, order){
+    var lsb = divSteps(n).map(function(st){ return st.r; });
+    if (len !== null && len !== undefined){
+      if (lsb.length > len) return {err:'OverflowError: int too big to convert', why:'Le nombre demande ' + lsb.length + ' octets, plus que les ' + len + ' imposés.'};
+      while (lsb.length < len) lsb.push(0);
+    }
+    return {bytes:order === 'little' ? lsb : lsb.slice().reverse()};
+  }
+  function parseBig(raw){
+    var s = raw.replace(/[\s_]/g, '');
+    if (/^0x[0-9a-fA-F]+$/.test(s) || /^\d+$/.test(s)) return {n:BigInt(s)};
+    if (/^-/.test(s)) return {err:'Ce laboratoire ne prend que des entiers positifs ou nuls.'};
+    return {err:'Écris un entier décimal (comme 4745505) ou hexadécimal avec 0x (comme 0x486921).'};
+  }
+
+  var FLAG = /crypto[{\/]/;
+  function flagLike(s){ return FLAG.test(s); }
+  function bytesFlag(bytes){ return FLAG.test(latin1(bytes)); }
+
+  function pyBytes(bytes){
+    var q = (bytes.indexOf(39) >= 0 && bytes.indexOf(34) < 0) ? 34 : 39, s = '';
+    for (var i = 0; i < bytes.length; i++){
+      var b = bytes[i];
+      if (b === 92) s += '\\\\';
+      else if (b === q) s += '\\' + String.fromCharCode(q);
+      else if (b === 9) s += '\\t';
+      else if (b === 10) s += '\\n';
+      else if (b === 13) s += '\\r';
+      else if (b >= 32 && b < 127) s += String.fromCharCode(b);
+      else s += '\\x' + h2(b);
+    }
+    return 'b' + String.fromCharCode(q) + s + String.fromCharCode(q);
+  }
+  function pyStr(str){
+    var q = (str.indexOf("'") >= 0 && str.indexOf('"') < 0) ? '"' : "'", s = '';
+    Array.from(str).forEach(function(ch){
+      var c = ch.codePointAt(0);
+      if (ch === '\\') s += '\\\\';
+      else if (ch === q) s += '\\' + q;
+      else if (ch === '\t') s += '\\t';
+      else if (ch === '\n') s += '\\n';
+      else if (ch === '\r') s += '\\r';
+      else if (c < 32 || (c >= 127 && c <= 160) || c === 173) s += '\\x' + h2(c);
+      else s += ch;
+    });
+    return q + s + q;
+  }
+
+  return {HX:HX, B64:B64, h2:h2, bin:bin, utf8:utf8, utf8dec:utf8dec, latin1:latin1, hexOf:hexOf, fromhex:fromhex, parseList:parseList,
+          b64Groups:b64Groups, b64enc:b64enc, b64dec:b64dec, toBig:toBig, divSteps:divSteps, fromBig:fromBig, parseBig:parseBig,
+          flagLike:flagLike, bytesFlag:bytesFlag, pyBytes:pyBytes, pyStr:pyStr};
+})();
+</script>
+
+<script>
+(function(){
+"use strict";
+var E = ENC;
+var $ = function(id){ return document.getElementById(id); };
+var each = function(list, fn){ Array.prototype.forEach.call(list, fn); };
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function nb(x){ var s = String(x), out = ''; for (var i = 0; i < s.length; i++){ if (i > 0 && (s.length - i) % 3 === 0) out += ' '; out += s.charAt(i); } return out; }
+function grp4(s){ var out = ''; for (var i = 0; i < s.length; i++){ if (i > 0 && (s.length - i) % 4 === 0) out += ' '; out += s.charAt(i); } return out; }
+function plural(n, w){ return n + ' ' + w + (n > 1 ? 's' : ''); }
+function seg(id, attr, val){ each($(id).querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', x.getAttribute(attr) === String(val) ? 'true' : 'false'); }); }
+var CTRL = ['NUL','SOH','STX','ETX','EOT','ENQ','ACK','BEL','BS','HT','LF','VT','FF','CR','SO','SI','DLE','DC1','DC2','DC3','DC4','NAK','SYN','ETB','CAN','EM','SUB','ESC','FS','GS','RS','US'];
+function asciiName(b){ if (b < 32) return CTRL[b]; if (b === 127) return 'DEL'; if (b === 32) return 'espace'; if (b < 127) return "'" + String.fromCharCode(b) + "'"; return 'hors ASCII'; }
+function guardHTML(){ return '<div class="msg meh"><p><b>Ce résultat ressemble à un flag CryptoHack</b> : il contient crypto{ ou crypto/. Le laboratoire ne l\'affiche pas. Ce défi se fait dans ton terminal Python, et ses indices sont en <a href="#p9">section 9</a>.</p></div>'; }
+function errHTML(r){ return '<div class="msg ko">' + (r.why ? '<code class="py">' + esc(r.err) + '</code>' + esc(r.why) : esc(r.err)) + '</div>'; }
+function decodeCell(bytes){ var t = E.utf8dec(bytes); return t === null ? '<span class="c-r">UnicodeDecodeError</span> : pas de l\'UTF-8 valide' : esc(E.pyStr(t)); }
+
+/* ---------- questions « Vérifie-toi » ---------- */
+each(document.querySelectorAll('.mq'), function(mq){
+  var a = +mq.getAttribute('data-a'), fb = mq.querySelector('.mq-fb'), ok = mq.querySelector('.mq-ok');
+  if (ok) ok.hidden = true;
+  each(mq.querySelectorAll('.mq-c button'), function(b, i){
+    b.addEventListener('click', function(){
+      if (i === a){ b.classList.add('good'); if (fb) fb.textContent = ''; if (ok) ok.hidden = false; }
+      else { b.classList.add('bad'); if (fb) fb.textContent = b.getAttribute('data-fb') || 'Pas tout à fait. Relis la section juste au-dessus, et réessaie.'; }
+    });
+  });
+});
+
+/* ---------- indices progressifs ---------- */
+each(document.querySelectorAll('.hints'), function(hs){
+  var ps = hs.querySelectorAll('p'), n = 0;
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn ghost';
+  function lab(){ b.textContent = n < ps.length ? 'Indice ' + (n + 1) + ' sur ' + ps.length : 'Tous les indices sont affichés'; b.disabled = n >= ps.length; }
+  b.addEventListener('click', function(){ if (n < ps.length){ ps[n].classList.add('shown'); n++; lab(); } });
+  lab();
+  hs.appendChild(b);
+});
+
+/* ---------- grille Base64 : 3 octets, 24 bits, 4 caractères ---------- */
+function charLabel(b){ return (b > 32 && b < 127) ? "'" + esc(String.fromCharCode(b)) + "' " : ''; }
+function b64Grid(g){
+  var n = g.n, h = '', i, k, s;
+  var label = 'octets ' + g.bytes.map(E.h2).join(' ') + ', caractères ' + g.chars.join('');
+  h += '<div class="b64" role="img" aria-label="' + esc(label) + '">';
+  for (i = 0; i < 3; i++){
+    if (i < n) h += '<span class="lb m y' + i + '" style="grid-column:span 8">' + charLabel(g.bytes[i]) + '0x' + E.h2(g.bytes[i]) + '</span>';
+    else h += '<span class="lb no" style="grid-column:span 8">pas d\'octet</span>';
+  }
+  var bits = '';
+  for (i = 0; i < n; i++) bits += E.bin(g.bytes[i], 8);
+  for (k = 0; k < 24; k++){
+    var by = Math.floor(k / 8), cut = (k % 8 === 0 && k > 0) ? ' gs' : '';
+    h += by < n ? '<span class="bt y' + by + cut + '">' + bits.charAt(k) + '</span>' : '<span class="bt no' + cut + '"></span>';
+  }
+  var sx = g.vals.map(function(v){ return E.bin(v, 6); }).join(''), used = 6 * (n + 1);
+  for (k = 0; k < 24; k++){
+    var cut2 = (k % 6 === 0 && k > 0) ? ' gs' : '';
+    if (k < 8 * n) h += '<span class="bt y' + Math.floor(k / 8) + cut2 + '">' + sx.charAt(k) + '</span>';
+    else if (k < used) h += '<span class="bt pz' + (sx.charAt(k) === '1' ? ' bad' : '') + cut2 + '">' + sx.charAt(k) + '</span>';
+    else h += '<span class="bt no' + cut2 + '"></span>';
+  }
+  for (s = 0; s < 4; s++){
+    if (s <= n) h += '<span class="lb" style="grid-column:span 6"><b>' + g.vals[s] + '</b> → <b class="c-b">' + esc(E.B64.charAt(g.vals[s])) + '</b></span>';
+    else h += '<span class="lb eqc" style="grid-column:span 6">=</span>';
+  }
+  return h + '</div>';
+}
+each(document.querySelectorAll('.b64fig'), function(el){
+  var g = E.b64Groups(E.fromhex(el.getAttribute('data-hex')).bytes)[0];
+  el.innerHTML = '<p class="b64t">' + esc(el.getAttribute('data-t')) + '</p>' + b64Grid(g);
+});
+(function(){
+  var el = $('alpha'); if (!el) return;
+  var h = '';
+  for (var v = 0; v < 64; v++){
+    var cls = v < 26 ? 'u' : (v < 52 ? 'l' : (v < 62 ? 'd' : 's'));
+    h += '<span class="' + cls + '"><b>' + esc(E.B64.charAt(v)) + '</b><i>' + v + '</i></span>';
+  }
+  el.innerHTML = h;
+})();
+
+/* ---------- la table ASCII ---------- */
+(function(){
+  var root = $('ascii'); if (!root) return;
+  var showCtl = false, sel = 65;
+  root.innerHTML = '<p class="lbl">La table ASCII</p>'
+    + '<div class="row"><label class="chk"><input type="checkbox" id="asc-ctl"> afficher les caractères de contrôle (colonnes 0 et 1)</label></div>'
+    + '<div class="asc-w"><table class="asc" id="asc-t"></table></div>'
+    + '<div class="legend"><span><i style="background:var(--soft-g)"></i>chiffres</span><span><i style="background:var(--soft-b)"></i>majuscules</span><span><i style="background:var(--soft-a)"></i>minuscules</span><span><i style="background:var(--card)"></i>ponctuation et symboles</span><span><i style="background:var(--paper);border-style:dashed"></i>contrôle</span></div>'
+    + '<div class="asc-d" id="asc-d" aria-live="polite"></div>';
+  var tab = $('asc-t'), det = $('asc-d');
+  var CTRLFR = {0:'l\'octet nul. En C, il marque la fin d\'une chaîne de caractères (section 3.5).', 7:'la sonnerie (bell) : le terminal émet un bip.', 8:'le retour arrière (backspace).', 9:'la tabulation horizontale, \\t.', 10:'le saut de ligne (line feed), \\n : la fin de ligne sous Linux.', 13:'le retour chariot (carriage return), \\r : Windows termine ses lignes par \\r\\n.', 27:'l\'échappement (escape) : il commence les séquences qui colorent ton terminal.', 127:'l\'effacement (delete). Sur un ruban perforé, les sept trous percés : tous les bits à 1.'};
+  var PUN = {'{':'L\'accolade ouvrante : les flags de CryptoHack ont la forme crypto{…}.', '}':'L\'accolade fermante : les flags de CryptoHack ont la forme crypto{…}.', '+':'Un des deux symboles de l\'alphabet Base64, de valeur 62 (section 4.3).', '/':'Un des deux symboles de l\'alphabet Base64, de valeur 63 (section 4.3).', '=':'Le caractère de remplissage du Base64 (section 4.5).', '\\':'L\'antislash annonce un échappement dans une chaîne Python (\\n, \\x41) : lui-même s\'écrit donc \'\\\\\'.', "'":'L\'apostrophe : dans une chaîne Python délimitée par des apostrophes, il faut l\'échapper, ou délimiter la chaîne par des guillemets.', '-':'Utilisé par la variante base64url à la place de + (section 4.8).', '_':'Utilisé par la variante base64url à la place de / (section 4.8).'};
+  function cat(c){ if (c < 32 || c === 127) return 'ctl'; if (c === 32) return 'sp'; if (c >= 48 && c <= 57) return 'dig'; if (c >= 65 && c <= 90) return 'up'; if (c >= 97 && c <= 122) return 'lo'; return 'pun'; }
+  function face(c){ if (c < 32) return CTRL[c]; if (c === 127) return 'DEL'; if (c === 32) return 'SP'; return esc(String.fromCharCode(c)); }
+  function pyChr(c){ if (c === 9) return "'\\t'"; if (c === 10) return "'\\n'"; if (c === 13) return "'\\r'"; if (c < 32 || c === 127) return "'\\x" + E.h2(c) + "'"; if (c === 39) return '"\'"'; if (c === 92) return "'\\\\'"; return "'" + String.fromCharCode(c) + "'"; }
+  function bits7(c, hl){ var s = E.bin(c, 7), out = ''; for (var i = 0; i < 7; i++){ if (i === 3) out += ' '; out += i === hl ? '<span class="bh">' + s.charAt(i) + '</span>' : s.charAt(i); } return '<span class="bits">' + out + '</span>'; }
+  function rang(n){ return n === 1 ? '1<sup>re</sup>' : n + '<sup>e</sup>'; }
+  function render(){
+    var cols = showCtl ? [0, 1, 2, 3, 4, 5, 6, 7] : [2, 3, 4, 5, 6, 7];
+    var h = '<tr><th></th>' + cols.map(function(c){ return '<th scope="col">' + c + '</th>'; }).join('') + '</tr>';
+    for (var r = 0; r < 16; r++){
+      h += '<tr><th scope="row">' + E.HX.charAt(r) + '</th>';
+      cols.forEach(function(col){
+        var c = col * 16 + r;
+        h += '<td><button type="button" class="ak ' + cat(c) + '" data-c="' + c + '" aria-pressed="' + (c === sel) + '" aria-label="code ' + c + ', ' + esc(asciiName(c)) + '">' + face(c) + '</button></td>';
+      });
+      h += '</tr>';
+    }
+    tab.innerHTML = h;
+    each(tab.querySelectorAll('.ak'), function(b){
+      b.addEventListener('click', function(){
+        sel = +b.getAttribute('data-c'); render(); detail();
+        var again = tab.querySelector('[data-c="' + sel + '"]'); if (again) again.focus({preventScroll:true});
+      });
+    });
+  }
+  function detail(){
+    var c = sel, k = cat(c), letter = (k === 'up' || k === 'lo'), py = esc(pyChr(c)), t;
+    var big = k === 'ctl' ? face(c) : (c === 32 ? '␣' : esc(String.fromCharCode(c)));
+    var h = '<div class="asc-big' + (k === 'ctl' ? ' sm' : '') + '">' + big + '</div><div>';
+    h += '<p><b>code ' + c + '</b> = 0x' + E.h2(c) + ' = ' + bits7(c, letter ? 1 : -1) + '</p>';
+    h += '<p class="note">colonne ' + (c >> 4) + ', ligne ' + E.HX.charAt(c & 15) + ' : les deux chiffres hexadécimaux du code</p>';
+    h += '<p>Python : <code>chr(' + c + ')</code> donne <code>' + py + '</code>' + (k !== 'ctl' ? ' et <code>ord(' + py + ')</code> donne ' + c : '') + '.</p>';
+    if (k === 'dig') t = 'Un chiffre : sa valeur, ' + (c - 48) + ', est le chiffre hexadécimal de droite du code. D\'où ord(' + py + ') − ord(\'0\') = ' + c + ' − 48 = ' + (c - 48) + '.';
+    else if (k === 'up') t = 'Une majuscule, la ' + rang(c & 31) + ' lettre de l\'alphabet (' + c + ' &amp; 0x1f = ' + (c & 31) + '). Sa minuscule, \'' + String.fromCharCode(c + 32) + '\', vaut ' + (c + 32) + ' = 0x' + E.h2(c + 32) + ' : seul le bit souligné change, celui de poids 32.';
+    else if (k === 'lo') t = 'Une minuscule, la ' + rang(c & 31) + ' lettre de l\'alphabet (' + c + ' &amp; 0x1f = ' + (c & 31) + '). Sa majuscule, \'' + String.fromCharCode(c - 32) + '\', vaut ' + (c - 32) + ' = 0x' + E.h2(c - 32) + ' : seul le bit souligné change, celui de poids 32.';
+    else if (k === 'sp') t = 'L\'espace, le premier caractère imprimable. Son code, 0x20, est aussi le bit de la casse : \'a\' = \'A\' + 0x20.';
+    else if (k === 'ctl') t = 'Un caractère de contrôle' + (CTRLFR[c] ? ' : ' + esc(CTRLFR[c]) : ' : il commandait le téléscripteur, et ne s\'affiche pas.');
+    else t = PUN[String.fromCharCode(c)] ? esc(PUN[String.fromCharCode(c)]) : 'Un signe de ponctuation ou un symbole.';
+    det.innerHTML = h + '<p>' + t + '</p></div>';
+  }
+  $('asc-ctl').addEventListener('change', function(){ showCtl = this.checked; if (!showCtl && sel < 32) sel = 65; render(); detail(); });
+  render(); detail();
+})();
+
+/* ---------- le traducteur d'octets ---------- */
+(function(){
+  var root = $('trad'); if (!root) return;
+  var mode = 'txt';
+  var EX = {txt:'Clé AES', hex:'3925841d02dc09fbdc118597196a0b32', list:'[72, 105, 33]'};
+  var LB = {txt:'texte (encodé en UTF-8)', hex:'chaîne hexadécimale', list:'liste d\'entiers de 0 à 255'};
+  root.innerHTML = '<p class="lbl">Le traducteur d\'octets</p>'
+    + '<div class="row"><span class="seg" id="tr-m" role="group" aria-label="Ce que tu tapes"><button type="button" data-m="txt" aria-pressed="true">texte</button><button type="button" data-m="hex" aria-pressed="false">hexadécimal</button><button type="button" data-m="list" aria-pressed="false">liste d\'entiers</button></span></div>'
+    + '<div class="row"><label class="fld" style="flex:1 1 260px"><span id="tr-l">' + LB.txt + '</span><input id="tr-in" type="text" value="' + esc(EX.txt) + '" autocomplete="off" spellcheck="false"></label></div>'
+    + '<div class="out" id="tr-out" aria-live="polite"></div>';
+  var inp = $('tr-in'), out = $('tr-out');
+  function run(){
+    var raw = inp.value, r = mode === 'txt' ? {bytes:E.utf8(raw)} : (mode === 'hex' ? E.fromhex(raw) : E.parseList(raw));
+    if (r.err){ out.innerHTML = errHTML(r); return; }
+    var b = r.bytes, h = '';
+    if (E.bytesFlag(b) && !E.flagLike(raw)){ out.innerHTML = guardHTML(); return; }
+    if (!b.length){ out.innerHTML = '<div class="msg info">Rien à traduire : tape quelque chose.</div>'; return; }
+    if (mode === 'txt'){
+      var chars = Array.from(raw);
+      h += '<p class="grpt">les caractères, et leurs octets en UTF-8</p><div class="tw"><table class="c tight bt"><tr><th>caractère</th><th>point de code</th><th>octets UTF-8</th></tr>';
+      chars.slice(0, 24).forEach(function(ch){
+        var cp = ch.codePointAt(0), u = E.utf8(ch);
+        h += '<tr><td>' + (cp <= 32 || cp === 127 ? asciiName(cp) : esc(ch)) + '</td><td>' + cp + ' = U+' + cp.toString(16).toUpperCase().padStart(4, '0') + '</td><td class="bits">' + E.hexOf(u, ' ') + (u.length > 1 ? ' <span class="note">(' + u.length + ' octets)</span>' : '') + '</td></tr>';
+      });
+      if (chars.length > 24) h += '<tr><td colspan="3">… et ' + plural(chars.length - 24, 'autre caractère') + '</td></tr>';
+      h += '</table></div>';
+    }
+    h += '<p class="grpt">les octets</p><div class="tw"><table class="c tight bt"><tr><th>n°</th><th>décimal</th><th>hexa</th><th>binaire</th><th>lecture ASCII</th></tr>';
+    b.slice(0, 48).forEach(function(x, i){
+      h += '<tr><td>' + i + '</td><td>' + x + '</td><td class="bits">' + E.h2(x) + '</td><td class="bits">' + grp4(E.bin(x, 8)) + '</td><td class="r">' + esc(asciiName(x)) + '</td></tr>';
+    });
+    if (b.length > 48) h += '<tr><td colspan="5">… et ' + plural(b.length - 48, 'autre octet') + '</td></tr>';
+    h += '</table></div>';
+    var pr = b.filter(function(x){ return x >= 32 && x < 127; }).length;
+    h += '<div class="cv-grid"><b>longueur</b><span>' + plural(b.length, 'octet') + '</span>'
+      + '<b>hexadécimal</b><span>' + E.hexOf(b) + '</span>'
+      + '<b>Python</b><span>' + esc(E.pyBytes(b)) + '</span>'
+      + '<b>liste</b><span>[' + b.join(', ') + ']</span>'
+      + '<b>.decode()</b><span>' + decodeCell(b) + '</span>'
+      + '<b>imprimables</b><span>' + pr + ' sur ' + b.length + '</span></div>';
+    out.innerHTML = h;
+  }
+  inp.addEventListener('input', run);
+  each($('tr-m').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ mode = btn.getAttribute('data-m'); seg('tr-m', 'data-m', mode); $('tr-l').textContent = LB[mode]; inp.value = EX[mode]; run(); });
+  });
+  run();
+})();
+
+/* ---------- la machine Base64 ---------- */
+(function(){
+  var root = $('b64lab'); if (!root) return;
+  var dir = 'enc', imode = 'txt';
+  root.innerHTML = '<p class="lbl">La machine Base64</p>'
+    + '<div class="row"><span class="seg" id="b6-d" role="group" aria-label="Sens"><button type="button" data-d="enc" aria-pressed="true">encoder</button><button type="button" data-d="dec" aria-pressed="false">décoder</button></span>'
+    + '<span class="seg" id="b6-m" role="group" aria-label="Format de la donnée à encoder"><button type="button" data-m="txt" aria-pressed="true">texte</button><button type="button" data-m="hex" aria-pressed="false">hexadécimal</button></span></div>'
+    + '<div class="row"><label class="fld" style="flex:1 1 260px"><span id="b6-l"></span><input id="b6-in" type="text" value="Hello" autocomplete="off" spellcheck="false"></label></div>'
+    + '<div class="out" id="b6-out" aria-live="polite"></div>';
+  var inp = $('b6-in'), out = $('b6-out');
+  function ui(){
+    $('b6-l').textContent = dir === 'dec' ? 'texte Base64 à décoder' : (imode === 'hex' ? 'octets à encoder, en hexadécimal' : 'texte à encoder (en UTF-8)');
+    $('b6-m').hidden = dir === 'dec';
+  }
+  function run(){
+    var raw = inp.value, h = '', r, groups, bytes, res = '';
+    if (dir === 'enc'){
+      r = imode === 'hex' ? E.fromhex(raw) : {bytes:E.utf8(raw)};
+      if (r.err){ out.innerHTML = errHTML(r); return; }
+      bytes = r.bytes; res = E.b64enc(bytes);
+      if ((E.flagLike(res) || E.bytesFlag(bytes)) && !E.flagLike(raw)){ out.innerHTML = guardHTML(); return; }
+      if (!bytes.length){ out.innerHTML = '<div class="msg info">Rien à encoder : base64.b64encode(b\'\') donne b\'\'.</div>'; return; }
+      groups = E.b64Groups(bytes);
+    } else {
+      r = E.b64dec(raw);
+      if (r.err){ out.innerHTML = errHTML(r); return; }
+      bytes = r.bytes; groups = r.groups;
+      if (E.bytesFlag(bytes) && !E.flagLike(raw)){ out.innerHTML = guardHTML(); return; }
+      if (!groups.length){ out.innerHTML = '<div class="msg info">Rien à décoder.</div>'; return; }
+    }
+    groups.slice(0, 6).forEach(function(g, i){
+      h += '<div class="b64w"><p class="b64t">groupe ' + (i + 1) + ' sur ' + groups.length + (g.n < 3 ? ' : ' + plural(g.n, 'octet') + ', avec remplissage' : '') + (g.canon === false ? ' <span class="c-r">(bits de remplissage non nuls)</span>' : '') + '</p>' + b64Grid(g) + '</div>';
+    });
+    if (groups.length > 6) h += '<p class="note">… et ' + plural(groups.length - 6, 'autre groupe') + ', calculés de la même façon.</p>';
+    var n = bytes.length;
+    if (dir === 'enc'){
+      h += '<div class="cv-grid"><b>résultat</b><span>' + esc(res) + '</span><b>Python</b><span>base64.b64encode(…) donne b\'' + esc(res) + '\'</span><b>taille</b><span>' + plural(n, 'octet') + ' → 4 × ⌈' + n + '/3⌉ = ' + res.length + ' caractères</span></div>';
+    } else {
+      h += '<div class="cv-grid"><b>octets</b><span>' + E.hexOf(bytes, ' ') + '</span><b>Python</b><span>' + esc(E.pyBytes(bytes)) + '</span><b>.decode()</b><span>' + decodeCell(bytes) + '</span></div>';
+      if (groups.some(function(g){ return g.canon === false; })) h += '<div class="msg meh">Les bits de remplissage en rouge ne sont pas tous nuls. Python décode quand même et les ignore : ce sont les deux Base64 pour les mêmes octets de la section 4.5.</div>';
+    }
+    out.innerHTML = h;
+  }
+  inp.addEventListener('input', run);
+  each($('b6-d').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ dir = btn.getAttribute('data-d'); seg('b6-d', 'data-d', dir); inp.value = dir === 'dec' ? 'SGVsbG8=' : (imode === 'hex' ? '414553' : 'Hello'); ui(); run(); });
+  });
+  each($('b6-m').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ imode = btn.getAttribute('data-m'); seg('b6-m', 'data-m', imode); inp.value = imode === 'hex' ? '414553' : 'Hello'; ui(); run(); });
+  });
+  ui(); run();
+})();
+
+/* ---------- octets et grand entier ---------- */
+(function(){
+  var root = $('biglab'); if (!root) return;
+  var dir = 'b2i', imode = 'txt', order = 'big';
+  root.innerHTML = '<p class="lbl">Octets et grand entier</p>'
+    + '<div class="row"><span class="seg" id="bg-d" role="group" aria-label="Sens"><button type="button" data-d="b2i" aria-pressed="true">octets → entier</button><button type="button" data-d="i2b" aria-pressed="false">entier → octets</button></span>'
+    + '<span class="seg" id="bg-o" role="group" aria-label="Ordre des octets"><button type="button" data-o="big" aria-pressed="true">gros-boutiste</button><button type="button" data-o="little" aria-pressed="false">petit-boutiste</button></span></div>'
+    + '<div class="row"><span class="seg" id="bg-m" role="group" aria-label="Format des octets"><button type="button" data-m="txt" aria-pressed="true">texte</button><button type="button" data-m="hex" aria-pressed="false">hexadécimal</button></span></div>'
+    + '<div class="row"><label class="fld" style="flex:2 1 220px"><span id="bg-l"></span><input id="bg-in" type="text" value="Hi!" autocomplete="off" spellcheck="false"></label>'
+    + '<label class="fld" style="flex:1 1 120px" id="bg-lw" hidden><span>longueur imposée</span><input id="bg-len" type="text" inputmode="numeric" placeholder="minimale" autocomplete="off"></label></div>'
+    + '<div class="out" id="bg-out" aria-live="polite"></div>';
+  var inp = $('bg-in'), lenIn = $('bg-len'), out = $('bg-out');
+  function ORD(){ return "'" + order + "'"; }
+  function ui(){
+    $('bg-m').hidden = dir !== 'b2i';
+    $('bg-lw').hidden = dir !== 'i2b';
+    $('bg-l').textContent = dir === 'i2b' ? 'entier (décimal, ou hexadécimal avec 0x)' : (imode === 'hex' ? 'octets, en hexadécimal' : 'octets, tapés comme du texte (UTF-8)');
+  }
+  function pick(len){ return len <= 14 ? Array.from({length:len}, function(_, i){ return i; }) : [0, 1, 2, 3, 4, 5, -1, len - 4, len - 3, len - 2, len - 1]; }
+  function b2i(){
+    var raw = inp.value, r = imode === 'hex' ? E.fromhex(raw) : {bytes:E.utf8(raw)};
+    if (r.err){ out.innerHTML = errHTML(r); return; }
+    var b = r.bytes;
+    if (E.bytesFlag(b) && !E.flagLike(raw)){ out.innerHTML = guardHTML(); return; }
+    if (!b.length){ out.innerHTML = '<div class="msg info">Aucun octet : int.from_bytes(b\'\', ' + ORD() + ') donne 0.</div>'; return; }
+    var seq = order === 'little' ? b.slice().reverse() : b, v = BigInt(0), K = BigInt(256), rows = [];
+    seq.forEach(function(x){ var prev = v; v = v * K + BigInt(x); rows.push({x:x, prev:prev, v:v}); });
+    var h = '<p class="grpt">méthode de Horner' + (order === 'little' ? ', en lisant les octets de droite à gauche (petit-boutiste)' : '') + ' : valeur = valeur × 256 + octet</p>';
+    h += '<div class="tw"><table class="c tight bt"><tr><th>octet</th><th>calcul</th><th>valeur</th></tr>';
+    pick(rows.length).forEach(function(i){
+      if (i < 0){ h += '<tr><td colspan="3">… ' + plural(rows.length - 10, 'étape') + ' de plus …</td></tr>'; return; }
+      var rw = rows[i];
+      h += '<tr><td>' + rw.x + ' <span class="note">(' + E.h2(rw.x) + ')</span></td><td>' + nb(rw.prev) + ' × 256 + ' + rw.x + '</td><td>' + nb(rw.v) + '</td></tr>';
+    });
+    h += '</table></div>';
+    h += '<div class="cv-grid"><b>entier</b><span>' + nb(v) + '</span><b>en hexadécimal</b><span>0x' + v.toString(16) + '</span><b>taille</b><span>' + (v > BigInt(0) ? v.toString(2).length : 0) + ' bits, ' + plural(b.length, 'octet') + '</span><b>Python</b><span>int.from_bytes(' + esc(E.pyBytes(b)) + ', ' + ORD() + ')</span></div>';
+    if (order === 'big' && b[0] === 0) h += '<div class="msg meh">Le premier octet est nul : il ne change pas le nombre. Au retour, long_to_bytes le perdra (section 5.7).</div>';
+    out.innerHTML = h;
+  }
+  function i2b(){
+    var raw = inp.value, p = E.parseBig(raw);
+    if (p.err){ out.innerHTML = '<div class="msg ko">' + esc(p.err) + '</div>'; return; }
+    var lenRaw = lenIn.value.trim(), len = null;
+    if (lenRaw){
+      if (!/^\d+$/.test(lenRaw) || +lenRaw > 4096){ out.innerHTML = '<div class="msg ko">La longueur imposée doit être un entier entre 0 et 4096.</div>'; return; }
+      len = +lenRaw;
+    }
+    var steps = E.divSteps(p.n), r = E.fromBig(p.n, len, order);
+    if (r.err){ out.innerHTML = errHTML(r); return; }
+    var b = r.bytes, h = '';
+    if (E.bytesFlag(b) && !E.flagLike(raw)){ out.innerHTML = guardHTML(); return; }
+    if (!steps.length) h += '<div class="msg info">0 n\'a aucun chiffre non nul : (0).to_bytes(0, ' + ORD() + ') donne b\'\', alors que long_to_bytes(0) donne b\'\\x00\'.</div>';
+    else {
+      h += '<p class="grpt">divisions successives par 256 : les restes sont les octets</p><div class="tw"><table class="c tight bt"><tr><th>division</th><th>quotient</th><th>reste</th></tr>';
+      pick(steps.length).forEach(function(i){
+        if (i < 0){ h += '<tr><td colspan="3">… ' + plural(steps.length - 10, 'division') + ' de plus …</td></tr>'; return; }
+        var st = steps[i];
+        h += '<tr><td>' + nb(st.n) + ' ÷ 256</td><td>' + nb(st.q) + '</td><td class="rest">' + st.r + ' <span class="note">(' + E.h2(st.r) + ')</span></td></tr>';
+      });
+      h += '</table></div>';
+      h += '<p class="note" style="margin-top:0">' + (order === 'big' ? 'Gros-boutiste : on lit les restes de bas en haut ; le dernier reste est l\'octet de poids fort, il vient en premier.' : 'Petit-boutiste : on lit les restes de haut en bas ; le premier reste, l\'octet de poids faible, vient en premier.') + '</p>';
+    }
+    var extra = len !== null && len > steps.length ? len - steps.length : 0;
+    h += '<div class="cv-grid"><b>octets</b><span>' + (b.length ? E.hexOf(b, ' ') : '(aucun)') + '</span><b>Python</b><span>' + esc(E.pyBytes(b)) + '</span><b>.decode()</b><span>' + decodeCell(b) + '</span><b>longueur</b><span>' + plural(b.length, 'octet') + (extra ? ', dont ' + plural(extra, 'octet nul') + ' ajouté' + (extra > 1 ? 's' : '') : ' : le minimum, (bit_length() + 7) // 8') + '</span></div>';
+    out.innerHTML = h;
+  }
+  function run(){ if (dir === 'b2i') b2i(); else i2b(); }
+  inp.addEventListener('input', run);
+  lenIn.addEventListener('input', run);
+  each($('bg-d').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ dir = btn.getAttribute('data-d'); seg('bg-d', 'data-d', dir); inp.value = dir === 'i2b' ? '4745505' : (imode === 'hex' ? '486921' : 'Hi!'); lenIn.value = ''; ui(); run(); });
+  });
+  each($('bg-o').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ order = btn.getAttribute('data-o'); seg('bg-o', 'data-o', order); run(); });
+  });
+  each($('bg-m').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){ imode = btn.getAttribute('data-m'); seg('bg-m', 'data-m', imode); inp.value = imode === 'hex' ? '486921' : 'Hi!'; ui(); run(); });
+  });
+  ui(); run();
+})();
+
+/* ---------- l'atelier des couches ---------- */
+(function(){
+  var root = $('atelier'); if (!root) return;
+  var OPS = [
+    {id:'encode', label:'.encode()', from:['str'], ex:'x.encode()', f:function(x){ return {t:'bytes', v:E.utf8(x.v)}; }},
+    {id:'decode', label:'.decode()', from:['bytes'], ex:'x.decode()', f:function(x){ var s = E.utf8dec(x.v); return s === null ? {err:'UnicodeDecodeError: \'utf-8\' codec can\'t decode', why:'Ces octets ne sont pas de l\'UTF-8 valide : ce n\'est pas du texte (section 2.5).'} : {t:'str', v:s}; }},
+    {id:'hex', label:'.hex()', from:['bytes'], ex:'x.hex()', f:function(x){ return {t:'str', v:E.hexOf(x.v)}; }},
+    {id:'fromhex', label:'bytes.fromhex()', from:['str'], ex:'bytes.fromhex(x)', f:function(x){ var r = E.fromhex(x.v); return r.err ? r : {t:'bytes', v:r.bytes}; }},
+    {id:'b64e', label:'base64.b64encode()', from:['bytes'], ex:'base64.b64encode(x)', f:function(x){ return {t:'bytes', v:E.utf8(E.b64enc(x.v))}; }},
+    {id:'b64d', label:'base64.b64decode()', from:['str', 'bytes'], ex:'base64.b64decode(x)', f:function(x){ var r = E.b64dec(x.t === 'str' ? x.v : E.latin1(x.v)); return r.err ? {err:'binascii.Error', why:r.err} : {t:'bytes', v:r.bytes}; }},
+    {id:'b2l', label:'bytes_to_long()', from:['bytes'], ex:'bytes_to_long(x)', f:function(x){ return {t:'int', v:E.toBig(x.v, 'big')}; }},
+    {id:'l2b', label:'long_to_bytes()', from:['int'], ex:'long_to_bytes(x)', f:function(x){ var b = E.fromBig(x.v, null, 'big').bytes; return {t:'bytes', v:b.length ? b : [0]}; }},
+    {id:'int', label:'int()', from:['str'], ex:'int(x)', f:function(x){
+      if (/^\s*\d+\s*$/.test(x.v)) return {t:'int', v:BigInt(x.v.trim())};
+      if (/^\s*-\d+\s*$/.test(x.v)) return {err:'(refusé par le laboratoire)', why:'Python accepte un entier négatif, mais les conversions en octets de cette page ne concernent que les entiers positifs ou nuls.'};
+      return {err:'ValueError: invalid literal for int() with base 10: ' + E.pyStr(x.v), why:'int() attend des chiffres décimaux.'};
+    }},
+    {id:'hexn', label:'hex()[2:]', from:['int'], ex:'hex(x)[2:]', f:function(x){ return {t:'str', v:x.v.toString(16)}; }}
+  ];
+  var PRE = [
+    {lab:'Le bon chemin (4.7)', s:'4869', ops:['fromhex', 'b64e', 'decode']},
+    {lab:'Le piège des deux couches (4.7)', s:'4869', ops:['encode', 'b64e', 'decode']},
+    {lab:'Aller-retour par un entier', s:'Hi!', ops:['encode', 'b2l', 'l2b', 'decode']},
+    {lab:'Le piège de hex() (5.7)', s:'2570', ops:['int', 'hexn', 'fromhex']}
+  ];
+  root.innerHTML = '<p class="lbl">L\'atelier des couches</p>'
+    + '<div class="row"><label class="fld" style="flex:1 1 240px">point de départ : un texte (str)<input id="at-in" type="text" value="4869" autocomplete="off" spellcheck="false"></label></div>'
+    + '<div class="presets" id="at-pre">' + PRE.map(function(p, i){ return '<button type="button" data-p="' + i + '">' + esc(p.lab) + '</button>'; }).join('') + '</div>'
+    + '<ol class="ch-h" id="at-h"></ol>'
+    + '<div id="at-msg" aria-live="polite"></div>'
+    + '<p class="grpt" style="margin-top:10px">applique une fonction à la valeur actuelle x</p>'
+    + '<div class="ch-ops" id="at-ops">' + OPS.map(function(o){ return '<button type="button" data-o="' + o.id + '">' + esc(o.label) + '</button>'; }).join('') + '</div>'
+    + '<div class="row"><button type="button" class="btn ghost" id="at-undo">Annuler la dernière étape</button><button type="button" class="btn ghost" id="at-reset">Revenir au départ</button></div>';
+  var start = '4869', chain = [], msg = '';
+  function opById(id){ return OPS.filter(function(o){ return o.id === id; })[0]; }
+  function cur(){ return chain.length ? chain[chain.length - 1].val : {t:'str', v:start}; }
+  function repr(x){ return x.t === 'str' ? E.pyStr(x.v) : (x.t === 'bytes' ? E.pyBytes(x.v) : String(x.v)); }
+  function desc(x){
+    if (x.t === 'bytes') return plural(x.v.length, 'octet');
+    if (x.t === 'str') return plural(Array.from(x.v).length, 'caractère');
+    return (x.v > BigInt(0) ? x.v.toString(2).length : 0) + ' bits';
+  }
+  function spoils(x){ if (E.flagLike(start)) return false; if (x.t === 'str') return E.flagLike(x.v); if (x.t === 'bytes') return E.bytesFlag(x.v); return false; }
+  function line(n, label, x, current){
+    return '<li' + (current ? ' class="ch-cur"' : '') + '><span class="ch-n">' + n + '</span><span><span class="ch-e">' + esc(label) + '</span><br><span class="ch-v">' + esc(repr(x)) + '</span><span class="tp ' + x.t + '">' + x.t + '</span> <span class="note">' + desc(x) + '</span></span></li>';
+  }
+  function render(){
+    var h = line(0, 'départ : x', {t:'str', v:start}, !chain.length);
+    chain.forEach(function(st, i){ h += line(i + 1, 'x = ' + st.op.ex, st.val, i === chain.length - 1); });
+    $('at-h').innerHTML = h;
+    $('at-msg').innerHTML = msg;
+    var t = cur().t;
+    each($('at-ops').querySelectorAll('button'), function(b){
+      var ok = opById(b.getAttribute('data-o')).from.indexOf(t) >= 0;
+      b.disabled = !ok;
+      b.title = ok ? '' : 'Ne s\'applique pas à un ' + t;
+    });
+    $('at-undo').disabled = !chain.length;
+  }
+  function apply(op){
+    var r = op.f(cur());
+    if (r.err){ msg = errHTML(r); render(); return false; }
+    if (spoils(r)){ msg = guardHTML(); render(); return false; }
+    chain.push({op:op, val:r}); msg = ''; render(); return true;
+  }
+  function preset(k){
+    var p = PRE[k];
+    start = p.s; $('at-in').value = p.s; chain = []; msg = '';
+    for (var i = 0; i < p.ops.length; i++){ if (!apply(opById(p.ops[i]))) break; }
+    render();
+  }
+  each($('at-ops').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ apply(opById(b.getAttribute('data-o'))); }); });
+  each($('at-pre').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ preset(+b.getAttribute('data-p')); }); });
+  $('at-in').addEventListener('input', function(){ start = this.value; chain = []; msg = ''; render(); });
+  $('at-undo').addEventListener('click', function(){ chain.pop(); msg = ''; render(); });
+  $('at-reset').addEventListener('click', function(){ chain = []; msg = ''; render(); });
+  preset(0);
+})();
+})();
+</script>
+</body>
+</html>

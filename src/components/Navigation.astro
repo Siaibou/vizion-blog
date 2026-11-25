@@ -1,7 +1,7 @@
 ---
 // Deux entrées : la licence, et tout ce que j'apprends seul.
 // Les articles gardent leurs adresses d'origine (/cybersecurite/..., /informatique/...),
-// d'où la liste des préfixes qui allument « NLP & Inclusive finance » ou « Personnel ».
+// d'où la liste des préfixes qui allument « Embedded cryptography » ou « Personnel ».
 const chemin = Astro.url.pathname;
 const actif = chemin.startsWith('/licence')
     ? 'licence'
@@ -17,7 +17,7 @@ const actif = chemin.startsWith('/licence')
 
         <div class="menu-links">
             <a href="/licence/" aria-current={actif === 'licence' ? 'page' : undefined}>Licence</a>
-            <a href="/autodidacte/" aria-current={actif === 'autodidacte' ? 'page' : undefined}>NLP &amp; Inclusive finance</a>
+            <a href="/autodidacte/" aria-current={actif === 'autodidacte' ? 'page' : undefined}>Embedded cryptography</a>
             <a href="/personnel/" aria-current={actif === 'personnel' ? 'page' : undefined}>Personnel</a>
         </div>
     </div>
