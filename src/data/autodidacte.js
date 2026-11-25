@@ -1,32 +1,20 @@
 // Tout ce que j'apprends en dehors des cours de la licence.
 // Pour publier un nouveau contenu : ajoute une ligne dans « contenus » du groupe concerné.
 
-// Menu « NLP & Inclusive finance ».
+// Menu « Embedded cryptography ».
 export const themes = [
   {
-    id: 'finance',
-    nom: 'Finance',
-    description: "Mon parcours d'apprentissage de la finance, et en particulier de l'inclusion financière.",
+    id: 'cryptographie',
+    nom: 'Cryptographie',
+    description: 'Mes cours et notes de cryptographie, en partant des bases.',
     groupes: [
-      {
-        titre: 'Parcours',
-        contenus: [
-          { titre: 'Finance : le parcours vers l\'inclusion financière', href: '/cours/finance-00-parcours.html' },
-        ],
-      },
       {
         titre: 'Les bases',
         contenus: [
-          { titre: 'Pourcentages et intérêts, depuis le tout début', href: '/cours/finance-f01-pourcentages-et-interets.html' },
+          { titre: 'Les encodages, depuis le tout début', href: '/cours/les-encodages-depuis-le-tout-debut.html', meta: 'Cours interactif' },
         ],
       },
     ],
-  },
-  {
-    id: 'linguistique',
-    nom: 'Linguistique',
-    description: 'Mes notes de linguistique, en lien avec le traitement automatique des langues (NLP).',
-    groupes: [],
   },
   {
     id: 'projets-personnels',
